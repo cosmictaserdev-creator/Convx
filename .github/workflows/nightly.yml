@@ -75,3 +75,31 @@ jobs:
         with:
           name: convx-gms-nightly
           path: app/build/outputs/apk/universalGms/release/*.apk
+
+      - name: Notify Discord
+        if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          PAYLOAD=$(cat <<EOF
+          {
+            "embeds": [{
+              "title": "Convx Nightly Build - $DATE",
+              "description": "A new nightly build is available for testing.",
+              "color": 16776960,
+              "fields": [
+                {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true},
+                {"name": "Commit", "value": "[${SHORT_SHA}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})", "inline": true},
+                {"name": "Download", "value": "[GitHub Actions Artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "inline": false}
+              ],
+              "footer": {"text": "Convx Music - Nightly Build"},
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            }]
+          }
+          EOF
+          )
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
