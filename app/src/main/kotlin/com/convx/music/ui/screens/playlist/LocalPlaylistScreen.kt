@@ -1457,7 +1457,58 @@ fun LocalPlaylistHeader(
                 horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // More Options Button (Left - Circular)
+                // Shuffle Button (Left - Circular)
+                GlassCircleButton(
+                    onClick = {
+                        playerConnection.playQueue(
+                            ListQueue(
+                                title = playlist.playlist.name,
+                                items = songs.shuffled().map { it.song.toMediaItem() },
+                            )
+                        )
+                    },
+                    size = 48.dp,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.shuffle),
+                        contentDescription = stringResource(R.string.shuffle),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+
+                // Play Button (Center - Large Circle)
+                // A playlist's own id never matches a song's albumId (different
+                // id spaces) — that comparison was always false, so this button
+                // never showed "pause" and always restarted the queue on tap.
+                // Membership of the current song in this playlist's own song
+                // list is the same "is this the active context" heuristic
+                // AlbumScreen uses (there, albumId happens to match directly).
+                val isPlayingThisPlaylist = isPlaying && songs.any { it.song.id == mediaMetadata?.id }
+                GlassCircleButton(
+                    onClick = {
+                        if (isPlayingThisPlaylist) {
+                            playerConnection.player.pause()
+                        } else if (songs.any { it.song.id == mediaMetadata?.id }) {
+                            playerConnection.player.play()
+                        } else {
+                            playerConnection.playQueue(
+                                ListQueue(
+                                    title = playlist.playlist.name,
+                                    items = songs.map { it.song.toMediaItem() },
+                                )
+                            )
+                        }
+                    },
+                    size = 72.dp,
+                ) {
+                    AnimatedPlayPauseIcon(
+                        isPlaying = isPlayingThisPlaylist,
+                        size = 32.dp,
+                        modifier = Modifier.offset(x = 2.dp),
+                    )
+                }
+
+                // More Options Button (Right - Circular)
                 GlassCircleButton(
                     onClick = {
                         menuState.show {
@@ -1527,58 +1578,7 @@ fun LocalPlaylistHeader(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.more_vert),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-
-                // Play Button (Center - Large Circle)
-                // A playlist's own id never matches a song's albumId (different
-                // id spaces) — that comparison was always false, so this button
-                // never showed "pause" and always restarted the queue on tap.
-                // Membership of the current song in this playlist's own song
-                // list is the same "is this the active context" heuristic
-                // AlbumScreen uses (there, albumId happens to match directly).
-                val isPlayingThisPlaylist = isPlaying && songs.any { it.song.id == mediaMetadata?.id }
-                GlassCircleButton(
-                    onClick = {
-                        if (isPlayingThisPlaylist) {
-                            playerConnection.player.pause()
-                        } else if (songs.any { it.song.id == mediaMetadata?.id }) {
-                            playerConnection.player.play()
-                        } else {
-                            playerConnection.playQueue(
-                                ListQueue(
-                                    title = playlist.playlist.name,
-                                    items = songs.map { it.song.toMediaItem() },
-                                )
-                            )
-                        }
-                    },
-                    size = 72.dp,
-                ) {
-                    AnimatedPlayPauseIcon(
-                        isPlaying = isPlayingThisPlaylist,
-                        size = 32.dp,
-                        modifier = Modifier.offset(x = 2.dp),
-                    )
-                }
-
-                // Shuffle Button (Right - Circular)
-                GlassCircleButton(
-                    onClick = {
-                        playerConnection.playQueue(
-                            ListQueue(
-                                title = playlist.playlist.name,
-                                items = songs.shuffled().map { it.song.toMediaItem() },
-                            )
-                        )
-                    },
-                    size = 48.dp,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.shuffle),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.more_options),
                         modifier = Modifier.size(20.dp),
                     )
                 }
