@@ -1274,6 +1274,34 @@
     <string name="library_icons_only">Library Icons Only</string>
     <string name="library_icons_only_desc">Show simple icons instead of artwork thumbnails in the library</string>
 
+    <!-- Declarative module host -->
+    <string name="declarative_modules">Declarative Modules</string>
+    <string name="module_host_ready">Module host ready</string>
+    <string name="module_host_not_started">Module host not started</string>
+    <string name="module_host_version">Convx %1$s</string>
+    <string name="module_host_scope">Declarative packages only; no playback or executable code.</string>
+    <string name="module_host_install">Install module</string>
+    <string name="module_host_install_hint">Pick a .smod package file</string>
+    <string name="module_host_installed_modules">Installed modules</string>
+    <string name="module_host_module_state">%1$s · %2$s</string>
+    <string name="module_host_remove">Remove</string>
+    <string name="module_host_remove_confirm_title">Remove module?</string>
+    <string name="module_host_remove_confirm_body">Uninstall %1$s from this device?</string>
+    <string name="module_host_error">Declarative module error</string>
+    <string name="module_host_error_already_installed">This module is already installed. Upgrading an installed module is not available in this build.</string>
+    <string name="module_host_error_invalid_package">This package could not be installed because it failed validation.</string>
+    <string name="module_host_error_install">The module could not be installed.</string>
+    <string name="module_state_discovered">Discovered</string>
+    <string name="module_state_validated">Validated</string>
+    <string name="module_state_staged">Staged</string>
+    <string name="module_state_installed">Installed</string>
+    <string name="module_state_enabled">Enabled</string>
+    <string name="module_state_disabled">Disabled</string>
+    <string name="module_state_invalid">Invalid</string>
+    <string name="module_state_incompatible">Incompatible</string>
+    <string name="module_state_failed">Failed</string>
+    <string name="module_state_rolled_back">Rolled back</string>
+
     <string name="app_font">App Font</string>
     <string name="font_selection">Font Selection</string>
     <string name="font_additional">Additional Fonts</string>

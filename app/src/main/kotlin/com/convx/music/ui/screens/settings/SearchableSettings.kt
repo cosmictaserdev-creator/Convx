@@ -55,6 +55,7 @@ fun getAllSearchableSettings(): List<SearchableSetting> {
         SearchableSetting("YouLyPlus", null, "Content", "settings/content"),
         SearchableSetting("PaxSenix", null, "Content", "settings/content"),
         SearchableSetting(stringResource(R.string.modules), null, "Content", "settings/modules"),
+        SearchableSetting(stringResource(R.string.declarative_modules), null, "Content", com.convx.music.modulehost.DeclarativeModuleHostRoutes.SETTINGS),
         SearchableSetting(stringResource(R.string.ai_lyrics_translation), null, "Content", "settings/ai"),
         SearchableSetting(stringResource(R.string.ai_api_key), null, "AI Lyrics Translation", "settings/ai"),
         SearchableSetting(stringResource(R.string.ai_model), null, "AI Lyrics Translation", "settings/ai"),

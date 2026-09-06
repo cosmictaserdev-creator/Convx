@@ -328,6 +328,7 @@ dependencies {
     implementation(project(":jiosaavn"))
     implementation(project(":spotify"))
     implementation(project(":spine"))
+    implementation(project(":modulehost"))
 
 
     implementation(libs.ktor.client.core)
