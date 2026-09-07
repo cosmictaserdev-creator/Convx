@@ -15,9 +15,21 @@ object YouTubeUrlParser {
 
         data class Video(
             override val id: String,
+            /** True for /shorts/ links — same playable video, vertical presentation. */
+            val isShort: Boolean = false,
         ) : ParsedUrl()
 
         data class Artist(
+            override val id: String,
+        ) : ParsedUrl()
+
+        /** A regular YouTube channel (UC… id or @handle). */
+        data class Channel(
+            override val id: String,
+        ) : ParsedUrl()
+
+        /** A playlist id from ?list=… or /playlist URLs (OLAK5uy_ music albums keep their own flow). */
+        data class Playlist(
             override val id: String,
         ) : ParsedUrl()
     }
@@ -27,10 +39,11 @@ object YouTubeUrlParser {
      */
     private val VIDEO_URL_PATTERNS =
         listOf(
-            Regex("""(?:https?://)?(?:www\.)?(?:music\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.|m\.)?(?:music\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?(?:www\.)?(?:music\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?youtu\.be/([a-zA-Z0-9_-]{11})"""),
-            Regex("""(?:https?://)?(?:www\.)?youtube\.com/shorts/([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.|m\.)?youtube\.com/shorts/([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.)?youtube\.com/(?:v|embed|live)/([a-zA-Z0-9_-]{11})"""),
         )
 
     /**
@@ -42,10 +55,31 @@ object YouTubeUrlParser {
             Regex("""(?:https?://)?(?:www\.)?music\.youtube\.com/browse/(MPRE[a-zA-Z0-9_-]+)"""),
         )
 
+    /** Regular YouTube channel URLs: /channel/UC…, /@handle, /c/name, /user/name. */
+    private val CHANNEL_URL_PATTERNS =
+        listOf(
+            Regex("""(?:https?://)?(?:www\.|m\.)?youtube\.com/channel/([a-zA-Z0-9_-]{10,})"""),
+            Regex("""(?:https?://)?(?:www\.|m\.)?youtube\.com/@([a-zA-Z0-9._-]+)"""),
+            Regex("""(?:https?://)?(?:www\.|m\.)?youtube\.com/c/([a-zA-Z0-9._-]+)"""),
+            Regex("""(?:https?://)?(?:www\.|m\.)?youtube\.com/user/([a-zA-Z0-9._-]+)"""),
+        )
+
+    /** Playlist URLs — the plain ?list=… form is handled separately (it rides along with watch links). */
+    private val PLAYLIST_URL_PATTERNS =
+        listOf(
+            Regex("""(?:https?://)?(?:www\.|m\.)?youtube\.com/playlist\?.*list=([a-zA-Z0-9_-]+)"""),
+        )
+
     /**
      * Checks if the given text is a YouTube URL.
      */
-    fun isYouTubeUrl(text: String): Boolean = parse(text) != null
+    fun isYouTubeUrl(text: String): Boolean = parse(text) != null || parsePlaylistId(text) != null
+
+    /**
+     * Extracts a bare playlist id from any URL that carries ?list=….
+     */
+    fun parsePlaylistId(url: String): String? =
+        Regex("""[?&]list=([a-zA-Z0-9_-]+)""").find(url.trim())?.groupValues?.getOrNull(1)
 
     /**
      * Parses a YouTube URL and returns the parsed result.
@@ -55,14 +89,15 @@ object YouTubeUrlParser {
      */
     fun parse(url: String): ParsedUrl? {
         val trimmedUrl = url.trim()
-        println("[LINK_PARSE_DEBUG] Parsing URL: $trimmedUrl")
 
         // Check for video URLs
         for (pattern in VIDEO_URL_PATTERNS) {
             pattern.find(trimmedUrl)?.let { matchResult ->
                 matchResult.groupValues.getOrNull(1)?.let { videoId ->
-                    println("[LINK_PARSE_DEBUG] Detected Video ID: $videoId")
-                    return ParsedUrl.Video(videoId)
+                    return ParsedUrl.Video(
+                        id = videoId,
+                        isShort = trimmedUrl.contains("/shorts/"),
+                    )
                 }
             }
         }
@@ -72,14 +107,37 @@ object YouTubeUrlParser {
             for (pattern in ARTIST_URL_PATTERNS) {
                 pattern.find(trimmedUrl)?.let { matchResult ->
                     matchResult.groupValues.getOrNull(1)?.let { artistId ->
-                        println("[LINK_PARSE_DEBUG] Detected Artist ID: $artistId")
                         return ParsedUrl.Artist(artistId)
                     }
                 }
             }
+            return null
         }
 
-        println("[LINK_PARSE_DEBUG] No match found or type restricted")
+        // Regular YouTube: channel and playlist URLs.
+        for (pattern in CHANNEL_URL_PATTERNS) {
+            pattern.find(trimmedUrl)?.let { matchResult ->
+                matchResult.groupValues.getOrNull(1)?.let { channelId ->
+                    val id = if (matchResult.value.contains("/@") || matchResult.value.contains("/c/") ||
+                        matchResult.value.contains("/user/")
+                    ) {
+                        "@$channelId"
+                    } else {
+                        channelId
+                    }
+                    return ParsedUrl.Channel(id)
+                }
+            }
+        }
+
+        for (pattern in PLAYLIST_URL_PATTERNS) {
+            pattern.find(trimmedUrl)?.let { matchResult ->
+                matchResult.groupValues.getOrNull(1)?.let { playlistId ->
+                    return ParsedUrl.Playlist(playlistId)
+                }
+            }
+        }
+
         return null
     }
 

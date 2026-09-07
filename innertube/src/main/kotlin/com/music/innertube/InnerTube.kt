@@ -176,6 +176,19 @@ class InnerTube {
         }
     }
 
+    /**
+     * Session-consistent visitor data for a client. A visitor id minted for the
+     * logged-in session is only valid when the request also carries the account
+     * credentials: clients that never send the cookie (ANDROID_VR, IOS, …) must
+     * present an anonymous identity. Sending the account visitor without its
+     * cookie is a mismatched session and YouTube answers it with bot gates or
+     * empty streaming data — exactly the "works logged out, breaks after
+     * login" signature on regular videos. Login-capable clients (WEB_REMIX,
+     * TVHTML5, …) are unaffected and keep the account visitor.
+     */
+    private fun sessionVisitorData(client: YouTubeClient): String? =
+        visitorData?.takeIf { cookie == null || client.loginSupported }
+
     private fun HttpRequestBuilder.ytClient(client: YouTubeClient, setLogin: Boolean = false) {
         contentType(ContentType.Application.Json)
         headers {
@@ -184,7 +197,7 @@ class InnerTube {
             append("X-YouTube-Client-Version", client.clientVersion)
             append("X-Origin", YouTubeClient.ORIGIN_YOUTUBE_MUSIC)
             append("Referer", YouTubeClient.REFERER_YOUTUBE_MUSIC)
-            visitorData?.let { append("X-Goog-Visitor-Id", it) }
+            sessionVisitorData(client)?.let { append("X-Goog-Visitor-Id", it) }
             if (setLogin && client.loginSupported) {
                 cookie?.let { cookie ->
                     append("cookie", cookie)
@@ -248,7 +261,7 @@ class InnerTube {
                 SearchBody(
                     context = client.toContext(
                         locale,
-                        visitorData,
+                        sessionVisitorData(client),
                         if (useLoginForBrowse) dataSyncId else null
                     ),
                     query = query,
@@ -271,7 +284,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 PlayerBody(
-                    context = client.toContext(locale, visitorData, dataSyncId).let {
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId).let {
                         if (client.isEmbedded) {
                             it.copy(
                                 thirdParty = Context.ThirdParty(
@@ -329,7 +342,7 @@ class InnerTube {
                 BrowseBody(
                     context = client.toContext(
                         locale,
-                        visitorData,
+                        sessionVisitorData(client),
                         if (setLogin || useLoginForBrowse) dataSyncId else null
                     ),
                     browseId = browseId,
@@ -353,7 +366,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 NextBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     videoId = videoId,
                     playlistId = playlistId,
                     playlistSetVideoId = playlistSetVideoId,
@@ -373,7 +386,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 FeedbackBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     feedbackTokens = tokens
                 )
             )
@@ -388,7 +401,7 @@ class InnerTube {
             ytClient(client)
             setBody(
                 GetSearchSuggestionsBody(
-                    context = client.toContext(locale, visitorData, null),
+                    context = client.toContext(locale, sessionVisitorData(client), null),
                     input = input
                 )
             )
@@ -404,7 +417,7 @@ class InnerTube {
             ytClient(client)
             setBody(
                 GetQueueBody(
-                    context = client.toContext(locale, visitorData, null),
+                    context = client.toContext(locale, sessionVisitorData(client), null),
                     videoIds = videoIds,
                     playlistId = playlistId
                 )
@@ -437,7 +450,7 @@ class InnerTube {
     suspend fun accountMenu(client: YouTubeClient) = withRetry {
         httpClient.post("account/account_menu") {
             ytClient(client, setLogin = true)
-            setBody(AccountMenuBody(client.toContext(locale, visitorData, dataSyncId)))
+            setBody(AccountMenuBody(client.toContext(locale, sessionVisitorData(client), dataSyncId)))
         }
     }
 
@@ -463,7 +476,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 LikeBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     target = LikeBody.Target.VideoTarget(videoId)
                 )
             )
@@ -478,7 +491,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 LikeBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     target = LikeBody.Target.VideoTarget(videoId)
                 )
             )
@@ -493,7 +506,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 SubscribeBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     channelIds = listOf(channelId)
                 )
             )
@@ -508,7 +521,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 SubscribeBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     channelIds = listOf(channelId)
                 )
             )
@@ -523,7 +536,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 LikeBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     target = LikeBody.Target.PlaylistTarget(playlistId)
                 )
             )
@@ -538,7 +551,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 LikeBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     target = LikeBody.Target.PlaylistTarget(playlistId)
                 )
             )
@@ -555,7 +568,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId.removePrefix("VL"),
                     actions = listOf(
                         Action.AddVideoAction(addedVideoId = videoId)
@@ -574,7 +587,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId.removePrefix("VL"),
                     actions = listOf(
                         Action.AddPlaylistAction(addedFullListId = addPlaylistId)
@@ -594,7 +607,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId.removePrefix("VL"),
                     actions = listOf(
                         Action.RemoveVideoAction(
@@ -617,7 +630,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId,
                     actions = listOf(
                         Action.MoveVideoAction(
@@ -639,7 +652,7 @@ class InnerTube {
             ytClient(client, true)
             setBody(
                 CreatePlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     title = title
                 )
             )
@@ -656,7 +669,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId,
                     actions = listOf(
                         Action.RenamePlaylistAction(
@@ -708,7 +721,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId,
                     actions = listOf(
                         Action.SetCustomThumbnailAction(
@@ -730,7 +743,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 EditPlaylistBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId,
                     actions = listOf(
                         Action.RemoveCustomThumbnailAction()
@@ -750,7 +763,7 @@ class InnerTube {
             ytClient(client, setLogin = true)
             setBody(
                 PlaylistDeleteBody(
-                    context = client.toContext(locale, visitorData, dataSyncId),
+                    context = client.toContext(locale, sessionVisitorData(client), dataSyncId),
                     playlistId = playlistId
                 )
             )

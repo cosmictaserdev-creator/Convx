@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Convxy monogram: the brand "C" ring with the five-bar waveform resting in
+     its hollow (matches app_icons/Convxy.png). Kept as @drawable/convxy_logo so
+     every existing reference (About, settings, wrapped, player) picks up the
+     new mark. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="@android:color/white">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M 19.66,18.43 A 10,10 0 1 1 19.66,5.57 L 16.21,8.46 A 5.5,5.5 0 1 0 16.21,15.54 Z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M 8,10.8 A 0.8,0.8 0 0 1 9.6,10.8 L 9.6,13.2 A 0.8,0.8 0 0 1 8,13.2 Z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M 9.6,9.3 A 0.8,0.8 0 0 1 11.2,9.3 L 11.2,14.7 A 0.8,0.8 0 0 1 9.6,14.7 Z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M 11.2,7.8 A 0.8,0.8 0 0 1 12.8,7.8 L 12.8,16.2 A 0.8,0.8 0 0 1 11.2,16.2 Z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M 12.8,9.3 A 0.8,0.8 0 0 1 14.4,9.3 L 14.4,14.7 A 0.8,0.8 0 0 1 12.8,14.7 Z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M 14.4,10.8 A 0.8,0.8 0 0 1 16,10.8 L 16,13.2 A 0.8,0.8 0 0 1 14.4,13.2 Z" />
+</vector>

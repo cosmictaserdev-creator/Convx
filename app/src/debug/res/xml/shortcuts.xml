@@ -6,9 +6,9 @@
         android:shortcutId="search"
         android:shortcutShortLabel="@string/search">
         <intent
-            android:action="com.convx.music.action.SEARCH"
-            android:targetClass="com.convx.music.MainActivity"
-            android:targetPackage="com.convx.music.debug" />
+            android:action="com.convxy.music.action.SEARCH"
+            android:targetClass="com.convxy.music.MainActivity"
+            android:targetPackage="com.convxy.music.debug" />
     </shortcut>
     <shortcut
         android:enabled="true"
@@ -16,8 +16,8 @@
         android:shortcutId="library"
         android:shortcutShortLabel="@string/filter_library">
         <intent
-            android:action="com.convx.music.action.LIBRARY"
-            android:targetClass="com.convx.music.MainActivity"
-            android:targetPackage="com.convx.music.debug" />
+            android:action="com.convxy.music.action.LIBRARY"
+            android:targetClass="com.convxy.music.MainActivity"
+            android:targetPackage="com.convxy.music.debug" />
     </shortcut>
 </shortcuts>

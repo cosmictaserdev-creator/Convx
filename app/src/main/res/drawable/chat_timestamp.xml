@@ -1,0 +1,18 @@
+<!-- Timestamped comments: the app's existing `chat` outline (Material Symbols, same 960 viewport as
+     chat_msg.xml) with a clock face set inside the bubble. Drawn as one even-odd path — outer circle,
+     inner circle, then the two hands — so the ring and the hands both fill while the space between
+     them stays hollow, matching the weight of the bubble outline around it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960"
+    android:tint="?attr/colorControlNormal">
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M80,880L80,160Q80,127 103.5,103.5Q127,80 160,80L800,80Q833,80 856.5,103.5Q880,127 880,160L880,640Q880,673 856.5,696.5Q833,720 800,720L240,720L80,880ZM206,640L800,640Q800,640 800,640Q800,640 800,640L800,160Q800,160 800,160Q800,160 800,160L160,160Q160,160 160,160Q160,160 160,160L160,685L206,640ZM160,640L160,640L160,160Q160,160 160,160Q160,160 160,160L160,160Q160,160 160,160Q160,160 160,160L160,160Q160,160 160,160Q160,160 160,160L160,640Q160,640 160,640Q160,640 160,640Z"/>
+  <path
+      android:fillColor="@android:color/white"
+      android:fillType="evenOdd"
+      android:pathData="M480,230C573.9,230 650,306.1 650,400C650,493.9 573.9,570 480,570C386.1,570 310,493.9 310,400C310,306.1 386.1,230 480,230ZM480,268C407.1,268 348,327.1 348,400C348,472.9 407.1,532 480,532C552.9,532 612,472.9 612,400C612,327.1 552.9,268 480,268ZM463,296L497,296L497,383L578,383L578,417L463,417Z"/>
+</vector>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Black-square placeholder for songs with no artwork: Convx monogram centered
+<!-- Black-square placeholder for songs with no artwork: Convxy monogram centered
      over a solid black fill. Used as Coil's placeholder/error for song thumbnails. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"

@@ -10,7 +10,7 @@
     android:targetCellWidth="3"
     android:targetCellHeight="3"
     android:updatePeriodMillis="0"
-    android:configure="com.convx.music.widget.WidgetConfigActivity"
+    android:configure="com.convxy.music.widget.WidgetConfigActivity"
     android:widgetFeatures="reconfigurable|configuration_optional"
     android:previewLayout="@layout/widget_lyrics"
     android:initialLayout="@layout/widget_lyrics"

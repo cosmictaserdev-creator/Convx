@@ -245,4 +245,17 @@ eval "set -- $(
         tr '\n' ' '
     )" '"$@"'
 
+# On GitHub Actions, capture Gradle stdout so compiler errors can be re-emitted
+# as workflow annotations. CI log blobs are not always retrievable.
+if [ -n "$GITHUB_ACTIONS" ]; then
+    log="$APP_HOME/gradle-ci.log"
+    "$JAVACMD" "$@" >"$log" 2>&1
+    status=$?
+    cat "$log"
+    if [ "$status" -ne 0 ] && [ -f "$APP_HOME/scripts/ci_report_gradle_failure.py" ]; then
+        python3 "$APP_HOME/scripts/ci_report_gradle_failure.py" "$log" || true
+    fi
+    exit "$status"
+fi
+
 exec "$JAVACMD" "$@"

@@ -57,7 +57,7 @@
     <string name="excluded_folders">Excluded folders</string>
     <string name="excluded_folders_desc">Choose which on-device folders local-only mode scans</string>
     <string name="excluded_folders_empty">No folders with music found yet. Tap Scan device to look again.</string>
-    <string name="excluded_folders_permission">Convx needs permission to read audio on this device before it can list your folders.</string>
+    <string name="excluded_folders_permission">Convxy needs permission to read audio on this device before it can list your folders.</string>
     <string name="excluded_folders_custom">Excluded by hand</string>
     <string name="exclude_folder_add">Add folder</string>
     <string name="excluded_folders_song_count">%1$d songs</string>
@@ -136,13 +136,13 @@
     <string name="vivimusic_canvas_desc">Replaces the static album artwork in the player with a looping animated video when one is available for the current song</string>
     <string name="canvas_source">Canvas source</string>
     <string name="canvas_source_auto">Auto</string>
-    <string name="canvas_source_auto_desc">Tries Echo Music first, then falls back to Apple Music, Convx, and Tidal. Picks the best match for the current song automatically</string>
+    <string name="canvas_source_auto_desc">Tries Echo Music first, then falls back to Apple Music, Convxy, and Tidal. Picks the best match for the current song automatically</string>
     <string name="canvas_source_echo_music">Echo Music</string>
     <string name="canvas_source_echo_music_desc">Uses the community-run Echo Music canvas database exclusively. Only shows a canvas if one has been contributed for the playing song</string>
     <string name="canvas_source_apple_music">Apple Music</string>
     <string name="canvas_source_apple_music_desc">Uses Apple Music&#8217;s animated visuals exclusively. Only shows a canvas if Apple Music has one for the playing song</string>
-    <string name="canvas_source_vivimusic">Convx</string>
-    <string name="canvas_source_vivimusic_desc">Uses the Convx curated canvas library exclusively. Only shows a canvas if one has been added for the playing song</string>
+    <string name="canvas_source_vivimusic">Convxy</string>
+    <string name="canvas_source_vivimusic_desc">Uses the Convxy curated canvas library exclusively. Only shows a canvas if one has been added for the playing song</string>
     <string name="canvas_source_tidal">Tidal</string>
     <string name="canvas_source_tidal_desc">Uses Tidal&#8217;s animated visuals exclusively. Only shows a canvas if Tidal has one for the playing song</string>
     <string name="show_album_canvas">Show Album Canvas</string>
@@ -231,8 +231,9 @@
     <string name="auto_scroll">Re-sync</string>
     <string name="slim">Slim</string>
     <string name="waveform">Waveform</string>
+    <string name="slider_style_liquid">Liquid glass</string>
     <string name="brand_font">Display font</string>
-    <string name="brand_font_desc">Use Chillax for the CONVX wordmark and the artist page title</string>
+    <string name="brand_font_desc">Use Chillax for the Convxy wordmark and the artist page title</string>
     <string name="custom_font">Custom font</string>
     <string name="custom_font_none">Tap to install a .ttf or .otf font, applied app-wide</string>
     <string name="custom_font_set">Custom font installed — tap to replace</string>
@@ -453,7 +454,7 @@
     <string name="enable_scrobbling">Enable scrobbling</string>
     <string name="lastfm_now_playing">Send Now Playing</string>
     <string name="last_fm_send_likes">Send Likes/Unlikes</string>
-    <string name="last_fm_send_likes_description">Love/Unlove songs in Last.fm when they are Liked/Unliked in Convx</string>
+    <string name="last_fm_send_likes_description">Love/Unlove songs in Last.fm when they are Liked/Unliked in Convxy</string>
     <string name="logging_in">Logging in…</string>
 
     <string name="scrobbling_configuration">Scrobbling Configuration</string>
@@ -484,6 +485,77 @@
 
     <!-- Ambient Mode -->
     <string name="ambient_mode">Ambient Mode</string>
+    <string name="ambient_mode_settings_desc">Customize the visual effects and interactions used in Ambient Mode</string>
+    <string name="ambient_video_canvas">Video Canvas background</string>
+    <string name="ambient_video_canvas_desc">Use the current track\'s animated canvas behind the artwork and lyrics</string>
+    <string name="ambient_canvas_source">Ambient Canvas source</string>
+    <string name="ambient_canvas_blur">Canvas blur</string>
+    <string name="ambient_canvas_blur_desc">Soften the moving background to keep foreground content readable</string>
+    <string name="ambient_canvas_dim">Canvas dim</string>
+    <string name="ambient_canvas_dim_desc">Darken the moving background behind artwork and lyrics</string>
+    <string name="ambient_canvas_blur_value">%1$d dp</string>
+    <string name="ambient_canvas_dim_value">%1$d%%</string>
+    <string name="ambient_lyrics_text_size_desc">Adjust the size of lyrics shown in Ambient Mode</string>
+    <string name="ambient_lyrics_text_size_value">%1$d sp</string>
+    <string name="ambient_display">Display</string>
+    <string name="ambient_progress_ring">Progress ring and ring seeking</string>
+    <string name="ambient_progress_ring_desc">Show live playback progress and allow seeking from the screen edge</string>
+    <string name="ambient_playback_feedback">Playback feedback</string>
+    <string name="ambient_playback_feedback_desc">Briefly show the play or pause state after a tap</string>
+    <string name="ambient_seek_time">Seek time feedback</string>
+    <string name="ambient_seek_time_desc">Show elapsed and total time while seeking on the ring</string>
+    <string name="ambient_seek_haptics">Seek marker haptics</string>
+    <string name="ambient_seek_haptics_desc">Give a subtle haptic cue at useful progress markers</string>
+    <string name="ambient_track_info">Track information lower-third</string>
+    <string name="ambient_track_info_desc">Briefly show the title and artist over the album artwork when the track changes</string>
+    <string name="ambient_interactions">Interactions</string>
+    <string name="ambient_tap_play_pause">Tap to play or pause</string>
+    <string name="ambient_tap_play_pause_desc">Toggle playback when tapping the main Ambient Mode surface</string>
+    <string name="ambient_swipe_navigation">Swipe track navigation</string>
+    <string name="ambient_swipe_navigation_desc">Swipe horizontally to move to the previous or next track</string>
+    <string name="ambient_track_transitions">Track slide transitions</string>
+    <string name="ambient_track_transitions_desc">Animate previous and next tracks in the swipe direction</string>
+    <string name="ambient_auto_hide_back_button">Auto-hide back button</string>
+    <string name="ambient_auto_hide_back_button_desc">Hide the back button after three seconds of inactivity and reveal it on interaction</string>
+    <string name="ambient_canvas_position_fit">Canvas Position &amp; Fit</string>
+    <string name="ambient_canvas_position_fit_desc">Place portrait canvases (3:4, 9:16) inside one side of the 16:9 layout at their full size instead of cropping them to cover the whole screen. Landscape canvases keep the default full-width background.</string>
+    <string name="ambient_canvas_percent_value">%1$d%%</string>
+    <string name="ambient_canvas_anchor_side">Canvas side</string>
+    <string name="ambient_canvas_anchor_auto">Auto</string>
+    <string name="ambient_canvas_anchor_auto_desc">Keep the canvas on the album artwork side, opposite the lyrics</string>
+    <string name="ambient_canvas_anchor_left">Left side</string>
+    <string name="ambient_canvas_anchor_left_desc">Anchor the canvas and its stronger gradient to the left</string>
+    <string name="ambient_canvas_anchor_right">Right side</string>
+    <string name="ambient_canvas_anchor_right_desc">Anchor the canvas and its stronger gradient to the right</string>
+    <string name="ambient_canvas_fit_mode">Canvas fit</string>
+    <string name="ambient_canvas_fit_fit">Fit</string>
+    <string name="ambient_canvas_fit_fit_desc">Show the whole canvas and size the panel to it, so nothing is cropped</string>
+    <string name="ambient_canvas_fit_zoom">Fill side</string>
+    <string name="ambient_canvas_fit_zoom_desc">Zoom the canvas until its side panel is fully covered; the edges are cropped</string>
+    <string name="ambient_canvas_fit_stretch">Stretch</string>
+    <string name="ambient_canvas_fit_stretch_desc">Fill the side panel without keeping the canvas aspect ratio</string>
+    <string name="ambient_canvas_side_width">Side width</string>
+    <string name="ambient_canvas_side_width_desc">How much of the 16:9 layout the canvas panel may claim</string>
+    <string name="ambient_canvas_side_gradient">Canvas-side gradient</string>
+    <string name="ambient_canvas_side_gradient_desc">Strength of the stronger gradient on the side the canvas occupies</string>
+    <string name="ambient_canvas_gradient_spread">Gradient spread</string>
+    <string name="ambient_canvas_gradient_spread_desc">How far the stronger gradient reaches across toward the lyrics</string>
+    <string name="ambient_canvas_far_veil">Lyrics-side gradient</string>
+    <string name="ambient_canvas_far_veil_desc">The lighter gradient left on the opposite side of the layout</string>
+    <string name="ambient_canvas_edge_feather">Edge feather</string>
+    <string name="ambient_canvas_edge_feather_desc">Blend the canvas edge into the ambient glow instead of ending it on a straight line</string>
+    <string name="ambient_canvas_fit_preview">Preview</string>
+    <string name="ambient_canvas_fit_preview_shape">Canvas shape</string>
+    <string name="ambient_canvas_fit_shape_916">9:16</string>
+    <string name="ambient_canvas_fit_shape_34">3:4</string>
+    <string name="ambient_canvas_fit_shape_169">16:9</string>
+    <string name="ambient_canvas_fit_preview_canvas_off">Turn on the Video Canvas background above to see how a canvas sits in the layout</string>
+    <string name="ambient_canvas_fit_preview_off">Position &amp; Fit is off — the canvas covers the whole screen and is cropped to it</string>
+    <string name="ambient_canvas_fit_preview_full_width">Not a portrait canvas, so this keeps the default full-width background</string>
+    <string name="ambient_canvas_fit_preview_panelled">Side panel — %1$d%% of the width, %2$s</string>
+    <string name="ambient_canvas_fit_preview_note_fit">the whole frame is visible</string>
+    <string name="ambient_canvas_fit_preview_note_zoom">cropped to the panel</string>
+    <string name="ambient_canvas_fit_preview_note_stretch">stretched to the panel</string>
 
     <!-- AI Playlist Modify -->
     <string name="modify_with_ai">Modify with AI</string>
@@ -521,7 +593,7 @@
     <string name="karaoke">Karaoke</string>
     <string name="apple_music_style">Apple Music</string>
     <string name="apple_music_style_letter">Apple Music V2 (Letter by Letter)</string>
-    <string name="vivimusic_1">Convx (Fluid)</string>
+    <string name="vivimusic_1">Convxy (Fluid)</string>
     <string name="apple_music_lyrics_blur">Apple Music Lyrics Blur</string>
     <string name="apple_music_lyrics_blur_desc">Apply blur to inactive lyrics lines for a premium focus effect</string>
     <string name="lyrics_v2_fluid">Lyrics V2 (Fluid)</string>
@@ -551,19 +623,19 @@
     <string name="wrapped_total_artists_subtitle">unique artists</string>
     <string name="wrapped_total_songs_title">You listened to</string>
     <string name="wrapped_total_songs_subtitle">unique songs</string>
-    <string name="wrapped_intro_title">Convx</string>
+    <string name="wrapped_intro_title">Convxy</string>
     <string name="wrapped_intro_subtitle">it\'s time to see what you\'ve been listening to</string>
     <string name="wrapped_intro_button">let\'s go!</string>
-    <string name="wrapped_end_thanks">Thanks for listening with Convx!</string>
+    <string name="wrapped_end_thanks">Thanks for listening with Convxy!</string>
     <string name="wrapped_end_create_playlist">Create Your Wrapped Playlist</string>
     <string name="wrapped_end_creating_playlist">Creating...</string>
     <string name="wrapped_end_playlist_saved">Playlist Saved</string>
-    <string name="wrapped_logo_content_description">Convx Logo</string>
+    <string name="wrapped_logo_content_description">Convxy Logo</string>
     <string name="wrapped_year">2025</string>
     <string name="wrapped_ready_title">YOUR WRAPPED IS READY!</string>
     <string name="wrapped_ready_subtitle">Time to see what you loved this year.</string>
     <string name="wrapped_thank_you">Thank you for listening</string>
-    <string name="wrapped_special_thanks">Special thanks to Vividh for creating the app Convx is built on</string>
+    <string name="wrapped_special_thanks">Special thanks to every open-source contributor who helped make Convxy possible</string>
     <string name="wrapped_close">Close wrapped</string>
     <string name="wrapped_playlist_title">Your %s Wrapped</string>
     <string name="wrapped_create_playlist">Create playlist</string>
@@ -639,9 +711,9 @@
     <string name="plays">plays</string>
     <string name="casting_to">Casting to %s</string>
     <string name="progress_percent">Progress %s%%</string>
-    <string name="listening_to_vivimusic">Listening to Convx</string>
+    <string name="listening_to_vivimusic">Listening to Convxy</string>
     <string name="listen_on_youtube_music">Listen on YouTube Music</string>
-    <string name="visit_vivimusic">Visit Convx</string>
+    <string name="visit_vivimusic">Visit Convxy</string>
     <string name="open">Open</string>
     <string name="failed_to_create_image">Failed to create image: %s</string>
     <string name="copied_title">Copied Title</string>
@@ -658,13 +730,13 @@
     <!-- Widget strings -->
     <string name="album_art">Album art</string>
     <string name="no_song_playing">No song playing</string>
-    <string name="tap_to_open">Tap to open Convx</string>
+    <string name="tap_to_open">Tap to open Convxy</string>
     <string name="previous">Previous</string>
     <string name="play_pause">Play/Pause</string>
     <string name="next">Next</string>
     <string name="like">Like</string>
     <string name="not_playing">No song playing</string>
-    <string name="tap_to_play">Tap to open Convx</string>
+    <string name="tap_to_play">Tap to open Convxy</string>
     <string name="widget_description">Music player widget with playback controls</string>
     <string name="queue_widget_description">Music player with queue preview</string>
     <string name="turntable_widget_description">Circular music widget with play and like controls</string>
@@ -866,7 +938,7 @@
     <string name="crash_share_logs">Share Logs</string>
     <string name="copy_logs">Copy Logs</string>
     <string name="crash_share_title">Share crash report</string>
-    <string name="crash_report_subject">Convx Crash Report</string>
+    <string name="crash_report_subject">Convxy Crash Report</string>
     <string name="crash_close">Close</string>
     <string name="crash_no_log">No crash log available</string>
 
@@ -920,7 +992,7 @@
     <string name="delete_from_history">Delete from history</string>
     <string name="re_listen">Re-listen</string>
     <string name="hold_to_recognize">Hold search icon to recognize music</string>
-    <string name="play_on_app">Play on Convx</string>
+    <string name="play_on_app">Play on Convxy</string>
     <string name="recognized_track">Recognized Track</string>
 
     <!-- CSV Import Strings -->
@@ -959,9 +1031,9 @@
     <string name="discord_rpc_preview">Rich Presence Preview</string>
     <string name="discord_presence">Presence</string>
     <string name="discord_connect_description">Sign in with Discord to share what you\'re listening to</string>
-    <string name="discord_playing_vivimusic">Playing Convx</string>
-    <string name="discord_watching_vivimusic">Watching Convx</string>
-    <string name="discord_competing_vivimusic">Competing in Convx</string>
+    <string name="discord_playing_vivimusic">Playing Convxy</string>
+    <string name="discord_watching_vivimusic">Watching Convxy</string>
+    <string name="discord_competing_vivimusic">Competing in Convxy</string>
     <string name="discord_activity_name">Activity name</string>
     <string name="discord_activity_name_description">Custom name for the activity (leave empty for default)</string>
     <string name="discord_advanced_mode">Advanced mode</string>
@@ -1021,7 +1093,7 @@
 
     <string name="perm_required">Required</string>
     <string name="perm_permissions">Permissions</string>
-    <string name="perm_intro_text">These permissions are required for Convx to function correctly. Please grant them to proceed.</string>
+    <string name="perm_intro_text">These permissions are required for Convxy to function correctly. Please grant them to proceed.</string>
 
     <string name="perm_notif_title">Notifications</string>
     <string name="perm_notif_desc">Know immediately when your music is playing and control it from the notification bar.</string>
@@ -1031,7 +1103,7 @@
 
     <string name="feat_discover">Discover</string>
     <string name="feat_features">Features</string>
-    <string name="feat_intro">Explore everything Convx has to offer for your music journey.</string>
+    <string name="feat_intro">Explore everything Convxy has to offer for your music journey.</string>
 
     <string name="feat_lyrics_title">Smart Lyrics</string>
     <string name="feat_lyrics_desc">Enjoy synchronized, word-by-word lyrics for millions of songs.</string>
@@ -1061,7 +1133,7 @@
     <string name="welcome_update_status">Updated</string>
     <string name="welcome_update_intro">Ensuring you have the latest features and security improvements.</string>
     <string name="welcome_checking_updates">Checking for updates…</string>
-    <string name="welcome_up_to_date">Convx is up to date!</string>
+    <string name="welcome_up_to_date">Convxy is up to date!</string>
     <string name="welcome_update_available">New version is available: %s</string>
     <string name="welcome_everything_ready">Everything is now up to date</string>
     <string name="commits_title">Commits</string>
@@ -1199,6 +1271,10 @@
     <string name="liquid_glass_player">Glass Player</string>
     <string name="liquid_glass_mini_player">Glass Mini Player</string>
     <string name="liquid_glass_nav_bar">Glass Navigation Bar</string>
+    <string name="liquid_glass_settings_controls">Glass Switches and Sliders</string>
+    <string name="liquid_glass_settings_controls_desc">Liquid glass toggle thumbs and slider handles. Costs a little per frame on screens with many of them</string>
+    <string name="liquid_glass_menus">Glass Menus</string>
+    <string name="liquid_glass_menus_desc">Long-press menus as a liquid glass sheet, with their pills and rows refracting it</string>
     <string name="liquid_glass_side_panel">Glass Side Panel</string>
     <string name="liquid_glass_side_panel_desc">Tablet side panel glass, set independently from the phone navigation bar</string>
     <string name="liquid_glass_side_panel_overrides">Side Panel Effect (overrides above)</string>
@@ -1234,8 +1310,8 @@
     <string name="support_upi">UPI</string>
     <string name="support_kofi">Ko-fi</string>
     <string name="support_kofi_desc">Buy the developer a coffee</string>
-    <string name="donation_prompt_title">Enjoying Convx?</string>
-    <string name="donation_prompt_message">If Convx has been useful to you, consider chipping in a little to help keep it going. Totally optional, never required.</string>
+    <string name="donation_prompt_title">Enjoying Convxy?</string>
+    <string name="donation_prompt_message">If Convxy has been useful to you, consider chipping in a little to help keep it going. Totally optional, never required.</string>
     <string name="donation_prompt_upi">Support via UPI</string>
     <string name="donation_prompt_kofi">Support via Ko-fi</string>
     <string name="donation_prompt_later">Maybe later</string>

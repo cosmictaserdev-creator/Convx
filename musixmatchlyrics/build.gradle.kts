@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.convx.music.musixmatch"
+    namespace = "com.convxy.music.musixmatch"
     compileSdk = 36
 
     defaultConfig {

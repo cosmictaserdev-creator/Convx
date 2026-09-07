@@ -29,4 +29,6 @@ dependencies {
     implementation(libs.ktor.serialization.json)
 
     coreLibraryDesugaring(libs.desugaring)
+
+    testImplementation(libs.junit)
 }

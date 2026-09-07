@@ -31,12 +31,12 @@ plugins {
 }
 
 android {
-    namespace = "com.convx.music"
+    namespace = "com.convxy.music"
     compileSdk = 37
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.convx.music"
+        applicationId = "com.convxy.music"
         minSdk = 26
         targetSdk = 36
         versionCode = appVersionCode
@@ -51,6 +51,18 @@ android {
 
         buildConfigField("String", "LASTFM_API_KEY", "\"$lastFmKey\"")
         buildConfigField("String", "LASTFM_SECRET", "\"$lastFmSecret\"")
+
+        // SoundCloud application credentials, for the timestamped-comments source. Same
+        // local.properties-or-environment pattern as Last.fm above, and optional in exactly the same
+        // way: an empty value means the source reports itself unconfigured and the comments sheet
+        // says so, rather than the build failing or the feature inventing data. A user can also set
+        // these at runtime in Settings → Integrations, which takes precedence.
+        val soundCloudClientId = localProperties.getProperty("SOUNDCLOUD_CLIENT_ID")
+            ?: System.getenv("SOUNDCLOUD_CLIENT_ID") ?: ""
+        val soundCloudClientSecret = localProperties.getProperty("SOUNDCLOUD_CLIENT_SECRET")
+            ?: System.getenv("SOUNDCLOUD_CLIENT_SECRET") ?: ""
+        buildConfigField("String", "SOUNDCLOUD_CLIENT_ID", "\"$soundCloudClientId\"")
+        buildConfigField("String", "SOUNDCLOUD_CLIENT_SECRET", "\"$soundCloudClientSecret\"")
 
 //add nightly build label support
         val isNightly = project.hasProperty("nightly") && project.property("nightly") == "true"
@@ -150,6 +162,24 @@ android {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
             buildConfigField("String", "ARCHITECTURE", "\"debug\"")
+        }
+        create("optimized") {
+            // Installable performance build for CI distribution: fully minified
+            // and resource-shrunk like release, but signed with the debug key so
+            // workflow artifacts install without a release keystore. Not
+            // debuggable — avoids the debug-build interpreter/JIT overhead that
+            // made the distributed test builds lag.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isCrunchPngs = false
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "ARCHITECTURE", "\"optimized\"")
         }
     }
 

@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 💬 Join the Community (Telegram)
-    url: https://t.me/+Nen-QpiY0tk1OTE9
-    about: Ask questions, chat with developers, or share your setups.
-  - name: ❓ GitHub Discussions
-    url: https://github.com/cosmictaserdev-creator/Convx/discussions
-    about: Use this for Q&A and general ideas that are not yet feature requests.
-  - name: 🔒 Security Vulnerability
-    url: https://github.com/cosmictaserdev-creator/Convx/security/policy
-    about: Please strictly report security issues here.
+  - name: Discord
+    url: https://discord.gg/GquSGfs2u
+    about: Release news, provider quirks, and questions before you file anything.
+  - name: GitHub Discussions
+    url: https://github.com/MeYashverma/Convxy/discussions
+    about: Ideas and questions that are not yet issues.
+  - name: Report a security issue
+    url: https://github.com/MeYashverma/Convxy/security/advisories/new
+    about: Please do not open a public issue for anything exploitable.

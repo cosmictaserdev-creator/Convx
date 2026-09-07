@@ -1,7 +1,7 @@
 /**
  * Wire protocol for Convx Listen Together.
  *
- * Mirrors app/src/main/kotlin/com/convx/music/listentogether/Protocol.kt.
+ * Mirrors app/src/main/kotlin/com/convxy/music/listentogether/Protocol.kt.
  * Field names are snake_case because the Kotlin side declares @SerialName on
  * every multi-word field — changing a name here silently breaks decoding on
  * the client, which fails as a missing field rather than an error.

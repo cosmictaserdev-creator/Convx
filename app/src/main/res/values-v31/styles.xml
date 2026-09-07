@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Widget Theme for Android 12+ with Dynamic Colors -->
-    <style name="Theme.Widget.Convx" parent="@android:style/Theme.DeviceDefault.DayNight" />
+    <style name="Theme.Widget.Convxy" parent="@android:style/Theme.DeviceDefault.DayNight" />
 </resources>

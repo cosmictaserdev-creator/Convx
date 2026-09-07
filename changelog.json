@@ -1,84 +1,38 @@
 {
-  "description": "Convx 1.4 — fixes the in-app updater (direct APK downloads, no more browser redirect) and consolidates every font control into one place. Plus everything from 1.3: bundled App Fonts, Auto-DJ mixing, a full-screen lyrics overhaul, waveform seeking in the mini player, a redesigned Liquid Glass system, and a large performance pass.",
+  "description": "Convxy 1.9 — Liquid Glass across the interface. The glass system now covers the controls, not just the chrome: switches, sliders, buttons, pills, the nav bar, the mini player, the player's own transport and volume controls, and long-press menus are real backdrop-sampling glass — each surface records the pixels behind it, blurs and refracts them through a lens, edge-lights them and answers touches with springs. A menu opened over the player bends the album art through its body; nothing is a translucent colour painted on top.",
   "image": "",
+  "warning": null,
   "changelog": [
     {
-      "title": "Updates & Fonts (Fixed)",
+      "title": "Liquid Glass controls",
       "items": [
-        "In-app updates fixed: the update check now finds Convx's actual APK asset and downloads it directly, so Check for updates installs the new version instead of bouncing you to the browser.",
-        "All font controls now live in one place — Settings → Appearance → App Font: the App Font picker, the Display font (Chillax wordmark/title) toggle, and the Custom font installer."
+        "Switches and sliders join the glass system: the liquid slider keeps the original capsule thumb that swells on press, with press-animated blur, lens and inner shadow on springs. It is opt-in as SliderStyle.LIQUID and switches on automatically with glass; every previous slider style remains available.",
+        "Buttons, icon buttons, segmented pills and tabs, circular queue buttons and the volume slider rows render as glass: sampled backdrop, blur, refraction, edge highlight and shadow, with spring press feedback.",
+        "The bottom navigation bar, mini player and floating now-playing pill sit on the shared backdrop recording, so they refract whatever scrolls beneath them.",
+        "Player transport controls, the seek bar and its thumb, and the volume rail refract the player's own background — the artwork wash, not the page behind the sheet."
       ]
     },
     {
-      "title": "App Fonts",
+      "title": "Glass menus and sheets",
       "items": [
-        "Pick a bundled typeface for the app's display text: Google Sans, Sans Flex, Outfit, or Plus Jakarta Sans — Settings → Appearance → App Font, with a live typography preview.",
-        "Choose System Default to use the system font, or a custom-installed font."
+        "Long-press menus render as a liquid glass sheet: the sheet body blurs and refracts what is actually under it — the player's exported glass surface (artwork included) while the player is open, the page stack otherwise — and the rows and pills inside the menu sample the sheet's own painted surface.",
+        "The queue sheet's header pills and circular buttons, and the player's bottom device/sleep-timer/comments trio, refract the player background through the same exported recording.",
+        "Dialogs and bottom-sheet pages route through the same backdrop providers, so their surfaces stay glass-consistent with the rest of the app."
       ]
     },
     {
-      "title": "Auto-DJ Mixing (New)",
+      "title": "The engine under it",
       "items": [
-        "Auto-DJ Mixing plays songs back-to-back with tempo-matched crossfades: the incoming song's speed is gently nudged to match the outgoing one while they blend, so the mix stays locked to a beat.",
-        "How to use: Settings → Player → turn on Crossfade first, then enable Auto-DJ Mixing. It uses on-device BPM detection (no internet), and falls back to a plain crossfade when a song's tempo can't be detected or is too far off.",
-        "A new Auto-DJ section is also surfaced right in the Player layout settings so the feature is easy to find."
+        "Surfaces sample recorded layers, not live captures: the app root records the page stack, the player records its background subtree and exports it, and each glass surface draws the recording cropped to its bounds. An ancestry guard refuses cyclic samplings, with a frosted fallback so the UI never breaks.",
+        "Effect pipeline per surface: vibrancy, runtime shader blur scaled against radius for performance, lens refraction with chromatic aberration, edge highlight, shadow and inner shadow, tint — all spring-animated on press.",
+        "Settings expose the master glass toggle, blur radius, vibrancy, lens depth, refraction, noise, tint, corner shape, springs, slider style and rubber-band overscroll; turning glass off restores the previous Material surfaces exactly."
       ]
     },
     {
-      "title": "Full-Screen Lyrics Overhaul",
+      "title": "Documentation and credit",
       "items": [
-        "Full-screen lyrics is now a dedicated, ArchiveTune-style presentation you can switch to from the player.",
-        "New one-tap flow: Settings → Player → enable One-tap full-screen lyrics and the lyrics button opens/closes full-screen lyrics in a single tap (off keeps the classic two-tap flow).",
-        "Player controls now collapse to the top (or bottom, your choice) instead of hiding: Settings → Player → Collapse controls upward.",
-        "Playback controls position in full-screen lyrics is toggleable, and the play/pause button can overlay the artwork thumbnail.",
-        "Swipe left/right on the artist + song name to change tracks while viewing lyrics."
-      ]
-    },
-    {
-      "title": "Player & Mini Player",
-      "items": [
-        "New waveform seek bar in the iOS mini player — drag it to scrub. Toggle under Settings → Player → Mini player waveform seek bar.",
-        "Mini bar style toggle: pick the simple thumbnail/seek/play look or the full multi-icon bar (shuffle, prev, play, next, repeat, lyrics, queue). Settings → Player → Multi-icon mini bar.",
-        "Mini bar lyrics/queue icons are wired up, codec badge no longer goes stale after a crossfade, and the standalone tab-pill height is properly floored.",
-        "New option to hide the volume bar in the player menu (Settings → Player).",
-        "Floating pill mini player is now a settings toggle and, on tablets, matches Apple Music's iPad mini-player exactly (width capped in all orientations)."
-      ]
-    },
-    {
-      "title": "Liquid Glass & Navigation",
-      "items": [
-        "Redesigned Liquid Glass system: glass settings copy on when you enable them, and nav bar vs mini bar now have independent tuning dials (blur, vibrancy, lens).",
-        "New per-element overrides for glass color, surface, and text — all under Settings → Liquid Glass.",
-        "The side panel gets its own blur/vibrancy/lens tuning, plus a new collapsible tablet sidebar with a smoother collapse animation and fixed pill shape.",
-        "The floating pill nav bar is now always on (the old toggle was removed). Restored blur on the nav-bar puck's hidden backdrop row.",
-        "In the nav bar there's a new inline search bar — type straight from the floating pill (iOS-style), with a search pill in tab view."
-      ]
-    },
-    {
-      "title": "Icons, Themes & Library",
-      "items": [
-        "Full icon set rescraped from Lucide in SF-Symbols style, with the tab bar switched to the Accord icon pack (home/library/group + play/pause/lyrics).",
-        "Theme settings overhaul: light-theme audit across screens and new library background modes — Settings → Appearance → Library background.",
-        "Pull-to-refresh added to playlists and library lists — just pull down on the list."
-      ]
-    },
-    {
-      "title": "Audio Reliability Fixes",
-      "items": [
-        "Fixed downloaded FLAC songs being unplayable when lossless/Spine toggles were on.",
-        "Fixed lossless/Atmos audio dropouts — playback now recovers and falls back to standard audio instead of stalling.",
-        "Stopped chunk-slicing Tidal/Spine lossless streams, which caused premature auto-skip.",
-        "Fixed a crash opening playlists and the Room migration 35→36 crash on upgrade.",
-        "No more spurious error reports when a signed-in account's info can't be refreshed after a token change."
-      ]
-    },
-    {
-      "title": "Performance",
-      "items": [
-        "Stopped app-wide idle redraw — the UI no longer re-renders when nothing changes.",
-        "Glass transitions are much cheaper to run.",
-        "Artist/list sorting moved off the main thread; per-item database flows are remembered.",
-        "Backdrop record gating, off-main persistence, and coalesced stats writes reduce jank and wake-ups."
+        "docs/LIQUID_GLASS.md documents the recording/sampling model, the component list, the settings and the rules for putting glass on a new surface.",
+        "The engine vendors Kyant0/AndroidLiquidGlass (Apache-2.0) with attribution headers kept; the glass system design descends from Convx (GPL-3.0). Convxy remains GPL-3.0."
       ]
     }
   ]

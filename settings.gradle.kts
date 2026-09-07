@@ -16,7 +16,7 @@ dependencyResolutionManagement {
 //     id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
 // }
 
-rootProject.name = "convx"
+rootProject.name = "convxy"
 include(":app")
 include(":canvas")
 include(":innertube")

@@ -30,14 +30,14 @@ jobs:
 
           # Build the embed with jq to safely escape JSON
           PAYLOAD=$(jq -n \
-            --arg title "Convx $TAG - $TYPE" \
+            --arg title "Convxy $TAG - $TYPE" \
             --arg desc "${BODY_TRIMMED:-No description provided.}" \
             --arg url "$URL" \
             --argjson color "$COLOR" \
             --arg version "$TAG" \
             --arg type "$TYPE" \
             --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            '{embeds: [{title: $title, description: $desc, url: $url, color: $color, fields: [{name: "Version", value: $version, inline: true}, {name: "Type", value: $type, inline: true}, {name: "Download", value: "[GitHub Release](\($url))", inline: false}], footer: {text: "Convx Music - Open Source"}, timestamp: $time}]}')
+            '{embeds: [{title: $title, description: $desc, url: $url, color: $color, fields: [{name: "Version", value: $version, inline: true}, {name: "Type", value: $type, inline: true}, {name: "Download", value: "[GitHub Release](\($url))", inline: false}], footer: {text: "Convxy Music - Open Source"}, timestamp: $time}]}')
 
           curl -s -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \

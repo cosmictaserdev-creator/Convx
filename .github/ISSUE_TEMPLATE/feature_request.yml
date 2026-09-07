@@ -1,48 +1,49 @@
-name: 🚀 Feature Request
-description: Have an idea? Pitch it!
+name: Feature request
+description: Something you'd like the app to do
 title: "[Feat]: "
 labels: ["enhancement", "triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### 💡 Feature Proposal
-        Help us make Convx even more awesome.
+        Say what you want the app to do and why; we'll work out how. If the idea depends on
+        something YouTube's API may or may not allow, say so — that changes how we'd build it.
 
   - type: dropdown
-    id: category
+    id: area
     attributes:
-      label: 🏷️ Category
+      label: Area
       options:
-        - ✨ New Feature
-        - 🎨 UI / Design Improvement
-        - ⚡ Performance / Optimization
-        - 🎧 Audio Experience
-        - 🌐 Translation / Localization
-        - 🔧 Other
+        - Playback and audio
+        - UI / theming
+        - Lyrics
+        - Ambient Mode
+        - Library / downloads
+        - Integrations (Discord, scrobbling, Auto)
+        - Other
     validations:
       required: true
 
   - type: textarea
     id: description
     attributes:
-      label: 📝 The Pitch
-      description: Describe your idea clearly. How should it work?
-      placeholder: "I would love to see..."
+      label: What should it do?
+      description: Behaviour, not implementation. How would you use it?
+      placeholder: "I'd like the lyrics screen to ..."
     validations:
       required: true
 
   - type: textarea
     id: problem
     attributes:
-      label: 🤝 Problem Solved
-      description: Why is this feature necessary? What problem does it solve for you?
-      placeholder: "Currently, it is difficult to..."
+      label: What does it fix for you?
+      description: The situation that makes this necessary, and what you do today instead.
+      placeholder: "Right now I have to ..."
     validations:
       required: true
 
   - type: textarea
     id: context
     attributes:
-      label: 🎨 Mockups / Screenshots / Extras
-      description: Drop images or sketches here if you have them!
+      label: Mockups, apps that do this well, other notes
+      description: Images welcome. Pointing at another app that gets it right is often the most useful line in the report.

@@ -35,7 +35,7 @@
     <string name="mobile_network_warning">Le téléchargement de mises à jour via un réseau mobile ou en itinérance peut entraîner des frais supplémentaires.</string>
     <string name="update_size">Taille de la mise à jour : %1$s Mo</string>
     <string name="check_internet_connection">Vérifiez votre connexion Internet et réessayez.</string>
-    <string name="vivi_music_version">Convx version %1$s</string>
+    <string name="vivi_music_version">Convxy version %1$s</string>
     <string name="last_checked">Dernière vérification : %1$s</string>
     <string name="install">Installer</string>
     <string name="check_for_update">Vérifier les mises à jour</string>
@@ -53,12 +53,11 @@
     <string name="later">Plus tard</string>
 
 
-    <string name="vivi_music_title">CONVX</string>
+    <string name="vivi_music_title">Convxy</string>
     <string name="developer_section">DÉVELOPPEUR</string>
     <string name="collaborator_section">COLLABORATEUR</string>
     <string name="app_info_section">INFORMATIONS SUR L\'APPLICATION</string>
     <string name="community_section">COMMUNAUTÉ</string>
-    <string name="developer_name">VIVIDH P ASHOKAN</string>
     <string name="app_developer">Développeur d\'applications</string>
     <string name="website">Site web</string>
     <string name="collaborator_tboyke">T-Boyke</string>

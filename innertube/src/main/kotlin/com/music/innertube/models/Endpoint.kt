@@ -16,6 +16,15 @@ data class WatchEndpoint(
     val playlistSetVideoId: String? = null,
     val params: String? = null,
     val index: Int? = null,
+    /**
+     * Seconds into [videoId] this link starts at. Present when the link is a timestamp — most often
+     * inside a comment, where a viewer wrote `[1:23]` and YouTube turned it into a seek link. Null
+     * for an ordinary link to the video's start.
+     *
+     * Additive: this field was always in the payload and simply discarded, so declaring it cannot
+     * change how any existing endpoint decodes.
+     */
+    val startTimeSeconds: Int? = null,
     val watchEndpointMusicSupportedConfigs: WatchEndpointMusicSupportedConfigs? = null,
 ) : Endpoint() {
 

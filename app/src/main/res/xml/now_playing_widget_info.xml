@@ -19,7 +19,7 @@
     android:targetCellWidth="4"
     android:targetCellHeight="2"
     android:updatePeriodMillis="0"
-    android:configure="com.convx.music.widget.WidgetConfigActivity"
+    android:configure="com.convxy.music.widget.WidgetConfigActivity"
     android:widgetFeatures="reconfigurable|configuration_optional"
     android:previewLayout="@layout/widget_now_playing_wide"
     android:initialLayout="@layout/widget_now_playing_wide"

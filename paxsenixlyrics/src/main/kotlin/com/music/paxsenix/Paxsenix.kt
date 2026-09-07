@@ -1,7 +1,7 @@
 package com.music.paxsenix
 
 import android.content.Context
-import com.convx.music.betterlyrics.TTMLParser
+import com.convxy.music.betterlyrics.TTMLParser
 import com.music.paxsenix.models.AppleMusicSearchResponse
 import com.music.paxsenix.models.LyricsResponse
 import com.music.paxsenix.models.SearchResult
@@ -459,7 +459,7 @@ object Paxsenix {
     private fun convertTTMLToAppFormat(ttml: String): String {
         return try {
             val parsedLines = TTMLParser.parseTTML(ttml)
-            TTMLParser.toLRC(parsedLines)
+            TTMLParser.toLRC(parsedLines, TTMLParser.parseAgents(ttml))
         } catch (e: Exception) {
             Timber.e(e, "TTML conversion failed: ${e.message}")
             ""

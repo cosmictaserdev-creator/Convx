@@ -60,3 +60,26 @@ jobs:
         with:
           name: app-universal-debug-pr-${{ github.event.number }}
           path: app/build/outputs/apk/universalFoss/debug/*.apk
+
+      - name: Run unit tests
+        run: ./gradlew --console=plain :app:testUniversalFossDebugUnitTest :betterlyrics:testDebugUnitTest --warning-mode summary
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          PULL_REQUEST: "true"
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
+
+      - name: Build Universal FOSS Optimized APK
+        run: ./gradlew --console=plain assembleUniversalFossOptimized --warning-mode summary
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          PULL_REQUEST: "true"
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
+
+      - name: Upload Optimized APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-universal-optimized-pr-${{ github.event.number }}
+          path: app/build/outputs/apk/universalFoss/optimized/*.apk
+        

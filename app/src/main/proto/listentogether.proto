@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package com.convx.music.listentogether.proto;
+package com.convxy.music.listentogether.proto;
 
-option java_package = "com.convx.music.listentogether.proto";
+option java_package = "com.convxy.music.listentogether.proto";
 option java_multiple_files = false;
 option java_outer_classname = "Listentogether";
 

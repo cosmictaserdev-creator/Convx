@@ -77,5 +77,5 @@ jobs:
         run: |
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
           APK_PATH=$(find app/build/outputs/apk -name '*.apk' | head -n 1)
-          mv "$APK_PATH" "convx-${TAG}.apk"
-          gh release upload "$TAG" "convx-${TAG}.apk" --repo "${{ github.repository }}" --clobber
+          mv "$APK_PATH" "convxy-${TAG}.apk"
+          gh release upload "$TAG" "convxy-${TAG}.apk" --repo "${{ github.repository }}" --clobber

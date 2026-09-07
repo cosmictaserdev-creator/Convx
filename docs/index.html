@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convxy — an open-source Liquid Glass music player for Android</title>
+<meta name="description" content="Convxy is a free, open-source music player for Android: YouTube Music and plain YouTube, synced multi-singer lyrics, a real backdrop-blur UI, offline downloads, no telemetry. GPL-3.0.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Convxy">
+<meta property="og:description" content="An open-source Liquid Glass music player for Android. Lyrics, downloads, Ambient Mode, no telemetry.">
+<meta property="og:image" content="https://meyashverma.github.io/Convxy/icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<style>
+  :root {
+    --paper: #fcfbf9;
+    --ink: #1b1c1e;
+    --muted: #5f6167;
+    --rule: #e2dfd8;
+    --accent: #b4451f;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #131316;
+      --ink: #e8e6ea;
+      --muted: #9c9aa5;
+      --rule: #2b2b32;
+      --accent: #ef8b5c;
+    }
+  }
+  * { box-sizing: border-box }
+  html { -webkit-text-size-adjust: 100% }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.62;
+    text-rendering: optimizeLegibility;
+  }
+  .page { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem 5rem }
+  a { color: inherit }
+  p, ul, ol, dl { margin: 0 0 1.1rem }
+  ul, ol { padding-left: 1.25rem }
+  li { margin: .25rem 0 }
+  code { font-family: var(--mono); font-size: .87em }
+
+  header.site {
+    display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+    padding: 1.4rem 0 1.1rem; margin-bottom: 2.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  header.site .name {
+    display: flex; align-items: center; gap: .55rem;
+    font-weight: 650; letter-spacing: -.01em;
+  }
+  header.site img { width: 22px; height: 22px; border-radius: 5px }
+  header.site nav { margin-left: auto; display: flex; gap: 1.1rem; font-size: .9rem }
+  header.site nav a { color: var(--muted); text-decoration: none }
+  header.site nav a:hover { color: var(--accent); text-decoration: underline }
+
+  h1 { font-size: 2.35rem; line-height: 1.15; letter-spacing: -.025em; margin: 0 0 .7rem }
+  h2 { font-size: 1.3rem; letter-spacing: -.01em; margin: 3rem 0 .9rem }
+  .lede { font-size: 1.1rem; color: var(--ink); max-width: 40rem }
+  .facts { font-family: var(--mono); font-size: .8rem; color: var(--muted); margin: 1.4rem 0 0; line-height: 1.9 }
+  .facts span + span::before { content: " · "; color: var(--rule) }
+  .actions { display: flex; gap: .8rem; flex-wrap: wrap; margin: 1.6rem 0 0 }
+  .actions a {
+    text-decoration: none; font-size: .95rem; font-weight: 550;
+    padding: .55rem .95rem; border: 1px solid var(--rule); border-radius: 8px;
+  }
+  .actions a.get { border-color: var(--accent); color: var(--accent) }
+  .actions a:hover { border-color: var(--accent) }
+
+  dl.features { margin: 0 }
+  dl.features dt { font-weight: 620; margin-top: 1.35rem }
+  dl.features dd { margin: .1rem 0 0; color: var(--muted) }
+  dl.features dd a { color: var(--ink) }
+
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .9rem; margin: 1.4rem 0 .4rem }
+  .shots figure { margin: 0 }
+  .shots img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 10px }
+  .shots figcaption { font-size: .8rem; color: var(--muted); margin-top: .4rem; line-height: 1.4 }
+
+  .note {
+    border-left: 2px solid var(--accent); padding: .1rem 0 .1rem 1rem;
+    margin: 1.4rem 0; color: var(--muted);
+  }
+  table.kv { border-collapse: collapse; width: 100%; font-size: .93rem; margin-bottom: 1.2rem }
+  table.kv th { text-align: left; font-weight: 600; width: 12rem; vertical-align: top; color: var(--muted) }
+  table.kv td { vertical-align: top }
+  table.kv tr + tr th, table.kv tr + tr td { padding-top: .55rem }
+  footer.site {
+    margin-top: 3.4rem; padding-top: 1.3rem; border-top: 1px solid var(--rule);
+    font-size: .88rem; color: var(--muted);
+  }
+  footer.site p { margin-bottom: .5rem }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="site">
+  <span class="name"><img src="icon.png" alt="">Convxy</span>
+  <nav>
+    <a href="https://github.com/MeYashverma/Convxy/releases">Releases</a>
+    <a href="https://github.com/MeYashverma/Convxy">Code</a>
+    <a href="https://discord.gg/GquSGfs2u">Discord</a>
+  </nav>
+</header>
+
+<h1>A music player that stays out of the way.</h1>
+
+<p class="lede">Convxy streams the YouTube&nbsp;Music catalogue and plain YouTube, keeps your
+library and downloads on the device, and puts Apple&nbsp;Music-style synced lyrics — including
+per-singer lines for duets — over a UI built on real backdrop blur rather than stock Material
+widgets. There is nothing to sign up for, and no ads or analytics; the YouTube side can use your own
+account if you want your subscriptions there, but the app works without one.</p>
+
+<p class="facts">
+  <span>Kotlin · Jetpack Compose · Media3</span>
+  <span>Android 8.0+</span>
+  <span>GPL-3.0</span>
+  <span id="versionLine">v1.8.0</span>
+</p>
+
+<p class="actions">
+  <a class="get" id="downloadLink" href="https://github.com/MeYashverma/Convxy/releases/latest">Download the APK</a>
+  <a href="https://github.com/MeYashverma/Convxy">Source on GitHub</a>
+  <a href="https://github.com/MeYashverma/Convxy/actions/workflows/build.yml">Nightly builds</a>
+</p>
+
+<h2 id="about">What it is</h2>
+
+<p>Convxy is a fork of <a href="https://github.com/cosmictaserdev-creator/Convx">Convx</a>,
+which is itself a fork of <a href="https://github.com/vivizzz007/vivi-music">vivi-music</a>. The
+playback core is a Media3 <code>ExoPlayer</code> service; streaming goes through an
+<a href="https://github.com/MeYashverma/Convxy/tree/main/innertube">unofficial InnerTube
+client</a> kept in its own module, with several native YouTube clients probed in parallel so a
+song still starts when one of them gets flagged.</p>
+
+<p>The interface is the part the fork is really about. <a href="#glass">Liquid Glass</a> surfaces
+sample the actual pixels behind them and blur and refract them, so the nav bar, sheets, menus and
+every switch, slider and button sit in the same light as the artwork behind them. It is not a
+translucent colour painted on top.</p>
+
+<h2 id="features">What it does</h2>
+
+<dl class="features">
+  <dt>Streaming and library</dt>
+  <dd>YouTube Music, JioSaavn and local files in one library, with playlists, subscriptions,
+  search, background playback and lock-screen controls. Downloads are cached on device, and
+  Settings → Storage breaks downloads, the song cache and the image cache out separately, each with
+  its own clear button.</dd>
+
+  <dt id="glass">Liquid Glass UI</dt>
+  <dd>A shared backdrop layer feeds the nav bar, mini player, sheets, dialogs and long-press
+  menus; switches, sliders, buttons, pills and the player's own controls each sample and refract
+  it — the menu over the player bends the album art through its body. Per-element blur, vibrancy,
+  lens depth and refraction are adjustable in Settings, along with iOS-style rubber-band overscroll
+  and spring transitions. Dynamic colour comes from the current artwork.
+  <a href="https://github.com/MeYashverma/Convxy/blob/main/docs/LIQUID_GLASS.md">How the engine
+  records, samples and shades</a>.</dd>
+
+  <dt>Synced lyrics, including who is singing</dt>
+  <dd>Word-by-word karaoke fill, and Apple Music-style multi-singer lines: every vocalist gets a
+  colour and a name badge, shared vocals are handled as a chorus rather than assigned to the
+  lead. <a href="https://github.com/MeYashverma/Convxy/blob/main/docs/MULTI_SINGER_LYRICS.md">How
+  the TTML agent data is parsed</a>.</dd>
+
+  <dt>Ambient Mode</dt>
+  <dd>A full-screen landscape view for the TV or the desk stand: artwork on one side, lyrics on the
+  other, an accent glow or the track's own animated canvas behind them, and a progress ring you can
+  scrub from the edge of the screen. Portrait canvases (3:4, 9:16) can be kept at their full size in
+  a side panel with the gradient weighted toward them instead of being cropped to cover.
+  <a href="https://github.com/MeYashverma/Convxy/blob/main/docs/AMBIENT_MODE.md">Settings and
+  how the canvas is fitted</a>.</dd>
+
+  <dt>Native YouTube</dt>
+  <dd>Home feed, search with suggestions and filters, channels, playlists and Shorts rendered in
+  the app — no WebView — plus a watch screen with immersive fullscreen, double-tap seek, speed
+  and a quality cap up to 1080p. Related videos become the queue, so they share the mini player
+  and notification with your music.
+  <a href="https://github.com/MeYashverma/Convxy/blob/main/docs/FULL_VIDEO_PLAYBACK.md">How video
+  playback resolves a stream</a>.</dd>
+
+  <dt>Sound</dt>
+  <dd>Built-in equalizer, optional high-bitrate and lossless sources where the provider has them,
+  crossfade with tempo-matched Auto-DJ mixing, and a waveform scrub bar in the mini player.
+  <a href="https://github.com/MeYashverma/Convxy/blob/main/app/src/main/kotlin/com/convxy/music/playback/audio/DjMixPlanner.kt">
+  The mix planner</a> decides per transition whether the two tracks are close enough in tempo to
+  stretch, and backs off to a plain crossfade when they are not.</dd>
+
+  <dt>Together, and where that reaches</dt>
+  <dd>Listen Together opens a room that several phones follow at once; the room lives on a small
+  WebSocket server (<code>listen-together-server/</code> in the repo) and the app lets you point at
+  your own deployment. Discord Rich Presence, Last.fm, ListenBrainz and Spotify scrobbling are each
+  off until you turn them on and connect your own account.</dd>
+
+  <dt>Everything else it is expected to do</dt>
+  <dd>Android Auto, a tablet sidebar layout, material icon and font choices, an in-app updater
+  that reads GitHub Releases, and zero telemetry — the library, settings and caches never leave
+  the phone.</dd>
+</dl>
+
+<h2 id="screens">Screens</h2>
+
+<div class="shots">
+  <figure>
+    <a href="screenshots/Screenshot_20260802_205400_Convx-portrait.png">
+      <img src="screenshots/Screenshot_20260802_205400_Convx-portrait.png" width="1245" height="2359"
+           alt="Convxy home screen with a frosted glass nav bar" loading="lazy"></a>
+    <figcaption>Home. The nav bar samples the artwork scrolling under it.</figcaption>
+  </figure>
+  <figure>
+    <a href="screenshots/lyrics%20screen-portrait.png">
+      <img src="screenshots/lyrics%20screen-portrait.png" width="1245" height="2359"
+           alt="Word-by-word synced lyrics with a glow on the active line" loading="lazy"></a>
+    <figcaption>Lyrics, with the accent glow on the active line.</figcaption>
+  </figure>
+  <figure>
+    <a href="screenshots/mobile%20%287%29-portrait.png">
+      <img src="screenshots/mobile%20%287%29-portrait.png" width="1245" height="2359"
+           alt="Multi-singer lyrics with per-vocalist colours" loading="lazy"></a>
+    <figcaption>A duet: each vocalist keeps its own colour.</figcaption>
+  </figure>
+  <figure>
+    <a href="screenshots/mobile%20%2813%29-portrait.png">
+      <img src="screenshots/mobile%20%2813%29-portrait.png" width="1245" height="2359"
+           alt="The built-in equalizer" loading="lazy"></a>
+    <figcaption>Equalizer.</figcaption>
+  </figure>
+  <figure>
+    <a href="screenshots/tabview%20%281%29-landscape.png">
+      <img src="screenshots/tabview%20%281%29-landscape.png" width="2226" height="1590"
+           alt="Tablet layout with a persistent sidebar" loading="lazy"></a>
+    <figcaption>Tablet: a sidebar replaces the nav bar.</figcaption>
+  </figure>
+</div>
+
+<h2 id="install">Installing</h2>
+
+<p>Download the APK from
+<a href="https://github.com/MeYashverma/Convxy/releases/latest">the latest release</a> and install
+it. Android will ask you to allow installs from this source once; that is the normal sideload
+prompt. The release asset is a single signed universal APK built as <code>universalGms</code>, so
+Google Cast is compiled in; it runs on Android 8.0 and newer and needs no Google account. Android
+Auto works in either flavour. If you would rather have a build with no Play Services dependency at
+all, the <code>universalFoss</code> variant is there in the Gradle project — build it from source,
+because the release page does not carry it.</p>
+
+<p>If you meant to listen in the car and Convxy is missing from Android Auto, enable
+<i>Settings → Android Auto → Developer settings → Unknown sources</i> in the Android Auto phone
+app, then restart it. The same setting is needed by most third-party Auto media apps.</p>
+
+<p class="note">Streaming goes through unofficial APIs. YouTube can and does change them, so
+expect a release or two to break playback until it is patched — which is also why the project
+publishes CI builds next to the tagged releases.</p>
+
+<h2 id="build">Building</h2>
+
+<p>JDK 21 and a current Android Studio are enough. Open the project, let Gradle sync, run the
+<code>app</code> module; <code>./gradlew :app:assembleUniversalFossDebug</code> works from the CLI
+too. <a href="https://github.com/MeYashverma/Convxy/blob/main/.github/CONTRIBUTING.md">CONTRIBUTING.md</a>
+covers the module layout, branch and commit conventions, and what a pull request should contain.</p>
+
+<h2 id="community">Community</h2>
+
+<p><a href="https://discord.gg/GquSGfs2u">Discord</a> is where release news, lyric-provider quirks
+and Listen Together sessions happen. Bugs and feature requests go to
+<a href="https://github.com/MeYashverma/Convxy/issues">issues</a>; the
+<a href="https://github.com/MeYashverma/Convxy/discussions">discussions</a> board is for anything
+that is not yet either.</p>
+
+<footer class="site">
+  <p>Maintained by <a href="https://github.com/MeYashverma">Yash Verma</a>
+  · <a href="https://meyashverma.github.io/yashverma-dev/">yashverma-dev</a>.</p>
+  <p>Built on <a href="https://github.com/cosmictaserdev-creator/Convx">Convx</a> by Aryan
+  (CosmicTaser) and <a href="https://github.com/vivizzz007/vivi-music">vivi-music</a> by Vividh P
+  Ashokan. Blur and refraction from <a href="https://github.com/Kyant0/backdrop">Kyant0/backdrop</a>;
+  lyrics from <a href="https://github.com/better-lyrics/better-lyrics">Better Lyrics</a>,
+  <a href="https://github.com/ibratabian17/YouLyPlus">YouLyPlus</a> and
+  <a href="https://github.com/maxrave-dev/SimpMusic">SimpMusic</a>; Rich Presence from
+  <a href="https://github.com/dead8309/Kizzy">Kizzy</a>.</p>
+  <p>GPL-3.0 licensed. Not affiliated with, endorsed by or funded by YouTube or Google LLC.
+  No track in this app is hosted by us; nothing is scraped for analytics.</p>
+</footer>
+
+</div>
+<script>
+// Only fills in the release version and its direct APK link. The page reads correctly
+// without it, and stays on the releases page if the API is unreachable or rate-limited.
+(function () {
+  fetch('https://api.github.com/repos/MeYashverma/Convxy/releases/latest', {
+    headers: { Accept: 'application/vnd.github+json' }
+  })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return;
+      if (d.tag_name) {
+        document.getElementById('versionLine').textContent =
+          'v' + d.tag_name.replace(/^v/, '') + ' · released ' +
+          new Date(d.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+      var apk = (d.assets || []).filter(function (a) { return /\.apk$/i.test(a.name); })[0];
+      if (apk) {
+        var link = document.getElementById('downloadLink');
+        link.href = apk.browser_download_url;
+        link.textContent = 'Download ' + apk.name;
+      }
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>
