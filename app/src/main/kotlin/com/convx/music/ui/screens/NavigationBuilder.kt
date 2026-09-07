@@ -88,6 +88,9 @@ import com.convx.music.ui.screens.recognition.RecognitionScreen
 import com.convx.music.ui.screens.recognition.RecognitionHistoryScreen
 import com.convx.music.ui.screens.settings.ModuleSourceScreen
 import com.convx.music.ui.screens.settings.ModuleDetailScreen
+import com.convx.music.ui.screens.settings.DeclarativeModuleDetailScreen
+import com.convx.music.ui.screens.settings.DeclarativeModuleHostSettingsScreen
+import com.convx.music.modulehost.DeclarativeModuleHostRoutes
 import com.convx.music.ui.screens.settings.UpdateSettings
 import com.convx.music.ui.screens.wrapped.WrappedScreen
 import com.convx.music.vivimusic.updater.UpdateScreen
@@ -466,6 +469,25 @@ fun NavGraphBuilder.navigationBuilder(
 
     sharedComposable("settings/modules") {
         ModuleSourceScreen(navController, scrollBehavior)
+    }
+
+    sharedComposable(DeclarativeModuleHostRoutes.SETTINGS) {
+        DeclarativeModuleHostSettingsScreen(navController, scrollBehavior)
+    }
+
+    sharedComposable(
+        route = DeclarativeModuleHostRoutes.DETAIL,
+        arguments = listOf(
+            navArgument("moduleId") {
+                type = NavType.StringType
+            },
+        ),
+    ) {
+        DeclarativeModuleDetailScreen(
+            navController = navController,
+            scrollBehavior = scrollBehavior,
+            moduleId = it.arguments?.getString("moduleId") ?: "",
+        )
     }
 
     sharedComposable(

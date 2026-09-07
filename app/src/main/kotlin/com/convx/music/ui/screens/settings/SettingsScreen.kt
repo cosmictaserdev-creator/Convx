@@ -229,6 +229,13 @@ fun SettingsScreen(
                 )
                 SettingsDivider()
                 SettingsNavItem(
+                    icon = painterResource(R.drawable.security),
+                    iconTint = Color(0xFF34C759),
+                    title = stringResource(R.string.declarative_modules),
+                    onClick = { navController.navigate(com.convx.music.modulehost.DeclarativeModuleHostRoutes.SETTINGS) },
+                )
+                SettingsDivider()
+                SettingsNavItem(
                     icon = painterResource(R.drawable.translate),
                     iconTint = Color(0xFFFF9500),
                     title = stringResource(R.string.ai_lyrics_translation),
