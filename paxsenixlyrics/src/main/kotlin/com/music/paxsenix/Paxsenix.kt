@@ -1,7 +1,7 @@
 package com.music.paxsenix
 
 import android.content.Context
-import com.convx.music.betterlyrics.TTMLParser
+import com.nexamusic.music.betterlyrics.TTMLParser
 import com.music.paxsenix.models.AppleMusicSearchResponse
 import com.music.paxsenix.models.LyricsResponse
 import com.music.paxsenix.models.SearchResult

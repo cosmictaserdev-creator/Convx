@@ -31,12 +31,12 @@ plugins {
 }
 
 android {
-    namespace = "com.convx.music"
+    namespace = "com.nexamusic.app"
     compileSdk = 37
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.convx.music"
+        applicationId = "com.nexamusic.app"
         minSdk = 26
         targetSdk = 36
         versionCode = appVersionCode

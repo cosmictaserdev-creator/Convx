@@ -1,0 +1,50 @@
+/**
+ * Convx Project (C) 2026
+ * Licensed under GPL-3.0 | See git history for contributors
+ */
+
+package com.nexamusic.app.listentogether
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class ListenTogetherServer(
+    val name: String,
+    val url: String,
+    val location: String,
+    val operator: String
+)
+
+object ListenTogetherServers {
+    // Note: Convx Sync has been removed as this project uses community-hosted servers.
+    // To use Listen Together, either connect to a community server (below) or
+    // host your own via the listen-together-server directory.
+    private const val ServersJson = """
+        [
+          {
+            "name": "Hugging Face Sync",
+            "url": "wss://devilmi-vivi-music-listen-together.hf.space",
+            "location": "Global",
+            "operator": "VIVIDH"
+          },
+          {
+            "name": "ViviMusic Sync Server",
+            "url": "wss://vivimusic-listen-together.onrender.com",
+            "location": "USA",
+            "operator": "Vividh"
+          }
+        ]
+    """
+
+    private val json = Json { ignoreUnknownKeys = true }
+
+    val servers: List<ListenTogetherServer> by lazy {
+        json.decodeFromString(ServersJson)
+    }
+
+    val defaultServerUrl: String
+        get() = servers.first().url
+
+    fun findByUrl(url: String): ListenTogetherServer? = servers.firstOrNull { it.url == url }
+}

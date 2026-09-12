@@ -1,0 +1,545 @@
+Reusing configuration cache.
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preArm64FossDebugBuild UP-TO-DATE
+> Task :app:mergeArm64FossDebugNativeDebugMetadata NO-SOURCE
+> Task :canvas:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :canvas:compileKotlin UP-TO-DATE
+> Task :canvas:compileJava NO-SOURCE
+> Task :canvas:processResources NO-SOURCE
+> Task :canvas:classes UP-TO-DATE
+> Task :canvas:jar UP-TO-DATE
+> Task :applecanvas:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :applecanvas:compileKotlin UP-TO-DATE
+> Task :applecanvas:compileJava NO-SOURCE
+> Task :applecanvas:processResources NO-SOURCE
+> Task :applecanvas:classes UP-TO-DATE
+> Task :applecanvas:jar UP-TO-DATE
+> Task :vivimusiccanvas:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :vivimusiccanvas:compileKotlin UP-TO-DATE
+> Task :vivimusiccanvas:compileJava NO-SOURCE
+> Task :vivimusiccanvas:processResources NO-SOURCE
+> Task :vivimusiccanvas:classes UP-TO-DATE
+> Task :vivimusiccanvas:jar UP-TO-DATE
+> Task :app:generateArm64FossDebugBuildConfig UP-TO-DATE
+> Task :app:protobufDummy UP-TO-DATE
+> Task :app:extractArm64FossDebugProto UP-TO-DATE
+> Task :app:extractArm64FossProto UP-TO-DATE
+> Task :app:extractArm64Proto UP-TO-DATE
+> Task :app:extractDebugProto UP-TO-DATE
+> Task :app:extractFossProto UP-TO-DATE
+> Task :artistvideo:preBuild UP-TO-DATE
+> Task :artistvideo:preDebugBuild UP-TO-DATE
+> Task :artistvideo:generateDebugResources UP-TO-DATE
+> Task :artistvideo:packageDebugResources UP-TO-DATE
+> Task :artistvideo:processDebugNavigationResources UP-TO-DATE
+> Task :artistvideo:parseDebugLocalResources UP-TO-DATE
+> Task :artistvideo:generateDebugRFile UP-TO-DATE
+> Task :artistvideo:compileDebugKotlin UP-TO-DATE
+> Task :artistvideo:javaPreCompileDebug UP-TO-DATE
+> Task :artistvideo:compileDebugJavaWithJavac NO-SOURCE
+> Task :artistvideo:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :artistvideo:processDebugJavaRes UP-TO-DATE
+> Task :artistvideo:createFullJarDebug UP-TO-DATE
+> Task :betterlyrics:preBuild UP-TO-DATE
+> Task :betterlyrics:preDebugBuild UP-TO-DATE
+> Task :betterlyrics:generateDebugResources UP-TO-DATE
+> Task :betterlyrics:packageDebugResources UP-TO-DATE
+> Task :betterlyrics:processDebugNavigationResources UP-TO-DATE
+> Task :betterlyrics:parseDebugLocalResources UP-TO-DATE
+> Task :betterlyrics:generateDebugRFile UP-TO-DATE
+> Task :betterlyrics:compileDebugKotlin UP-TO-DATE
+> Task :betterlyrics:javaPreCompileDebug UP-TO-DATE
+> Task :betterlyrics:compileDebugJavaWithJavac NO-SOURCE
+> Task :betterlyrics:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :betterlyrics:processDebugJavaRes UP-TO-DATE
+> Task :betterlyrics:createFullJarDebug UP-TO-DATE
+> Task :innertube:preBuild UP-TO-DATE
+> Task :innertube:preDebugBuild UP-TO-DATE
+> Task :innertube:generateDebugResources UP-TO-DATE
+> Task :innertube:packageDebugResources UP-TO-DATE
+> Task :innertube:processDebugNavigationResources UP-TO-DATE
+> Task :innertube:parseDebugLocalResources UP-TO-DATE
+> Task :innertube:generateDebugRFile UP-TO-DATE
+> Task :innertube:compileDebugKotlin UP-TO-DATE
+> Task :innertube:javaPreCompileDebug UP-TO-DATE
+> Task :innertube:compileDebugJavaWithJavac NO-SOURCE
+> Task :innertube:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :innertube:processDebugJavaRes UP-TO-DATE
+> Task :innertube:createFullJarDebug UP-TO-DATE
+> Task :jiosaavn:preBuild UP-TO-DATE
+> Task :jiosaavn:preDebugBuild UP-TO-DATE
+> Task :jiosaavn:generateDebugResources UP-TO-DATE
+> Task :jiosaavn:packageDebugResources UP-TO-DATE
+> Task :jiosaavn:processDebugNavigationResources UP-TO-DATE
+> Task :jiosaavn:parseDebugLocalResources UP-TO-DATE
+> Task :jiosaavn:generateDebugRFile UP-TO-DATE
+> Task :jiosaavn:compileDebugKotlin UP-TO-DATE
+> Task :jiosaavn:javaPreCompileDebug UP-TO-DATE
+> Task :jiosaavn:compileDebugJavaWithJavac NO-SOURCE
+> Task :jiosaavn:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :jiosaavn:processDebugJavaRes UP-TO-DATE
+> Task :jiosaavn:createFullJarDebug UP-TO-DATE
+> Task :kizzy:preBuild UP-TO-DATE
+> Task :kizzy:preDebugBuild UP-TO-DATE
+> Task :kizzy:generateDebugResources UP-TO-DATE
+> Task :kizzy:packageDebugResources UP-TO-DATE
+> Task :kizzy:processDebugNavigationResources UP-TO-DATE
+> Task :kizzy:parseDebugLocalResources UP-TO-DATE
+> Task :kizzy:generateDebugRFile UP-TO-DATE
+> Task :kizzy:compileDebugKotlin UP-TO-DATE
+> Task :kizzy:javaPreCompileDebug UP-TO-DATE
+> Task :kizzy:compileDebugJavaWithJavac NO-SOURCE
+> Task :kizzy:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :kizzy:processDebugJavaRes UP-TO-DATE
+> Task :kizzy:createFullJarDebug UP-TO-DATE
+> Task :kugou:preBuild UP-TO-DATE
+> Task :kugou:preDebugBuild UP-TO-DATE
+> Task :kugou:generateDebugResources UP-TO-DATE
+> Task :kugou:packageDebugResources UP-TO-DATE
+> Task :kugou:processDebugNavigationResources UP-TO-DATE
+> Task :kugou:parseDebugLocalResources UP-TO-DATE
+> Task :kugou:generateDebugRFile UP-TO-DATE
+> Task :kugou:compileDebugKotlin UP-TO-DATE
+> Task :kugou:javaPreCompileDebug UP-TO-DATE
+> Task :kugou:compileDebugJavaWithJavac NO-SOURCE
+> Task :kugou:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :kugou:processDebugJavaRes UP-TO-DATE
+> Task :kugou:createFullJarDebug UP-TO-DATE
+> Task :lastfm:preBuild UP-TO-DATE
+> Task :lastfm:preDebugBuild UP-TO-DATE
+> Task :lastfm:generateDebugResources UP-TO-DATE
+> Task :lastfm:packageDebugResources UP-TO-DATE
+> Task :lastfm:processDebugNavigationResources UP-TO-DATE
+> Task :lastfm:parseDebugLocalResources UP-TO-DATE
+> Task :lastfm:generateDebugRFile UP-TO-DATE
+> Task :lastfm:compileDebugKotlin UP-TO-DATE
+> Task :lastfm:javaPreCompileDebug UP-TO-DATE
+> Task :lastfm:compileDebugJavaWithJavac NO-SOURCE
+> Task :lastfm:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :lastfm:processDebugJavaRes UP-TO-DATE
+> Task :lastfm:createFullJarDebug UP-TO-DATE
+> Task :lrclib:preBuild UP-TO-DATE
+> Task :lrclib:preDebugBuild UP-TO-DATE
+> Task :lrclib:generateDebugResources UP-TO-DATE
+> Task :lrclib:packageDebugResources UP-TO-DATE
+> Task :lrclib:processDebugNavigationResources UP-TO-DATE
+> Task :lrclib:parseDebugLocalResources UP-TO-DATE
+> Task :lrclib:generateDebugRFile UP-TO-DATE
+> Task :lrclib:compileDebugKotlin UP-TO-DATE
+> Task :lrclib:javaPreCompileDebug UP-TO-DATE
+> Task :lrclib:compileDebugJavaWithJavac NO-SOURCE
+> Task :lrclib:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :lrclib:processDebugJavaRes UP-TO-DATE
+> Task :lrclib:createFullJarDebug UP-TO-DATE
+> Task :musixmatchlyrics:preBuild UP-TO-DATE
+> Task :musixmatchlyrics:preDebugBuild UP-TO-DATE
+> Task :musixmatchlyrics:generateDebugResources UP-TO-DATE
+> Task :musixmatchlyrics:packageDebugResources UP-TO-DATE
+> Task :musixmatchlyrics:processDebugNavigationResources UP-TO-DATE
+> Task :musixmatchlyrics:parseDebugLocalResources UP-TO-DATE
+> Task :musixmatchlyrics:generateDebugRFile UP-TO-DATE
+> Task :musixmatchlyrics:compileDebugKotlin UP-TO-DATE
+> Task :musixmatchlyrics:javaPreCompileDebug UP-TO-DATE
+> Task :musixmatchlyrics:compileDebugJavaWithJavac NO-SOURCE
+> Task :musixmatchlyrics:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :musixmatchlyrics:processDebugJavaRes UP-TO-DATE
+> Task :musixmatchlyrics:createFullJarDebug UP-TO-DATE
+> Task :betterlyrics:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :paxsenixlyrics:preBuild UP-TO-DATE
+> Task :paxsenixlyrics:preDebugBuild UP-TO-DATE
+> Task :paxsenixlyrics:generateDebugResources UP-TO-DATE
+> Task :paxsenixlyrics:packageDebugResources UP-TO-DATE
+> Task :paxsenixlyrics:processDebugNavigationResources UP-TO-DATE
+> Task :paxsenixlyrics:parseDebugLocalResources UP-TO-DATE
+> Task :paxsenixlyrics:generateDebugRFile UP-TO-DATE
+> Task :paxsenixlyrics:compileDebugKotlin UP-TO-DATE
+> Task :paxsenixlyrics:javaPreCompileDebug UP-TO-DATE
+> Task :paxsenixlyrics:compileDebugJavaWithJavac NO-SOURCE
+> Task :paxsenixlyrics:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :paxsenixlyrics:processDebugJavaRes UP-TO-DATE
+> Task :paxsenixlyrics:createFullJarDebug UP-TO-DATE
+> Task :shazamkit:preBuild UP-TO-DATE
+> Task :shazamkit:preDebugBuild UP-TO-DATE
+> Task :shazamkit:generateDebugResources UP-TO-DATE
+> Task :shazamkit:packageDebugResources UP-TO-DATE
+> Task :shazamkit:processDebugNavigationResources UP-TO-DATE
+> Task :shazamkit:parseDebugLocalResources UP-TO-DATE
+> Task :shazamkit:generateDebugRFile UP-TO-DATE
+> Task :shazamkit:compileDebugKotlin UP-TO-DATE
+> Task :shazamkit:javaPreCompileDebug UP-TO-DATE
+> Task :shazamkit:compileDebugJavaWithJavac NO-SOURCE
+> Task :shazamkit:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :shazamkit:processDebugJavaRes UP-TO-DATE
+> Task :shazamkit:createFullJarDebug UP-TO-DATE
+> Task :simpmusic:preBuild UP-TO-DATE
+> Task :simpmusic:preDebugBuild UP-TO-DATE
+> Task :simpmusic:generateDebugResources UP-TO-DATE
+> Task :simpmusic:packageDebugResources UP-TO-DATE
+> Task :simpmusic:processDebugNavigationResources UP-TO-DATE
+> Task :simpmusic:parseDebugLocalResources UP-TO-DATE
+> Task :simpmusic:generateDebugRFile UP-TO-DATE
+> Task :simpmusic:compileDebugKotlin UP-TO-DATE
+> Task :simpmusic:javaPreCompileDebug UP-TO-DATE
+> Task :simpmusic:compileDebugJavaWithJavac NO-SOURCE
+> Task :simpmusic:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :simpmusic:processDebugJavaRes UP-TO-DATE
+> Task :simpmusic:createFullJarDebug UP-TO-DATE
+> Task :spine:preBuild UP-TO-DATE
+> Task :spine:preDebugBuild UP-TO-DATE
+> Task :spine:generateDebugResources UP-TO-DATE
+> Task :spine:packageDebugResources UP-TO-DATE
+> Task :spine:processDebugNavigationResources UP-TO-DATE
+> Task :spine:parseDebugLocalResources UP-TO-DATE
+> Task :spine:generateDebugRFile UP-TO-DATE
+> Task :spine:compileDebugKotlin UP-TO-DATE
+> Task :spine:javaPreCompileDebug UP-TO-DATE
+> Task :spine:compileDebugJavaWithJavac NO-SOURCE
+> Task :spine:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :spine:processDebugJavaRes UP-TO-DATE
+> Task :spine:createFullJarDebug UP-TO-DATE
+> Task :spotify:preBuild UP-TO-DATE
+> Task :spotify:preDebugBuild UP-TO-DATE
+> Task :spotify:generateDebugResources UP-TO-DATE
+> Task :spotify:packageDebugResources UP-TO-DATE
+> Task :spotify:processDebugNavigationResources UP-TO-DATE
+> Task :spotify:parseDebugLocalResources UP-TO-DATE
+> Task :spotify:generateDebugRFile UP-TO-DATE
+> Task :spotify:compileDebugKotlin UP-TO-DATE
+> Task :spotify:javaPreCompileDebug UP-TO-DATE
+> Task :spotify:compileDebugJavaWithJavac NO-SOURCE
+> Task :spotify:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :spotify:processDebugJavaRes UP-TO-DATE
+> Task :spotify:createFullJarDebug UP-TO-DATE
+> Task :youlyplus:preBuild UP-TO-DATE
+> Task :youlyplus:preDebugBuild UP-TO-DATE
+> Task :youlyplus:generateDebugResources UP-TO-DATE
+> Task :youlyplus:packageDebugResources UP-TO-DATE
+> Task :youlyplus:processDebugNavigationResources UP-TO-DATE
+> Task :youlyplus:parseDebugLocalResources UP-TO-DATE
+> Task :youlyplus:generateDebugRFile UP-TO-DATE
+> Task :youlyplus:compileDebugKotlin UP-TO-DATE
+> Task :youlyplus:javaPreCompileDebug UP-TO-DATE
+> Task :youlyplus:compileDebugJavaWithJavac NO-SOURCE
+> Task :youlyplus:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :youlyplus:processDebugJavaRes UP-TO-DATE
+> Task :youlyplus:createFullJarDebug UP-TO-DATE
+> Task :app:extractIncludeArm64FossDebugProto UP-TO-DATE
+> Task :app:extractProto UP-TO-DATE
+> Task :app:generateArm64FossDebugProto UP-TO-DATE
+> Task :app:extractArm64FossDebugSupportedLocales UP-TO-DATE
+> Task :app:mapArm64FossDebugSourceSetPaths UP-TO-DATE
+> Task :artistvideo:extractDebugSupportedLocales UP-TO-DATE
+> Task :betterlyrics:extractDebugSupportedLocales UP-TO-DATE
+> Task :innertube:extractDebugSupportedLocales UP-TO-DATE
+> Task :jiosaavn:extractDebugSupportedLocales UP-TO-DATE
+> Task :kizzy:extractDebugSupportedLocales UP-TO-DATE
+> Task :kugou:extractDebugSupportedLocales UP-TO-DATE
+> Task :lastfm:extractDebugSupportedLocales UP-TO-DATE
+> Task :lrclib:extractDebugSupportedLocales UP-TO-DATE
+> Task :musixmatchlyrics:extractDebugSupportedLocales UP-TO-DATE
+> Task :paxsenixlyrics:extractDebugSupportedLocales UP-TO-DATE
+> Task :shazamkit:extractDebugSupportedLocales UP-TO-DATE
+> Task :simpmusic:extractDebugSupportedLocales UP-TO-DATE
+> Task :spine:extractDebugSupportedLocales UP-TO-DATE
+> Task :spotify:extractDebugSupportedLocales UP-TO-DATE
+> Task :youlyplus:extractDebugSupportedLocales UP-TO-DATE
+> Task :app:generateArm64FossDebugLocaleConfig UP-TO-DATE
+> Task :app:generateArm64FossDebugResources UP-TO-DATE
+> Task :app:packageArm64FossDebugResources UP-TO-DATE
+> Task :app:processArm64FossDebugNavigationResources UP-TO-DATE
+> Task :app:parseArm64FossDebugLocalResources UP-TO-DATE
+> Task :app:generateArm64FossDebugRFile UP-TO-DATE
+> Task :artistvideo:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :innertube:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :jiosaavn:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :kizzy:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :kugou:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :lastfm:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :lrclib:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :musixmatchlyrics:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :paxsenixlyrics:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :shazamkit:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :simpmusic:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :spine:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :spotify:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :youlyplus:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:kspArm64FossDebugKotlin
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '2.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '3.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '4.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '5.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '6.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '7.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '8.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '9.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '10.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '11.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '12.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '13.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '14.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '15.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '16.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '17.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '18.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '19.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '20.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '21.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '22.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '23.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '24.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '25.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '26.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '27.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '28.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '29.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '30.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '31.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '32.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '33.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '34.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+e: [ksp] /storage/internal_new/project/NexaMusic-/app/src/main/kotlin/com/nexamusic/music/db/MusicDatabase.kt:160: Schema '36.json' required for migration was not found at the schema out folder: /storage/internal_new/project/NexaMusic-/app/schemas/com.nexamusic.music.db.InternalDatabase. Cannot generate auto migrations.
+
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException: Cannot invoke "ksp.com.intellij.openapi.application.Application.getService(java.lang.Class)" because the return value of "ksp.com.intellij.openapi.application.ApplicationManager.getApplication()" is null
+	at ksp.com.intellij.openapi.fileEditor.FileDocumentManager.getInstance(FileDocumentManager.java:35)
+	at ksp.com.intellij.openapi.fileTypes.BinaryFileTypeDecompilers.lambda$notifyDecompilerSetChange$1(BinaryFileTypeDecompilers.java:29)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:318)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+
+> Task :app:kspArm64FossDebugKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:kspArm64FossDebugKotlin'.
+> A failure occurred while executing com.google.devtools.ksp.gradle.KspAAWorkerAction
+   > KSP failed with exit code: PROCESSING_ERROR
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:kspArm64FossDebugKotlin'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)
+	at org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:146)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:131)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$11(DefaultBuildLifecycleController.java:323)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:304)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$9(StateTransitionController.java:215)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:45)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:215)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:314)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$withLocksAcquired$0(DefaultWorkerLeaseService.java:275)
+	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocksAcquired(DefaultWorkerLeaseService.java:273)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:265)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:182)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:199)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:199)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing com.google.devtools.ksp.gradle.KspAAWorkerAction
+	at org.gradle.workers.internal.DefaultWorkerExecutor$WorkItemExecution.waitForCompletion(DefaultWorkerExecutor.java:289)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.lambda$waitForItemsAndGatherFailures$2(DefaultAsyncWorkTracker.java:130)
+	at org.gradle.internal.Factories$1.create(Factories.java:30)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$withoutLocks$2(DefaultWorkerLeaseService.java:350)
+	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:348)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:332)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLock(DefaultWorkerLeaseService.java:337)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:126)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:92)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForAll(DefaultAsyncWorkTracker.java:78)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForCompletion(DefaultAsyncWorkTracker.java:66)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:267)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:244)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:227)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:210)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:176)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:167)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:47)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:137)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:134)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:134)
+	at org.gradle.internal.execution.steps.ExecuteStep$Mutable.execute(ExecuteStep.java:80)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:51)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:29)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:39)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:42)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:24)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:76)
+	at org.gradle.internal.Either$Right.fold(Either.java:176)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:74)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:49)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:70)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:32)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:69)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:37)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:63)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:34)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:79)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:99)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.execute(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.executeMutable(CaptureMutableStateBeforeExecutionStep.java:86)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeWithNonEmptySources(SkipEmptyMutableWorkStep.java:210)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:90)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:53)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:77)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:43)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$executeMutable$0(AssignMutableWorkspaceStep.java:34)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:305)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:30)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	... 61 more
+Caused by: java.lang.Exception: KSP failed with exit code: PROCESSING_ERROR
+	at com.google.devtools.ksp.gradle.KspAAWorkerAction.execute(KspAATask.kt:719)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:68)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:64)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:61)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:102)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:61)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:58)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:176)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:194)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:127)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:169)
+	at org.gradle.internal.Factories$1.create(Factories.java:30)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$withLocksAcquired$0(DefaultWorkerLeaseService.java:275)
+	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocksAcquired(DefaultWorkerLeaseService.java:273)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:265)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:164)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:133)
+	... 2 more
+
+
+BUILD FAILED in 4m 18s
+204 actionable tasks: 1 executed, 203 up-to-date
+Configuration cache entry reused.

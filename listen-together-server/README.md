@@ -1,8 +1,12 @@
-# Convx Sync — Listen Together server
+# NexaMusic Sync — Listen Together server
 
 Cloudflare Worker + Durable Objects. One Durable Object per room code; that
 object owns membership, host, playback position and the queue, so there is
 never a second server with a different opinion about the same room.
+
+## About
+
+Listen Together is a shared listening feature for NexaMusic. By default, the app connects to community-hosted servers (see `ListenTogetherServers.kt`). If you want a dedicated server for your use, you can host your own using this code.
 
 ## Deploy
 
@@ -12,14 +16,14 @@ npx wrangler login      # browser auth, no card asked
 npx wrangler deploy
 ```
 
-You get `https://convx-sync.<subdomain>.workers.dev`. Put
-`wss://convx-sync.<subdomain>.workers.dev` into the app under
+You get `https://nexamusic-sync.<subdomain>.workers.dev`. Put
+`wss://nexamusic-sync.<subdomain>.workers.dev` into the app under
 **Settings → Integrations → Listen Together → custom server URL**.
 
 Check it is alive:
 
 ```bash
-curl https://convx-sync.<subdomain>.workers.dev/health   # {"ok":true}
+curl https://nexamusic-sync.<subdomain>.workers.dev/health   # {"ok":true}
 ```
 
 Watch live logs while testing:
