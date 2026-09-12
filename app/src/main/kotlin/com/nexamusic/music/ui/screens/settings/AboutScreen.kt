@@ -171,7 +171,7 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.github),
                     title = { Text(stringResource(R.string.github_repository)) },
                     description = { Text(stringResource(R.string.view_source_code)) },
-                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/cosmictaserdev-creator/Convx") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/nkosanamahungela-dev/NexaMusic-") }
                 ),
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.discord),
@@ -222,7 +222,7 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.license_vivi),
                     title = { Text(stringResource(R.string.license)) },
                     description = { Text("GPL-3.0 • Free Open Source Software") },
-                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/cosmictaserdev-creator/Convx/blob/main/LICENSE") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/nkosanamahungela-dev/NexaMusic-/blob/main/LICENSE") }
                 ),
             )
         )

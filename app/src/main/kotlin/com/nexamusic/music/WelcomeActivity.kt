@@ -512,7 +512,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Convx is open-source and depends on community support to grow. Your help makes a difference!",
+                        text = "NexaMusic is open-source and depends on community support to grow. Your help makes a difference!",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = GoogleSansFlex
                         ),
@@ -541,7 +541,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 )
                             },
                             onClick = {
-                                uriHandler.safeOpenUri(context, "https://github.com/cosmictaserdev-creator/Convx")
+                                uriHandler.safeOpenUri(context, "https://github.com/nkosanamahungela-dev/NexaMusic-")
                             }
                         )
 

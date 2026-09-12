@@ -59,10 +59,10 @@ class DiscordRPC(
         }
         if (button2Visible) {
             val resolvedText = resolveVariables(
-                button2Text.ifEmpty { "Visit Convx" },
+                button2Text.ifEmpty { "Visit NexaMusic" },
                 song
             )
-            buttonsList.add(resolvedText to "https://github.com/cosmictaserdev-creator/Convx")
+            buttonsList.add(resolvedText to "https://github.com/nkosanamahungela-dev/NexaMusic-")
         }
 
         val type = when (activityType) {
