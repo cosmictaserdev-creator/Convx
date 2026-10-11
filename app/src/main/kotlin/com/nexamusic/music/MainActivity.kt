@@ -1556,7 +1556,7 @@ class MainActivity : ComponentActivity() {
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         topBar = {
                             AnimatedVisibility(
-                                visible = false, // Hide the app-wide wordmark strip; let each screen use the full available height.
+                                visible = shouldShowTopBar,
                                 enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                                 exit = fadeOut(animationSpec = tween(durationMillis = 200))
                             ) {
@@ -1581,12 +1581,36 @@ class MainActivity : ComponentActivity() {
                                         // recomposition path anyway, and the `if` drops the
                                         // backdrop capture entirely once it is fully hidden.
                                         //
-                                        // The fade is asymmetric on purpose: coming back has
-                                        // to feel immediate, because it trails the scroll
-                                        // that asked for it. Going away can be lazy.
-                                        // Keep the app-wide top bar as a normal transparent
-                                        // Material top bar. No backdrop/gradient strip is drawn
-                                        // over screen content, so artwork and titles stay clear.
+                                        // Match Convx: use a soft, screen-tinted gradient behind the header.
+                                        val chromeAlpha by animateFloatAsState(
+                                            targetValue = if (topBarChrome.visible) 1f else 0f,
+                                            animationSpec = tween(
+                                                durationMillis = if (topBarChrome.visible) 90 else 200
+                                            ),
+                                            label = "topBarChromeAlpha",
+                                        )
+                                        val scrimColor = rememberAppBackgroundTint(
+                                            MaterialTheme.colorScheme.background
+                                        )
+                                        if (chromeAlpha > 0.01f) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(AppBarHeight * 1.9f)
+                                                    .align(Alignment.TopCenter)
+                                                    .graphicsLayer { alpha = chromeAlpha }
+                                                    .background(
+                                                        Brush.verticalGradient(
+                                                            0f to scrimColor.copy(alpha = 0.82f),
+                                                            0.42f to scrimColor.copy(alpha = 0.70f),
+                                                            0.68f to scrimColor.copy(alpha = 0.38f),
+                                                            0.86f to scrimColor.copy(alpha = 0.14f),
+                                                            1f to Color.Transparent,
+                                                        )
+                                                    )
+                                            )
+                                        }
+                                        TopAppBar(
                                         TopAppBar(
                                         title = {
                                             // Home shows the wordmark; every other tab keeps
