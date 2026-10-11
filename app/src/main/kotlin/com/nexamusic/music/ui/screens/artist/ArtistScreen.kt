@@ -77,6 +77,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -565,11 +566,7 @@ fun ArtistScreen(
                                     top = if (thumbnail != null && !tabView) {
                                         // Position content at the bottom part of the image
                                         // Using screen width to calculate aspect ratio height minus overlap
-                                        LocalResources.current.displayMetrics.widthPixels.let { screenWidth ->
-                                            with(density) {
-                                                ((screenWidth / 1.2f) - 144).toDp()
-                                            }
-                                        }
+                                        (LocalConfiguration.current.screenWidthDp.dp / 1.2f) - 144.dp
                                     } else {
                                         16.dp
                                     }
