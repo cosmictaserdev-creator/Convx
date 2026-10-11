@@ -76,7 +76,7 @@
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/ic_launcher"
             android:theme="@style/Theme.NexaMusic" />
 
         <activity
@@ -192,9 +192,9 @@
             android:name=".LauncherWhite"
             android:enabled="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_white"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_white"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -206,9 +206,9 @@
             android:name=".LauncherAzure"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_azure"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_azure"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -220,9 +220,9 @@
             android:name=".LauncherSky"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_sky"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_sky"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -234,9 +234,9 @@
             android:name=".LauncherTeal"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_teal"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_teal"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -248,9 +248,9 @@
             android:name=".LauncherSlate"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_slate"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_slate"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -262,9 +262,9 @@
             android:name=".LauncherSilver"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_silver"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_silver"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -276,9 +276,9 @@
             android:name=".LauncherPeriwinkle"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_periwinkle"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_periwinkle"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -290,9 +290,9 @@
             android:name=".LauncherViolet"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_violet"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_violet"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -304,9 +304,9 @@
             android:name=".LauncherMidnight"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_midnight"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_midnight"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -318,9 +318,9 @@
             android:name=".LauncherMauve"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_mauve"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_mauve"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -332,9 +332,9 @@
             android:name=".LauncherRose"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_rose"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_rose"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -346,9 +346,9 @@
             android:name=".LauncherCopper"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_copper"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_copper"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -360,9 +360,9 @@
             android:name=".LauncherRust"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_rust"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_rust"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
