@@ -240,7 +240,14 @@ ksp {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-opt-in=kotlin.RequiresOptIn"
+            "-opt-in=kotlin.RequiresOptIn",
+            // YTPlayerUtils.playerResponseForPlayback is intentionally feature-rich and
+            // generates an exceptionally large coroutine state machine. The Kotlin
+            // bytecode optimizer can exhaust the GitHub runner's heap while building
+            // its control-flow graph, even with a 6 GiB heap. Skip bytecode
+            // optimization for app Kotlin compilation; this is safe for debug APKs
+            // and avoids the compiler OOM seen in CI.
+            "-Xno-optimize"
         )
         suppressWarnings.set(false)
     }
