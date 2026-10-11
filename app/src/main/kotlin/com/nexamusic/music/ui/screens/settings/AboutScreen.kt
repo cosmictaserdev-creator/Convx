@@ -130,7 +130,7 @@ fun AboutScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.convx_logo),
+                    painter = painterResource(R.drawable.nexamusic_logo),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
@@ -174,7 +174,7 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.discord),
                     title = { Text(stringResource(R.string.discord_channel)) },
                     description = { Text(stringResource(R.string.join_discord)) },
-                    onClick = { uriHandler.safeOpenUri(context, "https://discord.gg/tBCfeMvt9") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://discord.gg/ebtn6byMYb") }
                 )
             )
         )
