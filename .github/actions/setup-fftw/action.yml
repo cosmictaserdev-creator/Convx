@@ -24,7 +24,7 @@ runs:
       with:
         path: app/src/main/cpp/vibrafp/third_party/fftw-android
         key: fftw-${{ inputs.fftw-version }}-ndk-${{ inputs.ndk-version }}-api-${{ inputs.api-level }}
-          save-always: true
+        save-always: true
 
     - name: Build FFTW for Android
       if: steps.cache-fftw.outputs.cache-hit != 'true'
