@@ -150,8 +150,8 @@ fun AboutScreen(
             items = listOf(
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.dev),
-                    title = { Text(stringResource(R.string.developer_name)) },
-                    description = { Text(stringResource(R.string.app_developer), color = MaterialTheme.colorScheme.primary) },
+                    title = { Text("Smelokuhle (Mahungela)") },
+                    description = { Text("Lead Developer", color = MaterialTheme.colorScheme.primary) },
                     tintIcon = false,
                     iconShape = cookieShape,
                     onClick = { uriHandler.safeOpenUri(context, "https://github.com/nkosanamahungela-dev") }
