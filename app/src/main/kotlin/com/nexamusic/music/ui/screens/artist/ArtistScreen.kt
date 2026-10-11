@@ -227,9 +227,10 @@ fun ArtistScreen(
 
     // Calculate the offset value outside of the offset lambda
     val systemBarsTopPadding = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
-    val headerOffset = with(density) {
-        -(systemBarsTopPadding + AppBarHeight).roundToPx()
-    }
+    // Keep the artist hero below the app bar on phones. The previous negative
+    // offset pulled the artwork into the top-bar/status-bar area, making the
+    // header and artist name feel clipped or overlapped on smaller screens.
+    val headerOffset = 0
 
     // How far the list has scrolled past the hero art, 0..1 — drives the
     // floating back/share chrome's scrim from transparent (over the art) to
