@@ -512,7 +512,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Convx is open-source and depends on community support to grow. Your help makes a difference!",
+                        text = "NexaMusic is built for music lovers. Join our community for updates and support.",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = GoogleSansFlex
                         ),
@@ -541,7 +541,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 )
                             },
                             onClick = {
-                                uriHandler.safeOpenUri(context, "https://github.com/cosmictaserdev-creator/Convx")
+                                uriHandler.safeOpenUri(context, "https://github.com/nkosanamahungela-dev/NexaMusic-")
                             }
                         )
 
@@ -562,7 +562,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 )
                             },
                             onClick = {
-                                uriHandler.safeOpenUri(context, "https://discord.gg/Ejeb4cmzfd")
+                                uriHandler.safeOpenUri(context, "https://discord.gg/ebtn6byMYb")
                             }
                         )
 
@@ -923,19 +923,12 @@ fun RotatingShapeContainer(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(id = com.nexamusic.music.R.drawable.ic_ten_sided_cookie),
-            contentDescription = null,
-            tint = primaryColor,
+            painter = painterResource(id = com.nexamusic.music.R.drawable.nexamusic_logo),
+            contentDescription = "NexaMusic logo",
+            tint = Color.Unspecified,
             modifier = Modifier
-                .fillMaxSize()
+                .size(260.dp)
                 .rotate(rotation)
-        )
-
-        Icon(
-            painter = painterResource(com.nexamusic.music.R.mipmap.ic_launcher_monochrome),
-            contentDescription = null,
-            modifier = Modifier.size(220.dp),
-            tint = backgroundColor
         )
     }
 }
