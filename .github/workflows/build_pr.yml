@@ -1,9 +1,7 @@
-name: Build PR
+name: Manual Universal FOSS Build
 
 on:
-  pull_request:
-    branches:
-      - "**"
+  workflow_dispatch:
 
 jobs:
   build:
