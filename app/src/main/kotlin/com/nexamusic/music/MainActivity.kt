@@ -242,7 +242,7 @@ import com.nexamusic.music.ui.component.AppFloatingNavBar
 import com.nexamusic.music.ui.component.LocalDownloads
 import com.nexamusic.music.ui.component.LocalItemPrefs
 import com.nexamusic.music.ui.component.LocalNavSearchState
-import com.nexamusic.music.ui.component.rememberAppBackgroundTint
+import com.nexamusic.music.ui.component.rememberAppBackgroundColor
 import com.nexamusic.music.ui.component.rememberItemPrefs
 import com.nexamusic.music.ui.component.NavSearchState
 import com.nexamusic.music.ui.component.GlassEffectConfig
@@ -1589,7 +1589,7 @@ class MainActivity : ComponentActivity() {
                                             ),
                                             label = "topBarChromeAlpha",
                                         )
-                                        val scrimColor = rememberAppBackgroundTint(
+                                        val scrimColor = rememberAppBackgroundColor(
                                             MaterialTheme.colorScheme.background
                                         )
                                         if (chromeAlpha > 0.01f) {
