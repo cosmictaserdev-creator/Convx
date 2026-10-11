@@ -1584,48 +1584,9 @@ class MainActivity : ComponentActivity() {
                                         // The fade is asymmetric on purpose: coming back has
                                         // to feel immediate, because it trails the scroll
                                         // that asked for it. Going away can be lazy.
-                                        val chromeAlpha by animateFloatAsState(
-                                            targetValue = if (topBarChrome.visible) 1f else 0f,
-                                            animationSpec = tween(
-                                                durationMillis = if (topBarChrome.visible) 90 else 200
-                                            ),
-                                            label = "topBarChromeAlpha",
-                                        )
-                                        // The scrim is the screen's OWN background faded
-                                        // out, not a fixed black: hardcoded black read as
-                                        // a dark band across the top of every light-theme
-                                        // screen. Same expression the top-level screens
-                                        // paint behind their content, so it honours the
-                                        // picked theme colour when dynamic colour is off.
-                                        val scrimColor = rememberAppBackgroundTint(
-                                            MaterialTheme.colorScheme.background
-                                        )
-                                        if (chromeAlpha > 0.01f) {
-                                            // Replaces the blur that used to sit here: one drawn
-                                            // rect, no capture, no layer of its own beyond the
-                                            // alpha fade. Weighted toward the top and held near
-                                            // full opacity across the whole bar rather than
-                                            // falling off immediately — the bar's title and icons
-                                            // sit in the first two thirds, and with the blur gone
-                                            // there is nothing but this gradient separating them
-                                            // from whatever artwork scrolls underneath.
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(AppBarHeight * 1.9f)
-                                                    .align(Alignment.TopCenter)
-                                                    .graphicsLayer { alpha = chromeAlpha }
-                                                    .background(
-                                                        Brush.verticalGradient(
-                                                            0f to scrimColor.copy(alpha = 0.82f),
-                                                            0.42f to scrimColor.copy(alpha = 0.70f),
-                                                            0.68f to scrimColor.copy(alpha = 0.38f),
-                                                            0.86f to scrimColor.copy(alpha = 0.14f),
-                                                            1f to Color.Transparent,
-                                                        )
-                                                    )
-                                            )
-                                        }
+                                        // Keep the app-wide top bar as a normal transparent
+                                        // Material top bar. No backdrop/gradient strip is drawn
+                                        // over screen content, so artwork and titles stay clear.
                                         TopAppBar(
                                         title = {
                                             // Home shows the wordmark; every other tab keeps
