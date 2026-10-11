@@ -568,7 +568,7 @@ fun ArtistScreen(
                                     top = if (thumbnail != null && !tabView) {
                                         // Position content at the bottom part of the image
                                         // Using screen width to calculate aspect ratio height minus overlap
-                                        (LocalConfiguration.current.screenWidthDp.dp / 1.2f) - 144.dp
+                                        ((LocalConfiguration.current.screenWidthDp.dp / 1.2f) - 144.dp).coerceAtLeast(16.dp)
                                     } else {
                                         16.dp
                                     }
