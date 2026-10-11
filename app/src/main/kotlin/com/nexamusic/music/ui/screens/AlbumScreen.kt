@@ -498,7 +498,7 @@ fun AlbumScreen(
                             .fillMaxWidth()
                             .padding(
                                 top = if (tabView) 0.dp else {
-                                    (LocalConfiguration.current.screenWidthDp.dp / 1.2f) - 144.dp
+                                    ((LocalConfiguration.current.screenWidthDp.dp / 1.2f) - 144.dp).coerceAtLeast(16.dp)
                                 }
                             )
                             .padding(bottom = 24.dp),
