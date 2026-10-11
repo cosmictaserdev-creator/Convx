@@ -379,17 +379,17 @@ fun AlbumScreen(
         state = lazyListState,
         // No bounce here: the top pull drives the hero zoom instead.
         overscrollEffect = heroZoom.listOverscroll(),
-        modifier = Modifier.heroPullZoom(heroZoom),
+        modifier = Modifier
+            .padding(top = AppBarHeight)
+            .heroPullZoom(heroZoom),
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
     ) {
         val albumWithSongs = albumWithSongs
         if (albumWithSongs != null && albumWithSongs.songs.isNotEmpty()) {
              item(key = "album_header", contentType = "header") {
-                val systemBarsTopPadding = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
-                val density = LocalDensity.current
-                val headerOffset = with(density) {
-                    -(systemBarsTopPadding + AppBarHeight).roundToPx()
-                }
+                // Keep the artwork below the floating top-bar controls instead of
+                // pulling it underneath them with a negative offset.
+                val headerOffset = 0
 
                 val tintHeader = tint
                 val onTintHeader = com.nexamusic.music.ui.theme.AppleTokens.onColor(tintHeader)
