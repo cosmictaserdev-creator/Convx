@@ -1556,7 +1556,7 @@ class MainActivity : ComponentActivity() {
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         topBar = {
                             AnimatedVisibility(
-                                visible = shouldShowTopBar,
+                                visible = shouldShowTopBar && !playerBottomSheetState.isExpanded,
                                 enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                                 exit = fadeOut(animationSpec = tween(durationMillis = 200))
                             ) {
