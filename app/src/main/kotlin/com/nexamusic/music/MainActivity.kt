@@ -1611,7 +1611,6 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                         TopAppBar(
-                                        TopAppBar(
                                         title = {
                                             // Home shows the wordmark; every other tab keeps
                                             // its own title.
