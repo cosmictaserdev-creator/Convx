@@ -360,6 +360,58 @@ private val WebViewRoutes = setOf(
     "settings/discord/login",
 )
 
+/**
+ * Drives whether the top bar's blur/scrim strip is drawn at all: shown while the
+ * list is at the top and while the user is scrolling back up, hidden once they
+ * scroll down into the content. Without this the darkened strip sits over every
+ * screen permanently.
+ *
+ * MainActivity doesn't own any screen's list state â€” the nested scroll stream is
+ * the only app-level scroll signal available here, so direction is tracked from
+ * the deltas rather than read off a LazyListState.
+ */
+@Stable
+private class TopBarChromeVisibility {
+    var visible by mutableStateOf(true)
+        private set
+
+    /** True while the content is against its top edge. */
+    private var atTop = true
+
+    val connection = object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            // Finger moving down (positive y) scrolls the content back up.
+            val dy = available.y
+            if (dy > ScrollSlopPx) {
+                visible = true
+            } else if (dy < -ScrollSlopPx && !atTop) {
+                visible = false
+            }
+            return Offset.Zero
+        }
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource,
+        ): Offset {
+            // Leftover downward delta the list could not consume means it is
+            // already pinned at its top edge.
+            if (available.y > 0f) {
+                atTop = true
+                visible = true
+            } else if (consumed.y != 0f) {
+                atTop = false
+            }
+            return Offset.Zero
+        }
+    }
+
+    private companion object {
+        /** Ignore sub-pixel jitter so the strip doesn't flicker while settling. */
+        const val ScrollSlopPx = 1.5f
+    }
+}
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -1202,6 +1254,10 @@ class MainActivity : ComponentActivity() {
                     },
                 )
 
+                // Shows the top bar's blur/scrim strip only at the top of a list
+                // or while scrolling back up â€” see TopBarChromeVisibility.
+                val topBarChrome = remember { TopBarChromeVisibility() }
+
                 // Navigation tracking. Keyed on effectiveRoute too, not just
                 // navBackStackEntry -- a pager tab switch (Home/Search/Library/
                 // ListenTogether/Settings) no longer changes the real back stack
@@ -1528,9 +1584,48 @@ class MainActivity : ComponentActivity() {
                                         // The fade is asymmetric on purpose: coming back has
                                         // to feel immediate, because it trails the scroll
                                         // that asked for it. Going away can be lazy.
-                                        // Keep the app-wide top bar as a normal transparent
-                                        // Material top bar. No backdrop/gradient strip is drawn
-                                        // over screen content, so artwork and titles stay clear.
+                                        val chromeAlpha by animateFloatAsState(
+                                            targetValue = if (topBarChrome.visible) 1f else 0f,
+                                            animationSpec = tween(
+                                                durationMillis = if (topBarChrome.visible) 90 else 200
+                                            ),
+                                            label = "topBarChromeAlpha",
+                                        )
+                                        // The scrim is the screen's OWN background faded
+                                        // out, not a fixed black: hardcoded black read as
+                                        // a dark band across the top of every light-theme
+                                        // screen. Same expression the top-level screens
+                                        // paint behind their content, so it honours the
+                                        // picked theme colour when dynamic colour is off.
+                                        val scrimColor = rememberAppBackgroundTint(
+                                            MaterialTheme.colorScheme.background
+                                        )
+                                        if (chromeAlpha > 0.01f) {
+                                            // Replaces the blur that used to sit here: one drawn
+                                            // rect, no capture, no layer of its own beyond the
+                                            // alpha fade. Weighted toward the top and held near
+                                            // full opacity across the whole bar rather than
+                                            // falling off immediately — the bar's title and icons
+                                            // sit in the first two thirds, and with the blur gone
+                                            // there is nothing but this gradient separating them
+                                            // from whatever artwork scrolls underneath.
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(AppBarHeight * 1.9f)
+                                                    .align(Alignment.TopCenter)
+                                                    .graphicsLayer { alpha = chromeAlpha }
+                                                    .background(
+                                                        Brush.verticalGradient(
+                                                            0f to scrimColor.copy(alpha = 0.82f),
+                                                            0.42f to scrimColor.copy(alpha = 0.70f),
+                                                            0.68f to scrimColor.copy(alpha = 0.38f),
+                                                            0.86f to scrimColor.copy(alpha = 0.14f),
+                                                            1f to Color.Transparent,
+                                                        )
+                                                    )
+                                            )
+                                        }
                                         TopAppBar(
                                         title = {
                                             // Home shows the wordmark; every other tab keeps
@@ -1955,6 +2050,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         )
                                         .nestedScroll(backdropFreezeConnection)
+                                        .nestedScroll(topBarChrome.connection)
                                         .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
                                         .nestedScroll(floatingNavBarScrollConnection)
                                 ) {
