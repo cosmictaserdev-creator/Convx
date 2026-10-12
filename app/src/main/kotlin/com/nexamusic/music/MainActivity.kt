@@ -1564,7 +1564,7 @@ class MainActivity : ComponentActivity() {
                         containerColor = Color.Transparent,
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         // Global TopAppBar intentionally disabled across the entire app.
-                        topBar = {}
+                        topBar = {},
                         bottomBar = {
                             val onNavItemClick: (Screens, Boolean) -> Unit = remember(navController, coroutineScope, topAppBarScrollBehavior, playerBottomSheetState, enterSearch) {
                                 var lastNavRoute: String? = null
