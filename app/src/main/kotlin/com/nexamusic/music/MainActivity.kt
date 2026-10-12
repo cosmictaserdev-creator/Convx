@@ -1565,7 +1565,8 @@ class MainActivity : ComponentActivity() {
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         topBar = {
                             AnimatedVisibility(
-                                visible = shouldShowTopBar,
+                                // Home has its own wordmark in the screen content; never render this app-wide bar there.
+                                visible = shouldShowTopBar && effectiveRoute != Screens.Home.route,
                                 enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                                 exit = fadeOut(animationSpec = tween(durationMillis = 200))
                             ) {
