@@ -1345,8 +1345,13 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(effectiveRoute, listenTogetherInTopBar, showRail) {
                     val isListenTogetherScreen = effectiveRoute == Screens.ListenTogether.route ||
                         currentRoute == "listen_together_from_topbar"
+                    // Home already renders its own NEXAMUSIC wordmark in the screen content.
+                    // Hide the duplicate app-wide TopAppBar there so the content can sit
+                    // directly under the transparent status bar. Keep titles/actions on
+                    // other top-level screens.
                     shouldShowTopBar = !showRail &&
                         effectiveRoute in topLevelScreens &&
+                        effectiveRoute != Screens.Home.route &&
                         effectiveRoute != "settings" &&
                         !(isListenTogetherScreen && listenTogetherInTopBar)
                 }
