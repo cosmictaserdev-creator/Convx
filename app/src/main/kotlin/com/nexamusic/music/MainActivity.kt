@@ -1553,6 +1553,10 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     Scaffold(
+                        // The parent Box paints the selected app background edge to edge.
+                        // Keep Scaffold transparent so its default Material surface does not
+                        // leave a gray strip behind the transparent status bar.
+                        containerColor = Color.Transparent,
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         topBar = {
                             AnimatedVisibility(
@@ -1581,7 +1585,7 @@ class MainActivity : ComponentActivity() {
                                         // recomposition path anyway, and the `if` drops the
                                         // backdrop capture entirely once it is fully hidden.
                                         //
-                                        // Match Convx: use a soft, screen-tinted gradient behind the header.
+                                        // Use a soft, screen-tinted gradient behind the header.
                                         val chromeAlpha by animateFloatAsState(
                                             targetValue = if (topBarChrome.visible) 1f else 0f,
                                             animationSpec = tween(
