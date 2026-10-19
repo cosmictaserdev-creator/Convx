@@ -29,6 +29,8 @@ class ModuleManager {
     private val streams = SharedModuleCalls<ModuleStreamResponse>(30_000L)
     private val liveStreams = SharedModuleCalls<ModuleStreamResponse>(0)
     private val loadedModules = ConcurrentHashMap<String, LoadedModule>()
+    private val addonManifests = ConcurrentHashMap<String, ModuleManifest>()
+    private val rateLimits = ConcurrentHashMap<String, Long>()
 
     data class LoadedModule(
         val module: SpineModule,
@@ -43,9 +45,22 @@ class ModuleManager {
         return indexes.get(sourceUrl) {
             catching {
                 require(EclipseAddon.isAllowedUrl(sourceUrl)) { "Module index must be https" }
-                val body = download(sourceUrl)
+                var resolvedSource = sourceUrl.trimEnd('/')
+                var body = try { download(resolvedSource) } catch (error: Exception) {
+                    if (error is CancellationException || resolvedSource.endsWith(".json")) throw error
+                    resolvedSource = "$resolvedSource/manifest.json"
+                    download(resolvedSource)
+                }
+                if (!EclipseAddon.isManifest(json, body) && !resolvedSource.endsWith(".json") && !body.trimStart().startsWith("{")) {
+                    resolvedSource = "$resolvedSource/manifest.json"
+                    body = download(resolvedSource)
+                }
                 // An Eclipse addon's manifest URL installs that one addon as a module.
-                if (EclipseAddon.isManifest(json, body)) return@catching listOf(EclipseAddon.toModule(json, sourceUrl, body))
+                if (EclipseAddon.isManifest(json, body)) {
+                    val module = EclipseAddon.toModule(json, resolvedSource, body).copy(sourceUrl = sourceUrl)
+                    addonManifests[module.download] = EclipseAddon.moduleManifest(json, body)
+                    return@catching listOf(module)
+                }
                 ModuleIndex.parseModules(json, body).map { module ->
                     fun imageUrl(value: String?): String? = value?.takeIf(String::isNotBlank)?.let {
                         URI(sourceUrl).resolve(it).toString()
@@ -54,6 +69,7 @@ class ModuleManager {
                         download = URI(sourceUrl).resolve(module.download).toString(),
                         logo = imageUrl(module.logo),
                         icon = imageUrl(module.icon),
+                        sourceUrl = sourceUrl,
                     )
                 }
             }
@@ -65,7 +81,9 @@ class ModuleManager {
         resolveBaseUrl: suspend (String) -> String = { it },
     ): Result<LoadedModule> = catching {
         if (module.type == EclipseAddon.TYPE) {
-            return@catching LoadedModule(module, "", module.download, digest("eclipse|${module.download}|${module.version}"))
+            val manifest = addonManifests[module.download] ?: EclipseAddon.moduleManifest(json, download("${module.download}/manifest.json"))
+                .also { addonManifests[module.download] = it }
+            return@catching LoadedModule(module, "", module.download, digest("eclipse|${module.download}|${module.version}"), manifest)
         }
         val downloadUrl = if (module.download.startsWith("https://")) module.download else {
             val base = resolveBaseUrl(module.download).trimEnd('/') + "/"
@@ -113,7 +131,8 @@ class ModuleManager {
         return searches.get(keyOf(loaded.engineId, query, limit.toString(), context)) {
             catching {
                 if (loaded.module.type == EclipseAddon.TYPE) {
-                    EclipseAddon.parseSearch(json, download(EclipseAddon.searchUrl(loaded.baseUrl, query)), limit)
+                    EclipseAddon.parseSearch(json, download(EclipseAddon.searchUrl(loaded.baseUrl, query,
+                        EclipseAddon.parameters(loaded.manifest, settings))), limit)
                 } else json.decodeFromString<ModuleSearchResponse>(call(
                     loaded, "searchTracks", listOf(Json.encodeToString(query), limit.toString(), context),
                 ))
@@ -132,7 +151,8 @@ class ModuleManager {
         return calls.get(keyOf(loaded.engineId, trackId, quality, context)) {
             catching {
                 if (loaded.module.type == EclipseAddon.TYPE) {
-                    EclipseAddon.parseStream(json, trackId, download(EclipseAddon.streamUrl(loaded.baseUrl, trackId)))
+                    EclipseAddon.parseStream(json, trackId, download(EclipseAddon.streamUrl(loaded.baseUrl, trackId,
+                        EclipseAddon.parameters(loaded.manifest, settings, quality))))
                 } else json.decodeFromString<ModuleStreamResponse>(call(
                     loaded, "getTrackStreamUrl",
                     listOf(Json.encodeToString(trackId), Json.encodeToString(quality), context),
@@ -179,6 +199,7 @@ class ModuleManager {
     fun unloadAll() {
         loadedModules.keys.forEach(QuickJsExecutor::unload)
         loadedModules.clear()
+        addonManifests.clear()
         indexes.clear()
         loads.clear()
         searches.clear()
@@ -187,8 +208,16 @@ class ModuleManager {
     }
 
     private suspend fun download(url: String): String = withContext(Dispatchers.IO) {
+        val origin = URI(url).let { "${it.scheme}://${it.authority}" }
+        val waitMs = (rateLimits[origin] ?: 0L) - System.currentTimeMillis()
+        require(waitMs <= 0L) { "This source is rate limited. Try again in ${(waitMs + 999) / 1000} seconds" }
         val response = client.get(url) { header(HttpHeaders.UserAgent, userAgent) }
         val body = response.bodyAsText()
+        if (response.status.value == 429) {
+            val retrySeconds = response.headers["Retry-After"]?.toLongOrNull()?.coerceIn(1, 300) ?: 5L
+            rateLimits[origin] = System.currentTimeMillis() + retrySeconds * 1000
+            error("This source is rate limited. Try again in $retrySeconds seconds")
+        }
         if (response.status.value !in 200..299) {
             val reason = runCatching {
                 json.decodeFromString(kotlinx.serialization.json.JsonObject.serializer(), body)["error"]

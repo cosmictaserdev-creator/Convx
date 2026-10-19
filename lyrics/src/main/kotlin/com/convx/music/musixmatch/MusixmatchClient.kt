@@ -8,7 +8,7 @@ package com.convx.music.musixmatch
 import android.content.Context
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -50,7 +50,7 @@ object MusixmatchClient {
         if (client != null) return
         synchronized(this) {
             if (client != null) return
-            client = HttpClient(CIO) {
+            client = HttpClient(OkHttp) {
                 install(HttpTimeout) {
                     requestTimeoutMillis = 15000
                     connectTimeoutMillis = 10000

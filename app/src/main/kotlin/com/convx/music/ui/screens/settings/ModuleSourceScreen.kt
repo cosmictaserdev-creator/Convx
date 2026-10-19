@@ -70,6 +70,9 @@ import com.convx.music.ui.component.ModernSwitch
 import com.convx.music.ui.theme.AppleTokens
 import com.convx.music.ui.utils.backToMain
 import com.convx.music.utils.rememberPreference
+import com.convx.music.utils.dataStore
+import androidx.datastore.preferences.core.edit
+import kotlinx.coroutines.CancellationException
 import com.music.spine.ModuleManager
 import com.music.spine.SpineModule
 import kotlinx.coroutines.launch
@@ -142,6 +145,7 @@ fun ModuleSourceScreen(
     }
 
     fun toggleModule(moduleId: String) {
+        moduleManager.unloadModule(moduleId)
         // Disabling drops it from the priority list; enabling appends it to the end
         // (lowest priority until the user drags it up) rather than rebuilding from
         // a Set, which would throw away any order the user already set.
@@ -151,8 +155,18 @@ fun ModuleSourceScreen(
     }
 
     fun removeSource(url: String) {
-        saveSources(sourceUrls.filter { it != url })
-        moduleManager.unloadAll()
+        scope.launch {
+            val removed = fetchedModules.filter { it.sourceUrl == url ||
+                (it.type == com.music.spine.EclipseAddon.TYPE && it.download == com.music.spine.EclipseAddon.baseUrl(url)) }
+                .mapTo(hashSetOf()) { it.id }
+            context.dataStore.edit { prefs ->
+                prefs[ModuleSourcesKey] = JSONArray(sourceUrls.filter { it != url }).toString()
+                prefs[EnabledModulesKey] = JSONArray(enabledOrder.filterNot { it in removed }).toString()
+                prefs[FetchedModulesKey] = json.encodeToString(
+                    kotlinx.serialization.builtins.ListSerializer(SpineModule.serializer()), fetchedModules.filterNot { it.id in removed })
+            }
+            moduleManager.unloadAll()
+        }
     }
 
     SettingsLazyPage(
@@ -388,6 +402,7 @@ fun ModuleSourceScreen(
                         color = AppTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(12.dp))
+                    errorMessage?.let { Text(it, color = AppTheme.colorScheme.error) }
                     OutlinedTextField(
                         value = urlInput,
                         onValueChange = { urlInput = it },
@@ -402,11 +417,32 @@ fun ModuleSourceScreen(
                 TextButton(
                     onClick = {
                         if (urlInput.isNotBlank()) {
-                            saveSources(sourceUrls + urlInput.trim())
-                            showAddDialog = false
+                            val url = urlInput.trim().trimEnd('/')
+                            scope.launch {
+                                isLoading = true
+                                errorMessage = null
+                                try {
+                                    val modules = moduleManager.fetchIndex(url, refresh = true).getOrThrow()
+                                    require(modules.isNotEmpty()) { "No addons or modules found at that URL" }
+                                    context.dataStore.edit { prefs ->
+                                        prefs[ModuleSourcesKey] = JSONArray((sourceUrls + url).distinct()).toString()
+                                        prefs[FetchedModulesKey] = json.encodeToString(
+                                            kotlinx.serialization.builtins.ListSerializer(SpineModule.serializer()),
+                                            (modules + fetchedModules).distinctBy { it.id })
+                                        prefs[EnabledModulesKey] = JSONArray((enabledOrder + modules.filterNot { m ->
+                                            fetchedModules.any { it.id == m.id }
+                                        }.map { it.id }).distinct()).toString()
+                                    }
+                                    showAddDialog = false
+                                } catch (cancelled: CancellationException) {
+                                    throw cancelled
+                                } catch (error: Exception) {
+                                    errorMessage = error.message ?: "Unable to add this source"
+                                } finally { isLoading = false }
+                            }
                         }
                     },
-                    enabled = urlInput.isNotBlank(),
+                    enabled = urlInput.isNotBlank() && !isLoading,
                 ) {
                     Text(stringResource(R.string.add_to_an_playlist))
                 }

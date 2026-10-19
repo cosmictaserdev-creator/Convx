@@ -7,19 +7,13 @@ package com.convx.music.lyrics
 
 object LyricsProviderRegistry {
     private val providers = listOf(
-        YouLyPlusLyricsProvider,
-        PaxSenixLyricsProvider,
-        MusixmatchLyricsProvider,
-        UnisonLyricsProvider,
-        BetterLyricsProvider,
-        SimpMusicLyricsProvider,
-        LrcLibLyricsProvider,
-        KuGouLyricsProvider,
         YouTubeSubtitleLyricsProvider,
         YouTubeLyricsProvider,
-    ).associateBy(LyricsProvider::id)
+    ).plus(BitChordLyricsProviders.all).associateBy(LyricsProvider::id)
 
-    private val legacyDisplayNames = providers.values.associate { it.displayName to it.id }
+    private val legacyDisplayNames = providers.values.associate { it.displayName to it.id } + mapOf(
+        "YouLy+" to "YouLyPlus", "YouLyPlus" to "YouLyPlus", "LrcLib" to "LrcLib", "Kugou" to "Kugou",
+    )
 
     val providerIds = providers.keys.toList()
 
@@ -30,31 +24,41 @@ object LyricsProviderRegistry {
 
     fun deserializeProviderOrder(orderString: String): List<String> {
         if (orderString.isBlank()) return getDefaultProviderOrder()
-        return orderString.split(",").map { it.trim() }.filter { it in providerIds }
+        return orderString.split(",").map { it.trim() }.filter { it in providerIds }.distinct()
     }
 
     fun serializeProviderOrder(providers: List<String>): String =
-        providers.filter { it in providerIds }.joinToString(",")
+        providers.filter { it in providerIds }.distinct().joinToString(",")
 
-    // LrcLib and Kugou lead: both are free, keyless, fast, and cover synced
-    // lyrics for the widest audience (Kugou for CJK). The remote/aggregator
-    // services follow; the YouTube-only pair stays last since it can only
-    // serve videoId tracks.
+    // Word timing providers lead so the default renderer receives real word
+    // timestamps. The saved order always takes precedence over this default.
     fun getDefaultProviderOrder(): List<String> = listOf(
-        "LrcLib",
-        "Kugou",
-        "YouLyPlus",
-        "Paxsenix",
-        "Musixmatch",
-        "Unison",
+        "LrcRed",
+        "BiniLyrics",
         "BetterLyrics",
+        "BetterLyricsPortato",
+        "Paxsenix",
+        "PaxsenixSpotify",
+        "PaxsenixMusixmatch",
+        "YouLyPlus",
+        "Unison",
         "SimpMusic",
         "YouTubeSubtitle",
         "YouTubeMusic",
+        "Megalobiz",
+        "Kugou",
+        "LrcLib",
+        "Musixmatch",
+        "Genius",
     )
 
     fun getOrderedProviders(orderString: String): List<LyricsProvider> =
-        deserializeProviderOrder(orderString).mapNotNull(::getProvider)
+        completeProviderOrder(orderString).mapNotNull(::getProvider)
+
+    fun completeProviderOrder(orderString: String): List<String> {
+        val saved = deserializeProviderOrder(orderString)
+        return saved + getDefaultProviderOrder().filterNot { it in saved }
+    }
 
     fun getDisplayName(id: String): String = getProviderForStoredName(id)?.displayName ?: id
 }

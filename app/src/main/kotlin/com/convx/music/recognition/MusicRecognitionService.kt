@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.nio.ByteOrder
@@ -66,6 +68,7 @@ object MusicRecognitionService {
         
         try {
             val audioData = recordAudio()
+            currentCoroutineContext().ensureActive()
             
             _recognitionStatus.value = RecognitionStatus.Processing
             
@@ -151,12 +154,12 @@ object MusicRecognitionService {
         
         val outputStream = ByteArrayOutputStream()
         val buffer = ByteArray(bufferSize)
-        val startTime = System.currentTimeMillis()
+        val startTime = android.os.SystemClock.elapsedRealtime()
         
         try {
             audioRecord.startRecording()
             
-            while (System.currentTimeMillis() - startTime < RECORDING_DURATION_MS && isActive) {
+            while (android.os.SystemClock.elapsedRealtime() - startTime < RECORDING_DURATION_MS && isActive) {
                 val bytesRead = audioRecord.read(buffer, 0, bufferSize)
                 if (bytesRead > 0) {
                     outputStream.write(buffer, 0, bytesRead)
@@ -169,6 +172,7 @@ object MusicRecognitionService {
             audioRecord.release()
         }
         
+        currentCoroutineContext().ensureActive()
         outputStream.toByteArray().also { require(it.isNotEmpty()) { "No audio was recorded" } }
     }
     

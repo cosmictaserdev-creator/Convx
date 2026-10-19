@@ -51,6 +51,7 @@ import com.convx.music.LocalPlayerConnection
 import com.convx.music.constants.AppleMusicLyricsBlurKey
 import com.convx.music.constants.LyricsRomanizeAsMainKey
 import com.convx.music.lyrics.LyricsEntry
+import com.convx.music.lyrics.wordsWithSpacing
 import com.convx.music.ui.screens.settings.LyricsPosition
 import com.convx.music.utils.rememberPreference
 import kotlinx.coroutines.isActive
@@ -111,6 +112,7 @@ fun String.containsComplexScript(): Boolean {
 
 @Composable
 fun MetroLyricsLine(
+    fontFamily: androidx.compose.ui.text.font.FontFamily = androidx.compose.ui.text.font.FontFamily.Default,
     entry: LyricsEntry,
     nextEntryTime: Long?,
     effectivePlaybackPosition: Long,
@@ -206,6 +208,7 @@ fun MetroLyricsLine(
     val agentTextAlign = singerTextAlign(entry.agent, entry.isBackground, lyricsTextPosition)
 
     val lyricStyle = TextStyle(
+        fontFamily = fontFamily,
         fontSize = lyricsTextSize.sp,
         fontWeight = FontWeight.Bold,
         fontStyle = if (entry.isBackground) FontStyle.Italic else FontStyle.Normal,
@@ -226,12 +229,12 @@ fun MetroLyricsLine(
     ) {
         val wordList = entry.words
         val effectiveWords: List<MetroWordTimestamp> = if (wordList != null && wordList.isNotEmpty() && (!showRomanized || !romanizeAsMain || !isRomanizedAvailable || mainText == entry.text)) {
-            wordList.mapIndexed { idx, word ->
+            entry.wordsWithSpacing().mapIndexed { idx, word ->
                 MetroWordTimestamp(
-                    text = word.text,
+                    text = word.text.trimEnd(),
                     startTime = word.startTime,
                     endTime = word.endTime,
-                    hasTrailingSpace = idx < wordList.size - 1
+                    hasTrailingSpace = word.text.lastOrNull()?.isWhitespace() == true
                 )
             }
         } else {
@@ -269,6 +272,7 @@ fun MetroLyricsLine(
             )
         } else {
             Text(
+                    fontFamily = fontFamily,
                 text = mainText,
                 style = lyricStyle.copy(color = if (isActive && !entry.isBackground) expressiveAccent else baseLineColor),
                 modifier = Modifier.fillMaxWidth()
@@ -277,6 +281,7 @@ fun MetroLyricsLine(
 
         if (subText != null) {
             Text(
+                    fontFamily = fontFamily,
                 text = subText,
                 fontSize = 18.sp,
                 color = baseLineColor.copy(alpha = 0.6f),
@@ -291,6 +296,7 @@ fun MetroLyricsLine(
             val translatedText by entry.translatedTextFlow.collectAsStateWithLifecycle()
             translatedText?.let { translated ->
                 Text(
+                    fontFamily = fontFamily,
                     text = translated,
                     fontSize = 16.sp,
                     color = expressiveAccent.copy(alpha = 0.8f),

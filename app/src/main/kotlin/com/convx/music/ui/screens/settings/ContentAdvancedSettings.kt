@@ -7,6 +7,11 @@ package com.convx.music.ui.screens.settings
 
 import com.convx.music.ui.component.sf
 import com.convx.music.ui.component.SymbolIcon
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.edit
+import com.convx.music.lyrics.LyricsProviderSettings
+import com.convx.music.utils.dataStore
+import kotlinx.coroutines.launch
 import android.content.ClipData
 import android.content.ClipboardManager
 import androidx.compose.animation.AnimatedVisibility
@@ -126,14 +131,6 @@ fun ContentAdvancedSettings(
     val (proxyPassword, onProxyPasswordChange) = rememberPreference(key = ProxyPasswordKey, defaultValue = "")
     val (ipVersion, onIpVersionChange) = rememberEnumPreference(IpVersionKey, defaultValue = IpVersion.AUTO)
 
-    val (enableKugou, onEnableKugouChange) = rememberPreference(key = EnableKugouKey, defaultValue = true)
-    val (enableLrclib, onEnableLrclibChange) = rememberPreference(key = EnableLrcLibKey, defaultValue = true)
-    val (enableBetterLyrics, onEnableBetterLyricsChange) = rememberPreference(key = EnableBetterLyricsKey, defaultValue = true)
-    val (enableSimpMusic, onEnableSimpMusicChange) = rememberPreference(key = EnableSimpMusicKey, defaultValue = true)
-    val (enableYouLyPlus, onEnableYouLyPlusChange) = rememberPreference(key = EnableYouLyPlusKey, defaultValue = true)
-    val (enablePaxsenix, onEnablePaxsenixChange) = rememberPreference(key = EnablePaxsenixKey, defaultValue = true)
-    val (enableMusixmatch, onEnableMusixmatchChange) = rememberPreference(key = EnableMusixmatchKey, defaultValue = true)
-    val (enableUnison, onEnableUnisonChange) = rememberPreference(key = EnableUnisonKey, defaultValue = true)
     val (lyricsProviderOrder, onLyricsProviderOrderChange) = rememberPreference(key = LyricsProviderOrderKey, defaultValue = "")
 
     val (lengthTop, onLengthTopChange) = rememberPreference(key = TopSize, defaultValue = "50")
@@ -292,27 +289,9 @@ fun ContentAdvancedSettings(
 
     if (showProviderPriorityDialog) {
         val defaultOrder = LyricsProviderRegistry.getDefaultProviderOrder()
-        // The selected order is also the enabled provider list; missing providers are disabled.
-        val enabledSetters = mapOf(
-            "LrcLib" to onEnableLrclibChange,
-            "Kugou" to onEnableKugouChange,
-            "BetterLyrics" to onEnableBetterLyricsChange,
-            "SimpMusic" to onEnableSimpMusicChange,
-            "YouLyPlus" to onEnableYouLyPlusChange,
-            "Paxsenix" to onEnablePaxsenixChange,
-            "Musixmatch" to onEnableMusixmatchChange,
-            "Unison" to onEnableUnisonChange,
-        )
-        val enabledStates = mapOf(
-            "LrcLib" to enableLrclib,
-            "Kugou" to enableKugou,
-            "BetterLyrics" to enableBetterLyrics,
-            "SimpMusic" to enableSimpMusic,
-            "YouLyPlus" to enableYouLyPlus,
-            "Paxsenix" to enablePaxsenix,
-            "Musixmatch" to enableMusixmatch,
-            "Unison" to enableUnison,
-        )
+        val providerPreferences by context.dataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences())
+        val providerScope = androidx.compose.runtime.rememberCoroutineScope()
+        val enabledStates = defaultOrder.associateWith { providerPreferences[LyricsProviderSettings.enabledKey(it)] ?: true }
 
         val savedOrder = LyricsProviderRegistry.deserializeProviderOrder(lyricsProviderOrder)
         val normalizedOrder = savedOrder + defaultOrder.filter { it !in savedOrder }
@@ -408,7 +387,12 @@ fun ContentAdvancedSettings(
                                 )
                             },
                             onToggleEnabled = { id ->
-                                enabledSetters[id]?.invoke(!(enabledStates[id] ?: true))
+                                providerScope.launch {
+                                    context.dataStore.edit { prefs ->
+                                        val key = LyricsProviderSettings.enabledKey(id)
+                                        prefs[key] = !(prefs[key] ?: true)
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

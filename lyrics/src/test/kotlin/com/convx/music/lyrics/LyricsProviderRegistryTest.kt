@@ -6,6 +6,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LyricsProviderRegistryTest {
+    @org.junit.Test
+    fun upgradingAnOrderPreservesPriorityAndAddsEveryProviderOnce() {
+        val order = LyricsProviderRegistry.completeProviderOrder("Kugou,Kugou,missing,YouTubeMusic")
+        assertEquals(listOf("Kugou", "YouTubeMusic"), order.take(2))
+        assertEquals(order.size, order.distinct().size)
+        assertEquals(LyricsProviderRegistry.providerIds.toSet(), order.toSet())
+        assertTrue(order.containsAll(listOf("LrcRed", "BiniLyrics", "BetterLyricsPortato", "Genius", "PaxsenixSpotify", "PaxsenixMusixmatch")))
+    }
     @Test
     fun videoProvidersDeclareStableIdsAndRequireVideoIds() {
         assertEquals("YouTubeMusic", YouTubeLyricsProvider.id)

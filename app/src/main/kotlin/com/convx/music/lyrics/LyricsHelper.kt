@@ -17,6 +17,10 @@ import com.convx.music.utils.NetworkConnectivityObserver
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -63,7 +67,11 @@ constructor(
     private val cache = LruCache<String, List<LyricsResult>>(MAX_CACHE_SIZE)
     private var currentLyricsJob: Job? = null
 
-    suspend fun getLyrics(mediaMetadata: MediaMetadata): LyricsWithProvider {
+    suspend fun getLyrics(
+        mediaMetadata: MediaMetadata,
+        initialLyrics: LyricsWithProvider? = null,
+        onUpgrade: suspend (LyricsWithProvider) -> Unit = {},
+    ): LyricsWithProvider {
         currentLyricsJob?.cancel()
 
         if (!hasNetworkConnection()) {
@@ -71,31 +79,59 @@ constructor(
         }
 
         val providers = resolveLyricsProviders().usableFor(isLocalSong(mediaMetadata.id))
-        for (provider in providers) {
-            if (!LyricsProviderSettings.isEnabled(context, provider)) continue
-
+            .filter { LyricsProviderSettings.isEnabled(context, it) }
+        return coroutineScope {
+            val policy = LyricsUpgradePolicy()
+            initialLyrics?.takeIf { initial -> providers.any { it.id == initial.provider } }?.let {
+                policy.consider(it.provider, providers.indexOfFirst { p -> p.id == it.provider }, it.lyrics)
+            }
+            val remaining = providers.indices.toMutableList()
+            // Keep one fast line fallback in the first window while the leading
+            // word providers work. No more than three source attempts run at once.
+            val fallback = providers.indexOfFirst { it.id == "LrcLib" }
+            if (fallback > 2) { remaining.remove(fallback); remaining.add(2, fallback) }
+            val answers = Channel<Pair<Int, Result<String>>>(Channel.UNLIMITED)
+            val jobs = mutableListOf<Job>()
+            val completed = hashSetOf<Int>()
+            var inFlight = 0
+            fun fillWindow() {
+                while (inFlight < 3 && remaining.isNotEmpty()) {
+                    val bestWord = policy.best?.takeIf { it.sync == LyricsSyncLevel.WORD }
+                    val next = if (bestWord == null) 0 else remaining.indexOfFirst { it < bestWord.priority }
+                    if (next < 0) break
+                    val index = remaining.removeAt(next)
+                    inFlight++
+                    jobs += launch(Dispatchers.IO) {
+                        val result = providerRepository.fetch(providers[index], mediaMetadata)
+                        answers.send(index to result)
+                    }
+                }
+            }
+            val deadline = System.nanoTime() / 1_000_000 + 20_000L
             try {
-                val result = withTimeoutOrNull(10_000) {
-                    providerRepository.fetch(
-                        provider,
-                        mediaMetadata.id,
-                        mediaMetadata.title,
-                        mediaMetadata.artists.joinToString { it.name },
-                        mediaMetadata.duration,
-                        mediaMetadata.album?.title,
-                    )
-                } ?: continue
-                val lyrics = result.getOrNull()
-                if (lyrics != null) return LyricsWithProvider(lyrics, provider.id)
-                result.exceptionOrNull()?.let(::reportException)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                reportException(e)
+                fillWindow()
+                while (inFlight > 0) {
+                    val timeout = deadline - System.nanoTime() / 1_000_000
+                    if (timeout <= 0) break
+                    val answer = withTimeoutOrNull(timeout) { answers.receive() } ?: break
+                    val (index, result) = answer
+                    inFlight--
+                    completed += index
+                    val provider = providers[index]
+                    result.getOrNull()?.takeIf { it.isNotBlank() && it != LYRICS_NOT_FOUND && LyricsProviderSettings.isEnabled(context, provider) }
+                        ?.let { policy.consider(provider.id, index, it) }
+                        ?.let { onUpgrade(LyricsWithProvider(it.lyrics, it.provider)) }
+                    val best = policy.best
+                    if (best?.sync == LyricsSyncLevel.WORD && (0 until best.priority).all { it in completed }) break
+                    fillWindow()
+                }
+                policy.best?.let { LyricsWithProvider(it.lyrics, it.provider) }
+                    ?: LyricsWithProvider(LYRICS_NOT_FOUND, "Unknown")
+            } finally {
+                jobs.forEach { it.cancel() }
+                answers.cancel()
             }
         }
-
-        return LyricsWithProvider(LYRICS_NOT_FOUND, "Unknown")
     }
 
     suspend fun getAllLyrics(

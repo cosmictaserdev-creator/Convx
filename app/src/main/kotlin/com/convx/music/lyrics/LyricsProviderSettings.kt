@@ -1,6 +1,8 @@
 package com.convx.music.lyrics
 
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.convx.music.constants.EnableBetterLyricsKey
 import com.convx.music.constants.EnableKugouKey
 import com.convx.music.constants.EnableLrcLibKey
@@ -23,17 +25,20 @@ object LyricsProviderSettings {
         PreferredLyricsProvider.PAXSENIX -> "Paxsenix"
     }
 
-    fun isEnabled(context: Context, provider: LyricsProvider): Boolean = when (provider.id) {
-        "BetterLyrics" -> context.dataStore[EnableBetterLyricsKey] ?: true
-        "Kugou" -> context.dataStore[EnableKugouKey] ?: true
-        "LrcLib" -> context.dataStore[EnableLrcLibKey] ?: true
-        "Musixmatch" -> context.dataStore[EnableMusixmatchKey] ?: true
-        "Paxsenix" -> context.dataStore[EnablePaxsenixKey] ?: true
-        "SimpMusic" -> context.dataStore[EnableSimpMusicKey] ?: true
-        "Unison" -> context.dataStore[EnableUnisonKey] ?: true
-        "YouLyPlus" -> context.dataStore[EnableYouLyPlusKey] ?: true
-        else -> true
+    fun enabledKey(id: String): Preferences.Key<Boolean> = when (id) {
+        "BetterLyrics" -> EnableBetterLyricsKey
+        "Kugou" -> EnableKugouKey
+        "LrcLib" -> EnableLrcLibKey
+        "Musixmatch" -> EnableMusixmatchKey
+        "Paxsenix" -> EnablePaxsenixKey
+        "SimpMusic" -> EnableSimpMusicKey
+        "Unison" -> EnableUnisonKey
+        "YouLyPlus" -> EnableYouLyPlusKey
+        else -> booleanPreferencesKey("enableLyrics$id")
     }
+
+    fun isEnabled(context: Context, provider: LyricsProvider): Boolean =
+        context.dataStore[enabledKey(provider.id)] ?: true
 
     fun initialize(context: Context, provider: LyricsProvider) {
         provider.initialize(context.applicationContext)

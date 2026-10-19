@@ -50,6 +50,11 @@ import com.convx.music.eq.data.ParametricEQBand
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.convx.music.ui.component.DefaultDialog
+import com.convx.music.ui.ios.compat.Text as Text
+import com.convx.music.ui.ios.compat.TextButton as TextButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -64,6 +69,22 @@ fun AxionEqScreen(
     val preamp by viewModel.preamp.collectAsStateWithLifecycle()
     val (spatialAudio, onSpatialAudioChange) = rememberPreference(SpatialAudioKey, false)
     val (bitPerfect) = rememberPreference(BitPerfectKey, false)
+    val isImporting by viewModel.isImporting.collectAsStateWithLifecycle()
+    val importSucceeded by viewModel.importSucceeded.collectAsStateWithLifecycle()
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(viewModel::importProfile)
+    }
+    if (importSucceeded != null) {
+        DefaultDialog(
+            onDismiss = viewModel::dismissImportResult,
+            title = { Text(stringResource(if (importSucceeded == true) R.string.import_profile else R.string.import_error_title)) },
+            buttons = {
+                TextButton(onClick = viewModel::dismissImportResult) { Text(stringResource(android.R.string.ok)) }
+            },
+        ) {
+            Text(stringResource(if (importSucceeded == true) R.string.eq_import_success else R.string.eq_import_failure))
+        }
+    }
 
     ScreenPage(
         title = stringResource(R.string.convx_equalizer),
@@ -71,6 +92,12 @@ fun AxionEqScreen(
         horizontalPadding = 16.dp,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+            IosSettingsGroup(items = listOf(IosSettingsItem(
+                icon = painterResource(R.drawable.equalizer),
+                title = { Text(stringResource(R.string.import_profile)) },
+                description = { Text(stringResource(if (isImporting) R.string.eq_import_progress else R.string.eq_import_description)) },
+                onClick = { if (!isImporting) importLauncher.launch(arrayOf("text/*", "application/octet-stream")) },
+            )))
             IosSettingsGroup(
                 items = listOf(
                     IosSettingsItem(

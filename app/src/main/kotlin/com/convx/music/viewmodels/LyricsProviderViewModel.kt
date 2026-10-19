@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.LyricsEntity
+import com.convx.music.lyrics.LyricsSyncLevel
+import kotlinx.coroutines.flow.combine
 import com.convx.music.lyrics.LyricsProviderRegistry
 import com.convx.music.lyrics.LyricsProviderRepository
 import com.convx.music.lyrics.LyricsProviderStatus
@@ -28,6 +30,8 @@ class LyricsProviderViewModel @Inject constructor(
     private var selection: Job? = null
     private val _statuses = MutableStateFlow<Map<String, LyricsProviderStatus>>(emptyMap())
     val statuses = _statuses.asStateFlow()
+    private val _syncLevels = MutableStateFlow<Map<String, LyricsSyncLevel>>(emptyMap())
+    val syncLevels = _syncLevels.asStateFlow()
     private val _requested = MutableStateFlow<String?>(null)
     val requested = _requested.asStateFlow()
     private val _error = MutableStateFlow(false)
@@ -44,7 +48,10 @@ class LyricsProviderViewModel @Inject constructor(
         _requested.value = null
         _error.value = false
         _statuses.value = emptyMap()
-        observation = viewModelScope.launch { repository.statuses(metadata).collect { _statuses.value = it } }
+        observation = viewModelScope.launch {
+            combine(repository.statuses(metadata), repository.syncLevels(metadata)) { statuses, levels -> statuses to levels }
+                .collect { (statuses, levels) -> _statuses.value = statuses; _syncLevels.value = levels }
+        }
     }
 
     fun select(providerId: String, onSelected: () -> Unit) {

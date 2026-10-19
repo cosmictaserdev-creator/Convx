@@ -55,9 +55,13 @@ fun DraggableLyricsProviderList(
     val reorderableState = rememberReorderableLazyListState(
         lazyListState = lazyListState,
     ) { from, to ->
-        val movedItem = items.removeAt(from.index)
-        items.add(to.index, movedItem)
-        hasDragged = true
+        val fromIndex = items.indexOfFirst { it.id == from.key }
+        val toIndex = items.indexOfFirst { it.id == to.key }
+        if (fromIndex >= 0 && toIndex >= 0 && fromIndex != toIndex) {
+            val movedItem = items.removeAt(fromIndex)
+            items.add(toIndex, movedItem)
+            hasDragged = true
+        }
     }
 
     LaunchedEffect(reorderableState.isAnyItemDragging) {
@@ -97,7 +101,7 @@ fun DraggableLyricsProviderList(
                             onClick = { },
                             modifier = Modifier.draggableHandle(),
                         ) {
-                            SymbolIcon(symbol = sf("line.3.horizontal"), contentDescription = null, tint = AppTheme.colorScheme.onSurfaceVariant)
+                            SymbolIcon(symbol = sf("line.3.horizontal"), contentDescription = "Reorder ${item.name}", tint = AppTheme.colorScheme.onSurfaceVariant)
                         }
 
                         Text(

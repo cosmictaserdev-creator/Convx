@@ -91,7 +91,9 @@ class ConvxWidgetManager @Inject constructor(
             val nowPlayingWidgetIds = appWidgetManager.getAppWidgetIds(
                 ComponentName(context, NowPlayingWidgetReceiver::class.java),
             )
-            if (musicWidgetIds.isEmpty() && nowPlayingWidgetIds.isEmpty()) {
+            val lyricsWidgetIds = appWidgetManager.getAppWidgetIds(ComponentName(context, LyricsWidgetReceiver::class.java))
+            val turntableWidgetIds = appWidgetManager.getAppWidgetIds(ComponentName(context, TurntableWidgetReceiver::class.java))
+            if (musicWidgetIds.isEmpty() && nowPlayingWidgetIds.isEmpty() && lyricsWidgetIds.isEmpty() && turntableWidgetIds.isEmpty()) {
                 cachedArtworkUri = null
                 cachedAlbumArt = null
                 cachedCircularAlbumArt = null
@@ -144,8 +146,6 @@ class ConvxWidgetManager @Inject constructor(
                 )
             }
 
-            val lyricsComponent = ComponentName(context, LyricsWidgetReceiver::class.java)
-            val lyricsWidgetIds = appWidgetManager.getAppWidgetIds(lyricsComponent)
             if (lyricsWidgetIds.isNotEmpty()) {
                 val lines = loadLyricLines(mediaId)
                 lyricsWidgetIds.forEach { widgetId ->
@@ -165,8 +165,6 @@ class ConvxWidgetManager @Inject constructor(
                 }
             }
 
-            val turntableComponentName = ComponentName(context, TurntableWidgetReceiver::class.java)
-            val turntableWidgetIds = appWidgetManager.getAppWidgetIds(turntableComponentName)
             if (turntableWidgetIds.isNotEmpty()) {
                 val turntableViews = createTurntableRemoteViews(
                     circularAlbumArt,

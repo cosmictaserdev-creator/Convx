@@ -182,7 +182,7 @@ fun AppearanceSettings(
     )
     val (lyricsAnimationStyle, onLyricsAnimationStyleChange) = rememberEnumPreference(
         LyricsAnimationStyleKey,
-        defaultValue = LyricsAnimationStyle.METRO_LYRICS
+        defaultValue = LyricsAnimationStyle.FLAMINGO
     )
     val (lyricsTextSize, onLyricsTextSizeChange) = rememberPreference(LyricsTextSizeKey, defaultValue = 30f)
     val (lyricsLineSpacing, onLyricsLineSpacingChange) = rememberPreference(LyricsLineSpacingKey, defaultValue = 1.3f)
@@ -541,20 +541,7 @@ fun AppearanceSettings(
                     title = { Text(stringResource(R.string.lyrics_animation_style)) },
                     description = {
                         Text(
-                            when (lyricsAnimationStyle) {
-                                LyricsAnimationStyle.NONE -> stringResource(R.string.none)
-                                LyricsAnimationStyle.FADE -> stringResource(R.string.fade)
-                                LyricsAnimationStyle.GLOW -> stringResource(R.string.glow)
-                                LyricsAnimationStyle.SLIDE -> stringResource(R.string.slide)
-                                LyricsAnimationStyle.KARAOKE -> stringResource(R.string.karaoke)
-                                LyricsAnimationStyle.BITCHORD -> stringResource(R.string.lyrics_animation_bitchord)
-                                LyricsAnimationStyle.CONVX_1 -> stringResource(R.string.convx_1)
-                                LyricsAnimationStyle.APPLE -> stringResource(R.string.apple_music_style)
-                                LyricsAnimationStyle.APPLE_V2 -> stringResource(R.string.apple_music_style_letter)
-                                LyricsAnimationStyle.LYRICS_V2 -> stringResource(R.string.lyrics_v2_fluid)
-                                LyricsAnimationStyle.METRO_LYRICS -> stringResource(R.string.lyrics_animation_metro)
-                                LyricsAnimationStyle.ARCHIVE_TUNE -> stringResource(R.string.lyrics_animation_karaoke_apple)
-                            }
+                            com.convx.music.ui.component.lyricsStyleLabel(lyricsAnimationStyle)
                         )
                     },
                     onClick = { showLyricsAnimationStyleDialog = true }
@@ -806,7 +793,7 @@ enum class PlayerTextAlignment {
 
 @Composable
 fun ColumnScope.LyricsAnimationSheetContent() {
-    val (selected, onSelect) = rememberEnumPreference(LyricsAnimationStyleKey, defaultValue = LyricsAnimationStyle.METRO_LYRICS)
+    val (selected, onSelect) = rememberEnumPreference(LyricsAnimationStyleKey, defaultValue = LyricsAnimationStyle.FLAMINGO)
     val (position, onPositionChange) = rememberEnumPreference(LyricsTextPositionKey, defaultValue = LyricsPosition.LEFT)
     val (autoScroll, onAutoScrollChange) = rememberPreference(LyricsScrollKey, defaultValue = true)
     val (swipeToChange, onSwipeToChangeChange) = rememberPreference(SwipeLyricsKey, defaultValue = false)
@@ -831,7 +818,7 @@ fun ColumnScope.LyricsAnimationSheetContent() {
         LyricsPosition.CENTER -> androidx.compose.ui.text.style.TextAlign.Center
         LyricsPosition.RIGHT -> androidx.compose.ui.text.style.TextAlign.End
     }
-    val fill = selected == LyricsAnimationStyle.KARAOKE || selected == LyricsAnimationStyle.ARCHIVE_TUNE ||
+    val fill = selected == LyricsAnimationStyle.FLAMINGO || selected == LyricsAnimationStyle.KARAOKE || selected == LyricsAnimationStyle.ARCHIVE_TUNE ||
         selected == LyricsAnimationStyle.APPLE || selected == LyricsAnimationStyle.APPLE_V2 ||
         selected == LyricsAnimationStyle.BITCHORD
 
@@ -1000,20 +987,7 @@ fun ColumnScope.LyricsAnimationSheetContent() {
                 items(LyricsAnimationStyle.entries) { style ->
                     val active = style == selected
                     Text(
-                        text = when (style) {
-                            LyricsAnimationStyle.NONE -> stringResource(R.string.none)
-                            LyricsAnimationStyle.FADE -> stringResource(R.string.fade)
-                            LyricsAnimationStyle.GLOW -> stringResource(R.string.glow)
-                            LyricsAnimationStyle.SLIDE -> stringResource(R.string.slide)
-                            LyricsAnimationStyle.KARAOKE -> stringResource(R.string.karaoke)
-                            LyricsAnimationStyle.APPLE -> stringResource(R.string.apple_music_style)
-                            LyricsAnimationStyle.APPLE_V2 -> stringResource(R.string.apple_music_style_letter)
-                            LyricsAnimationStyle.BITCHORD -> stringResource(R.string.lyrics_animation_bitchord)
-                            LyricsAnimationStyle.CONVX_1 -> stringResource(R.string.convx_1)
-                            LyricsAnimationStyle.LYRICS_V2 -> stringResource(R.string.lyrics_v2_fluid)
-                            LyricsAnimationStyle.METRO_LYRICS -> stringResource(R.string.lyrics_animation_metro)
-                            LyricsAnimationStyle.ARCHIVE_TUNE -> stringResource(R.string.lyrics_animation_karaoke_apple)
-                        },
+                        text = com.convx.music.ui.component.lyricsStyleLabel(style),
                         color = if (active) Color.White else IosTheme.colors.label,
                         style = IosTheme.typography.subheadline,
                         fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,

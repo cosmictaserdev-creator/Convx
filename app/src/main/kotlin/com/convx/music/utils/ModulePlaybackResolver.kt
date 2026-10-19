@@ -158,7 +158,11 @@ internal object ModulePlaybackResolver {
 
         for (track in candidates) {
             for (tier in tiers) {
-                val stream = ModuleManager.shared.getStreamUrl(
+                val stream = track.streamUrl?.takeIf(::validUrl)?.let {
+                    ModuleStreamResponse(streamUrl = it, track = com.music.spine.ModuleStreamTrack(
+                        id = track.id, format = track.format, audioQuality = track.audioQuality,
+                    ))
+                } ?: ModuleManager.shared.getStreamUrl(
                     loaded, track.id, settingsFor(tier), hostTier(tier),
                 ).getOrNull() ?: continue
                 val url = stream.streamUrl?.takeIf(::validUrl) ?: continue

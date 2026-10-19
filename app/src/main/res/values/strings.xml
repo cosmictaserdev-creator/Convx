@@ -7,6 +7,17 @@
 <!-- Translators: Do not modify this file for translations, use the reference app's Weblate instead. -->
 
 <resources>
+    <string name="song_insight_title">Track insights</string>
+    <string name="song_insight_disclosure">Uses track metadata sent to your configured AI provider. Suggestions may be inaccurate. Audio is not uploaded or measured.</string>
+    <string name="song_insight_error">Could not create an overview. Check your connection, provider settings and selected track, then try again.</string>
+    <string name="song_insight_configure">Set up an AI provider and API key in Settings to create an overview.</string>
+    <string name="song_insight_generate">Create overview</string>
+    <string name="song_insight_retry">Create again</string>
+    <string name="widget_open_app">Tap to open your music</string>
+    <string name="eq_import_description">Choose a ParametricEQ .txt preset</string>
+    <string name="eq_import_progress">Importing preset…</string>
+    <string name="eq_import_success">Preset imported and selected. Enable the equalizer to hear it.</string>
+    <string name="eq_import_failure">Could not import this preset. Choose a ParametricEQ .txt file smaller than 64 KB with valid filters.</string>
     <!-- Bottom navigation -->
     <string name="home">Home</string>
     <string name="music">Music</string>
@@ -746,4 +757,6 @@
     <string name="transition_off">Off</string>
     <string name="no_playlists">No Playlists</string>
     <string name="playlist_load_failed">Couldn?t load this playlist.</string>
+    <string name="lyrics_centered_scroll_description">Smooth centered scrolling, with word animation when timing is available</string>
+    <string name="lyrics_style_flamingo">Flamingo</string>
 </resources>

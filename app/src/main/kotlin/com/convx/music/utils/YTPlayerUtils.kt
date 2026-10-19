@@ -877,7 +877,7 @@ object YTPlayerUtils {
             else -> -1
         }
 
-        for (clientIndex in (startIndex until STREAM_FALLBACK_CLIENTS.size)) {
+        clientLoop@ for (clientIndex in (startIndex until STREAM_FALLBACK_CLIENTS.size)) {
             format = null
             streamUrl = null
             streamExpiresInSeconds = null
@@ -929,26 +929,17 @@ object YTPlayerUtils {
 
                 val responseToUse = streamPlayerResponse
 
-                format =
-                    findFormat(
-                        responseToUse,
-                        audioQuality,
-                        connectivityManager,
-                        preferAac,
-                    )
-
-                if (format == null) {
-                    Timber.tag(logTag).d("No suitable format found for client: ${if (clientIndex == -1) MAIN_CLIENT.clientName else STREAM_FALLBACK_CLIENTS[clientIndex].clientName}")
-                    continue
-                }
-
-                Timber.tag(logTag).d("Format found: ${format.mimeType}, bitrate: ${format.bitrate}")
-
-                streamUrl = findUrlOrNull(format, videoId, responseToUse, skipNewPipe = wasOriginallyAgeRestricted)
-                if (streamUrl == null) {
-                    Timber.tag(logTag).d("Stream URL not found for format")
-                    continue
-                }
+                val candidates = rankedAudioFormats(
+                    responseToUse.streamingData?.adaptiveFormats.orEmpty(),
+                    audioQuality,
+                    connectivityManager.isActiveNetworkMetered,
+                    preferAac,
+                )
+                for (candidate in candidates) {
+                    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+                    format = candidate
+                    streamUrl = findUrlOrNull(candidate, videoId, responseToUse, skipNewPipe = wasOriginallyAgeRestricted)
+                    if (streamUrl == null) continue
 
                 val currentClient = if (clientIndex == -1) {
                     usedAgeRestrictedClient ?: MAIN_CLIENT
@@ -998,14 +989,14 @@ object YTPlayerUtils {
                         Timber.tag(logTag).d("Using last fallback client without validation: ${STREAM_FALLBACK_CLIENTS[clientIndex].clientName}")
                     }
                     Timber.tag(TAG).i("Playback: client=${currentClient.clientName}, videoId=$videoId, private=$isPrivatelyOwnedTrack")
-                    break
+                    break@clientLoop
                 }
 
                 if (validateStatus(streamUrl)) {
                     Timber.tag(logTag).d("Stream validated successfully with client: ${currentClient.clientName}")
                     PlaybackLogManager.log(PlaybackLogLevel.INFO, "Stream validated", currentClient.clientName)
                     Timber.tag(TAG).i("Playback: client=${currentClient.clientName}, videoId=$videoId")
-                    break
+                    break@clientLoop
                 } else {
                     Timber.tag(logTag).d("Stream validation failed for client: ${currentClient.clientName}")
 
@@ -1028,8 +1019,9 @@ object YTPlayerUtils {
                             Timber.tag(logTag).e(e, "CipherDeobfuscator n-transform error")
                         }
 
-                        if (nTransformWorked) break
+                        if (nTransformWorked) break@clientLoop
                     }
+                }
                 }
             } else {
                 val status = streamPlayerResponse?.playabilityStatus?.status ?: "Unknown"
@@ -1116,41 +1108,6 @@ object YTPlayerUtils {
             .onFailure { Timber.tag(logTag).e(it, "Failed to fetch metadata") }
     }
 
-    private fun findFormat(
-        playerResponse: PlayerResponse,
-        audioQuality: AudioQuality,
-        connectivityManager: ConnectivityManager,
-        preferAac: Boolean = false,
-    ): PlayerResponse.StreamingData.Format? {
-        Timber.tag(logTag).d("Finding format with audioQuality: $audioQuality, network metered: ${connectivityManager.isActiveNetworkMetered}")
-
-        val audioFormats = playerResponse.streamingData?.adaptiveFormats
-            ?.filter { it.isAudio && (!preferAac || it.mimeType.contains("mp4", ignoreCase = true) || it.mimeType.contains("aac", ignoreCase = true)) }
-            .orEmpty()
-        // Some videos (auto-dubs, certain regional content) only serve non-original
-        // audio tracks — requiring isOriginal made those permanently unplayable
-        // (format=null -> thrown as a generic Exception -> ExoPlayer buckets it as
-        // ERROR_CODE_IO_UNSPECIFIED and retries the same doomed resolve forever).
-        val original = audioFormats.filter { it.isOriginal }
-        val candidates = original.ifEmpty { audioFormats }
-
-        val format = candidates
-            .maxByOrNull {
-                it.bitrate * when (audioQuality) {
-                    AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
-                    AudioQuality.HIGH -> 1
-                    AudioQuality.LOW -> -1
-                } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // prefer opus stream
-            }
-
-        if (format != null) {
-            Timber.tag(logTag).d("Selected format: ${format.mimeType}, bitrate: ${format.bitrate}")
-        } else {
-            Timber.tag(logTag).d("No suitable audio format found")
-        }
-
-        return format
-    }
     private fun validateStatus(url: String): Boolean {
         Timber.tag(logTag).d("Validating stream URL status")
         try {
@@ -1249,16 +1206,7 @@ object YTPlayerUtils {
                 return streamUrl
             }
 
-            val audioStream = streamUrls.find { urlPair ->
-                playerResponse.streamingData?.adaptiveFormats?.any {
-                    it.itag == urlPair.first && it.isAudio
-                } == true
-            }?.second
 
-            if (audioStream != null) {
-                Timber.tag(logTag).d("Audio stream URL obtained from StreamInfo (different itag)")
-                return audioStream
-            }
         }
 
         Timber.tag(logTag).e("Failed to get stream URL")

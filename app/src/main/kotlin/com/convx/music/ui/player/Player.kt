@@ -246,7 +246,7 @@ import com.convx.music.ui.utils.Motion
 import com.convx.music.ui.player.customize.DiyDesignCanvas
 import com.convx.music.ui.player.customize.DiyOrientation
 import com.convx.music.ui.player.customize.DiyStickerLayer
-import com.convx.music.ui.utils.additiveChrome
+import com.convx.music.ui.utils.flamingoChrome
 import com.convx.music.ui.component.heroFootLiveBlur
 import com.convx.music.ui.player.customize.AnimatedPlayerGlyph
 import com.convx.music.ui.player.customize.PlayerGlyph
@@ -332,7 +332,7 @@ private const val PARENT_SHEET_SETTLE_TIMEOUT_MS = 1_000L
 
 /** Strength of white content added onto the background under `additiveChrome`. Below full so
  *  the blend doesn't clip to plain white and wash out the background's colour. */
-private const val AdditiveChromeContentAlpha = 0.62f
+private const val AdditiveChromeContentAlpha = 1f
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -1923,7 +1923,7 @@ fun BottomSheetPlayer(
                                     .fillMaxWidth()
                                     .basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp)
                                     .padding(end = 12.dp)
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                             ) {
                                 var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -1990,7 +1990,7 @@ fun BottomSheetPlayer(
 
                     DjReadout(
                         modifier = Modifier.padding(top = 2.dp)
-                            .additiveChrome(additiveChrome)
+                            .flamingoChrome(additiveChrome)
                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                     )
                 }
@@ -2034,7 +2034,7 @@ fun BottomSheetPlayer(
                                         contentColor = iconButtonColor,
                                     ),
                                     modifier = Modifier.size(42.dp)
-                                        .additiveChrome(additiveChrome)
+                                        .flamingoChrome(additiveChrome)
                                         .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                                 ) {
                                     SymbolIcon(symbol = sf("arrow.up.left.and.arrow.down.right"), contentDescription = null, size = 24.dp)
@@ -2076,7 +2076,7 @@ fun BottomSheetPlayer(
                                         contentColor = iconButtonColor,
                                     ),
                                     modifier = Modifier.size(42.dp)
-                                        .additiveChrome(additiveChrome)
+                                        .flamingoChrome(additiveChrome)
                                         .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                                 ) {
                                     when (download?.state) {
@@ -2124,7 +2124,7 @@ fun BottomSheetPlayer(
                                     ),
                                     modifier = Modifier.size(42.dp)
                                         
-                                        .additiveChrome(additiveChrome)
+                                        .flamingoChrome(additiveChrome)
                                         .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                                 ) {
                                     PlayerGlyph(
@@ -2207,7 +2207,7 @@ fun BottomSheetPlayer(
                                         fallback = R.drawable.more_horiz,
                                         tint = LocalContentColor.current,
                                         modifier = Modifier.size(24.dp)
-                                            .additiveChrome(additiveChrome)
+                                            .flamingoChrome(additiveChrome)
                                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                                     )
                                 }
@@ -2261,7 +2261,7 @@ fun BottomSheetPlayer(
                                             R.drawable.favorite else R.drawable.favorite_border,
                                         tint = if (currentSong?.song?.liked == true) AppTheme.colorScheme.error else LocalContentColor.current,
                                         modifier = Modifier.size(24.dp)
-                                            .additiveChrome(additiveChrome)
+                                            .flamingoChrome(additiveChrome)
                                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                                     )
                                 }
@@ -2310,8 +2310,8 @@ fun BottomSheetPlayer(
                         ),
                         modifier = Modifier
                             .padding(horizontal = PlayerHorizontalPadding)
-                            .additiveChrome(additiveChrome)
-                            .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
+                            .flamingoChrome(additiveChrome)
+                            .graphicsLayer { if (additiveChrome) alpha = 0.45f },
                     )
                 }
 
@@ -2345,7 +2345,7 @@ fun BottomSheetPlayer(
                             inactiveAlpha = if (additiveChrome) 0.05f else 0.3f,
                             ),
                             modifier = Modifier.padding(horizontal = PlayerHorizontalPadding)
-                                .additiveChrome(additiveChrome)
+                                .flamingoChrome(additiveChrome)
                                 .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                             isPlaying = effectiveIsPlaying
                         )
@@ -2420,7 +2420,7 @@ fun BottomSheetPlayer(
                         },
                         modifier = Modifier
                             .padding(horizontal = PlayerHorizontalPadding)
-                            .additiveChrome(additiveChrome)
+                            .flamingoChrome(additiveChrome)
                             // After additiveChrome, never before: alpha applied first
                             // is folded into the saved layer and the add then runs at
                             // full strength.
@@ -2468,7 +2468,7 @@ fun BottomSheetPlayer(
                             .fillMaxWidth()
                             .padding(horizontal = PlayerHorizontalPadding)
                             .height(40.dp)
-                            .additiveChrome(additiveChrome)
+                            .flamingoChrome(additiveChrome)
                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                     )
                 }
@@ -2483,7 +2483,7 @@ fun BottomSheetPlayer(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = PlayerHorizontalPadding + 4.dp)
-                    .additiveChrome(additiveChrome)
+                    .flamingoChrome(additiveChrome)
                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
             ) {
                 Text(
@@ -2750,7 +2750,7 @@ fun BottomSheetPlayer(
                                     .height(68.dp)
                                     .weight(backButtonWeight)
                                     .widthIn(min = 44.dp)
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                             ) {
                                 PlayerGlyph(
@@ -2792,7 +2792,7 @@ fun BottomSheetPlayer(
                                     .height(68.dp)
                                     .weight(playPauseWeight)
                                     .widthIn(min = 44.dp)
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                             ) {
                                 Row(
@@ -2850,7 +2850,7 @@ fun BottomSheetPlayer(
                                     .height(68.dp)
                                     .weight(nextButtonWeight)
                                     .widthIn(min = 44.dp)
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                             ) {
                                 PlayerGlyph(
@@ -2880,7 +2880,7 @@ fun BottomSheetPlayer(
                                     .size(48.dp)
                                     .align(Alignment.Center)
                                     .alpha(if (isListenTogetherGuest) 0.5f else 1f)
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                                     onClick = playerConnection::seekToPrevious,
                                 )
@@ -2893,7 +2893,7 @@ fun BottomSheetPlayer(
                                 Modifier
                                     .size(100.dp) //100
                                     .clip(RoundedCornerShape(playPauseRoundness))
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                                     .clickable {
                                         if (isListenTogetherGuest) {
@@ -2963,7 +2963,7 @@ fun BottomSheetPlayer(
                                     .size(48.dp)
                                     .align(Alignment.Center)
                                     .alpha(if (isListenTogetherGuest) 0.5f else 1f)
-                                    .additiveChrome(additiveChrome)
+                                    .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                                     onClick = playerConnection::seekToNext,
                                 )
@@ -2982,7 +2982,7 @@ fun BottomSheetPlayer(
                                 .padding(horizontal = PlayerHorizontalPadding)
                                 .alpha(if (hideVolumeBar) 0f else 1f)
                                 .then(if (hideVolumeBar) Modifier.clearAndSetSemantics {} else Modifier)
-                                .additiveChrome(additiveChrome, bleed = 8.dp)
+                                .flamingoChrome(additiveChrome, bleed = 8.dp)
                                 .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                         ) {
                             val volumeInteractionSource = remember { MutableInteractionSource() }
@@ -3080,7 +3080,7 @@ fun BottomSheetPlayer(
                         ) {
                             val bottomTint = textButtonColor
                             val tabChrome = Modifier
-                                .additiveChrome(additiveChrome)
+                                .flamingoChrome(additiveChrome)
                                 .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                             val isLyricsActive = classicPages.showing && classicPages.value == PlayerInternalState.LYRICS
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -3745,7 +3745,7 @@ private fun BackgroundVideoView(
                 }
             }
         },
-        modifier = modifier.graphicsLayer { this.alpha = alpha }
+        modifier = modifier.graphicsLayer { this.alpha = alpha; clip = true }
     )
 }
 

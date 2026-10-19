@@ -110,6 +110,19 @@ fun RecognitionScreen(
     val context = LocalContext.current
     val database = LocalDatabase.current.get()
     val coroutineScope = rememberCoroutineScope()
+    var recognitionJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+
+    fun recognize() {
+        if (recognitionJob?.isActive == true) return
+        recognitionJob = coroutineScope.launch {
+            com.convx.music.recognition.MusicRecognitionService.recognize(context)
+        }
+    }
+
+    fun cancelRecognition() {
+        recognitionJob?.cancel()
+        com.convx.music.recognition.MusicRecognitionService.reset()
+    }
     
     LaunchedEffect(Unit) {
         com.convx.music.recognition.MusicRecognitionService.reset()
@@ -117,6 +130,7 @@ fun RecognitionScreen(
     
     DisposableEffect(Unit) {
         onDispose {
+            recognitionJob?.cancel()
             com.convx.music.recognition.MusicRecognitionService.reset()
         }
     }
@@ -135,24 +149,20 @@ fun RecognitionScreen(
     ) { isGranted ->
         hasPermission = isGranted
         if (isGranted) {
-            coroutineScope.launch {
-                com.convx.music.recognition.MusicRecognitionService.recognize(context)
-            }
+            recognize()
         }
     }
     
     fun startRecognition() {
         if (hasPermission) {
-            coroutineScope.launch {
-                com.convx.music.recognition.MusicRecognitionService.recognize(context)
-            }
+            recognize()
         } else {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
     
     fun resetToReady() {
-        com.convx.music.recognition.MusicRecognitionService.reset()
+        cancelRecognition()
     }
 
     fun saveToHistory(result: RecognitionResult) {
@@ -214,7 +224,7 @@ fun RecognitionScreen(
                     }
                     is RecognitionStatus.Listening -> {
                         ListeningState(
-                            onCancel = { com.convx.music.recognition.MusicRecognitionService.reset() }
+                            onCancel = ::cancelRecognition
                         )
                     }
                     is RecognitionStatus.Processing -> {

@@ -30,6 +30,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -204,7 +205,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 /** Centers the active line about a third down the pane and settles before the next line. */
-private val LyricScrollSpec = spring<Float>(dampingRatio = 1f, stiffness = 160f)
 
 @Composable
 private fun LyricsTranslationStatus(
@@ -456,7 +456,9 @@ fun Lyrics(
     val romanizeHindiLyrics by rememberPreference(LyricsRomanizeHindiKey, true)
     val romanizePunjabiLyrics by rememberPreference(LyricsRomanizePunjabiKey, true)
     val lyricsGlowEffect by rememberPreference(LyricsGlowEffectKey, true)
-    val lyricsAnimationStyle by rememberEnumPreference(LyricsAnimationStyleKey, LyricsAnimationStyle.METRO_LYRICS)
+    val lyricsAnimationStyle by rememberEnumPreference(LyricsAnimationStyleKey, LyricsAnimationStyle.FLAMINGO)
+    val lyricsFontSelection by rememberPreference(com.convx.music.constants.LyricsFontKey, "default")
+    val lyricsFontFamily = com.convx.music.lyrics.rememberLyricsFont(lyricsFontSelection)
     val lyricsTextSize by rememberPreference(LyricsTextSizeKey, 30f)
     val lyricsLineSpacing by rememberPreference(LyricsLineSpacingKey, 1.3f)
     val lyricsStandardBlur by rememberPreference(LyricsStandardBlurKey, false)
@@ -682,11 +684,11 @@ fun Lyrics(
     val usesArchiveTuneRenderer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
         lyricsAnimationStyle == LyricsAnimationStyle.ARCHIVE_TUNE &&
         lines.hasKaraokeTimings()
-    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer
+    val usesFlamingoRenderer = lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO && lines.isNotEmpty()
+    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer
 
     val lazyListState = rememberLazyListState()
     
-    var isAnimating by remember { mutableStateOf(false) }
     var isAutoScrollEnabled by rememberSaveable { mutableStateOf(true) }
 
     BackHandler(enabled = isSelectionModeActive) {
@@ -758,47 +760,25 @@ fun Lyrics(
             val position = sliderPosition ?: playerConnection.player.currentPosition
             currentPlaybackPosition = position
             val lyricsOffset = currentSong?.song?.lyricsOffset ?: 0
-            val newLineIndex = findCurrentLineIndex(lines, position + lyricsOffset)
+            val newLineIndex = com.convx.music.lyrics.primaryLyricLineIndex(lines, position + lyricsOffset)
             if (newLineIndex != currentLineIndex) {
                 currentLineIndex = newLineIndex
             }
         }
     }
 
-    LaunchedEffect(isSeeking, lastPreviewTime) {
-        if (isSeeking) {
-            lastPreviewTime = 0L
-        } else if (lastPreviewTime != 0L) {
+    val isUserDragging by lazyListState.interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(lastPreviewTime, isUserDragging, isSelectionModeActive, scrollLyrics) {
+        if (lastPreviewTime != 0L && !isUserDragging && !isSelectionModeActive) {
             delay(LyricsPreviewTime)
             lastPreviewTime = 0L
+            isAutoScrollEnabled = true
         }
     }
 
-    suspend fun performSmoothPageScroll(targetIndex: Int) {
-        if (isAnimating) return
-        isAnimating = true
-        try {
-            val info = lazyListState.layoutInfo
-            val itemIndex = targetIndex + if (hasProviderRow) 1 else 0
-            val item = info.visibleItemsInfo.firstOrNull { it.index == itemIndex }
-            if (item == null) {
-                lazyListState.scrollToItem(itemIndex)
-                return
-            }
-
-            val viewportHeight = info.viewportEndOffset - info.viewportStartOffset
-            val viewportCenter = info.viewportStartOffset + viewportHeight / 3
-            val itemCenter = item.offset + item.size / 2
-            val scrollDistance = itemCenter - viewportCenter
-            if (kotlin.math.abs(scrollDistance) > 10) {
-                lazyListState.animateScrollBy(
-                    value = scrollDistance.toFloat(),
-                    animationSpec = LyricScrollSpec,
-                )
-            }
-        } finally {
-            isAnimating = false
-        }
+    suspend fun performSmoothPageScroll(targetIndex: Int, animate: Boolean = true) {
+        if (targetIndex < 0) return
+        lazyListState.followLyricLine(targetIndex + if (hasProviderRow) 1 else 0, animate)
     }
     LaunchedEffect(introKey) {
         if (introKey == 0) return@LaunchedEffect
@@ -806,8 +786,8 @@ fun Lyrics(
         // active line directly instead of first showing the top and gliding down.
         initialScrollDone = false
     }
-    LaunchedEffect(currentLineIndex, lastPreviewTime, initialScrollDone, isAutoScrollEnabled) {
-        if (!isSynced) return@LaunchedEffect
+    LaunchedEffect(currentLineIndex, lastPreviewTime, initialScrollDone, isAutoScrollEnabled, scrollLyrics, isSeeking, hasProviderRow, lines, lazyListState.layoutInfo.totalItemsCount) {
+        if (!isSynced || usesFlamingoRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
         // The playhead-to-line lookup starts asynchronously. Don't interpret its
         // initial -1 as line zero and briefly jump to the start of the lyrics.
         if (currentLineIndex < 0) return@LaunchedEffect
@@ -817,8 +797,7 @@ fun Lyrics(
                 (currentLineIndex == 0 && shouldScrollToFirstLine) || !initialScrollDone
             if (shouldCenterFirstLine) {
                 shouldScrollToFirstLine = false
-                val leadingProviderRow = if (hasProviderRow) 1 else 0
-                lazyListState.scrollToItem(currentLineIndex + leadingProviderRow)
+                performSmoothPageScroll(currentLineIndex, animate = false)
                 if (!isAppMinimized) {
                     initialScrollDone = true
                 }
@@ -858,6 +837,7 @@ fun Lyrics(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
+                    fontFamily = lyricsFontFamily,
                     text = stringResource(R.string.lyrics_not_found),
                     fontSize = 20.sp,
                     color = AppTheme.colorScheme.secondary,
@@ -866,6 +846,21 @@ fun Lyrics(
                     modifier = Modifier.alpha(0.5f)
                 )
             }
+        } else if (usesFlamingoRenderer) {
+            val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
+            FlamingoLyrics(
+                fontFamily = lyricsFontFamily,
+                fontSize = lyricsTextSize,
+                lineSpacing = lyricsLineSpacing,
+                showTranslation = hasActiveTranslations,
+                lines = lines,
+                positionMs = { (sliderPositionProvider() ?: playerConnection.player.currentPosition) + lyricsOffset },
+                useBlur = lyricsStandardBlur,
+                isSynced = isSynced,
+                autoScrollEnabled = scrollLyrics,
+                onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
+                modifier = Modifier.fillMaxSize().fadingEdge(vertical = 64.dp),
+            )
         } else if (
             // This renderer needs API 29; older devices use the regular list below.
             usesArchiveTuneRenderer
@@ -874,6 +869,7 @@ fun Lyrics(
             // timestamps, the regular list produces the same result with less work.
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
             KaraokeLyrics(
+                fontFamily = lyricsFontFamily,
                 lines = lines,
                 positionMs = { currentPlaybackPosition + lyricsOffset },
                 textColor = textColor,
@@ -897,7 +893,7 @@ fun Lyrics(
                 state = lazyListState,
                 contentPadding = WindowInsets.systemBars
                     .only(WindowInsetsSides.Top)
-                    .add(WindowInsets(top = maxHeight / 3, bottom = maxHeight / 2))
+                    .add(WindowInsets(top = maxHeight / 2, bottom = maxHeight / 2))
                     .asPaddingValues(),
                 modifier = Modifier
                     .fadingEdge(vertical = 64.dp)
@@ -910,9 +906,7 @@ fun Lyrics(
                             ): Offset {
                                 if (source == NestedScrollSource.UserInput) {
                                     isAutoScrollEnabled = false
-                                }
-                                if (!isSelectionModeActive) { // Only update preview time if not selecting
-                                    lastPreviewTime = System.currentTimeMillis()
+                                    if (!isSelectionModeActive) lastPreviewTime = System.currentTimeMillis()
                                 }
                                 return super.onPostScroll(consumed, available, source)
                             }
@@ -939,6 +933,7 @@ fun Lyrics(
                 if (hasProviderRow) {
                     item {
                         Text(
+                    fontFamily = lyricsFontFamily,
                             text = "Lyrics from ${lyricsEntity?.provider}",
                             fontSize = 12.sp,
                             color = AppTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -987,6 +982,7 @@ fun Lyrics(
                         val isActiveByTime = isLineAtSameTime && displayedCurrentLineIndex >= 0
 
                         ConvxLyricsLine(
+                fontFamily = lyricsFontFamily,
                             entry = item,
                             nextEntryTime = lines.getOrNull(index + 1)?.time,
                             effectivePlaybackPosition = effectivePlaybackPosition,
@@ -1027,22 +1023,9 @@ fun Lyrics(
                                 } else if (isSynced && changeLyrics && !isGuest) {
                                     val lyricsOffset = currentSong?.song?.lyricsOffset ?: 0
                                     playerConnection.seekTo((item.time - lyricsOffset).coerceAtLeast(0))
-                                    scope.launch {
-                                        lazyListState.scrollToItem(index = index)
-                                        val itemInfo = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
-                                        if (itemInfo != null) {
-                                            val viewportHeight = lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
-                                            val center = lazyListState.layoutInfo.viewportStartOffset + (viewportHeight / 3)
-                                            val itemCenter = itemInfo.offset + itemInfo.size / 2
-                                            val offset = itemCenter - center
-                                            if (kotlin.math.abs(offset) > 10) {
-                                                lazyListState.animateScrollBy(
-                                                    value = offset.toFloat(),
-                                                    animationSpec = LyricScrollSpec
-                                                )
-                                            }
-                                        }
-                                    }
+                                    currentLineIndex = index
+                                    isAutoScrollEnabled = true
+                                    lastPreviewTime = 0L
                                     lastPreviewTime = 0L
                                 }
                             },
@@ -1058,7 +1041,7 @@ fun Lyrics(
                             }
                         )
                         return@itemsIndexed
-                    } else if (lyricsAnimationStyle == LyricsAnimationStyle.METRO_LYRICS) {
+                    } else if (lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO) {
                         val currentLineTime = if (displayedCurrentLineIndex >= 0 && displayedCurrentLineIndex < lines.size) {
                             lines[displayedCurrentLineIndex].time
                         } else -1L
@@ -1067,6 +1050,7 @@ fun Lyrics(
                         val isActiveByTime = isLineAtSameTime && displayedCurrentLineIndex >= 0
 
                         MetroLyricsLine(
+                fontFamily = lyricsFontFamily,
                             entry = item,
                             nextEntryTime = lines.getOrNull(index + 1)?.time,
                             effectivePlaybackPosition = effectivePlaybackPosition,
@@ -1106,22 +1090,9 @@ fun Lyrics(
                                 } else if (isSynced && changeLyrics && !isGuest) {
                                     val lyricsOffset = currentSong?.song?.lyricsOffset ?: 0
                                     playerConnection.seekTo((item.time - lyricsOffset).coerceAtLeast(0))
-                                    scope.launch {
-                                        lazyListState.scrollToItem(index = index)
-                                        val itemInfo = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
-                                        if (itemInfo != null) {
-                                            val viewportHeight = lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
-                                            val center = lazyListState.layoutInfo.viewportStartOffset + (viewportHeight / 3)
-                                            val itemCenter = itemInfo.offset + itemInfo.size / 2
-                                            val offset = itemCenter - center
-                                            if (kotlin.math.abs(offset) > 10) {
-                                                lazyListState.animateScrollBy(
-                                                    value = offset.toFloat(),
-                                                    animationSpec = LyricScrollSpec
-                                                )
-                                            }
-                                        }
-                                    }
+                                    currentLineIndex = index
+                                    isAutoScrollEnabled = true
+                                    lastPreviewTime = 0L
                                     lastPreviewTime = 0L
                                 }
                             },
@@ -1161,27 +1132,9 @@ fun Lyrics(
                                 } else if (isSynced && changeLyrics && !isGuest) {
                                     val lyricsOffset = currentSong?.song?.lyricsOffset ?: 0
                                     playerConnection.seekTo((item.time - lyricsOffset).coerceAtLeast(0))
-                                    scope.launch {
-                                        lazyListState.scrollToItem(index = index)
-
-                                        val itemInfo =
-                                            lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
-                                        if (itemInfo != null) {
-                                            val viewportHeight =
-                                                lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
-                                            val center =
-                                                lazyListState.layoutInfo.viewportStartOffset + (viewportHeight / 3)
-                                            val itemCenter = itemInfo.offset + itemInfo.size / 2
-                                            val offset = itemCenter - center
-
-                                            if (kotlin.math.abs(offset) > 10) { // Only animate if not already centered
-                                                lazyListState.animateScrollBy(
-                                                    value = offset.toFloat(),
-                                                    animationSpec = LyricScrollSpec
-                                                )
-                                            }
-                                        }
-                                    }
+                                    currentLineIndex = index
+                                    isAutoScrollEnabled = true
+                                    lastPreviewTime = 0L
                                     lastPreviewTime = 0L
                                 }
                             },
@@ -1324,6 +1277,7 @@ fun Lyrics(
                                 }
                             }
                             Text(
+                    fontFamily = lyricsFontFamily,
                                 text = styledText,
                                 fontSize = lyricsTextSize.sp,
                                 textAlign = alignment,
@@ -1379,6 +1333,7 @@ fun Lyrics(
                                 }
                             }
                             Text(
+                    fontFamily = lyricsFontFamily,
                                 text = styledText,
                                 fontSize = lyricsTextSize.sp,
                                 textAlign = alignment,
@@ -1426,6 +1381,7 @@ fun Lyrics(
                                 }
                             }
                             Text(
+                    fontFamily = lyricsFontFamily,
                                 text = styledText,
                                 fontSize = lyricsTextSize.sp,
                                 textAlign = alignment,
@@ -1668,6 +1624,7 @@ fun Lyrics(
                                             }
 
                                             Text(
+                    fontFamily = lyricsFontFamily,
                                                 text = char.toString(),
                                                 fontSize = lyricsTextSize.sp,
                                                 color = expressiveAccent.copy(alpha = if (!isActiveLine) 1f else if (charProgress >= 1f) 1f else 0.3f + (0.7f * charProgress)),
@@ -1677,6 +1634,7 @@ fun Lyrics(
                                         }
                                         if (wordIndex < wordData.size - 1) {
                                             Text(
+                    fontFamily = lyricsFontFamily,
                                                 text = " ",
                                                 fontSize = lyricsTextSize.sp,
                                                 letterSpacing = (-0.5).sp
@@ -1690,6 +1648,7 @@ fun Lyrics(
                                     val translatedText by item.translatedTextFlow.collectAsStateWithLifecycle()
                                     translatedText?.let { translated ->
                                         Text(
+                    fontFamily = lyricsFontFamily,
                                             text = translated,
                                             fontSize = (lyricsTextSize * 0.7f).sp,
                                             color = expressiveAccent.copy(alpha = if (isActiveLine) 0.8f else 0.3f),
@@ -1705,6 +1664,7 @@ fun Lyrics(
                             }
                         } else if (lyricsAnimationStyle == LyricsAnimationStyle.LYRICS_V2) {
                             LyricsLineV2(
+                fontFamily = lyricsFontFamily,
                                 entry = item,
                                 isActive = isActiveLine,
                                 isPast = !isActiveLine && item.time < currentPlaybackPosition,
@@ -1781,6 +1741,7 @@ fun Lyrics(
                             }
                             
                             Text(
+                    fontFamily = lyricsFontFamily,
                                 text = styledText,
                                 fontSize = lyricsTextSize.sp,
                                 textAlign = alignment,
@@ -1794,6 +1755,7 @@ fun Lyrics(
                             )
                         } else if (isActiveLine && !lyricsGlowEffect) {
                             Text(
+                    fontFamily = lyricsFontFamily,
                                 text = mainText,
                                 fontSize = lyricsTextSize.sp,
                                 color = expressiveAccent,
@@ -1803,6 +1765,7 @@ fun Lyrics(
                             )
                         } else {
                             Text(
+                    fontFamily = lyricsFontFamily,
                                 text = mainText,
                                 fontSize = lyricsTextSize.sp,
                                 color = VibrantChromeInk.copy(alpha = if (item.isBackground) 0.5f else 0.7f),
@@ -1827,6 +1790,7 @@ fun Lyrics(
                                     romanizePunjabiLyrics)) {
                             subText?.let { text ->
                                 Text(
+                    fontFamily = lyricsFontFamily,
                                     text = text,
                                     fontSize = 18.sp,
                                     color = expressiveAccent.copy(alpha = 0.6f),
@@ -1844,6 +1808,7 @@ fun Lyrics(
                             val translatedText by item.translatedTextFlow.collectAsStateWithLifecycle()
                             translatedText?.let { translated ->
                                         Text(
+                    fontFamily = lyricsFontFamily,
                                             text = translated,
                                             fontSize = (lyricsTextSize * 0.7f).sp,
                                             color = expressiveAccent.copy(alpha = 0.8f),
@@ -1868,7 +1833,6 @@ fun Lyrics(
         isSelectionModeActive = isSelectionModeActive,
         hasSelection = selectedIndices.isNotEmpty(),
         onAutoScroll = {
-            scope.launch { performSmoothPageScroll(currentLineIndex) }
             isAutoScrollEnabled = true
         },
         onCancelSelection = {
@@ -1904,6 +1868,7 @@ fun Lyrics(
             ) {
                 Box(modifier = Modifier.padding(32.dp)) {
                     Text(
+                    fontFamily = lyricsFontFamily,
                         text = stringResource(R.string.generating_image) + "\n" + stringResource(R.string.please_wait),
                         color = AppTheme.colorScheme.onSurface
                     )
@@ -2016,6 +1981,7 @@ fun Lyrics(
                         .padding(20.dp)
                 ) {
                     Text(
+                    fontFamily = lyricsFontFamily,
                         text = stringResource(id = R.string.customize_colors),
                         style = AppTheme.typography.headlineSmall,
                         textAlign = TextAlign.Center,

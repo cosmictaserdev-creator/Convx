@@ -101,7 +101,7 @@ object SettingsHubs {
                     SettingsLink("Lyrics style", R.drawable.lyrics, { systemPink }, SettingsAction.LyricsStyle,
                         "Animation, position, scrolling and swipe — live preview", "animation karaoke word by word apple music position auto scroll swipe"),
                     SettingsLink("Lyrics effects", R.drawable.lyrics, { systemPink }, route("settings/lyrics"),
-                        "Glow and blur", "glow blur apple music standard"),
+                        "Style, fonts, size, glow and blur", "flamingo font size glow blur apple music standard"),
                     SettingsLink("Text & layout", R.drawable.lyrics, { systemOrange }, route("settings/appearance"),
                         "Text size, spacing and full-screen lyrics", "size spacing fullscreen"),
                     SettingsLink("Sources & priority", R.drawable.lyrics, { systemBlue }, route("settings/content/advanced"),

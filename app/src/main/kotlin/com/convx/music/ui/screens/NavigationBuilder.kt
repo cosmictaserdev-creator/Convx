@@ -397,6 +397,10 @@ fun NavGraphBuilder.navigationBuilder(
         LocalFolderScreen(navController, it.arguments?.getString("path").orEmpty())
     }
 
+    sharedComposable("local_folders") {
+        com.convx.music.ui.screens.library.LocalFoldersScreen(navController)
+    }
+
     sharedComposable(
         route = "auto_playlist/{playlist}?thumb={thumb}",
         arguments = listOf(
@@ -591,6 +595,12 @@ fun NavGraphBuilder.navigationBuilder(
 
     sharedComposable("settings/equalizer") {
         AxionEqScreen(onBackClick = { navController.navigateUp() })
+    }
+    sharedComposable(
+        route = "song_insight/{songId}",
+        arguments = listOf(navArgument("songId") { type = NavType.StringType }),
+    ) {
+        com.convx.music.ui.screens.library.SongInsightScreen(navController)
     }
 
     sharedComposable("settings/privacy") {

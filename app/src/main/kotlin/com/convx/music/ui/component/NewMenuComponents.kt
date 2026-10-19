@@ -13,6 +13,7 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -64,25 +65,26 @@ fun NewActionGrid(
     // Inside the menu panel the quick actions sit bare on the panel (iOS 27 clip).
     val inPanel = LocalInMenuPanel.current
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (inPanel) Modifier
-                else Modifier.clip(ContinuousCapsule()).background(colors.secondarySystemGroupedBackground),
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        actions.forEachIndexed { index, action ->
-            if (index > 0 && !inPanel) {
-                Box(
-                    Modifier
-                        .width(IosMetrics.SeparatorThickness)
-                        .height(36.dp)
-                        .background(colors.separator)
-                )
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val columnCount = minOf(columns.coerceAtLeast(1), (maxWidth / 88.dp).toInt().coerceAtLeast(1))
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            actions.chunked(columnCount).forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().then(
+                        if (inPanel) Modifier else Modifier.clip(ContinuousCapsule())
+                            .background(colors.secondarySystemGroupedBackground),
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    row.forEachIndexed { index, action ->
+                        if (index > 0 && !inPanel) {
+                            Box(Modifier.width(IosMetrics.SeparatorThickness).height(36.dp).background(colors.separator))
+                        }
+                        ActionSegment(action, Modifier.weight(1f))
+                    }
+                    repeat(columnCount - row.size) { Spacer(Modifier.weight(1f)) }
+                }
             }
-            ActionSegment(action, Modifier.weight(1f))
         }
     }
 }
@@ -126,7 +128,7 @@ private fun ActionSegment(action: NewAction, modifier: Modifier) {
             style = IosTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
             color = contentColor,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
     }

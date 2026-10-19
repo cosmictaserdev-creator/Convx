@@ -8,6 +8,9 @@ import com.convx.music.db.entities.Album
 import com.convx.music.db.entities.Artist
 import com.convx.music.db.entities.Song
 import com.convx.music.utils.LocalAudioScanner
+import com.convx.music.utils.LocalFolderIndex
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.combine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,6 +35,13 @@ class LocalMusicViewModel @Inject constructor(
     val artists: StateFlow<List<Artist>> = database.artistsLocalByNameAsc()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val indexedFolders = MutableStateFlow<List<LocalFolderIndex.Folder>>(emptyList())
+    val folders = combine(indexedFolders, songs) { folders, songs ->
+        val ids = songs.mapTo(hashSetOf()) { it.id }
+        folders.map { it.copy(songIds = it.songIds.filter(ids::contains)) }
+            .filter { it.songIds.isNotEmpty() }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
 
@@ -54,8 +64,11 @@ class LocalMusicViewModel @Inject constructor(
             try {
                 val result = LocalAudioScanner.scanAndInsert(context, database)
                 _scanResult.value = result
+                indexedFolders.value = LocalFolderIndex.load(context)
                 lastScanAt = System.currentTimeMillis()
                 Timber.tag("LocalMusicViewModel").i("Scan complete: $result")
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Timber.tag("LocalMusicViewModel").e(e, "Scan failed")
             } finally {

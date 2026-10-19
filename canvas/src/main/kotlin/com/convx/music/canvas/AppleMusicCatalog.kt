@@ -1,7 +1,7 @@
 package com.convx.music.canvas
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.request.get
@@ -99,7 +99,7 @@ object AppleMusicCatalog {
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; explicitNulls = false }
 
     internal val client by lazy {
-        HttpClient(CIO) {
+        HttpClient(OkHttp) {
             install(HttpTimeout) {
                 connectTimeoutMillis = 10_000
                 requestTimeoutMillis = 15_000

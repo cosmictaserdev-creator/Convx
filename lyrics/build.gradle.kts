@@ -25,12 +25,12 @@ kotlin {
 dependencies {
     implementation(project(":innertube"))
     implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.client.encoding)
     implementation(libs.timber)
+    implementation(libs.jsoup)
     testImplementation(libs.junit)
     coreLibraryDesugaring(libs.desugaring)
 }

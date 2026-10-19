@@ -776,6 +776,7 @@ val FetchedModulesKey = stringPreferencesKey("fetchedModules")
 
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
 enum class LyricsAnimationStyle {
+    FLAMINGO,
     NONE,
     FADE,
     GLOW,
@@ -798,6 +799,8 @@ enum class LyricsAnimationStyle {
 }
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
+val LyricsFontKey = stringPreferencesKey("lyricsFont")
+val LyricsCustomFontKey = stringPreferencesKey("lyricsCustomFont")
 val LyricsLineSpacingKey = floatPreferencesKey("lyricsLineSpacing")
 
 val PlayerVolumeKey = floatPreferencesKey("playerVolume")

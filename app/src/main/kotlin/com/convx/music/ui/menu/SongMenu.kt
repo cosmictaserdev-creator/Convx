@@ -373,6 +373,14 @@ fun SongMenu(
             NewActionGrid(
                 actions = listOfNotNull(
                     NewAction(
+                        icon = { Icon(painterResource(R.drawable.sparks), contentDescription = null, modifier = Modifier.size(28.dp)) },
+                        text = stringResource(R.string.song_insight_title),
+                        onClick = {
+                            onDismiss()
+                            navController.navigate("song_insight/${android.net.Uri.encode(song.id)}")
+                        },
+                    ),
+                    NewAction(
                         icon = {
                             SymbolIcon(symbol = sf("pencil"), contentDescription = null, size = 28.dp, tint = AppTheme.colorScheme.onSurfaceVariant)
                         },

@@ -13,8 +13,15 @@ import android.os.Build
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.convx.music.playback.MusicService
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 open class MusicWidgetReceiver : AppWidgetProvider() {
+    @Inject lateinit var widgetManager: ConvxWidgetManager
 
     override fun onUpdate(
         context: Context,
@@ -33,7 +40,22 @@ open class MusicWidgetReceiver : AppWidgetProvider() {
                 // Service might be restricted in background
             }
         }
-        // If service is not running, widget shows default layout until user opens app
+        if (!MusicService.isRunning) {
+            val pendingResult = goAsync()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    widgetManager.updateWidgets(
+                        title = context.getString(com.convx.music.R.string.app_name),
+                        artist = context.getString(com.convx.music.R.string.widget_open_app),
+                        artworkUri = null, isPlaying = false, isLiked = false,
+                    )
+                } catch (error: Exception) {
+                    timber.log.Timber.w(error, "Could not initialize widgets")
+                } finally {
+                    pendingResult.finish()
+                }
+            }
+        }
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -43,6 +65,10 @@ open class MusicWidgetReceiver : AppWidgetProvider() {
         newOptions: Bundle
     ) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        if (!MusicService.isRunning) {
+            onUpdate(context, appWidgetManager, intArrayOf(appWidgetId))
+            return
+        }
         // Trigger widget update when size changes
         if (MusicService.isRunning) {
             val intent = Intent(context, MusicService::class.java).apply {

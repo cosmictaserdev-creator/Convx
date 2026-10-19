@@ -6,6 +6,8 @@
 
 package com.convx.music.ui.player
 
+import androidx.lifecycle.repeatOnLifecycle
+
 import com.convx.music.ui.component.sf
 import com.convx.music.ui.component.SymbolIcon
 import com.convx.music.ui.component.heroSideLiveBlur
@@ -144,7 +146,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.convx.music.ui.player.customize.AbsoluteFrameDiyStickers
 import com.convx.music.ui.player.customize.PlayerGlyph
 import androidx.compose.ui.graphics.graphicsLayer
-import com.convx.music.ui.utils.additiveChrome
+import com.convx.music.ui.utils.flamingoChrome
 import com.convx.music.ui.player.customize.AnimatedPlayerGlyph
 import com.convx.music.ui.player.customize.PlayerIconSlot
 import com.convx.music.ui.player.customize.rememberDiyLayout
@@ -291,6 +293,16 @@ private fun PlayerV2Content(
         videoStream = videoStream.takeIf { watchVideo },
         videoStartPositionMs = playerConnection.player.currentPosition,
     )
+    val videoLifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    LaunchedEffect(canvasVideo, watchVideo, videoStream?.videoId, state.isCollapsed, videoLifecycleOwner) {
+        if (!watchVideo || videoStream == null || state.isCollapsed) return@LaunchedEffect
+        videoLifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            while (isActive) {
+                canvasVideo.synchronizeTo(playerConnection.player)
+                delay(500L)
+            }
+        }
+    }
     // For the hero artwork's live swipe peek below: the neighbour thumbnail slides in from
     // whichever side the finger is dragging toward, tracking the drag itself rather than
     // only appearing once the gesture commits.
@@ -732,7 +744,7 @@ private fun PlayerV2Content(
             )
             DjReadout(
                 modifier = Modifier.padding(top = 2.dp)
-                    .additiveChrome(additiveChrome)
+                    .flamingoChrome(additiveChrome)
                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                 color = adaptiveSecondary,
             )
@@ -741,7 +753,7 @@ private fun PlayerV2Content(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = actionsModifier
-                .additiveChrome(additiveChrome)
+                .flamingoChrome(additiveChrome)
                 .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
         ) {
             IconButton(
@@ -1315,7 +1327,7 @@ private fun PlayerV2Content(
                                             animatedVisibilityScope = this@AnimatedContent,
                                             boundsTransform = { _, _ -> Motion.artwork() },
                                         )
-                                            .additiveChrome(additiveChrome)
+                                            .flamingoChrome(additiveChrome)
                                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                                     ) {
                                         IconButton(
@@ -1608,7 +1620,7 @@ private fun PlayerV2Content(
                             .align(Alignment.CenterHorizontally)
                             .widthIn(max = 302.dp) // 292pt glyph frame + 2x5: 61pt targets centred on 51pt glyphs
                             .fillMaxWidth()
-                            .additiveChrome(additiveChrome)
+                            .flamingoChrome(additiveChrome)
                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
@@ -1707,7 +1719,7 @@ private fun PlayerV2Content(
                             // Keep the row's layout space when hidden so DIY stickers do not jump.
                             .alpha(if (hideVolumeBar) 0f else 1f)
                             .then(if (hideVolumeBar) Modifier.clearAndSetSemantics {} else Modifier)
-                            .additiveChrome(additiveChrome, bleed = 8.dp)
+                            .flamingoChrome(additiveChrome, bleed = 8.dp)
                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -1796,7 +1808,7 @@ private fun PlayerV2Content(
                 // Chrome is applied per tab, not on the whole row: an additive layer would turn the selected
                 // tab's dark glyph into a hole.
                 val tabChrome = Modifier
-                    .additiveChrome(additiveChrome)
+                    .flamingoChrome(additiveChrome)
                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 val isLyricsActive = playerState == PlayerInternalState.LYRICS
@@ -1935,34 +1947,24 @@ private fun V2SeekSection(
         interactionSource = trackInteractionSource,
         thumb = { Spacer(modifier = Modifier.size(0.dp)) },
         track = { sliderState ->
-            // Played plain white; the unplayed rail is the vibrant fill, its own full-width
-            // layer under a transparent-inactive track.
-            Box(contentAlignment = Alignment.Center) {
-                if (additiveChrome) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(trackHeight)
-                            .vibrantChrome()
-                            .background(VibrantChromeInk, RoundedCornerShape(50))
-                    )
-                }
-                PlayerSliderTrack(
-                    sliderState = sliderState,
-                    trackHeight = trackHeight,
-                    colors = PlayerSliderColors.getSliderColors(
-                        activeColor = if (additiveChrome) activeColor else activeColor.copy(alpha = 0.8f),
-                        inactiveAlpha = if (additiveChrome) 0f else 0.3f,
-                    ),
-                )
-            }
+            PlayerSliderTrack(
+                sliderState = sliderState,
+                trackHeight = trackHeight,
+                colors = PlayerSliderColors.getSliderColors(
+                    activeColor = activeColor,
+                    inactiveAlpha = if (additiveChrome) 0.05f else 0.3f,
+                ),
+                modifier = Modifier.flamingoChrome(additiveChrome).graphicsLayer {
+                    if (additiveChrome) alpha = 0.45f
+                },
+            )
         },
         modifier = Modifier.fillMaxWidth().requiredHeight(48.dp),
     )
     }
     // Keep the quality badge centered between elapsed and remaining time.
-    val ink = if (additiveChrome) VibrantChromeInk else timeColor
-    val timeModifier = Modifier.vibrantChrome(additiveChrome)
+    val ink = timeColor
+    val timeModifier = Modifier.flamingoChrome(additiveChrome)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -2323,7 +2325,7 @@ private const val FlamingoTimeAlpha = 0.3f
  * Preserve the reference's content alpha when applying the additive treatment;
  * secondary text already carries its own opacity and must not be dimmed twice.
  */
-private const val AdditiveChromeContentAlpha = 0.62f
+private const val AdditiveChromeContentAlpha = 1f
 
 /** Shows a translucent disc while pressed, then fades it after release. */
 @Composable

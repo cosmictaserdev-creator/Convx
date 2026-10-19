@@ -1,187 +1,142 @@
 package com.music.spotify
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
+import android.webkit.WebStorage
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.music.spotify.models.SpotifyInternalToken
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
-import java.net.HttpURLConnection
-import java.net.URL
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
-import kotlin.math.floor
 
+/** Web player token capture adapted from BitChord's Android SpotifyToken, GPL-3.0. */
 object SpotifyAuth {
-    private const val TOKEN_URL = "https://open.spotify.com/api/token"
-    private const val SERVER_TIME_URL = "https://open.spotify.com/api/server-time"
-    private const val NUANCE_GIST_URL =
-        "https://api.github.com/gists/22ed9c6ba463899e933427f7de1f0eef"
-    private const val USER_AGENT =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-
     const val LOGIN_URL = "https://accounts.spotify.com/login?continue=https%3A%2F%2Fopen.spotify.com%2F"
+    private const val ORIGIN = "https://open.spotify.com"
+    private const val BRIDGE = "ConvxSpotifyToken"
+    private val mutex = Mutex()
+    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    @Volatile private var appContext: Context? = null
 
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
+    fun initialize(context: Context) { appContext = context.applicationContext }
+
+    fun browserUserAgent(agent: String): String = agent.replace("; wv", "")
+        .replace(Regex("\\s*Version/\\d+(?:\\.\\d+)*"), "").trim()
+
+    internal fun parseWebPlayerToken(payload: String, nowMillis: Long = System.currentTimeMillis()): SpotifyInternalToken? =
+        runCatching { json.decodeFromString<SpotifyInternalToken>(payload) }.getOrNull()?.takeIf {
+            !it.isAnonymous && it.accessToken.isNotBlank() && it.accessTokenExpirationTimestampMs > nowMillis
+        }
+
+    suspend fun clearWebSession() = withContext(Dispatchers.Main) {
+        val cookies = CookieManager.getInstance()
+        for (origin in listOf(ORIGIN, "https://accounts.spotify.com", "https://spotify.com")) {
+            cookies.getCookie(origin).orEmpty().split(';').map { it.substringBefore('=').trim() }
+                .filter(String::isNotBlank).forEach { name ->
+                    val expired = "$name=; Max-Age=0; Path=/; Secure"
+                    cookies.setCookie(origin, expired)
+                    cookies.setCookie(origin, "$expired; Domain=.spotify.com")
+                }
+        }
+        cookies.flush()
     }
 
-    @Serializable
-    private data class Nuance(val s: String, val v: Int)
-
-    @Serializable
-    private data class GistFile(val content: String)
-
-    @Serializable
-    private data class GistFiles(val files: Map<String, GistFile>)
-
-    @Serializable
-    private data class ServerTimeResponse(val serverTime: Long)
-
-    suspend fun fetchAccessToken(
-        spDc: String,
-        spKey: String = "",
-    ): Result<SpotifyInternalToken> = runCatching {
-        val nuance = fetchNuance()
-        val serverTimeSec = fetchServerTime()
-        val totp = generateTotp(nuance.s, serverTimeSec)
-
-        val tokenUrl = buildString {
-            append(TOKEN_URL)
-            append("?reason=transport")
-            append("&productType=web-player")
-            append("&totp=$totp")
-            append("&totpServer=$totp")
-            append("&totpVer=${nuance.v}")
-        }
-
-        val cookieHeader = buildString {
-            append("sp_dc=$spDc")
-            if (spKey.isNotEmpty()) {
-                append("; sp_key=$spKey")
-            }
-        }
-
-        val body = withContext(Dispatchers.IO) {
-            httpGet(tokenUrl, mapOf("Cookie" to cookieHeader))
-        }
-
-        val token = json.decodeFromString<SpotifyInternalToken>(body)
-
-        if (token.isAnonymous || token.accessToken.isBlank()) {
-            throw Spotify.SpotifyException(
-                401,
-                "Received anonymous token — sp_dc cookie is invalid or expired",
-            )
-        }
-
-        token
+    suspend fun fetchAccessToken(spDc: String, spKey: String = ""): Result<SpotifyInternalToken> = try {
+        require(spDc.isNotBlank() && spDc.none { it == ';' || it == '\r' || it == '\n' }) { "Invalid Spotify session" }
+        val context = checkNotNull(appContext) { "Spotify sign-in is not initialized" }
+        Result.success(mutex.withLock { withContext(Dispatchers.Main) { harvest(context, spDc, spKey) } })
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: Exception) {
+        Result.failure(error)
     }
 
-    private suspend fun fetchNuance(): Nuance = withContext(Dispatchers.IO) {
-        val body = try {
-            httpGet(NUANCE_GIST_URL, emptyMap())
-        } catch (e: Exception) {
-            throw Spotify.SpotifyException(
-                503,
-                "Failed to fetch TOTP secret from gist: ${e.message}",
-            )
+    @SuppressLint("SetJavaScriptEnabled")
+    private suspend fun harvest(context: Context, spDc: String, spKey: String): SpotifyInternalToken {
+        val result = CompletableDeferred<SpotifyInternalToken>()
+        val cookies = CookieManager.getInstance().apply { setAcceptCookie(true) }
+        suspend fun setCookie(value: String) {
+            val ready = CompletableDeferred<Boolean>()
+            cookies.setCookie(ORIGIN, "$value; Domain=.spotify.com; Path=/; Secure") { ready.complete(it) }
+            check(ready.await()) { "Unable to save the Spotify browser session" }
         }
-        val gist = json.decodeFromString<GistFiles>(body)
-        val nuancesJson = gist.files.values.firstOrNull()?.content
-            ?: throw Spotify.SpotifyException(500, "Gist has no files")
-        val nuances = json.decodeFromString<List<Nuance>>(nuancesJson)
-        nuances.maxByOrNull { it.v }
-            ?: throw Spotify.SpotifyException(500, "No nuance data found in gist")
-    }
-
-    private suspend fun fetchServerTime(): Long = withContext(Dispatchers.IO) {
-        val body = try {
-            httpGet(SERVER_TIME_URL, emptyMap())
-        } catch (e: Exception) {
-            throw Spotify.SpotifyException(
-                503,
-                "Failed to fetch Spotify server time: ${e.message}",
-            )
-        }
-        val response = json.decodeFromString<ServerTimeResponse>(body)
-        response.serverTime
-    }
-
-    private fun generateTotp(secret: String, serverTimeSec: Long): String {
-        val key = base32Decode(secret)
-        val interval = 30L
-        val timeStep = floor(serverTimeSec.toDouble() / interval).toLong()
-
-        val timeBytes = ByteArray(8)
-        var value = timeStep
-        for (i in 7 downTo 0) {
-            timeBytes[i] = (value and 0xFF).toByte()
-            value = value shr 8
-        }
-
-        val mac = Mac.getInstance("HmacSHA1")
-        mac.init(SecretKeySpec(key, "HmacSHA1"))
-        val hash = mac.doFinal(timeBytes)
-
-        val offset = hash[hash.size - 1].toInt() and 0x0F
-        val code = ((hash[offset].toInt() and 0x7F) shl 24) or
-            ((hash[offset + 1].toInt() and 0xFF) shl 16) or
-            ((hash[offset + 2].toInt() and 0xFF) shl 8) or
-            (hash[offset + 3].toInt() and 0xFF)
-
-        val otp = code % 1_000_000
-        return otp.toString().padStart(6, '0')
-    }
-
-    private fun base32Decode(input: String): ByteArray {
-        val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-        val cleaned = input.uppercase().replace("=", "")
-
-        val output = mutableListOf<Byte>()
-        var buffer = 0
-        var bitsLeft = 0
-
-        for (c in cleaned) {
-            val value = alphabet.indexOf(c)
-            if (value < 0) continue
-            buffer = (buffer shl 5) or value
-            bitsLeft += 5
-            if (bitsLeft >= 8) {
-                bitsLeft -= 8
-                output.add(((buffer shr bitsLeft) and 0xFF).toByte())
-            }
-        }
-
-        return output.toByteArray()
-    }
-
-    private fun httpGet(urlString: String, extraHeaders: Map<String, String>): String {
-        val connection = URL(urlString).openConnection() as HttpURLConnection
+        setCookie("sp_dc=$spDc")
+        if (spKey.isNotBlank() && spKey.none { it == ';' || it == '\r' || it == '\n' }) setCookie("sp_key=$spKey")
+        cookies.flush()
+        WebStorage.getInstance().deleteOrigin(ORIGIN)
+        val view = WebView(context)
         try {
-            connection.requestMethod = "GET"
-            connection.instanceFollowRedirects = true
-            connection.connectTimeout = 15_000
-            connection.readTimeout = 15_000
-            connection.setRequestProperty("User-Agent", USER_AGENT)
-            connection.setRequestProperty("Accept", "application/json, text/plain, */*")
-            connection.setRequestProperty("Accept-Language", "en")
-            for ((key, value) in extraHeaders) {
-                connection.setRequestProperty(key, value)
+            view.settings.javaScriptEnabled = true
+            view.settings.domStorageEnabled = true
+            // The desktop player boots the token client even on phones; the
+            // mobile landing page can show an app download prompt instead.
+            view.settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+            cookies.setAcceptThirdPartyCookies(view, true)
+            check(WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) { "Please update Android System WebView to connect Spotify" }
+            WebViewCompat.addWebMessageListener(view, BRIDGE, setOf(ORIGIN)) { _, message, origin, mainFrame, _ ->
+                if (!mainFrame || origin.toString().trimEnd('/') != ORIGIN || result.isCompleted) return@addWebMessageListener
+                parseWebPlayerToken(message.data.orEmpty())?.let(result::complete)
             }
+            val hook = tokenHook
+            val startScript = if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT))
+                WebViewCompat.addDocumentStartJavaScript(view, hook, setOf(ORIGIN)) else null
+            view.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
+                    request.isForMainFrame && (request.url.scheme != "https" ||
+                        request.url.host?.let { it != "open.spotify.com" && it != "accounts.spotify.com" } != false)
 
-            val responseCode = connection.responseCode
-            if (responseCode !in 200..299) {
-                val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                throw Spotify.SpotifyException(
-                    responseCode,
-                    "HTTP $responseCode: $errorBody",
-                )
+                override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+                    if (Uri.parse(url.orEmpty()).host == "open.spotify.com") view.evaluateJavascript(hook, null)
+                }
+                override fun onPageFinished(view: WebView, url: String?) {
+                    if (Uri.parse(url.orEmpty()).host == "open.spotify.com") view.evaluateJavascript(hook, null)
+                }
             }
-
-            return connection.inputStream.bufferedReader().use { it.readText() }
+            view.loadUrl("$ORIGIN/")
+            return try {
+                withTimeoutOrNull(30_000) { result.await() }
+                    ?: throw Spotify.SpotifyException(503, "Spotify could not finish connecting. Check your connection and sign in again.")
+            } finally { startScript?.remove() }
         } finally {
-            connection.disconnect()
+            view.stopLoading()
+            view.loadUrl("about:blank")
+            view.destroy()
+            result.cancel()
         }
     }
+
+    private val tokenHook = """
+        (function() {
+          if (location.origin !== '$ORIGIN' || window.__convxSpotifyHook) return;
+          window.__convxSpotifyHook = true;
+          function report(body) { try { window.$BRIDGE.postMessage(body); } catch (_) {} }
+          function isToken(url) { try { var u = new URL(String(url), location.href); return u.origin === '$ORIGIN' && u.pathname === '/api/token'; } catch (_) { return false; } }
+          var fetchOriginal = window.fetch;
+          window.fetch = function(input) {
+            var response = fetchOriginal.apply(this, arguments);
+            if (isToken(input && input.url ? input.url : input)) response.then(function(r) { r.clone().text().then(report).catch(function() {}); }).catch(function() {});
+            return response;
+          };
+          var open = XMLHttpRequest.prototype.open, send = XMLHttpRequest.prototype.send;
+          XMLHttpRequest.prototype.open = function(method, url) { this.__convxTokenUrl = url; return open.apply(this, arguments); };
+          XMLHttpRequest.prototype.send = function() {
+            var xhr = this;
+            xhr.addEventListener('load', function() { if (isToken(xhr.__convxTokenUrl)) { try { report(xhr.responseText); } catch (_) {} } });
+            return send.apply(this, arguments);
+          };
+          try { var session = document.getElementById('session'); if (session) report(session.textContent); } catch (_) {}
+        })();
+    """.trimIndent()
 }

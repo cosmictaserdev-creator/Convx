@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.convx.music.lyrics.LyricsEntry
+import com.convx.music.lyrics.wordsWithSpacing
 import com.convx.music.lyrics.WordTimestamp
 import com.mocharealm.accompanist.lyrics.core.model.ISyncedLine
 import com.mocharealm.accompanist.lyrics.core.model.SyncedLyrics
@@ -36,6 +37,7 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun KaraokeLyrics(
+    fontFamily: androidx.compose.ui.text.font.FontFamily = androidx.compose.ui.text.font.FontFamily.Default,
     lines: List<LyricsEntry>,
     /**
      * The playhead, read as a lambda rather than passed as a value on purpose: the
@@ -55,6 +57,7 @@ fun KaraokeLyrics(
     val synced = remember(lines) { lines.toSyncedLyrics() }
 
     val normalStyle = TextStyle(
+        fontFamily = fontFamily,
         fontSize = fontSize.sp,
         lineHeight = (fontSize * lineSpacing).sp,
         fontWeight = FontWeight.Bold,
@@ -63,21 +66,23 @@ fun KaraokeLyrics(
     )
     // Background vocals use smaller, bold text.
     val accompanimentStyle = TextStyle(
+        fontFamily = fontFamily,
         fontSize = (fontSize * 0.82f).sp,
         lineHeight = (fontSize * 0.82f * lineSpacing).sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = (fontSize * 0.82f * 0.012f).sp,
     )
     val phoneticStyle = TextStyle(
+        fontFamily = fontFamily,
         fontSize = (fontSize * 0.5f).sp,
         lineHeight = (fontSize * 0.5f * lineSpacing).sp,
         fontWeight = FontWeight.Medium,
     )
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        // The active line rests just above the middle rather than dead centre, so the
-        // lines still to come get more of the screen than the ones already sung.
-        val viewportOffset = maxHeight * 0.38f
+        val viewportOffset = maxHeight * 0.5f - with(androidx.compose.ui.platform.LocalDensity.current) {
+            (fontSize * lineSpacing / 2f).sp.toDp()
+        }
 
         // Reset scroll and per-line animation state when the lyrics change.
         key(synced) {
@@ -171,7 +176,7 @@ private fun LyricsEntry.toLine(
     background: List<LyricsEntry>,
 ): ISyncedLine? {
     val alignment = if (agent?.lowercase() == "v2") KaraokeAlignment.End else KaraokeAlignment.Start
-    val syllables = words?.takeIf { it.isNotEmpty() }?.toSyllables()
+    val syllables = wordsWithSpacing().takeIf { it.isNotEmpty() }?.toSyllables()
 
     if (syllables.isNullOrEmpty()) {
         // No word timings: a plain synced line still renders, it just does not light up
@@ -185,7 +190,7 @@ private fun LyricsEntry.toLine(
     if (end <= start) return null
 
     val accompaniment = background.mapNotNull { entry ->
-        val bg = entry.words?.takeIf { it.isNotEmpty() }?.toSyllables() ?: return@mapNotNull null
+        val bg = entry.wordsWithSpacing().takeIf { it.isNotEmpty() }?.toSyllables() ?: return@mapNotNull null
         val bgStart = bg.first().start
         val bgEnd = bg.last().end
         if (bgEnd <= bgStart) return@mapNotNull null

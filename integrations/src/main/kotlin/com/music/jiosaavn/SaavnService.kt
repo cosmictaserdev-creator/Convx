@@ -17,7 +17,7 @@ package com.music.jiosaavn
 import android.util.Base64
 import android.util.Log
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -106,7 +106,7 @@ object SaavnService {
     }
 
     private val client by lazy {
-        HttpClient(CIO) {
+        HttpClient(OkHttp) {
             install(ContentNegotiation) { json(json) }
             install(HttpTimeout) {
                 requestTimeoutMillis = 6_000
@@ -236,7 +236,7 @@ object SaavnService {
     suspend fun getContentLength(url: String): Long? = runCatching {
         Log.d(TAG, "getContentLength: url=$url")
         // Use short timeouts so this metadata request does not delay playback.
-        val headClient = HttpClient(CIO) {
+        val headClient = HttpClient(OkHttp) {
             install(HttpTimeout) {
                 requestTimeoutMillis = 3_000
                 connectTimeoutMillis = 2_000

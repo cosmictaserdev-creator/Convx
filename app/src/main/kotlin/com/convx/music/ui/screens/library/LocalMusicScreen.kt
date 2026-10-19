@@ -102,6 +102,7 @@ fun LocalMusicScreen(
     val menuState = LocalMenuState.current
     val (accentColor, onAccentColor) = rememberGlobalAccentColors()
 
+    val folders by viewModel.folders.collectAsStateWithLifecycle()
     val songs by viewModel.songs.collectAsStateWithLifecycle()
     val albums by viewModel.albums.collectAsStateWithLifecycle()
     val artists by viewModel.artists.collectAsStateWithLifecycle()
@@ -342,6 +343,13 @@ fun LocalMusicScreen(
                         Text("Shuffle")
                     }
                 }
+            }
+        }
+
+        if (hasStoragePermission && folders.isNotEmpty()) {
+            item(key = "folders_header") { SectionHeader(title = "Folders", count = folders.size) }
+            itemsIndexed(folders.filter { it.path.contains(searchQuery, ignoreCase = true) }, key = { _, folder -> "folder:${folder.path}" }) { _, folder ->
+                LocalMusicFolderRow(folder = folder, navController = navController)
             }
         }
 

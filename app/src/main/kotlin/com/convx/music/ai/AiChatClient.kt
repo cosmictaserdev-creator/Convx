@@ -14,6 +14,16 @@ import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
+import java.io.IOException
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resumeWithException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,7 +33,7 @@ import org.json.JSONObject
 
 /** Sends chat-completions requests using the configured provider URL, model, and API key. */
 object AiChatClient {
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS).build()
 
     /** Returns the assistant response, or null if the request fails. */
     suspend fun complete(
@@ -62,26 +72,40 @@ object AiChatClient {
             })
         }.toString().toRequestBody("application/json".toMediaType())
 
-        val request = Request.Builder()
-            .url(baseUrl)
-            .addHeader("Authorization", "Bearer $apiKey")
-            .post(requestBody)
-            .build()
-
         try {
-            val response = client.newCall(request).execute()
-            if (!response.isSuccessful) {
-                val errorBody = response.body.string().take(300)
-                onLog("AI request failed: ${response.code} $errorBody")
-                return@withContext null
+            val request = Request.Builder()
+                .url(baseUrl)
+                .addHeader("Authorization", "Bearer $apiKey")
+                .post(requestBody)
+                .build()
+            client.newCall(request).awaitResponse().use { response ->
+                if (!response.isSuccessful) {
+                    onLog("AI request failed: HTTP ${response.code}")
+                    return@withContext null
+                }
+                val responseString = response.body.string()
+                currentCoroutineContext().ensureActive()
+                val responseJson = JSONObject(responseString)
+                val choices = responseJson.optJSONArray("choices") ?: return@withContext null
+                choices.optJSONObject(0)?.optJSONObject("message")?.optString("content")
             }
-            val responseString = response.body.string()
-            val responseJson = JSONObject(responseString)
-            val choices = responseJson.optJSONArray("choices") ?: return@withContext null
-            choices.optJSONObject(0)?.optJSONObject("message")?.optString("content")
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (e: Exception) {
             onLog("Network error: ${e.message}")
             null
         }
+    }
+
+    private suspend fun Call.awaitResponse(): Response = suspendCancellableCoroutine { continuation ->
+        continuation.invokeOnCancellation { cancel() }
+        enqueue(object : Callback {
+            override fun onFailure(call: Call, error: IOException) {
+                if (continuation.isActive) continuation.resumeWithException(error)
+            }
+            override fun onResponse(call: Call, response: Response) {
+                continuation.resume(response) { _, value, _ -> value.close() }
+            }
+        })
     }
 }

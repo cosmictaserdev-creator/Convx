@@ -2,7 +2,7 @@ package com.convx.music.canvas
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.compression.ContentEncoding
@@ -35,7 +35,7 @@ object AppleMusicArtistBackgroundProvider {
     }
 
     private val client by lazy {
-        HttpClient(CIO) {
+        HttpClient(OkHttp) {
             install(ContentNegotiation) {
                 json(json)
                 register(ContentType.Text.JavaScript, KotlinxSerializationConverter(json))

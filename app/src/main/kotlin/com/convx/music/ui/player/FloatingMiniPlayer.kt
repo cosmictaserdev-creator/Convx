@@ -113,7 +113,7 @@ import com.convx.music.LocalAmbientBackgroundColor
 import com.convx.music.ui.component.asSoftIconTint
 import com.convx.music.ui.component.elasticStretchLayerBlock
 import com.convx.music.ui.component.backdrop.catalog.utils.InteractiveHighlight
-import com.convx.music.ui.utils.additiveChrome
+import com.convx.music.ui.utils.flamingoChrome
 import com.convx.music.ui.utils.resize
 import com.convx.music.utils.rememberPreference
 import kotlin.math.abs
@@ -502,7 +502,7 @@ fun FloatingMiniPlayer(
                         // Combine both lines into one layer; their glyphs do not overlap.
                         modifier = Modifier
                             .weight(1f)
-                            .additiveChrome(useGlass && isDark),
+                            .flamingoChrome(useGlass && isDark),
                     ) {
                         // Scroll long titles only during playback; paused titles stay still.
                         Box(Modifier.marqueeEdgeFade(MarqueeFade)) {
@@ -556,7 +556,7 @@ fun FloatingMiniPlayer(
                         modifier = Modifier
                             .scaledWidth(64.dp, fade = true, fraction = extras)
                             .height(22.dp)
-                            .additiveChrome(useGlass && isDark),
+                            .flamingoChrome(useGlass && isDark),
                     )
                 }
 
@@ -586,7 +586,7 @@ fun FloatingMiniPlayer(
                         slot = PlayerIconSlot.NEXT,
                         fallbackVector = SfSymbols.Monochrome.SFForwardFill,
                         tint = if (canSkipNext) transportTint else transportTint.copy(alpha = 0.4f),
-                        modifier = Modifier.size(playIconSize).additiveChrome(useGlass && isDark),
+                        modifier = Modifier.size(playIconSize).flamingoChrome(useGlass && isDark),
                     )
                 }
             } else {
@@ -597,7 +597,7 @@ fun FloatingMiniPlayer(
                     onClick = { playerConnection.player.shuffleModeEnabled = !shuffleModeEnabled },
                     modifier = Modifier.size(controlSize),
                 ) {
-                    SymbolIcon(symbol = sf("SFShuffle"), contentDescription = stringResource(R.string.shuffle_label), modifier = Modifier.size(iconSize).additiveChrome(useGlass && isDark), tint = transportTint)
+                    SymbolIcon(symbol = sf("SFShuffle"), contentDescription = stringResource(R.string.shuffle_label), modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark), tint = transportTint)
                 }
                 IconButton(
                     onClick = { playerConnection.requestSkip(forward = false) },
@@ -608,7 +608,7 @@ fun FloatingMiniPlayer(
                         slot = PlayerIconSlot.PREVIOUS,
                         fallbackVector = SfSymbols.Monochrome.SFBackwardFill,
                         tint = if (canSkipPrevious) transportTint else transportTint.copy(alpha = 0.4f),
-                        modifier = Modifier.size(iconSize).additiveChrome(useGlass && isDark),
+                        modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark),
                     )
                 }
                 IconButton(
@@ -630,14 +630,14 @@ fun FloatingMiniPlayer(
                         slot = PlayerIconSlot.NEXT,
                         fallbackVector = SfSymbols.Monochrome.SFForwardFill,
                         tint = if (canSkipNext) transportTint else transportTint.copy(alpha = 0.4f),
-                        modifier = Modifier.size(playIconSize).additiveChrome(useGlass && isDark),
+                        modifier = Modifier.size(playIconSize).flamingoChrome(useGlass && isDark),
                     )
                 }
                 IconButton(
                     onClick = { playerConnection.player.toggleRepeatMode() },
                     modifier = Modifier.size(controlSize),
                 ) {
-                    SymbolIcon(symbol = if (repeatMode == Player.REPEAT_MODE_ONE) sf("SFRepeat1") else sf("SFRepeat"), contentDescription = stringResource(R.string.repeat_mode_all), modifier = Modifier.size(iconSize).additiveChrome(useGlass && isDark), tint = if (repeatMode != Player.REPEAT_MODE_OFF) transportTint else transportTint.copy(alpha = 0.4f))
+                    SymbolIcon(symbol = if (repeatMode == Player.REPEAT_MODE_ONE) sf("SFRepeat1") else sf("SFRepeat"), contentDescription = stringResource(R.string.repeat_mode_all), modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark), tint = if (repeatMode != Player.REPEAT_MODE_OFF) transportTint else transportTint.copy(alpha = 0.4f))
                 }
 
                 Spacer(Modifier.width(8.dp))
@@ -680,7 +680,7 @@ fun FloatingMiniPlayer(
 
                     Column(
                         // Combine both lines into one layer; their glyphs do not overlap.
-                        modifier = Modifier.weight(1f).additiveChrome(useGlass && isDark),
+                        modifier = Modifier.weight(1f).flamingoChrome(useGlass && isDark),
                     ) {
                         Text(
                             text = mediaMetadata?.title.orEmpty(),
@@ -712,13 +712,13 @@ fun FloatingMiniPlayer(
                     onClick = onLyricsClick ?: onClick,
                     modifier = Modifier.size(controlSize),
                 ) {
-                    SymbolIcon(symbol = sf("SFQuoteBubble"), contentDescription = stringResource(R.string.lyrics), modifier = Modifier.size(iconSize * LyricsIconScale).additiveChrome(useGlass && isDark), tint = transportTint)
+                    SymbolIcon(symbol = sf("SFQuoteBubble"), contentDescription = stringResource(R.string.lyrics), modifier = Modifier.size(iconSize * LyricsIconScale).flamingoChrome(useGlass && isDark), tint = transportTint)
                 }
                 IconButton(
                     onClick = onQueueClick ?: onClick,
                     modifier = Modifier.size(controlSize),
                 ) {
-                    SymbolIcon(symbol = sf("SFListBullet"), contentDescription = stringResource(R.string.queue), modifier = Modifier.size(iconSize).additiveChrome(useGlass && isDark), tint = transportTint)
+                    SymbolIcon(symbol = sf("SFListBullet"), contentDescription = stringResource(R.string.queue), modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark), tint = transportTint)
                 }
             }
         }

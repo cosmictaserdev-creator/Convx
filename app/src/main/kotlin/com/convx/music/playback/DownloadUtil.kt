@@ -373,6 +373,8 @@ constructor(
                         publishDownload(download.request.id, download)
 
                         if (download.state == Download.STATE_FAILED) {
+                            // A retry must resolve a fresh URL after a CDN error or expired signature.
+                            songUrlCache.remove(download.request.id)
                             Timber.e(
                                 finalException,
                                 "Download failed: id=%s title=%s reason=%d",
@@ -414,6 +416,7 @@ constructor(
                     }
 
                     override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
+                        songUrlCache.remove(download.request.id)
                         DownloadDuplicates.unregister(download.request.id)
                         autoDownloadRequests.remove(download.request.id)
                         publishDownload(download.request.id, null)

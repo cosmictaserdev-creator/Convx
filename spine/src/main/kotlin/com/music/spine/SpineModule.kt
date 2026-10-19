@@ -25,6 +25,7 @@ data class SpineModule(
     @SerialName("featured") val featured: Boolean = false,
     @SerialName("nsfw") val nsfw: Boolean = false,
     @SerialName("sources") val sources: List<SpineSource> = emptyList(),
+    @SerialName("sourceUrl") val sourceUrl: String = "",
 ) {
     val tags: List<String> get() = if (declaredTags.isNotEmpty()) declaredTags else declaredLabels
 

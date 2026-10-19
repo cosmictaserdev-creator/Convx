@@ -60,7 +60,7 @@ const val MenuIconChrome = 0.8f
  */
 const val MenuItemChrome = 0.25f
 
-fun Modifier.additiveChrome(enabled: Boolean = true, strength: Float = 1f, bleed: Dp = 0.dp): Modifier =
+fun Modifier.additiveChrome(enabled: Boolean = true, strength: Float = 1f, bleed: Dp = 0.dp, passes: Int = AdditiveChromePasses): Modifier =
     if (!enabled) this else drawWithCache {
         // Record once and composite the same layer twice.
         val layer = obtainGraphicsLayer().apply { blendMode = BlendMode.Plus; alpha = strength }
@@ -73,9 +73,13 @@ fun Modifier.additiveChrome(enabled: Boolean = true, strength: Float = 1f, bleed
         )
         onDrawWithContent {
             layer.record(layerSize) { translate(pad, pad) { this@onDrawWithContent.drawContent() } }
-            translate(-pad, -pad) { repeat(AdditiveChromePasses) { drawLayer(layer) } }
+            translate(-pad, -pad) { repeat(passes) { drawLayer(layer) } }
         }
     }
+
+/** Flamingo's overlayEffect uses one Plus blend pass, with opacity supplied by each control. */
+fun Modifier.flamingoChrome(enabled: Boolean = true, strength: Float = 1f, bleed: Dp = 0.dp): Modifier =
+    additiveChrome(enabled, strength, bleed, passes = 1)
 
 /**
  * Apple's "vibrant" secondary fill -- the Now Playing unplayed track and time labels.

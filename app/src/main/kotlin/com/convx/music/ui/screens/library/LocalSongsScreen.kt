@@ -88,6 +88,7 @@ fun LocalSongsScreen(
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsStateWithLifecycle()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
 
+    val folders by viewModel.folders.collectAsStateWithLifecycle()
     val songs by viewModel.songs.collectAsStateWithLifecycle()
     val isScanning by viewModel.isScanning.collectAsStateWithLifecycle()
 
@@ -201,6 +202,11 @@ fun LocalSongsScreen(
                 }
             }
 
+            if (audioPermission.granted) {
+                item(key = "folders_entry") {
+                    LocalMusicFoldersEntry(count = folders.size, navController = navController)
+                }
+            }
             itemsIndexed(
                 items = visibleSongs,
                 key = { _, song -> song.id },

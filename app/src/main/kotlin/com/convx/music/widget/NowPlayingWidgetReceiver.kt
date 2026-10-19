@@ -34,7 +34,15 @@ class NowPlayingWidgetReceiver : MusicWidgetReceiver() {
          * since a background start would throw on Android 14+.
          */
         fun requestUpdate(context: Context) {
-            if (!MusicService.isRunning) return
+            if (!MusicService.isRunning) {
+                val manager = android.appwidget.AppWidgetManager.getInstance(context)
+                val component = android.content.ComponentName(context, NowPlayingWidgetReceiver::class.java)
+                context.sendBroadcast(Intent(context, NowPlayingWidgetReceiver::class.java).apply {
+                    action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, manager.getAppWidgetIds(component))
+                })
+                return
+            }
             runCatching {
                 context.startService(
                     Intent(context, MusicService::class.java).apply {

@@ -140,8 +140,9 @@ fun SpotifyScreen(
                 } else {
                     IosSettingsItem(
                         title = { Text(stringResource(R.string.spotify_connect)) },
-                        description = { Text(stringResource(R.string.spotify_not_connected)) },
+                        description = { Text(if (state.isLoading) "Connecting to Spotify…" else stringResource(R.string.spotify_not_connected)) },
                         icon = painterResource(R.drawable.spotify),
+                        enabled = !state.isLoading,
                         onClick = { showSpotifyLogin = true }
                     )
                 }
@@ -451,9 +452,10 @@ private fun SpotifyLoginSheet(
     onDismiss: () -> Unit,
     onCookiesCaptured: (spDc: String, spKey: String) -> Unit,
 ) {
-    val sheetState = rememberIosModalSheetState(skipPartiallyExpanded = true)
     var webView by remember { mutableStateOf<WebView?>(null) }
     var captured by remember { mutableStateOf(false) }
+    var pageError by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(true) }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -464,16 +466,17 @@ private fun SpotifyLoginSheet(
         }
     }
 
-    ModalBottomSheet(
+    androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = AppTheme.colorScheme.surface,
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
     ) {
+        Surface(modifier = Modifier.fillMaxSize(), color = AppTheme.colorScheme.surface) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f)
+                .fillMaxSize()
+                .systemBarsPadding()
+                .imePadding()
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -488,6 +491,15 @@ private fun SpotifyLoginSheet(
                 style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colorScheme.onSurfaceVariant,
             )
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(onClick = { if (webView?.canGoBack() == true) webView?.goBack() else onDismiss() }) { Text("Back") }
+                TextButton(onClick = onDismiss) { Text("Close") }
+            }
+            if (loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            pageError?.let { message ->
+                Text(message, color = AppTheme.colorScheme.error)
+                TextButton(onClick = { pageError = null; webView?.reload() }) { Text("Retry") }
+            }
             AndroidView(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -508,13 +520,15 @@ private fun SpotifyLoginSheet(
                         settings.builtInZoomControls = true
                         settings.displayZoomControls = false
                         // Spotify rejects embedded WebViews; drop the WebView markers from the UA.
-                        settings.userAgentString = settings.userAgentString.replace("; wv", "")
+                        settings.userAgentString = SpotifyAuth.browserUserAgent(settings.userAgentString)
                         if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
                             WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, emptySet())
                         }
                         webViewClient = object : WebViewClient() {
                             private fun captureCookies(url: String?): Boolean {
                                 if (captured) return true
+                                val uri = android.net.Uri.parse(url.orEmpty())
+                                if (uri.scheme != "https" || uri.host != "open.spotify.com") return false
                                 cookieManager.flush()
                                 val domainsToCheck = listOfNotNull(
                                     url,
@@ -544,17 +558,27 @@ private fun SpotifyLoginSheet(
                             override fun shouldOverrideUrlLoading(
                                 view: WebView,
                                 request: WebResourceRequest,
-                            ): Boolean = request.isForMainFrame && captureCookies(request.url?.toString())
+                            ): Boolean = request.url.scheme != "https"
 
                             override fun onPageStarted(
                                 view: WebView,
                                 url: String?,
                                 favicon: android.graphics.Bitmap?,
                             ) {
+                                loading = true
+                                pageError = null
                                 captureCookies(url)
                             }
 
+                            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: android.webkit.WebResourceError) {
+                                if (request.isForMainFrame) {
+                                    loading = false
+                                    pageError = "Spotify's sign-in page could not load. Check your connection and retry."
+                                }
+                            }
+
                             override fun onPageFinished(view: WebView, url: String?) {
+                                loading = false
                                 captureCookies(url)
                             }
                         }
@@ -572,5 +596,6 @@ private fun SpotifyLoginSheet(
                 },
             )
         }
+    }
     }
 }

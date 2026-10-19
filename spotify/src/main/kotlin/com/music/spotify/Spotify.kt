@@ -1,9 +1,10 @@
 package com.music.spotify
 
 import com.music.spotify.models.*
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
@@ -21,6 +22,8 @@ import java.util.UUID
 object Spotify {
     @Volatile
     var accessToken: String? = null
+    @Volatile
+    var clientId: String = ""
 
     private const val GQL_URL = "https://api-partner.spotify.com/pathfinder/v2/query"
     private val homeVisitorId = UUID.randomUUID().toString().replace("-", "")
@@ -46,9 +49,9 @@ object Spotify {
     }
 
     private val gqlClient by lazy {
-        HttpClient(CIO) {
-            engine {
-                requestTimeout = 30000
+        HttpClient(OkHttp) {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30_000
             }
             defaultRequest {
                 header("User-Agent", randomUserAgent())
@@ -86,9 +89,19 @@ object Spotify {
         extraHeaders: Map<String, String> = emptyMap(),
     ): JsonObject {
         val token = accessToken ?: throw SpotifyException(401, "Not authenticated")
-        val sha256Hash = SpotifyHashProvider.getHash(operationName)
-        val body = buildGqlBody(operationName, sha256Hash, variables)
-        return executeGqlWithRetries(operationName, token, body, extraHeaders)
+        val headers = if (clientId.isNotBlank()) {
+            val authorization = SpotifyCanvas.pathfinderAuthorization(clientId)
+            mapOf("client-token" to authorization.token, "spotify-app-version" to authorization.clientVersion) + extraHeaders
+        } else extraHeaders
+        val body = buildGqlBody(operationName, SpotifyHashProvider.getHash(operationName), variables)
+        return try {
+            executeGqlWithRetries(operationName, token, body, headers)
+        } catch (error: SpotifyException) {
+            if (error.message?.contains("PersistedQueryNotFound", ignoreCase = true) != true) throw error
+            SpotifyHashProvider.refreshFromWebPlayer()
+            executeGqlWithRetries(operationName, token,
+                buildGqlBody(operationName, SpotifyHashProvider.getHash(operationName), variables), headers)
+        }
     }
 
     private fun buildGqlBody(
@@ -121,7 +134,7 @@ object Spotify {
                 setBody(
                     TextContent(
                         body.toString(),
-                        ContentType.Application.Json.withParameter("charset", "UTF-8"),
+                        ContentType.Application.Json,
                     ),
                 )
             }

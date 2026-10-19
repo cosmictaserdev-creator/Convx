@@ -65,9 +65,9 @@ data class PlayerResponse(
             val audioTrack: AudioTrack?
         ) {
             val isAudio: Boolean
-                get() = width == null
+                get() = mimeType.startsWith("audio/", ignoreCase = true)
             val isOriginal: Boolean
-                get() = audioTrack?.isAutoDubbed == null
+                get() = audioTrack?.isAutoDubbed != true
 
             @Serializable
             data class AudioTrack(

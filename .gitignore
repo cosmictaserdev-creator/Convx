@@ -137,9 +137,9 @@ NEW-UI/
 
 # Reference checkouts read during the BitChord/ArchiveTune parity work.
 # Cloned repos with their own .git — never ours to commit.
-BitChord/
+/BitChord/
 ArchiveTune/
-Flamingo/
+/Flamingo/
 News/
 fastlane/
 merge_strings.py

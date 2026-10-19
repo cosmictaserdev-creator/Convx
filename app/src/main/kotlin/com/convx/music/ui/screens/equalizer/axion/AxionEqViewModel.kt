@@ -1,13 +1,21 @@
 package com.convx.music.ui.screens.equalizer.axion
 
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.eq.EqualizerService
 import com.convx.music.eq.data.EQProfileRepository
 import com.convx.music.eq.data.ParametricEQBand
 import com.convx.music.eq.data.SavedEQProfile
+import com.convx.music.eq.data.EQProfileImport
 import com.tencent.mmkv.MMKV
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AxionEqViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val equalizerService: EqualizerService,
     private val eqProfileRepository: EQProfileRepository,
 ) : ViewModel() {
@@ -44,6 +53,10 @@ class AxionEqViewModel @Inject constructor(
     val mode = _mode.asStateFlow()
     private val _isDirty = MutableStateFlow(false)
     val isDirty = _isDirty.asStateFlow()
+    private val _isImporting = MutableStateFlow(false)
+    val isImporting = _isImporting.asStateFlow()
+    private val _importSucceeded = MutableStateFlow<Boolean?>(null)
+    val importSucceeded = _importSucceeded.asStateFlow()
     val customProfiles = eqProfileRepository.profiles.map { profiles ->
         profiles.filter { it.isCustom && it.id != "vivi_tuning" }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -145,5 +158,38 @@ class AxionEqViewModel @Inject constructor(
 
     fun deleteProfiles(ids: List<String>) {
         viewModelScope.launch { ids.forEach { eqProfileRepository.deleteProfile(it) } }
+    }
+
+    fun dismissImportResult() { _importSucceeded.value = null }
+
+    fun importProfile(uri: Uri) {
+        if (_isImporting.value) return
+        _isImporting.value = true
+        _importSucceeded.value = null
+        viewModelScope.launch {
+            try {
+                val profile = withContext(Dispatchers.IO) {
+                    val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+                        ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+                        ?.substringBeforeLast('.')?.trim()?.take(120)?.takeIf { it.isNotBlank() }
+                        ?: context.getString(com.convx.music.R.string.import_profile)
+                    val parsed = requireNotNull(context.contentResolver.openInputStream(uri)).use(EQProfileImport::read)
+                    SavedEQProfile(
+                        id = "custom_${UUID.randomUUID()}", name = name, deviceModel = name,
+                        bands = parsed.bands, preamp = parsed.preamp, isCustom = true,
+                    ).also { eqProfileRepository.saveProfile(it) }
+                }
+                selectProfile(profile)
+                _mode.value = 1
+                prefs.encode("mode", 1)
+                _importSucceeded.value = true
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                _importSucceeded.value = false
+            } finally {
+                _isImporting.value = false
+            }
+        }
     }
 }

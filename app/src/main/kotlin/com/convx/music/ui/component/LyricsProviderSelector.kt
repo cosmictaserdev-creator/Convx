@@ -84,6 +84,7 @@ fun LyricsProviderMenu(
     viewModel: LyricsProviderViewModel = hiltViewModel(),
 ) {
     val statuses by viewModel.statuses.collectAsStateWithLifecycle()
+    val syncLevels by viewModel.syncLevels.collectAsStateWithLifecycle()
     val requested by viewModel.requested.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val (order) = rememberPreference(LyricsProviderOrderKey, "")
@@ -196,6 +197,10 @@ fun LyricsProviderMenu(
                             style = AppTheme.typography.bodySmall,
                             color = AppTheme.colorScheme.onSurfaceVariant,
                         )
+                        if (status == LyricsProviderStatus.FOUND) {
+                            Text(syncLevels[name]?.label.orEmpty(), style = AppTheme.typography.labelSmall,
+                                color = AppTheme.colorScheme.primary)
+                        }
                     }
                 }
             }

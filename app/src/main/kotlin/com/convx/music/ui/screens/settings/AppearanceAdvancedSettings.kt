@@ -133,7 +133,9 @@ fun AppearanceAdvancedSettings(
     val hiddenTabs = remember(hiddenNavigationRoutes) {
         hiddenNavigationRoutes.lineSequence().map(String::trim).filter(String::isNotEmpty).toSet()
     }
-    val optionalTabs = listOf(Screens.Radio, Screens.Explore)
+    val (localOnlyMode) = rememberPreference(com.convx.music.constants.LocalOnlyModeKey, false)
+    val optionalTabs = Screens.mainScreens(localOnlyMode).filter { it != Screens.Search } +
+        if (localOnlyMode) emptyList() else listOf(Screens.Explore)
     val onTabVisibilityChange: (Screens, Boolean) -> Unit = { tab, visible ->
         val updated = if (visible) hiddenTabs - tab.route else hiddenTabs + tab.route
         onHiddenNavigationRoutesChange(updated.sorted().joinToString("\n"))

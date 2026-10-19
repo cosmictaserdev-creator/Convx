@@ -38,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.convx.music.lyrics.LyricsEntry
+import com.convx.music.lyrics.wordsWithSpacing
+import androidx.compose.runtime.remember
 import com.convx.music.lyrics.WordTimestamp
 import kotlin.math.PI
 import kotlin.math.sin
@@ -46,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LyricsLineV2(
+    fontFamily: androidx.compose.ui.text.font.FontFamily = androidx.compose.ui.text.font.FontFamily.Default,
     entry: LyricsEntry,
     isActive: Boolean,
     isPast: Boolean,
@@ -64,7 +67,7 @@ fun LyricsLineV2(
         else -> Arrangement.Start
     }
 
-    val words = entry.words ?: emptyList()
+    val words = remember(entry.words, entry.text) { entry.wordsWithSpacing() }
 
     if (words.isNotEmpty()) {
         FlowRow(
@@ -76,8 +79,12 @@ fun LyricsLineV2(
             )
         ) {
             words.forEachIndexed { wordIndex, word ->
+                Box(Modifier.padding(end = with(LocalDensity.current) {
+                    (baseFontSize * 0.25f * word.text.takeLastWhile { it.isWhitespace() }.length).sp.toDp()
+                })) {
                 AnimatedWordV2(
-                    word = word,
+                    fontFamily = fontFamily,
+                    word = word.copy(text = word.text.trimEnd()),
                     isLineActive = isActive,
                     isLinePast = isPast,
                     effectivePlaybackPosition = effectivePlaybackPosition,
@@ -87,18 +94,13 @@ fun LyricsLineV2(
                     lineHeight = lineHeight.coerceAtMost(baseFontSize * 1.3f),
                     isBackground = entry.isBackground
                 )
-                if (wordIndex < words.size - 1) {
-                    Text(
-                        text = " ",
-                        fontSize = baseFontSize.sp,
-                        lineHeight = lineHeight.coerceAtMost(baseFontSize * 1.3f).sp
-                    )
                 }
             }
         }
     } else {
         // Fallback for lines without word timings (e.g. standard LRC without word sync)
         Text(
+                    fontFamily = fontFamily,
             text = entry.text,
             style = AppTheme.typography.headlineMedium.copy(
                 fontSize = if (entry.isBackground) (baseFontSize * 0.85f).sp else baseFontSize.sp,
@@ -119,6 +121,7 @@ fun LyricsLineV2(
         val translatedText by entry.translatedTextFlow.collectAsStateWithLifecycle()
         translatedText?.let { translated ->
             Text(
+                    fontFamily = fontFamily,
                 text = translated,
                 fontSize = (baseFontSize * 0.7f).sp,
                 color = expressiveAccent.copy(alpha = if (isActive) 0.8f else inactiveAlpha * 0.8f),
@@ -135,6 +138,7 @@ fun LyricsLineV2(
 
 @Composable
 fun AnimatedWordV2(
+    fontFamily: androidx.compose.ui.text.font.FontFamily = androidx.compose.ui.text.font.FontFamily.Default,
     word: WordTimestamp,
     isLineActive: Boolean,
     isLinePast: Boolean,
@@ -190,6 +194,7 @@ fun AnimatedWordV2(
     ) {
         // Layer 1: Base text (always dimmed)
         Text(
+                    fontFamily = fontFamily,
             text = word.text,
             style = AppTheme.typography.headlineMedium.copy(
                 fontSize = fontSize.sp,
@@ -204,6 +209,7 @@ fun AnimatedWordV2(
         // Layer 2: Filled overlay with liquid sweep mask + glow
         if (isWordComplete || isWordActive) {
             Text(
+                    fontFamily = fontFamily,
                 text = word.text,
                 style = AppTheme.typography.headlineMedium.copy(
                     fontSize = fontSize.sp,

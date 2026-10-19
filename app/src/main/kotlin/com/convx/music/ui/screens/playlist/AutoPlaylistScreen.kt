@@ -101,6 +101,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.LocalPlayerConnection
+import com.convx.music.LocalDownloadUtil
+import androidx.media3.exoplayer.offline.Download
+import com.convx.music.playback.DownloadTarget
+import com.convx.music.playback.combinedDownloadState
+import com.convx.music.playback.downloadSongs
+import com.convx.music.playback.cancelDownloads
+import com.convx.music.playback.removeDownloads
 import com.convx.music.R
 import com.convx.music.constants.SongSortDescendingKey
 import com.convx.music.constants.SongSortType
@@ -664,6 +671,12 @@ private fun AutoPlaylistHeader(
     searchFocusRequester: FocusRequester? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
+    val downloadUtil = LocalDownloadUtil.current.get()
+    val downloads by downloadUtil.downloads.collectAsStateWithLifecycle()
+    val downloadableSongs = remember(songs) { songs.filterNot { it.song.isLocal } }
+    val downloadState = remember(downloadableSongs, downloads) {
+        combinedDownloadState(downloadableSongs, downloads) { it.id }
+    }
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsStateWithLifecycle()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
 val totalLength = remember(songs) { songs.fastSumBy { it.song.duration } }
@@ -692,11 +705,24 @@ val totalLength = remember(songs) { songs.fastSumBy { it.song.duration } }
         onRightAction = {
                     menuState.show {
                         AutoPlaylistMenu(
-                            downloadState = androidx.media3.exoplayer.offline.Download.STATE_STOPPED,
+                            downloadState = downloadState,
                             onQueue = {
                                 playerConnection.addToQueue(songs.map { it.toMediaItem() })
                             },
-                            onDownload = { },
+                            onDownload = {
+                                when (downloadState) {
+                                    Download.STATE_COMPLETED -> removeDownloads(context, downloadableSongs.map { it.id })
+                                    Download.STATE_DOWNLOADING, Download.STATE_QUEUED ->
+                                        cancelDownloads(context, downloadableSongs.map { it.id }, downloads)
+                                    else -> downloadSongs(
+                                        context,
+                                        downloadableSongs.map {
+                                            DownloadTarget(it.id, it.song.title, it.artists.firstOrNull()?.name, it.song.duration)
+                                        },
+                                        downloads,
+                                    )
+                                }
+                            },
                             onDismiss = { menuState.dismiss() },
                         )
                     }

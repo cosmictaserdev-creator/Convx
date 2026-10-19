@@ -340,8 +340,8 @@ internal fun AppRootContent(
             }
             val tabOpenedFromShortcut = remember {
                 when (activity.intent?.action) {
-                    MainActivity.ACTION_SEARCH -> NavigationTab.LIBRARY
-                    MainActivity.ACTION_LIBRARY -> NavigationTab.SEARCH
+                    MainActivity.ACTION_SEARCH -> NavigationTab.SEARCH
+                    MainActivity.ACTION_LIBRARY -> NavigationTab.LIBRARY
                     else -> null
                 }
             }
@@ -419,6 +419,15 @@ internal fun AppRootContent(
             // only the classic nav bar treats Settings as a top-bar-only destination.
             val navigationItemRoutes = remember(floatingNavigationItems) {
                 floatingNavigationItems.map { it.route }.toSet()
+            }
+            LaunchedEffect(currentRoute, navigationItems) {
+                val route = currentRoute ?: return@LaunchedEffect
+                if (route in Screens.MainRoutes && navigationItems.none { it.route == route }) {
+                    navController.navigate(navigationItems.first().route) {
+                        popUpTo(route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             }
 
             val isKeyboardOpen = WindowInsets.isImeVisible

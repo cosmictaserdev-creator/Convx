@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.convx.music.constants.AppleMusicLyricsBlurKey
 import com.convx.music.lyrics.LyricsEntry
+import com.convx.music.lyrics.wordsWithSpacing
 import com.convx.music.ui.screens.settings.LyricsPosition
 import com.convx.music.utils.rememberPreference
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,6 +61,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ConvxLyricsLine(
+    fontFamily: androidx.compose.ui.text.font.FontFamily = androidx.compose.ui.text.font.FontFamily.Default,
     entry: LyricsEntry,
     nextEntryTime: Long?,
     effectivePlaybackPosition: Long,
@@ -114,7 +116,7 @@ fun ConvxLyricsLine(
         val isHindiText = com.convx.music.lyrics.LyricsUtils.isHindi(entry.text)
         if (!isHindiText && entry.words != null && entry.words.isNotEmpty()) {
             // Use precise word timestamps if available
-            entry.words.mapIndexed { index, word ->
+            entry.wordsWithSpacing().mapIndexed { index, word ->
                 val wordStart = ((word.startTime * 1000).toLong() - entry.time).coerceAtLeast(0L)
                 val wordEnd = ((word.endTime * 1000).toLong() - entry.time).coerceAtLeast(wordStart + 50L)
                 Triple(word.text, wordStart, wordEnd)
@@ -135,7 +137,7 @@ fun ConvxLyricsLine(
                     val wordDur = if (totalChars > 0) (activeDuration * charCount.toFloat() / totalChars).toLong() else activeDuration
                     val wordEnd = wordStart + wordDur
                     accumulatedTime += wordDur
-                    Triple(word, wordStart, wordEnd)
+                    Triple(word + if (includeSpace) " " else "", wordStart, wordEnd)
                 }
             }
         }
@@ -220,7 +222,11 @@ fun ConvxLyricsLine(
 
                 // Draw each word once so the shader and glyphs share the same measured bounds.
                 Text(
-                    text = wordText,
+                    fontFamily = fontFamily,
+                    text = wordText.trimEnd(),
+                    modifier = Modifier.padding(end = with(LocalDensity.current) {
+                        (textSize * 0.25f * wordText.takeLastWhile { it.isWhitespace() }.length).sp.toDp()
+                    }),
                     fontSize = textSize.sp,
                     style = TextStyle(
                         brush = Brush.horizontalGradient(
@@ -242,23 +248,7 @@ fun ConvxLyricsLine(
                         )
                     )
                 )
-                if (index != wordData.lastIndex) {
-                    Text(
-                        text = " ",
-                        fontSize = textSize.sp,
-                        color = textColor.copy(alpha = if (lineRelTime >= endRelative) 1f else 0.45f), // Increased from 0.35f
-                        lineHeight = (textSize * lineSpacing.coerceAtMost(1.3f)).sp,
-                        style = TextStyle(
-                            shadow = if (lineRelTime >= endRelative) {
-                                androidx.compose.ui.graphics.Shadow(
-                                    color = textColor.copy(alpha = 0.3f),
-                                    offset = Offset.Zero,
-                                    blurRadius = 6f
-                                )
-                            } else null
-                        )
-                    )
-                }
+
             }
         }
 
@@ -267,6 +257,7 @@ fun ConvxLyricsLine(
             val romanizedText by entry.romanizedTextFlow.collectAsStateWithLifecycle()
             romanizedText?.let { romanized ->
                 Text(
+                    fontFamily = fontFamily,
                     text = romanized,
                     fontSize = (textSize * 0.65f).sp,
                     color = textColor.copy(alpha = 0.6f),
@@ -283,6 +274,7 @@ fun ConvxLyricsLine(
             val translatedText by entry.translatedTextFlow.collectAsStateWithLifecycle()
             translatedText?.let { translated ->
                 Text(
+                    fontFamily = fontFamily,
                     text = translated,
                     fontSize = (textSize * 0.7f).sp,
                     color = textColor.copy(alpha = 0.8f),

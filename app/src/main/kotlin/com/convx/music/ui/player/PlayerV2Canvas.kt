@@ -10,6 +10,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.view.TextureView
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.view.Gravity
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -333,6 +335,19 @@ class CanvasVideoController internal constructor(
         if (loadingVideoStream != null) exoPlayer.seekTo(positionMs.coerceAtLeast(0L))
     }
 
+    internal fun synchronizeTo(audioPlayer: Player) {
+        if (loadingVideoStream == null || videoFailed) return
+        exoPlayer.playWhenReady = audioPlayer.isPlaying
+        if (exoPlayer.playbackParameters.speed != audioPlayer.playbackParameters.speed) {
+            exoPlayer.setPlaybackSpeed(audioPlayer.playbackParameters.speed)
+        }
+        if (exoPlayer.playbackState == Player.STATE_READY || exoPlayer.playbackState == Player.STATE_ENDED) {
+            if (kotlin.math.abs(exoPlayer.currentPosition - audioPlayer.currentPosition) > 500L) {
+                exoPlayer.seekTo(audioPlayer.currentPosition.coerceAtLeast(0L))
+            }
+        }
+    }
+
     internal fun retryVideo() {
         val stream = loadingVideoStream ?: return
         videoReady = false
@@ -494,26 +509,31 @@ fun CanvasVideoSurface(
     val aspect = controller.videoAspect
     AndroidView(
         factory = { viewContext ->
-            AspectRatioFrameLayout(viewContext).apply {
-                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                resizeMode = if (crop) AspectRatioFrameLayout.RESIZE_MODE_ZOOM else AspectRatioFrameLayout.RESIZE_MODE_FIT
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                val view = com.convx.music.artistvideo.VideoFrameTextureView(viewContext).apply {
+            FrameLayout(viewContext).apply {
+                clipChildren = true
+                clipToPadding = true
+                addView(AspectRatioFrameLayout(viewContext).apply {
                     layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                }
-                view.onFrame = {
-                    controller.onSurfaceFrame(view)
-                    onFrame?.invoke()
-                }
-                addView(view)
-                texture = view
-                controller.attach(token, view)
+                    resizeMode = if (crop) AspectRatioFrameLayout.RESIZE_MODE_ZOOM else AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                    val view = com.convx.music.artistvideo.VideoFrameTextureView(viewContext).apply {
+                        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                    }
+                    view.onFrame = {
+                        controller.onSurfaceFrame(view)
+                        onFrame?.invoke()
+                    }
+                    addView(view)
+                    texture = view
+                    controller.attach(token, view)
+                }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER))
             }
         },
         update = {
-            it.setAspectRatio(aspect)
-            it.resizeMode = if (crop) AspectRatioFrameLayout.RESIZE_MODE_ZOOM else AspectRatioFrameLayout.RESIZE_MODE_FIT
-            val frameView = it.getChildAt(0) as? com.convx.music.artistvideo.VideoFrameTextureView
+            val frame = it.getChildAt(0) as AspectRatioFrameLayout
+            frame.setAspectRatio(aspect)
+            frame.resizeMode = if (crop) AspectRatioFrameLayout.RESIZE_MODE_ZOOM else AspectRatioFrameLayout.RESIZE_MODE_FIT
+            val frameView = frame.getChildAt(0) as? com.convx.music.artistvideo.VideoFrameTextureView
             frameView?.let { view ->
                 view.onFrame = {
                     controller.onSurfaceFrame(view)

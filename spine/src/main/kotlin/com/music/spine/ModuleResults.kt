@@ -17,6 +17,7 @@ data class ModuleSearchResult(
     @SerialName("audioQuality") val audioQuality: String = "",
     @SerialName("format") val format: String = "",
     @SerialName("availableQualities") val availableQualities: List<String> = emptyList(),
+    @SerialName("streamUrl") val streamUrl: String? = null,
 )
 
 @Serializable

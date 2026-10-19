@@ -9,7 +9,7 @@ kotlin {
 
 dependencies {
     implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.json)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")

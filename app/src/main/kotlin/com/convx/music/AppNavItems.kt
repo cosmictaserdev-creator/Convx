@@ -42,7 +42,7 @@ fun rememberAppNavItems(): AppNavItems {
         } else {
             screens
         }
-        visible.filter { it != Screens.Radio || it.route !in hiddenRoutes }
+        visible.filter { it == Screens.Search || it.route !in hiddenRoutes }
     }
     // Explore is only shown in the floating navigation bar, and is online-only.
     val floatingNavigationItems = remember(navigationItems, localOnlyMode, hiddenRoutes) {

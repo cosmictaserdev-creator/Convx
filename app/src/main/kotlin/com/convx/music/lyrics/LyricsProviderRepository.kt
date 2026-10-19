@@ -4,6 +4,7 @@ import android.content.Context
 import com.convx.music.db.entities.LyricsEntity
 import com.convx.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
 import com.convx.music.models.MediaMetadata
+import com.convx.music.utils.dataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withTimeout
@@ -33,6 +35,7 @@ class LyricsProviderRepository @Inject constructor(@ApplicationContext private v
     private class Attempt(val work: Deferred<Result<String>>) {
         var status = LyricsProviderStatus.FETCHING
         var completedAt = 0L
+        var syncLevel = LyricsSyncLevel.PLAIN
     }
 
     private val lock = Any()
@@ -43,17 +46,23 @@ class LyricsProviderRepository @Inject constructor(@ApplicationContext private v
 
     private fun MediaMetadata.key() = SongKey(id, title, artists.joinToString { it.name }, duration, album?.title)
 
-    fun statuses(song: MediaMetadata): Flow<Map<String, LyricsProviderStatus>> = revision.map {
+    fun statuses(song: MediaMetadata): Flow<Map<String, LyricsProviderStatus>> = combine(revision, context.dataStore.data) { _, preferences ->
         val identity = song.key()
         LyricsProviderRegistry.providerIds.associateWith { id ->
             val provider = LyricsProviderRegistry.getProvider(id)
             when {
                 identity.id.startsWith("content://") && provider?.requiresVideoId == true -> LyricsProviderStatus.UNSUPPORTED
-                provider == null || !LyricsProviderSettings.isEnabled(context, provider) -> LyricsProviderStatus.DISABLED
+                provider == null || preferences[LyricsProviderSettings.enabledKey(id)] == false -> LyricsProviderStatus.DISABLED
                 else -> synchronized(lock) {
                     attempts[Key(identity, provider.id)]?.status ?: LyricsProviderStatus.NOT_FETCHED
                 }
             }
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun syncLevels(song: MediaMetadata): Flow<Map<String, LyricsSyncLevel>> = revision.map {
+        synchronized(lock) {
+            LyricsProviderRegistry.providerIds.associateWith { attempts[Key(song.key(), it)]?.syncLevel ?: LyricsSyncLevel.PLAIN }
         }
     }.flowOn(Dispatchers.IO)
 
@@ -66,6 +75,7 @@ class LyricsProviderRepository @Inject constructor(@ApplicationContext private v
             trim()
             attempts[key] = Attempt(CompletableDeferred(Result.success(lyrics.lyrics))).apply {
                 status = LyricsProviderStatus.FOUND
+                syncLevel = LyricsSyncLevel.detect(lyrics.lyrics)
                 completedAt = now()
             }
             revision.value++
@@ -98,6 +108,9 @@ class LyricsProviderRepository @Inject constructor(@ApplicationContext private v
                     var status = LyricsProviderStatus.FAILED
                     val result = try {
                         gate.withPermit {
+                            if (!LyricsProviderSettings.isEnabled(context, provider)) {
+                                return@withPermit Result.failure<String>(IllegalStateException("Lyrics provider is disabled"))
+                            }
                             withTimeout(12_000L) {
                                 LyricsProviderSettings.initialize(context, provider)
                                 provider.getLyrics(id, title, artist, duration, album).also { result ->
@@ -121,8 +134,10 @@ class LyricsProviderRepository @Inject constructor(@ApplicationContext private v
                     } catch (e: Exception) {
                         Result.failure(e)
                     }
+                    val syncLevel = result.getOrNull()?.let(LyricsSyncLevel::detect) ?: LyricsSyncLevel.PLAIN
                     synchronized(lock) {
                         pending.status = status
+                        pending.syncLevel = syncLevel
                         pending.completedAt = now()
                         revision.value++
                     }

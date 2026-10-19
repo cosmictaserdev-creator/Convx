@@ -12,26 +12,14 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.convx.music.playback.MusicService
 
-class TurntableWidgetReceiver : AppWidgetProvider() {
+class TurntableWidgetReceiver : MusicWidgetReceiver() {
 
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        // Only trigger update through MusicService if it's already running
-        // This prevents BackgroundServiceStartNotAllowedException on Android 14+
-        if (MusicService.isRunning) {
-            val intent = Intent(context, MusicService::class.java).apply {
-                action = ACTION_UPDATE_TURNTABLE_WIDGET
-            }
-            try {
-                context.startService(intent)
-            } catch (e: Exception) {
-                // Service might be restricted in background
-            }
-        }
-        // If service is not running, widget shows default layout until user opens app
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
     override fun onReceive(context: Context, intent: Intent) {

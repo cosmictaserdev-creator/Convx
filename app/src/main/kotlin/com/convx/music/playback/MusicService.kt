@@ -91,6 +91,11 @@ import com.music.innertube.models.WatchEndpoint
 import com.music.lastfm.LastFM
 import com.convx.music.MainActivity
 import com.convx.music.R
+import com.convx.music.lyrics.LyricsSyncLevel
+import com.convx.music.lyrics.LyricsWithProvider
+import com.convx.music.lyrics.LyricsProviderRegistry
+import com.convx.music.lyrics.LyricsProviderSettings
+import com.convx.music.constants.LyricsProviderOrderKey
 import com.convx.music.constants.AudioNormalizationKey
 import com.convx.music.constants.AudioOffload
 import com.convx.music.constants.AudioQualityKey
@@ -808,30 +813,47 @@ class MusicService :
             notificationUpdater.updateWidgetUI(player.isPlaying)
         }
 
+        var previousPolicy: String? = null
         combine(
             currentMediaMetadata.distinctUntilChangedBy { it?.id },
-            // Prefetch lyrics unless Data Saver is enabled.
-            dataStore.data.map { it[DataSaverEnabledKey] != true }.distinctUntilChanged(),
-        ) { mediaMetadata, showLyrics ->
-            mediaMetadata to showLyrics
-        }.collectLatest(scope) { (mediaMetadata, showLyrics) ->
-            if (!showLyrics || mediaMetadata == null) return@collectLatest
-            if (database.lyrics(mediaMetadata.id).first() != null) return@collectLatest
-
-            val lyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
-            database.withTransaction {
-                // A source chosen on the lyrics page takes precedence over
-                // an automatic request that was already in flight.
-                if (lyrics(mediaMetadata.id).first() == null) {
-                    upsert(
-                        LyricsEntity(
-                            id = mediaMetadata.id,
-                            lyrics = lyricsWithProvider.lyrics,
-                            provider = lyricsWithProvider.provider,
-                        ),
-                    )
+            dataStore.data.map { prefs ->
+                val policy = prefs[LyricsProviderOrderKey].orEmpty() + "|" +
+                    LyricsProviderRegistry.providerIds.joinToString(",") { id ->
+                        "$id:${prefs[LyricsProviderSettings.enabledKey(id)] ?: true}"
+                    }
+                (prefs[DataSaverEnabledKey] != true) to policy
+            }.distinctUntilChanged(),
+        ) { metadata, policy -> metadata to policy }.collectLatest(scope) { (metadata, settings) ->
+            val (showLyrics, policy) = settings
+            val changed = previousPolicy != null && previousPolicy != policy
+            previousPolicy = policy
+            if (!showLyrics || metadata == null) return@collectLatest
+            val existing = database.lyrics(metadata.id).first()
+            if (existing != null) {
+                val provider = LyricsProviderRegistry.getProviderForStoredName(existing.provider)
+                // Embedded or manually edited lyrics keep their own source.
+                if (provider == null && existing.provider != "Unknown") return@collectLatest
+                if (!changed && provider != null && LyricsProviderSettings.isEnabled(this, provider) &&
+                    LyricsSyncLevel.detect(existing.lyrics) == LyricsSyncLevel.WORD) return@collectLatest
+            }
+            var lastWritten = existing
+            var manuallyChanged = false
+            suspend fun persistUpgrade(found: LyricsWithProvider) {
+                if (manuallyChanged) return
+                database.withTransaction {
+                    if (lyrics(metadata.id).first() != lastWritten) {
+                        manuallyChanged = true
+                    } else {
+                        val next = LyricsEntity(metadata.id, found.lyrics, found.provider)
+                        if (lastWritten != next) upsert(next)
+                        lastWritten = next
+                    }
                 }
             }
+            val initial = existing?.let { LyricsWithProvider(it.lyrics, it.provider) }
+            val found = lyricsHelper.getLyrics(metadata, initial, ::persistUpgrade)
+            if (found.lyrics != LyricsEntity.LYRICS_NOT_FOUND || lastWritten == null || changed) persistUpgrade(found)
+
         }
     }
 

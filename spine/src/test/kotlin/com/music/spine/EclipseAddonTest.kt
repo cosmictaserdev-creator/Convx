@@ -9,6 +9,28 @@ import org.junit.Test
 class EclipseAddonTest {
     private val json = Json { isLenient = true; ignoreUnknownKeys = true; explicitNulls = false }
 
+    @Test fun forwardsSettingsNegotiatesQualityAndPreservesTokenPath() {
+        val manifest = EclipseAddon.moduleManifest(json, """{"id":"addon","settings":[{"key":"country","default":"IN"},{"key":"quality","default":"low","options":[{"value":"low"},{"value":"high"},{"value":"flac"}]}]}""")
+        val parameters = EclipseAddon.parameters(manifest, mapOf("quality" to "LOSSLESS", "dolbyAtmos" to "true"))
+        assertEquals("IN", parameters["country"])
+        assertEquals("flac", parameters["quality"])
+        assertEquals("auto", parameters["atmos"])
+        val url = EclipseAddon.streamUrl("https://addon.example/token", "track/a?b", parameters)
+        assertTrue(url.startsWith("https://addon.example/token/stream/track%2Fa%3Fb?"))
+        assertTrue(url.contains("quality=flac"))
+    }
+
+    @Test fun acceptsDecimalMetadataInlineStreamsAndTransportAliases() {
+        val search = EclipseAddon.parseSearch(json, """{"tracks":[{"id":"t","duration":213.5,"albumArtworkURL":"cover","streamURL":"https://cdn/audio"}]}""", 10)
+        assertEquals(213, search.tracks.single().duration)
+        assertEquals("cover", search.tracks.single().albumCover)
+        assertEquals("https://cdn/audio", search.tracks.single().streamUrl)
+        val stream = EclipseAddon.parseStream(json, "t", """{"url":"https://cdn/opaque","format":"DASH","fileCodec":"flac","bitDepth":24.0,"sampleRate":96000.0,"audioModes":["STEREO"]}""")
+        assertEquals("dash", stream.streamType)
+        assertEquals("flac", stream.track?.codec)
+        assertEquals(24, stream.track?.bitDepth)
+    }
+
     @Test
     fun manifestBecomesOneModuleWithTokenisedBase() {
         val body = """{"id":"com.x.addon","name":"X","version":"1.0.0","resources":["search","stream"],"types":["track"]}"""

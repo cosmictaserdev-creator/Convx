@@ -3,7 +3,7 @@ package com.music.youlyplus
 import com.music.youlyplus.models.LyricsResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -52,7 +52,7 @@ object YouLyPlus {
         }
 
     private val client by lazy {
-        HttpClient(CIO) {
+        HttpClient(OkHttp) {
             install(HttpTimeout) {
                 connectTimeoutMillis = 3_000
                 requestTimeoutMillis = 8_000
