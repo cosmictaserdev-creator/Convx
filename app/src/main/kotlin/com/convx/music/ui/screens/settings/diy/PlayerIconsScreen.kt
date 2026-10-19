@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,12 +23,17 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import com.convx.music.ui.ios.compat.AlertDialog
@@ -77,6 +83,11 @@ import com.convx.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import java.io.File
 import com.convx.music.ui.screens.settings.SettingsPage
 
 /**
@@ -94,6 +105,7 @@ fun PlayerIconsScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val iconWriteMutex = remember { Mutex() }
     val (useAppleMusicPlayer, _) = rememberPreference(UseAppleMusicPlayerKey, defaultValue = true)
     val (json) = rememberPreference(PlayerIconsKey, defaultValue = "{}")
     val v1Set = remember(json) { PlayerIconSet.fromJson(json) }
@@ -101,17 +113,25 @@ fun PlayerIconsScreen(
     val v2Set = remember(v2Json) { PlayerIconSet.fromJson(v2Json) }
 
     var pendingSlot by remember { mutableStateOf<PlayerIconSlot?>(null) }
+    var choosingSlot by remember { mutableStateOf<PlayerIconSlot?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    fun persist(slot: PlayerIconSlot, set: PlayerIconSet) {
+    fun persist(slot: PlayerIconSlot, update: (PlayerIconSet) -> PlayerIconSet) {
         val key = if (slot.isV2) V2PlayerIconsKey else PlayerIconsKey
         scope.launch {
-            context.dataStore.edit { it[key] = set.toJson() }
-            // Prune the directory this slot actually lives in. Pruning the V1 directory
-            // against a V2 set (or the reverse) deletes every glyph the user picked for
-            // the other player, since the two use different file names.
-            withContext(Dispatchers.IO) {
-                PlayerIconStore.pruneOrphans(context, set, slot.isV2)
+            iconWriteMutex.withLock {
+                var updated = PlayerIconSet.EMPTY
+                context.dataStore.edit { preferences ->
+                    val latest = PlayerIconSet.fromJson(preferences[key] ?: "{}")
+                    updated = update(latest)
+                    preferences[key] = updated.toJson()
+                }
+                // Merge against the latest set and prune while holding one lock. Concurrent
+                // imports used to overwrite each other's slots, then prune the other import's
+                // file using a stale snapshot.
+                withContext(Dispatchers.IO) {
+                    PlayerIconStore.pruneOrphans(context, updated, slot.isV2)
+                }
             }
         }
     }
@@ -129,7 +149,6 @@ fun PlayerIconsScreen(
                 MediaImport.Kind.PLAYER_ICON
             }
             val destDir = if (slot.isV2) PlayerIconStore.v2Dir(context) else PlayerIconStore.dir(context)
-            val currentSet = if (slot.isV2) v2Set else v1Set
             val result = withContext(Dispatchers.IO) {
                 MediaImport.import(
                     context = context,
@@ -143,18 +162,74 @@ fun PlayerIconsScreen(
                 is MediaImport.Result.Failed ->
                     errorMessage = context.getString(importErrorRes(result.error))
 
-                is MediaImport.Result.Ok -> persist(
-                    slot,
-                    currentSet.with(
+                is MediaImport.Result.Ok -> persist(slot) { latest ->
+                    latest.with(
                         slot,
                         PlayerIconOverride(
                             fileName = result.file.name,
-                            tint = currentSet.overrides[slot]?.tint ?: false,
+                            tint = latest.overrides[slot]?.tint ?: false,
                         ),
-                    ),
-                )
+                    )
+                }
             }
         }
+    }
+
+    choosingSlot?.let { slot ->
+        val set = if (slot.isV2) v2Set else v1Set
+        val choices = remember(set, slot, context) {
+            set.overrides.mapNotNull { (sourceSlot, override) ->
+                PlayerIconStore.fileFor(context, override, slot.isV2)
+                    .takeIf(File::isFile)
+                    ?.let { PlayerIconChoice(it, sourceSlot.labelRes) }
+            }.distinctBy { it.file.name }
+        }
+        PlayerIconChoiceDialog(
+            slot = slot,
+            choices = choices,
+            selectedFileName = set.overrides[slot]?.fileName,
+            onDismiss = { choosingSlot = null },
+            onChoose = { fileName ->
+                choosingSlot = null
+                scope.launch {
+                    val copiedName = withContext(Dispatchers.IO) {
+                        runCatching {
+                            val source = PlayerIconStore.fileFor(
+                                context,
+                                PlayerIconOverride(fileName, tint = false),
+                                slot.isV2,
+                            )
+                            val destination = File(
+                                if (slot.isV2) PlayerIconStore.v2Dir(context) else PlayerIconStore.dir(context),
+                                "${slot.name.lowercase()}.${source.extension}",
+                            )
+                            if (source.absoluteFile != destination.absoluteFile) {
+                                source.copyTo(destination, overwrite = true)
+                            }
+                            destination.name
+                        }.getOrNull()
+                    }
+                    if (copiedName == null) {
+                        errorMessage = context.getString(R.string.media_import_io)
+                    } else {
+                        persist(slot) { latest ->
+                            latest.with(
+                                slot,
+                                PlayerIconOverride(
+                                    fileName = copiedName,
+                                    tint = latest.overrides[slot]?.tint ?: false,
+                                ),
+                            )
+                        }
+                    }
+                }
+            },
+            onBrowse = {
+                choosingSlot = null
+                pendingSlot = slot
+                pickLauncher.launch(ACCEPTED_TYPES)
+            },
+        )
     }
 
     errorMessage?.let { message ->
@@ -205,11 +280,12 @@ fun PlayerIconsScreen(
                 SlotRow(
                     slot = slot,
                     override = v1Set.overrides[slot],
-                    onPick = { pendingSlot = slot; pickLauncher.launch(ACCEPTED_TYPES) },
-                    onClear = { persist(slot, v1Set.with(slot, null)) },
+                    onChoose = { choosingSlot = slot },
+                    onClear = { persist(slot) { it.with(slot, null) } },
                     onTintChange = { tint ->
-                        val current = v1Set.overrides[slot] ?: return@SlotRow
-                        persist(slot, v1Set.with(slot, current.copy(tint = tint)))
+                        persist(slot) { current ->
+                            current.overrides[slot]?.let { current.with(slot, it.copy(tint = tint)) } ?: current
+                        }
                     },
                 )
             }
@@ -232,11 +308,12 @@ fun PlayerIconsScreen(
                     SlotRow(
                         slot = slot,
                         override = v2Set.overrides[slot],
-                        onPick = { pendingSlot = slot; pickLauncher.launch(ACCEPTED_TYPES) },
-                        onClear = { persist(slot, v2Set.with(slot, null)) },
+                        onChoose = { choosingSlot = slot },
+                        onClear = { persist(slot) { it.with(slot, null) } },
                         onTintChange = { tint ->
-                            val current = v2Set.overrides[slot] ?: return@SlotRow
-                            persist(slot, v2Set.with(slot, current.copy(tint = tint)))
+                            persist(slot) { current ->
+                                current.overrides[slot]?.let { current.with(slot, it.copy(tint = tint)) } ?: current
+                            }
                         },
                     )
                 }
@@ -257,7 +334,7 @@ private val ACCEPTED_TYPES = arrayOf("image/*", "image/svg+xml")
 private fun SlotRow(
     slot: PlayerIconSlot,
     override: PlayerIconOverride?,
-    onPick: () -> Unit,
+    onChoose: () -> Unit,
     onClear: () -> Unit,
     onTintChange: (Boolean) -> Unit,
 ) {
@@ -266,7 +343,7 @@ private fun SlotRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onPick)
+            .clickable(onClick = onChoose)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -301,7 +378,7 @@ private fun SlotRow(
             Text(stringResource(slot.labelRes), style = AppTheme.typography.bodyLarge)
             Text(
                 text = stringResource(
-                    if (override == null) R.string.player_icon_default else R.string.player_icon_custom,
+                    if (override == null) R.string.player_icon_default else R.string.player_icon_active,
                 ),
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.colorScheme.onSurfaceVariant,
@@ -320,4 +397,90 @@ private fun SlotRow(
             }
         }
     }
+}
+
+private data class PlayerIconChoice(val file: File, val labelRes: Int)
+
+@Composable
+private fun PlayerIconChoiceDialog(
+    slot: PlayerIconSlot,
+    choices: List<PlayerIconChoice>,
+    selectedFileName: String?,
+    onDismiss: () -> Unit,
+    onChoose: (String) -> Unit,
+    onBrowse: () -> Unit,
+) {
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.player_icon_choose_title, stringResource(slot.labelRes))) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(R.string.player_icon_choose_description),
+                    style = AppTheme.typography.bodySmall,
+                )
+                if (choices.isEmpty()) {
+                    Text(
+                        stringResource(R.string.player_icon_no_saved),
+                        style = AppTheme.typography.bodySmall,
+                        color = AppTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(60.dp),
+                        modifier = Modifier.fillMaxWidth().heightIn(max = 220.dp),
+                        contentPadding = PaddingValues(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(choices, key = { it.file.name }) { choice ->
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                val selected = choice.file.name == selectedFileName
+                                val painter = rememberAsyncImagePainter(
+                                    ImageRequest.Builder(context)
+                                        .data(choice.file)
+                                        .memoryCacheKey("player_icon_${choice.file.path}_${choice.file.lastModified()}")
+                                        .diskCacheKey("player_icon_${choice.file.path}_${choice.file.lastModified()}")
+                                        .build(),
+                                )
+                                Box(
+                                    Modifier
+                                        .size(52.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(AppTheme.colorScheme.surfaceVariant)
+                                        .border(
+                                            width = if (selected) 2.dp else 1.dp,
+                                            color = if (selected) AppTheme.colorScheme.primary else Color.Transparent,
+                                            shape = RoundedCornerShape(12.dp),
+                                        )
+                                        .clickable { onChoose(choice.file.name) },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = stringResource(choice.labelRes),
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier.size(36.dp),
+                                    )
+                                }
+                                Text(
+                                    stringResource(choice.labelRes),
+                                    style = AppTheme.typography.labelSmall,
+                                    maxLines = 1,
+                                )
+                            }
+                        }
+                    }
+                }
+                TextButton(onClick = onBrowse, modifier = Modifier.align(Alignment.End)) {
+                    Text(stringResource(R.string.player_icon_browse))
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+        },
+    )
 }

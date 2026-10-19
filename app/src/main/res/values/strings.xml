@@ -711,9 +711,14 @@
     <string name="diy_mock_artist">Artist name</string>
 
     <string name="player_icons">Custom player icons</string>
-    <string name="player_icons_desc">Replace any player control with your own image. PNG, JPEG, WebP or SVG.</string>
+    <string name="player_icons_desc">Tap a control to reuse an image or browse for one. PNG, JPEG, WebP or SVG.</string>
     <string name="player_icon_default">Built-in</string>
     <string name="player_icon_custom">Custom image</string>
+    <string name="player_icon_active">Active custom image</string>
+    <string name="player_icon_choose_title">Choose an image for %1$s</string>
+    <string name="player_icon_choose_description">Choose an image already used by another player control, or browse for a new one.</string>
+    <string name="player_icon_no_saved">No other player icons are saved yet.</string>
+    <string name="player_icon_browse">Browse files</string>
     <string name="player_icon_tint">Tint</string>
     <string name="player_icon_play">Play</string>
     <string name="player_icon_pause">Pause</string>
