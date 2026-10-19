@@ -38,4 +38,16 @@ class LyricsTextSpacingTest {
         assertEquals(1, primaryLyricLineIndex(lines, 1100))
         assertEquals(-1, primaryLyricLineIndex(lines, -1))
     }
+
+    @Test fun leadingSpacerDoesNotStealTheFirstTimestamp() {
+        val lines = listOf(LyricsEntry.HEAD_LYRICS_ENTRY, LyricsEntry(0, "First line"), LyricsEntry(1000, "Next"))
+        assertEquals(1, primaryLyricLineIndex(lines, 0))
+        assertEquals(1, primaryLyricLineIndex(lines, 500))
+    }
+
+    @Test fun blankRowsNeverBecomeTheFollowTarget() {
+        val lines = listOf(LyricsEntry(0, "First line"), LyricsEntry(1000, "  "), LyricsEntry(2000, "Next"))
+        assertEquals(0, primaryLyricLineIndex(lines, 1500))
+        assertEquals(-1, primaryLyricLineIndex(listOf(LyricsEntry.HEAD_LYRICS_ENTRY), 1000))
+    }
 }
