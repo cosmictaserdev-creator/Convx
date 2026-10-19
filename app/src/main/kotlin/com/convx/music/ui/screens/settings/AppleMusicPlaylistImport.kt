@@ -3,6 +3,7 @@ package com.convx.music.ui.screens.settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.res.painterResource
@@ -26,22 +27,52 @@ fun AppleMusicPlaylistImport(
     navController: NavController,
     viewModel: AppleMusicImportViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val exportPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let(viewModel::loadExport)
-    }
     IosSettingsGroup(items = listOf(IosSettingsItem(
         title = { Text(stringResource(R.string.import_from_apple_music)) },
         icon = painterResource(R.drawable.playlist_add),
         onClick = viewModel::open,
     )))
+    AppleMusicImportDialogs(navController, viewModel, openOnStart = false, onCloseSheet = {})
+}
+
+/** Opens the import dialog over the current screen, used by the Accounts & Services shortcut. */
+@Composable
+fun AppleMusicImportDialogHost(
+    navController: NavController,
+    onCloseSheet: () -> Unit,
+    viewModel: AppleMusicImportViewModel = hiltViewModel(),
+) {
+    AppleMusicImportDialogs(navController, viewModel, openOnStart = true, onCloseSheet = onCloseSheet)
+}
+
+@Composable
+private fun AppleMusicImportDialogs(
+    navController: NavController,
+    viewModel: AppleMusicImportViewModel,
+    openOnStart: Boolean,
+    onCloseSheet: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val exportPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(viewModel::loadExport)
+    }
+
+    LaunchedEffect(viewModel, openOnStart) {
+        if (openOnStart) viewModel.open()
+    }
+
     if (state.visible) AppleMusicImportDialog(
         state,
         viewModel::updateUrl,
         viewModel::load,
         viewModel::chooseDestination,
-        onCreatePlaylist = { viewModel.createPlaylist { id -> navController.navigate("local_playlist/$id") } },
-        onDismiss = viewModel::dismiss,
+        onCreatePlaylist = {
+            viewModel.createPlaylist { id ->
+                onCloseSheet()
+                navController.navigate("local_playlist/$id")
+            }
+        },
+        onDismiss = { viewModel.dismiss(); onCloseSheet() },
         onImportFile = { exportPicker.launch(arrayOf("application/xml", "text/xml", "text/plain")) },
     )
     key(state.session) {
@@ -50,7 +81,7 @@ fun AppleMusicPlaylistImport(
             allowSyncing = false,
             initialTextFieldValue = state.title,
             onGetSong = { viewModel.persistSongs() },
-            onDismiss = viewModel::dismiss,
+            onDismiss = { viewModel.dismiss(); onCloseSheet() },
         )
     }
 }

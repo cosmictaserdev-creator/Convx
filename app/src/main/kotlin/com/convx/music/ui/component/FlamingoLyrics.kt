@@ -22,6 +22,7 @@ fun FlamingoLyrics(
     useBlur: Boolean,
     isSynced: Boolean = true,
     autoScrollEnabled: Boolean = true,
+    wordGlowEnabled: Boolean = true,
     modifier: Modifier = Modifier,
     onSeek: (Int) -> Unit,
 ) {
@@ -80,6 +81,7 @@ fun FlamingoLyrics(
             modifier = modifier,
             textStyle = MainTextStyle.copy(fontFamily = fontFamily, fontSize = fontSize.sp, lineHeight = (fontSize * lineSpacing).sp),
             onBackClick = {},
+            wordGlowEnabled = wordGlowEnabled,
         )
     }
 }

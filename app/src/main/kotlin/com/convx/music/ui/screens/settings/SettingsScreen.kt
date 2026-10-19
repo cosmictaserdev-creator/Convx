@@ -223,8 +223,13 @@ private fun rememberSearchEntries(): List<SearchEntry> {
                     s.title,
                     R.drawable.search,
                     { systemGray },
-                    if (s.opensLyricsSheet) SettingsAction.LyricsStyle else SettingsAction.Route(s.route),
+                    when {
+                        s.opensLyricsSheet -> SettingsAction.LyricsStyle
+                        s.opensAppleMusicImport -> SettingsAction.AppleMusicImport
+                        else -> SettingsAction.Route(s.route)
+                    },
                     s.description,
+                    s.keywords,
                 ),
                 s.category,
             )
@@ -235,11 +240,12 @@ private fun rememberSearchEntries(): List<SearchEntry> {
 @Composable
 private fun SearchResults(entries: List<SearchEntry>, query: String, onAction: (SettingsAction) -> Unit) {
     val q = query.trim().lowercase()
+    val terms = q.split(Regex("\\s+")).filter(String::isNotBlank)
     val hits = entries.filter { e ->
-        e.link.title.lowercase().contains(q) ||
-            e.link.subtitle?.lowercase()?.contains(q) == true ||
-            e.link.keywords.contains(q) ||
-            e.category.lowercase().contains(q)
+        val searchableText = listOfNotNull(e.link.title, e.link.subtitle, e.link.keywords, e.category)
+            .joinToString(" ")
+            .lowercase()
+        terms.isNotEmpty() && terms.all { term -> searchableText.contains(term) }
     }
     if (hits.isEmpty()) {
         Text(

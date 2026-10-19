@@ -48,6 +48,7 @@ sealed interface SettingsAction {
     data class Route(val route: String) : SettingsAction
     data object PlayerDesign : SettingsAction
     data object LyricsStyle : SettingsAction
+    data object AppleMusicImport : SettingsAction
 }
 
 /** One row: a coloured glyph tile, a name, and where it goes. */
@@ -101,7 +102,7 @@ object SettingsHubs {
                     SettingsLink("Lyrics style", R.drawable.lyrics, { systemPink }, SettingsAction.LyricsStyle,
                         "Animation, position, scrolling and swipe — live preview", "animation karaoke word by word apple music position auto scroll swipe"),
                     SettingsLink("Lyrics effects", R.drawable.lyrics, { systemPink }, route("settings/lyrics"),
-                        "Style, fonts, size, glow and blur", "flamingo font size glow blur apple music standard"),
+                        "Style, fonts, size, glow and blur", "convx lyrics font size glow blur apple music standard"),
                     SettingsLink("Text & layout", R.drawable.lyrics, { systemOrange }, route("settings/appearance"),
                         "Text size, spacing and full-screen lyrics", "size spacing fullscreen"),
                     SettingsLink("Sources & priority", R.drawable.lyrics, { systemBlue }, route("settings/content/advanced"),
@@ -217,7 +218,7 @@ object SettingsHubs {
                 listOf(
                     SettingsLink("YouTube Music", R.drawable.account, { systemRed }, route("settings/account"), "Sign-in, sync and ListenBrainz", "login youtube sync listenbrainz"),
                     SettingsLink("Spotify", R.drawable.spotify, { systemGreen }, route("settings/spotify"), "Connect and import playlists", "import"),
-                    SettingsLink("Apple Music import", R.drawable.playlist_add, { systemRed }, route("settings/backup_restore"), "Import playlists from a link or export", "apple music import"),
+                    SettingsLink("Apple Music import", R.drawable.playlist_add, { systemRed }, SettingsAction.AppleMusicImport, "Import playlists from a link or export", "apple music playlist import export"),
                     SettingsLink("Discord", R.drawable.discord, { systemIndigo }, route("settings/integrations/discord"), "Listening status", "rich presence"),
                     SettingsLink("Last.fm", R.drawable.music_note, { systemRed }, route("settings/integrations/lastfm"), "Scrobbling", "scrobble"),
                 ),
@@ -275,7 +276,7 @@ object SettingsSheets {
 fun rememberSettingsActionHandler(navController: NavController): (SettingsAction) -> Unit = { action ->
     when (action) {
         is SettingsAction.Route -> navController.navigate(action.route)
-        SettingsAction.PlayerDesign, SettingsAction.LyricsStyle -> SettingsSheets.open = action
+        SettingsAction.PlayerDesign, SettingsAction.LyricsStyle, SettingsAction.AppleMusicImport -> SettingsSheets.open = action
     }
 }
 
@@ -291,6 +292,10 @@ fun SettingsSheetHost(navController: NavController) {
             })
         }
         SettingsAction.LyricsStyle -> IosPageSheet("Lyrics style", close) { LyricsAnimationSheetContent() }
+        SettingsAction.AppleMusicImport -> AppleMusicImportDialogHost(
+            navController = navController,
+            onCloseSheet = { SettingsSheets.open = null },
+        )
         else -> Unit
     }
 }

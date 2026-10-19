@@ -52,6 +52,7 @@ fun KaraokeLyrics(
     lineSpacing: Float = 1.3f,
     /** Blurs the lines either side of the active one. Off is cheaper and flatter. */
     useBlur: Boolean = true,
+    wordGlowEnabled: Boolean = true,
     onLineClick: (startMs: Int) -> Unit = {},
 ) {
     val synced = remember(lines) { lines.toSyncedLyrics() }
@@ -63,6 +64,11 @@ fun KaraokeLyrics(
         fontWeight = FontWeight.Bold,
         // Keep tracking proportional to the lyric size.
         letterSpacing = (fontSize * 0.012f).sp,
+        shadow = if (wordGlowEnabled) androidx.compose.ui.graphics.Shadow(
+            color = textColor.copy(alpha = 0.24f),
+            offset = androidx.compose.ui.geometry.Offset.Zero,
+            blurRadius = 10f,
+        ) else null,
     )
     // Background vocals use smaller, bold text.
     val accompanimentStyle = TextStyle(
@@ -71,6 +77,11 @@ fun KaraokeLyrics(
         lineHeight = (fontSize * 0.82f * lineSpacing).sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = (fontSize * 0.82f * 0.012f).sp,
+        shadow = if (wordGlowEnabled) androidx.compose.ui.graphics.Shadow(
+            color = textColor.copy(alpha = 0.18f),
+            offset = androidx.compose.ui.geometry.Offset.Zero,
+            blurRadius = 8f,
+        ) else null,
     )
     val phoneticStyle = TextStyle(
         fontFamily = fontFamily,

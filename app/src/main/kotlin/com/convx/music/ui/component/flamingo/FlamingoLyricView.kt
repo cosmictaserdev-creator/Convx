@@ -62,13 +62,17 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.CacheDrawScope
 import androidx.compose.ui.draw.DrawResult
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -126,7 +130,8 @@ fun YosLyricView(
     textStyle: TextStyle = MainTextStyle,
     otherSideForLines: List<Boolean>,
     currentLyricIndex: androidx.compose.runtime.MutableIntState,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    wordGlowEnabled: Boolean = true,
 ) {
     val view = androidx.compose.ui.platform.LocalView.current
     val mainTextBasicColor = Color(uiConfig.mainTextBasicColor)
@@ -388,6 +393,7 @@ fun YosLyricView(
                                 mainTextBasicColor,
                                 subTextBasicColor,
                                 otherSide = otherSide,
+                                wordGlowEnabled = wordGlowEnabled,
                                 liveTimeLambda = liveTimeLambda,
                                 measurer = measurer,
                                 isLyricEmpty = { isLyricEmpty.value },
@@ -527,6 +533,7 @@ fun LazyItemScope.LyricItem(
     nextTime: () -> Float,
     otherSide: Boolean,
     liveTimeLambda: () -> Int,
+    wordGlowEnabled: Boolean = true,
     onClick: () -> Unit
 ) {
     val viewAlign = if (otherSide) Alignment.End else Alignment.Start
@@ -535,6 +542,11 @@ fun LazyItemScope.LyricItem(
     val unfocusedColor = Color(0x2EFFFFFF)
 
     val unfocusedSolidBrush = SolidColor(unfocusedColor)
+    val currentLineChrome = animateFloatAsState(
+        targetValue = if (isCurrentLambda()) 1f else 0f,
+        animationSpec = tween(durationMillis = 240, easing = yosEasing),
+        label = "currentLyricChrome",
+    )
 
     val isNotOneByOne = rememberSaveable(mainLyric) {
         mutableStateOf(
@@ -778,6 +790,49 @@ fun LazyItemScope.LyricItem(
                                             }
                                             .padding(vertical = 4.dp)
                                             .then(otherSidePadding.value)
+                                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                                            .drawBehind {
+                                                val intensity = currentLineChrome.value
+                                                if (intensity > 0.001f) {
+                                                    val radius = CornerRadius(size.height / 2f)
+                                                    val accent = mainTextBasicColor
+                                                    drawRoundRect(
+                                                        brush = Brush.verticalGradient(
+                                                            colors = listOf(
+                                                                Color.White.copy(alpha = 0.025f * intensity),
+                                                                accent.copy(alpha = 0.075f * intensity),
+                                                                accent.copy(alpha = 0.035f * intensity),
+                                                            ),
+                                                        ),
+                                                        cornerRadius = radius,
+                                                    )
+                                                    drawRoundRect(
+                                                        brush = Brush.verticalGradient(
+                                                            colors = listOf(
+                                                                Color.White.copy(alpha = 0.30f * intensity),
+                                                                accent.copy(alpha = 0.11f * intensity),
+                                                                Color.White.copy(alpha = 0.04f * intensity),
+                                                            ),
+                                                        ),
+                                                        cornerRadius = radius,
+                                                        style = Stroke(width = 1.dp.toPx()),
+                                                    )
+                                                    drawLine(
+                                                        brush = Brush.horizontalGradient(
+                                                            colors = listOf(
+                                                                Color.Transparent,
+                                                                Color.White.copy(alpha = 0.38f * intensity),
+                                                                accent.copy(alpha = 0.22f * intensity),
+                                                                Color.Transparent,
+                                                            ),
+                                                        ),
+                                                        start = Offset(12.dp.toPx(), size.height - 1.dp.toPx()),
+                                                        end = Offset(size.width - 12.dp.toPx(), size.height - 1.dp.toPx()),
+                                                        strokeWidth = 1.5.dp.toPx(),
+                                                        cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                                                    )
+                                                }
+                                            }
                                             .clickable(
                                                 indication = null,
                                                 interactionSource = remember { MutableInteractionSource() }
@@ -918,13 +973,23 @@ fun LazyItemScope.LyricItem(
 
                                         onDrawBehind {
                                             wordsToDraw.fastForEach { l ->
+                                                val progress = l.percent()
+                                                val wordGlow = if (
+                                                    wordGlowEnabled && l.word.isNotBlank() && progress in 0f..1f
+                                                ) {
+                                                    Shadow(
+                                                        color = focusedColor.copy(alpha = (0.18f + 0.4f * progress).coerceAtMost(0.62f)),
+                                                        offset = Offset.Zero,
+                                                        blurRadius = 8f + 10f * progress,
+                                                    )
+                                                } else {
+                                                    null
+                                                }
                                                 drawText(
                                                     textLayoutResult = l.layout,
                                                     topLeft = l.topLeft(),
-                                                    brush = l.brush(
-                                                        0.3f,
-                                                        l.percent()
-                                                    )
+                                                    brush = l.brush(0.3f, progress),
+                                                    shadow = wordGlow,
                                                 )
                                             }
                                         }

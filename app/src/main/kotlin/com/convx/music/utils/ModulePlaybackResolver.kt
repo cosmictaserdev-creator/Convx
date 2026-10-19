@@ -136,7 +136,6 @@ internal object ModulePlaybackResolver {
             forceSelectedQuality = request.forceSelectedQuality,
             allowLossless = request.allowLossless,
             moduleSettings = moduleSettings,
-            configuredSettings = configured,
         )
         val wanted = qualityForDevice(loaded, compatibleQuality(loaded, selected), supportsAtmos)
         fun settingsFor(tier: String) = configured + mapOf(
@@ -157,12 +156,11 @@ internal object ModulePlaybackResolver {
             (if (wanted != "LOW") listOf("HIGH") else emptyList())).distinct()
 
         for (track in candidates) {
+            // A URL attached to search results is often just the add-on's default AAC stream.
+            // Ask the stream endpoint for each requested tier first so the quality setting can
+            // actually upgrade that result to FLAC when the add-on supports it.
             for (tier in tiers) {
-                val stream = track.streamUrl?.takeIf(::validUrl)?.let {
-                    ModuleStreamResponse(streamUrl = it, track = com.music.spine.ModuleStreamTrack(
-                        id = track.id, format = track.format, audioQuality = track.audioQuality,
-                    ))
-                } ?: ModuleManager.shared.getStreamUrl(
+                val stream = ModuleManager.shared.getStreamUrl(
                     loaded, track.id, settingsFor(tier), hostTier(tier),
                 ).getOrNull() ?: continue
                 val url = stream.streamUrl?.takeIf(::validUrl) ?: continue
@@ -172,6 +170,8 @@ internal object ModulePlaybackResolver {
 
                 val lossless = mime.contains("flac", true) || mime.contains("alac", true)
                 if (lossless && (!request.allowLossless || request.forceSelectedQuality)) continue
+                if (tierIsLossless(tier) && !lossless) continue
+                if (wantsAtmos(tier) && !atmos) continue
 
                 return Match(
                     module = module,
@@ -183,8 +183,39 @@ internal object ModulePlaybackResolver {
                     priority = request.enabledOrder.indexOf(module.id),
                 )
             }
+
+            // Legacy modules can put a playable URL directly on search results and have no
+            // stream endpoint. Keep those usable after all quality-aware lookups have failed.
+            val directUrl = track.streamUrl?.takeIf(::validUrl) ?: continue
+            val directStream = ModuleStreamResponse(
+                streamUrl = directUrl,
+                track = com.music.spine.ModuleStreamTrack(
+                    id = track.id,
+                    format = track.format,
+                    audioQuality = track.audioQuality,
+                ),
+            )
+            val mime = mimeType(directStream, track, directUrl)
+            val atmos = isAtmos(directStream, mime)
+            val lossless = mime.contains("flac", true) || mime.contains("alac", true)
+            if (atmos && (!supportsAtmos || request.forceSelectedQuality)) continue
+            if (lossless && (!request.allowLossless || request.forceSelectedQuality)) continue
+            return Match(
+                module = module,
+                track = track,
+                stream = directStream,
+                mimeType = mime,
+                lossless = lossless,
+                atmos = atmos,
+                priority = request.enabledOrder.indexOf(module.id),
+            )
         }
         return null
+    }
+
+    private fun tierIsLossless(quality: String): Boolean = quality.uppercase(Locale.ROOT).let {
+        it.contains("LOSSLESS") || it.contains("HIRES") || it.contains("HI_RES") ||
+            it.contains("FLAC") || it == "CD"
     }
 
     private fun selectedQuality(
@@ -192,20 +223,18 @@ internal object ModulePlaybackResolver {
         forceSelectedQuality: Boolean,
         allowLossless: Boolean,
         moduleSettings: Map<String, String>?,
-        configuredSettings: Map<String, String>,
     ): String {
         if (forceSelectedQuality || !allowLossless) {
             return if (audioQuality == AudioQuality.LOW) "LOW" else "HIGH"
         }
 
-        if (!moduleSettings?.get("quality").isNullOrBlank()) {
-            return configuredSettings.getValue("quality")
-        }
+        moduleSettings?.get("quality")?.takeIf { it.isNotBlank() }?.let { return it }
         if (audioQuality == AudioQuality.LOW) return "LOW"
 
-        return configuredSettings["quality"]
-            ?.takeIf { it.isNotBlank() }
-            ?: "LOSSLESS"
+        // A manifest's default is often just its safe AAC tier. Treat that as an add-on
+        // default only when the user has explicitly saved it; otherwise try lossless and
+        // fall back through the advertised tiers above.
+        return "LOSSLESS"
     }
 
     private suspend fun findCandidates(
