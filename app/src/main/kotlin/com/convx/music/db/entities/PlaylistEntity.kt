@@ -54,7 +54,7 @@ data class PlaylistEntity(
     val shareLink: String?
         get() {
             return if (browseId != null)
-                "https://music.youtube.com/playlist?list=$browseId"
+                com.convx.music.utils.ShareUtils.playlistUrl(browseId)
             else null
         }
 

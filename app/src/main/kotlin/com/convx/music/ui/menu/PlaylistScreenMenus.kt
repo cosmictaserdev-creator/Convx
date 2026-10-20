@@ -165,7 +165,7 @@ fun LocalPlaylistMenu(
                 },
                 onClick = {
                     val shareText = if (isYouTubePlaylist) {
-                        "https://music.youtube.com/playlist?list=${playlist.playlist.browseId}"
+                        com.convx.music.utils.ShareUtils.playlistUrl(playlist.playlist.browseId)
                     } else {
                         songs.joinToString("\n") { it.song.song.title }
                     }

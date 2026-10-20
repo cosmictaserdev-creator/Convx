@@ -52,10 +52,10 @@ class DiscordRPC(
         val buttonsList = mutableListOf<Pair<String, String>>()
         if (button1Visible) {
             val resolvedText = resolveVariables(
-                button1Text.ifEmpty { "Listen on YouTube Music" },
+                button1Text.ifEmpty { "Listen on Convx" },
                 song
             )
-            buttonsList.add(resolvedText to "https://music.youtube.com/watch?v=${song.song.id}")
+            buttonsList.add(resolvedText to ShareUtils.songUrl(song.song.id))
         }
         if (button2Visible) {
             val resolvedText = resolveVariables(
@@ -80,7 +80,7 @@ class DiscordRPC(
             name = name,
             details = songTitleWithRate,
             state = song.artists.joinToString { it.name },
-            detailsUrl = "https://music.youtube.com/watch?v=${song.song.id}",
+            detailsUrl = ShareUtils.songUrl(song.song.id),
             largeImage = song.song.thumbnailUrl?.let { RpcImage.ExternalImage(it) },
             smallImage = song.artists.firstOrNull()?.thumbnailUrl?.let { RpcImage.ExternalImage(it) },
             largeText = song.album?.title,

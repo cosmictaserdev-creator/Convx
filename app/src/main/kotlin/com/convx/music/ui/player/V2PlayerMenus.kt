@@ -220,7 +220,7 @@ fun V2OptionsMenuHost(
                 {
                     val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(android.content.Intent.EXTRA_TEXT, "https://music.youtube.com/watch?v=${mediaMetadata.id}")
+                        putExtra(android.content.Intent.EXTRA_TEXT, com.convx.music.utils.ShareUtils.songUrl(mediaMetadata.id))
                     }
                     context.startActivity(android.content.Intent.createChooser(intent, null))
                 }

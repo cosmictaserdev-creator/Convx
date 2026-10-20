@@ -863,7 +863,7 @@ fun RichPresence(
                     onClick = {
                         val intent = Intent(
                             Intent.ACTION_VIEW,
-                            "https://music.youtube.com/watch?v=${song?.id}".toUri()
+                            com.convx.music.utils.ShareUtils.songUrl(song?.id ?: "").toUri()
                         )
                         context.startActivity(intent)
                     },

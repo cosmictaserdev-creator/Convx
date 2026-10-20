@@ -783,7 +783,7 @@ fun AlbumScreen(
                                     type = "text/plain"
                                     putExtra(
                                         android.content.Intent.EXTRA_TEXT,
-                                        "https://music.youtube.com/playlist?list=${albumWithSongs.album.playlistId}"
+                                        com.convx.music.utils.ShareUtils.albumUrl(albumWithSongs.album.playlistId ?: albumWithSongs.album.id)
                                     )
                                 }
                                 context.startActivity(

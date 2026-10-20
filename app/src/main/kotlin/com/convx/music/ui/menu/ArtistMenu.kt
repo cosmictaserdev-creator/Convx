@@ -189,7 +189,7 @@ fun ArtistMenu(
                                         type = "text/plain"
                                         putExtra(
                                             Intent.EXTRA_TEXT,
-                                            "https://music.youtube.com/channel/${artist.id}"
+                                            com.convx.music.utils.ShareUtils.artistUrl(artist.id)
                                         )
                                     }
                                     context.startActivity(Intent.createChooser(intent, null))

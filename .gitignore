@@ -4,6 +4,9 @@
 *.ap_
 *.aab
 
+# Standalone web portal repo
+convx-web/
+
 # Files for the ART/Dalvik VM
 *.dex
 

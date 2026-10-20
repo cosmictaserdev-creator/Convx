@@ -532,7 +532,7 @@ internal fun LibraryItemMenu(
     }
 
     val shareUrl = when (item) {
-        is Album -> item.album.playlistId?.let { "https://music.youtube.com/playlist?list=$it" }
+        is Album -> item.album.playlistId?.let { com.convx.music.utils.ShareUtils.albumUrl(it) }
         is Playlist -> item.playlist.shareLink
         else -> null
     }

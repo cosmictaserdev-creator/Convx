@@ -389,7 +389,7 @@ fun AlbumMenu(
                             val intent = Intent().apply {
                                 action = Intent.ACTION_SEND
                                 type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, "https://music.youtube.com/playlist?list=${album.album.playlistId}")
+                                putExtra(Intent.EXTRA_TEXT, com.convx.music.utils.ShareUtils.albumUrl(album.album.playlistId ?: album.id))
                             }
                             context.startActivity(Intent.createChooser(intent, null))
                         }

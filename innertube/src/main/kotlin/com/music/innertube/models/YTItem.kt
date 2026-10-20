@@ -3,6 +3,9 @@ package com.music.innertube.models
 import com.music.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_ATV
 import com.music.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_PODCAST_EPISODE
 
+const val SHARE_DOMAIN = "convx.aryavl.com"
+const val SHARE_BASE_URL = "https://$SHARE_DOMAIN"
+
 sealed class YTItem {
     abstract val id: String
     abstract val title: String
@@ -45,7 +48,7 @@ data class SongItem(
         get() = musicVideoType != null && musicVideoType != MUSIC_VIDEO_TYPE_ATV && !isPodcastEpisode
 
     override val shareLink: String
-        get() = "https://music.youtube.com/watch?v=$id"
+        get() = "$SHARE_BASE_URL/watch?v=$id"
 }
 
 data class AlbumItem(
@@ -60,7 +63,7 @@ data class AlbumItem(
     val description: String? = null,
 ) : YTItem() {
     override val shareLink: String
-        get() = "https://music.youtube.com/playlist?list=$playlistId"
+        get() = "$SHARE_BASE_URL/playlist?list=$playlistId"
 }
 
 data class PlaylistItem(
@@ -77,7 +80,7 @@ data class PlaylistItem(
     override val explicit: Boolean
         get() = false
     override val shareLink: String
-        get() = "https://music.youtube.com/playlist?list=$id"
+        get() = "$SHARE_BASE_URL/playlist?list=$id"
 }
 
 data class ArtistItem(
@@ -92,7 +95,7 @@ data class ArtistItem(
     override val explicit: Boolean
         get() = false
     override val shareLink: String
-        get() = "https://music.youtube.com/channel/$id"
+        get() = "$SHARE_BASE_URL/channel/$id"
 }
 
 fun <T : YTItem> List<T>.filterExplicit(enabled: Boolean = true) =

@@ -267,7 +267,7 @@ fun QueueMenu(
                                 type = "text/plain"
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "https://music.youtube.com/watch?v=${mediaMetadata.id}"
+                                    com.convx.music.utils.ShareUtils.songUrl(mediaMetadata.id)
                                 )
                             }
                             context.startActivity(Intent.createChooser(intent, null))

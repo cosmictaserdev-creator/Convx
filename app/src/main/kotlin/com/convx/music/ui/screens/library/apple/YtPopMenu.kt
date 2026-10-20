@@ -60,12 +60,7 @@ internal fun ytItemMenu(
     val context = LocalContext.current
     fun glyph(v: SfSymbol): @Composable (Color) -> Unit = { tint -> IosGlyph(v, tint, 20.dp) }
 
-    val shareUrl = when (item) {
-        is SongItem -> "https://music.youtube.com/watch?v=${item.id}"
-        is AlbumItem -> "https://music.youtube.com/playlist?list=${item.playlistId}"
-        is PlaylistItem -> "https://music.youtube.com/playlist?list=${item.id}"
-        is ArtistItem -> "https://music.youtube.com/channel/${item.id}"
-    }
+    val shareUrl = item.shareLink
     val quick = listOf(
         IosMenuItem(stringResource(R.string.share), icon = glyph(sf("SFSquareAndArrowUp"))) {
             context.startActivity(

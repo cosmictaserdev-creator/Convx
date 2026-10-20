@@ -901,7 +901,7 @@ internal fun songMenu(song: Song, navController: NavController): SongMenuEntries
         if (isLocal) null else IosMenuItem(stringResource(R.string.share), icon = glyph(sf("SFSquareAndArrowUp"))) {
             context.startActivity(
                 Intent.createChooser(
-                    Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, "https://music.youtube.com/watch?v=${song.id}"),
+                    Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, com.convx.music.utils.ShareUtils.songUrl(song.id)),
                     null,
                 ),
             )

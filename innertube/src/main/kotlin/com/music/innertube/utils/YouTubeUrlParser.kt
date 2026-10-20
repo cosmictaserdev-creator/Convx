@@ -21,12 +21,16 @@ object YouTubeUrlParser {
             Regex("""(?:https?://)?(?:www\.)?(?:music\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?youtu\.be/([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?(?:www\.)?youtube\.com/shorts/([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/watch\?.*v=([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/(?:song|v)/([a-zA-Z0-9_-]{11})"""),
         )
 
     private val ARTIST_URL_PATTERNS =
         listOf(
             Regex("""(?:https?://)?(?:www\.)?music\.youtube\.com/channel/([a-zA-Z0-9_-]+)"""),
             Regex("""(?:https?://)?(?:www\.)?music\.youtube\.com/browse/(MPRE[a-zA-Z0-9_-]+)"""),
+            Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/(?:channel|artist)/([a-zA-Z0-9_-]+)"""),
+            Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/browse/(MPRE[a-zA-Z0-9_-]+)"""),
         )
 
     fun isYouTubeUrl(text: String): Boolean = parse(text) != null
@@ -42,7 +46,7 @@ object YouTubeUrlParser {
             }
         }
 
-        if (trimmedUrl.contains("music.youtube.com")) {
+        if (trimmedUrl.contains("music.youtube.com") || trimmedUrl.contains("convx.aryavl.com")) {
             for (pattern in ARTIST_URL_PATTERNS) {
                 pattern.find(trimmedUrl)?.let { matchResult ->
                     matchResult.groupValues.getOrNull(1)?.let { artistId ->

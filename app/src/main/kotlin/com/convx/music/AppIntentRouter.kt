@@ -65,10 +65,10 @@ internal class AppIntentRouter(
 
         when (uri.pathSegments.firstOrNull()) {
             "playlist" -> openPlaylist(uri, navController)
-            "browse" -> cleanId(uri.lastPathSegment)?.let { browseId ->
+            "browse", "album" -> cleanId(uri.lastPathSegment)?.let { browseId ->
                 navController.navigate("album/$browseId") { launchSingleTop = true }
             }
-            "channel", "c" -> cleanId(uri.lastPathSegment)?.let { artistId ->
+            "channel", "c", "artist" -> cleanId(uri.lastPathSegment)?.let { artistId ->
                 navController.navigate("artist/$artistId") { launchSingleTop = true }
             }
             "search" -> openSearch(uri, navController)
@@ -107,7 +107,9 @@ internal class AppIntentRouter(
     }
 
     private fun openPlaylist(uri: Uri, navController: NavHostController) {
-        val playlistId = cleanId(uri.getQueryParameter("list"), max = 128) ?: return
+        val playlistId = cleanId(uri.getQueryParameter("list"), max = 128)
+            ?: cleanId(uri.pathSegments.getOrNull(1), max = 128)
+            ?: return
         if (!playlistId.startsWith("OLAK5uy_")) {
             navController.navigate("online_playlist/$playlistId") { launchSingleTop = true }
             return
@@ -133,14 +135,16 @@ internal class AppIntentRouter(
         val path = uri.pathSegments.firstOrNull()
         val videoId = cleanId(
             when {
-                path == "watch" -> uri.getQueryParameter("v")
+                path == "watch" -> uri.getQueryParameter("v") ?: uri.pathSegments.getOrNull(1)
                 uri.host == "youtu.be" -> uri.pathSegments.firstOrNull()
+                path == "song" || path == "v" -> uri.pathSegments.getOrNull(1) ?: uri.pathSegments.firstOrNull()
                 else -> null
             },
             min = 6,
             max = 32,
         )
         val playlistId = cleanId(uri.getQueryParameter("list"), max = 128)
+            ?: if (path == "playlist") cleanId(uri.pathSegments.getOrNull(1), max = 128) else null
 
         if (videoId != null || playlistId != null) {
             playFromYouTubeLink(videoId, playlistId)
