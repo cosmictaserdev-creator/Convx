@@ -43,6 +43,12 @@ android {
             .orElse("androidx.test.runner.AndroidJUnitRunner").get()
         vectorDrawables.useSupportLibrary = true
 
+        externalNativeBuild {
+            cmake {
+                arguments("-DANDROID_STL=c++_static")
+            }
+        }
+
         // LastFM API keys from local.properties or environment variables
         val lastFmKey = localProperties.getProperty("LASTFM_API_KEY") ?: System.getenv("LASTFM_API_KEY") ?: ""
         val lastFmSecret = localProperties.getProperty("LASTFM_SECRET") ?: System.getenv("LASTFM_SECRET") ?: ""

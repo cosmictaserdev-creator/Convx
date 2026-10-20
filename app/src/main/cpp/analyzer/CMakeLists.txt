@@ -28,7 +28,7 @@ target_include_directories(convx_analysis PRIVATE
 target_compile_options(convx_analysis PRIVATE -O3 -fvisibility=hidden)
 
 find_library(log-lib log)
-target_link_libraries(convx_analysis ${log-lib})
+target_link_libraries(convx_analysis ${log-lib} c++_static c++abi)
 
 # Required for Android's 16 KB page size devices — without this the linker
 # defaults to 4 KB ELF segment alignment and the loader refuses/degrades the
