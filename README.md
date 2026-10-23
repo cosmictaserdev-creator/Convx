@@ -23,7 +23,7 @@
       <img src="https://img.shields.io/badge/Donate-UPI-6B4EFF?style=for-the-badge" alt="Donate via UPI">
     </a>
   </p>
-  <p><strong>UPI ID:</strong> <code>cosmictaser@okicici</code></p>
+  <p><strong>UPI ID:</strong> <code>cosmictaser@okicici</code><br><strong>UPI payment link:</strong> <code>upi://pay?pa=cosmictaser%40okicici&amp;pn=CosmicTaser&amp;cu=INR</code></p>
   <p>
     <a href=".github/CONTRIBUTING.md">Contributing</a> ·
     <a href="https://discord.gg/Ejeb4cmzfd">Community</a>
