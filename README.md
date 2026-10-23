@@ -2,7 +2,6 @@
   <img src="assets/convx-banner.png" width="1000" alt="Convx poster with the words Just Listen and a phone displaying the music player">
   <h1>Convx</h1>
   <p><strong>An open-source Android music player with a calm, glass-inspired interface.</strong></p>
-  <p><strong>Downloads:</strong> the current Stable release is outdated and not working. Use Nightly 2.0.4 from GitHub while the remaining issues are fixed; an updated Stable release will be published soon after they are fixed. The project website is being reworked, so download from GitHub Releases for now.</p>
   <p>
     <a href="https://github.com/cosmictaserdev-creator/Convx/releases/tag/2.0.4-nightly">
       <img src="https://img.shields.io/badge/Download-Nightly%202.0.4-5268D8?style=for-the-badge&logo=android&logoColor=white" alt="Download Convx Nightly 2.0.4">
@@ -17,9 +16,14 @@
     </a>
   </p>
   <p>
-    <a href="https://ko-fi.com/cosmictaser">Donate on Ko-fi</a> ·
-    <a href="upi://pay?pa=cosmictaser%40okicici&pn=CosmicTaser&cu=INR">Donate via UPI</a>
+    <a href="https://ko-fi.com/cosmictaser">
+      <img src="https://img.shields.io/badge/Support-Ko--fi-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Support Convx on Ko-fi">
+    </a>
+    <a href="upi://pay?pa=cosmictaser%40okicici&pn=CosmicTaser&cu=INR">
+      <img src="https://img.shields.io/badge/Donate-UPI-6B4EFF?style=for-the-badge" alt="Donate via UPI">
+    </a>
   </p>
+  <p><strong>UPI ID:</strong> <code>cosmictaser@okicici</code></p>
   <p>
     <a href=".github/CONTRIBUTING.md">Contributing</a> ·
     <a href="https://discord.gg/Ejeb4cmzfd">Community</a>
@@ -29,6 +33,11 @@
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat&logo=android&logoColor=white" alt="Android 8.0 and later">
   </p>
 </div>
+
+> [!WARNING]
+> **The current Stable release is outdated and not working.** Use [Nightly 2.0.4](https://github.com/cosmictaserdev-creator/Convx/releases/tag/2.0.4-nightly) from GitHub while the remaining issues are fixed. A refreshed Stable release will be published soon after they are fixed.
+>
+> The project website is being reworked, so download from GitHub Releases for now.
 
 Convx brings music discovery, playback, lyrics, and your library together in one Android app. It is built with Kotlin, Jetpack Compose, and Media3, with custom Cupertino-style controls and Liquid Glass surfaces.
 
