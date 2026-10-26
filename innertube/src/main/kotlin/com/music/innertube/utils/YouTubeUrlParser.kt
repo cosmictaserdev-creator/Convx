@@ -18,10 +18,10 @@ object YouTubeUrlParser {
 
     private val VIDEO_URL_PATTERNS =
         listOf(
-            Regex("""(?:https?://)?(?:www\.)?(?:music\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.)?(?:music\.)?youtube\.com/watch/?\?.*v=([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?youtu\.be/([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?(?:www\.)?youtube\.com/shorts/([a-zA-Z0-9_-]{11})"""),
-            Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/watch\?.*v=([a-zA-Z0-9_-]{11})"""),
+            Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/watch/?\?.*v=([a-zA-Z0-9_-]{11})"""),
             Regex("""(?:https?://)?(?:www\.)?convx\.aryavl\.com/(?:song|v)/([a-zA-Z0-9_-]{11})"""),
         )
 

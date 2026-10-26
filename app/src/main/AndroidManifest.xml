@@ -127,6 +127,17 @@
                 <data android:host="party" />
             </intent-filter>
 
+            <!-- General Convx scheme for direct deep links (convx://watch?v=..., convx://playlist?list=..., etc.) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="convx" />
+            </intent-filter>
+
             <!-- Custom scheme for direct opens from browser (works in ALL browsers) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

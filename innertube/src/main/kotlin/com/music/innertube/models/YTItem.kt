@@ -48,7 +48,7 @@ data class SongItem(
         get() = musicVideoType != null && musicVideoType != MUSIC_VIDEO_TYPE_ATV && !isPodcastEpisode
 
     override val shareLink: String
-        get() = "$SHARE_BASE_URL/watch?v=$id"
+        get() = "$SHARE_BASE_URL/watch/?v=$id"
 }
 
 data class AlbumItem(
@@ -63,7 +63,7 @@ data class AlbumItem(
     val description: String? = null,
 ) : YTItem() {
     override val shareLink: String
-        get() = "$SHARE_BASE_URL/playlist?list=$playlistId"
+        get() = "$SHARE_BASE_URL/playlist/?list=$playlistId"
 }
 
 data class PlaylistItem(
@@ -80,7 +80,7 @@ data class PlaylistItem(
     override val explicit: Boolean
         get() = false
     override val shareLink: String
-        get() = "$SHARE_BASE_URL/playlist?list=$id"
+        get() = "$SHARE_BASE_URL/playlist/?list=$id"
 }
 
 data class ArtistItem(
