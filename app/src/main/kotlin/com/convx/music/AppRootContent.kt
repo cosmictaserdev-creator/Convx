@@ -1260,6 +1260,13 @@ internal fun AppRootContent(
                 }
             } // Box end
 
+                com.convx.music.core.updater.FloatingUpdaterHost(
+                    visible = currentRoute == "home" && playerBottomSheetState.progress == 0f &&
+                        !LocalMenuState.current.isVisible && !LocalBottomSheetPageState.current.isVisible,
+                    backdrop = menuBackdrop,
+                    onDetails = { navController.navigate("update") { launchSingleTop = true } },
+                )
+
             // menuBackdrop records the entire preceding Box, including the player.
             // Keep the same glass material over the expanded player as over Home.
                 // Menus on album, artist, playlist and player surfaces use the dark palette too.

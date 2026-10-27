@@ -14,9 +14,11 @@ import android.widget.Toast
 import com.convx.music.R
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.PlaybackParameters
 import com.convx.music.extensions.metadata
 import com.convx.music.extensions.toMediaItem
 import com.convx.music.listentogether.ListenTogetherPlayerConnectionBridge
+import com.convx.music.listentogether.JamMediaRecovery
 import com.convx.music.models.MediaMetadata
 import com.convx.music.playback.PlayerConnection
 import com.convx.music.playback.queues.ListQueue
@@ -31,6 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
@@ -53,6 +56,7 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
+import kotlin.random.Random
 
 /** What this device knows about the party it is in. */
 data class JamSession(
@@ -64,10 +68,14 @@ data class JamSession(
     val playback: PartyPlayback = PartyPlayback(),
     val queue: PartyQueue = PartyQueue(),
     val connected: Boolean = false,
+    val localPlayback: JamLocalPlayback = JamLocalPlayback.PREPARING,
+    val controlPending: Boolean = false,
 ) {
     /** The server refuses controls from everybody but the host when [hostOnlyControl] is on. */
     val canControl: Boolean get() = !hostOnlyControl || you.isHost
 }
+
+enum class JamLocalPlayback { PREPARING, SCHEDULED, PLAYING, PAUSED, RECOVERING, LOCALLY_PAUSED, UNAVAILABLE }
 
 @Singleton
 class JamManager @Inject constructor(
@@ -96,7 +104,7 @@ class JamManager @Inject constructor(
         /** Between this device's control and its echo the party still describes the world before it. */
         private const val INTENT_QUIET_MS = 4_500L
 
-        /** A play held for the server's scheduled start; started anyway if no echo comes. */
+        /** Request authoritative state if a control's echo is missing. Never execute it speculatively. */
         private const val DEFERRED_PLAY_TIMEOUT_MS = 1_800L
 
         /** Below this a position difference is two devices slightly apart, not a seek anyone made. */
@@ -131,6 +139,8 @@ class JamManager @Inject constructor(
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
     private val client = JamClient()
     private val clock = JamClock()
+    private val pendingPings = linkedMapOf<Long, Long>()
+    private val playbackScheduler = JamPlaybackScheduler(SystemClock::elapsedRealtime)
     private val prefs = context.getSharedPreferences("jam", Context.MODE_PRIVATE)
 
     private val _session = MutableStateFlow<JamSession?>(null)
@@ -173,6 +183,11 @@ class JamManager @Inject constructor(
         get() = prefs.getString("lastCode", null)
         private set(value) = prefs.edit().putString("lastCode", value).apply()
 
+    /** Selected before joining; alternate recordings cannot be assumed to share a timeline. */
+    var consistentSource: Boolean
+        get() = prefs.getBoolean("consistentSource", true)
+        set(value) { if (_session.value == null) prefs.edit().putBoolean("consistentSource", value).apply() }
+
     suspend fun preview(code: String): PartyPreview? = client.preview(serverUrl, normalise(code))
 
     suspend fun stats(): PartyStats? = client.stats(serverUrl)
@@ -189,6 +204,7 @@ class JamManager @Inject constructor(
 
     private var token: String? = null
     private var socket: WebSocket? = null
+    private var activeServerUrl: String? = null
     private var pingJob: Job? = null
     private var reconnectJob: Job? = null
     private var queueSendJob: Job? = null
@@ -204,6 +220,16 @@ class JamManager @Inject constructor(
     private var intentQuietUntil = 0L
     private var driftStrikes = 0
     private var driftCooldownUntil = 0L
+    private var sessionGeneration = 0L
+    private var connectionGeneration = 0L
+    private var transitionGeneration = 0L
+    private var rejoinJob: Job? = null
+    private var pendingControlJob: Job? = null
+    private var applyingPlayerState = false
+    private var originalPlaybackParameters: PlaybackParameters? = null
+    private var speedCorrectionUntil = 0L
+    private var preparedQueueIndex = -1
+    private var preparedForSession = false
 
     /** The song this device was told to load, so the reconcile tick does not reload it every second. */
     private var loadingTrackId: String? = null
@@ -225,18 +251,24 @@ class JamManager @Inject constructor(
 
     // ---- party lifecycle -------------------------------------------------------------------
 
-    suspend fun create(name: String, avatarUrl: String? = null) = enter { client.create(serverUrl, request(name, avatarUrl)) }
+    suspend fun create(name: String, avatarUrl: String? = null) {
+        val server = serverUrl
+        enter(server) { client.create(server, request(name, avatarUrl)) }
+    }
 
-    suspend fun join(code: String, name: String, avatarUrl: String? = null) =
-        enter { client.join(serverUrl, normalise(code), request(name, avatarUrl)) }
+    suspend fun join(code: String, name: String, avatarUrl: String? = null) {
+        val server = serverUrl
+        enter(server) { client.join(server, normalise(code), request(name, avatarUrl)) }
+    }
 
     fun leave() {
         val current = _session.value ?: return
+        val leavingServer = activeServerUrl ?: serverUrl
         leaving = true
         val leavingToken = token
         teardown()
         endSession()
-        scope.launch { if (leavingToken != null) client.leave(serverUrl, current.code, leavingToken) }
+        scope.launch { if (leavingToken != null) client.leave(leavingServer, current.code, leavingToken) }
     }
 
     fun setHostOnlyControl(enabled: Boolean) = control("setHostOnlyControl") { put("enabled", enabled) }
@@ -247,10 +279,11 @@ class JamManager @Inject constructor(
 
     fun kick(memberId: String) = control("kick") { put("memberId", memberId) }
 
-    private suspend fun enter(call: suspend () -> PartyMembership) {
+    private suspend fun enter(server: String, call: suspend () -> PartyMembership) {
         if (_busy.value) return
         _busy.value = true
         _message.value = null
+        val enteringGeneration = ++sessionGeneration
         // Being in a classic room as well would run two syncs against one player.
         runCatching { classic.get().takeIf { it.isInRoom }?.leaveRoom() }
         val waking = scope.launch {
@@ -259,10 +292,15 @@ class JamManager @Inject constructor(
         }
         try {
             val membership = call()
+            if (sessionGeneration != enteringGeneration) {
+                scope.launch { client.leave(server, membership.code, membership.token) }
+                return
+            }
             teardown()
             leaving = false
             lastSeq = -1
             token = membership.token
+            activeServerUrl = server
             lastCode = membership.code
             _activity.value = emptyList()
             val party = membership.party
@@ -275,11 +313,13 @@ class JamManager @Inject constructor(
                 playback = party.playback,
                 queue = party.queue,
             )
+            bridge.jamConsistentSource = consistentSource
+            bridge.setJamActive(true)
             connect(membership.code, membership.token)
             startReconcile()
             applyRemote(party.playback)
         } catch (e: JamException) {
-            _message.value = e.message
+            if (sessionGeneration == enteringGeneration) _message.value = e.message
         } finally {
             waking.cancel()
             if (_session.value != null) _message.value = null
@@ -300,9 +340,13 @@ class JamManager @Inject constructor(
     // ---- socket ----------------------------------------------------------------------------
 
     private fun connect(code: String, token: String) {
-        socket = client.open(serverUrl, code, token, object : WebSocketListener() {
+        val generation = ++connectionGeneration
+        clock.reset()
+        pendingPings.clear()
+        socket = client.open(activeServerUrl ?: serverUrl, code, token, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 scope.launch {
+                    if (generation != connectionGeneration || webSocket !== socket || leaving) return@launch
                     lastHeardAt = SystemClock.elapsedRealtime()
                     _session.value = _session.value?.copy(connected = true)
                     startPing(webSocket)
@@ -311,13 +355,17 @@ class JamManager @Inject constructor(
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
-                scope.launch { runCatching { onFrame(text) }.onFailure { Timber.tag(TAG).w(it, "Bad frame") } }
+                scope.launch {
+                    if (generation != connectionGeneration || webSocket !== socket || leaving) return@launch
+                    runCatching { onFrame(text) }.onFailure { Timber.tag(TAG).w(it, "Bad frame") }
+                }
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = lost(webSocket)
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 scope.launch {
+                    if (generation != connectionGeneration || webSocket !== socket || leaving) return@launch
                     // A refused handshake means the token is gone (grace period passed or the server restarted);
                     // joining again reclaims the slot if the party still exists.
                     if (webSocket === socket && !leaving && response?.code in REFUSED) rejoin() else lost(webSocket)
@@ -339,17 +387,19 @@ class JamManager @Inject constructor(
         val session = _session.value ?: return
         if (rejoining) return
         rejoining = true
-        scope.launch {
+        val generation = sessionGeneration
+        rejoinJob = scope.launch {
             try {
                 pingJob?.cancel()
                 _session.value = _session.value?.copy(connected = false)
-                val membership = client.join(serverUrl, session.code, request(displayName, avatar))
-                if (leaving || _session.value == null) return@launch
+                val membership = client.join(activeServerUrl ?: serverUrl, session.code, request(displayName, avatar))
+                if (leaving || _session.value == null || generation != sessionGeneration) return@launch
                 token = membership.token
                 lastSeq = -1
                 update { it.copy(you = membership.you) }
                 connect(membership.code, membership.token)
             } catch (e: JamException) {
+                if (generation != sessionGeneration) return@launch
                 if (e.code == "unreachable") {
                     reconnect()
                 } else {
@@ -357,7 +407,7 @@ class JamManager @Inject constructor(
                     dropSession()
                 }
             } finally {
-                rejoining = false
+                if (generation == sessionGeneration) rejoining = false
             }
         }
     }
@@ -373,10 +423,12 @@ class JamManager @Inject constructor(
                     dropSession(forget = false)
                     return@launch
                 }
-                delay(wait)
+                delay(Random.nextLong(wait / 2, wait + 1))
                 wait = (wait * 2).coerceAtMost(8_000L)
                 val session = _session.value ?: return@launch
                 val current = token ?: return@launch
+                if (rejoining) continue
+                ++connectionGeneration
                 socket?.cancel()
                 connect(session.code, current)
                 delay(3_000)
@@ -395,7 +447,7 @@ class JamManager @Inject constructor(
                     webSocket.cancel()
                     return@launch
                 }
-                webSocket.send("""{"type":"ping","clientMs":${System.currentTimeMillis()}}""")
+                sendClockPing(webSocket)
                 if (sent >= WARMUP_PINGS) report(webSocket)
                 delay(if (++sent <= WARMUP_PINGS) WARMUP_PING_MS else PING_MS)
             }
@@ -407,9 +459,25 @@ class JamManager @Inject constructor(
         val player = listenedPlayer ?: return
         if (player.currentMediaItem == null) return
         webSocket.send("""{"type":"report","positionMs":${player.currentPosition},"isPlaying":${player.isPlaying}}""")
+        Timber.tag(TAG).d("Local playback: track=${player.currentMediaItem?.mediaId} state=${_session.value?.localPlayback} clockUncertaintyEstimate=${clock.uncertaintyMs()}ms")
+    }
+
+    private fun sendClockPing(webSocket: WebSocket) {
+        val stamp = System.currentTimeMillis()
+        pendingPings[stamp] = SystemClock.elapsedRealtime()
+        while (pendingPings.size > 12) pendingPings.remove(pendingPings.keys.first())
+        webSocket.send("""{"type":"ping","clientMs":$stamp}""")
     }
 
     private fun teardown() {
+        ++sessionGeneration
+        ++connectionGeneration
+        ++transitionGeneration
+        rejoinJob?.cancel()
+        rejoinJob = null
+        rejoining = false
+        pendingControlJob?.cancel()
+        restorePlaybackSpeed()
         pingJob?.cancel()
         reconnectJob?.cancel()
         queueSendJob?.cancel()
@@ -423,7 +491,12 @@ class JamManager @Inject constructor(
         socket?.close(1000, null)
         socket = null
         token = null
+        activeServerUrl = null
         clock.reset()
+        pendingPings.clear()
+        preparedQueueIndex = -1
+        preparedForSession = false
+        bridge.setJamActive(false)
     }
 
     /** [forget] is false when the party may still exist, so a restart can offer to go back to it. */
@@ -462,6 +535,7 @@ class JamManager @Inject constructor(
             "state" -> frame["playback"]?.let { onState(client.json.decodeFromJsonElement(it)) }
             "queue" -> frame["queue"]?.let { queue ->
                 val incoming = client.json.decodeFromJsonElement<PartyQueue>(queue)
+                if (incoming.seq < (_session.value?.queue?.seq ?: -1L)) return
                 update { it.copy(queue = incoming) }
                 applyQueue(incoming)
             }
@@ -475,12 +549,16 @@ class JamManager @Inject constructor(
             "pong" -> {
                 val sent = frame["clientMs"]?.jsonPrimitive?.longOrNull
                 val server = frame["serverMs"]?.jsonPrimitive?.longOrNull
-                val wasSynced = clock.synced
-                if (sent != null && server != null) clock.observe(sent, server, System.currentTimeMillis())
+                val wasSynced = clock.isFresh(SystemClock.elapsedRealtime())
+                val sentMonotonic = sent?.let(pendingPings::remove)
+                if (sentMonotonic != null && server != null) {
+                    clock.observe(sentMonotonic, server, SystemClock.elapsedRealtime())
+                }
                 // Until now a playing party was only loaded, not positioned; the first measured clock places it.
                 if (!wasSynced && clock.synced) _session.value?.let { applyRemote(it.playback) }
             }
             "error" -> {
+                resolvePendingControl()
                 val code = frame["error"]?.jsonPrimitive?.contentOrNull
                 _message.value = frame["message"]?.jsonPrimitive?.contentOrNull ?: code
                 if (code == "host_only") Toast.makeText(context, R.string.jam_host_only_toast, Toast.LENGTH_SHORT).show()
@@ -500,9 +578,15 @@ class JamManager @Inject constructor(
 
     private fun onState(playback: PartyPlayback) {
         // Every mutation bumps seq; an older or equal one is a duplicate or a straggler.
-        if (playback.seq <= lastSeq) return
+        if (playback.seq <= lastSeq) {
+            if (playback.seq == lastSeq && _session.value?.controlPending == true) {
+                resolvePendingControl()
+                applyRemote(playback)
+            }
+            return
+        }
         lastSeq = playback.seq
-        intentQuietUntil = 0L
+        resolvePendingControl()
         val before = _session.value?.playback
         update { it.copy(playback = playback) }
         // A queue edit bumps seq too, and must not cost an audible seek.
@@ -518,50 +602,118 @@ class JamManager @Inject constructor(
     private fun applyRemote(playback: PartyPlayback) {
         val connection = bridge.playerConnection.value ?: return
         val player = connection.player
-        val track = playback.track ?: return
-        if (detached) return
-        // A file from this phone is playing on purpose; the party carries on without it.
-        if (player.currentMediaItem?.metadata?.isLocalFile == true) return
-        echoUntil = SystemClock.elapsedRealtime() + ECHO_WINDOW_MS
-        val serverNow = clock.serverNow(System.currentTimeMillis())
-        val target = JamSync.positionAt(playback, serverNow)
-        // Without a measured clock a playing party's position is a guess: load the song now and
-        // place it when the first pong lands.
-        val placeable = clock.synced || !playback.isPlaying
-
-        if (player.currentMediaItem?.mediaId != track.videoId) {
-            loadingTrackId = track.videoId
-            startTrack(connection, track, target, playback.isPlaying && placeable && !locallyPaused)
+        val generation = ++transitionGeneration
+        val sessionId = sessionGeneration
+        startJob?.cancel()
+        queueSendJob?.cancel()
+        restorePlaybackSpeed()
+        val track = playback.track ?: run {
+            withPlayerChange { player.pause() }
+            setLocalPlayback(JamLocalPlayback.PAUSED)
             return
         }
-        loadingTrackId = null
-        if (!placeable || locallyPaused) return
+        if (detached) return
+        if (player.currentMediaItem?.metadata?.isLocalFile == true) return
+        if (bridge.jamRecovery.value != JamMediaRecovery.NONE) {
+            if (player.currentMediaItem?.mediaId == track.videoId) return
+            connection.service.resetJamAudioRecovery()
+        }
         driftStrikes = 0
         deferredPlayJob?.cancel()
-        if (abs(player.currentPosition - target) > ALIGN_MS) player.seekTo(target)
-        startJob?.cancel()
-        if (playback.isPlaying) {
-            val delayMs = JamSync.startDelayMs(playback, serverNow)
-            if (!player.playWhenReady) {
-                startJob = scope.launch { delay(delayMs); echoUntil = SystemClock.elapsedRealtime() + ECHO_WINDOW_MS; connection.play() }
+        val queueIndex = playback.queueIndex
+        val needsLoad = !preparedForSession || player.currentMediaItem?.mediaId != track.videoId ||
+            (preparedQueueIndex >= 0 && queueIndex >= 0 && preparedQueueIndex != queueIndex)
+        if (needsLoad) {
+            loadingTrackId = track.videoId
+            setLocalPlayback(JamLocalPlayback.PREPARING)
+            withPlayerChange { player.pause(); startTrack(connection, track) }
+        } else if (player.playbackState == Player.STATE_IDLE && player.playerError == null) {
+            withPlayerChange { player.prepare() }
+        }
+        preparedQueueIndex = queueIndex
+        if (!playback.isPlaying || locallyPaused) withPlayerChange { player.pause() }
+        startJob = scope.launch {
+            val began = SystemClock.elapsedRealtime()
+            fun current(): Boolean = generation == transitionGeneration && sessionId == sessionGeneration &&
+                bridge.playerConnection.value === connection && _session.value?.playback?.track?.videoId == track.videoId
+            val ready = playbackScheduler.awaitReady(
+                current = { current() && !detached && bridge.jamRecovery.value == JamMediaRecovery.NONE },
+                ready = { player.currentMediaItem?.mediaId == track.videoId && player.playbackState == Player.STATE_READY &&
+                    (_session.value?.playback?.isPlaying != true || clock.isFresh(SystemClock.elapsedRealtime())) },
+            )
+            if (!ready) {
+                if (current() && !detached && bridge.jamRecovery.value == JamMediaRecovery.NONE) {
+                    bridge.setJamRecovery(JamMediaRecovery.UNAVAILABLE)
+                    withPlayerChange { player.pause() }
+                    _message.value = "Audio could not be prepared. Retry to rejoin the party."
+                }
+                return@launch
             }
-        } else if (player.playWhenReady) {
-            connection.pause()
+            if (!current() || detached) return@launch
+            var latest = _session.value?.playback ?: return@launch
+            val wait = JamSync.startDelayMs(latest, clock.serverNow(SystemClock.elapsedRealtime()))
+            if (wait > 0) {
+                setLocalPlayback(JamLocalPlayback.SCHEDULED)
+                withPlayerChange { player.pause() }
+                if (!playbackScheduler.awaitStart(current = { current() && !detached }, startDelayMs = {
+                    JamSync.startDelayMs(_session.value?.playback ?: latest, clock.serverNow(SystemClock.elapsedRealtime()))
+                })) return@launch
+            }
+            if (!current() || detached || bridge.jamRecovery.value != JamMediaRecovery.NONE) return@launch
+            latest = _session.value?.playback ?: return@launch
+            val target = JamSync.positionAt(latest, clock.serverNow(SystemClock.elapsedRealtime()))
+                .coerceAtLeast(0L).let { position -> if (player.duration > 0) minOf(position, player.duration) else position }
+            withPlayerChange {
+                if (abs(player.currentPosition - target) > ALIGN_MS) player.seekTo(target)
+                player.playWhenReady = latest.isPlaying && !locallyPaused
+            }
+            loadingTrackId = null
+            setLocalPlayback(if (locallyPaused) JamLocalPlayback.LOCALLY_PAUSED else
+                if (latest.isPlaying) JamLocalPlayback.PLAYING else JamLocalPlayback.PAUSED)
+            Timber.tag(TAG).d("Prepared ${track.videoId} in ${SystemClock.elapsedRealtime() - began}ms, target=$target")
         }
     }
 
-    private fun startTrack(connection: PlayerConnection, track: PartyTrack, position: Long, playing: Boolean) {
+    private fun startTrack(connection: PlayerConnection, track: PartyTrack) {
+        preparedForSession = true
+        connection.service.resetJamAudioRecovery()
         val queue = _session.value?.queue
         val inQueue = queue != null && queue.index in queue.items.indices && queue.items[queue.index].videoId == track.videoId
         val items = if (inQueue) queue!!.items.map { toMediaItem(it) } else listOf(toMediaItem(track))
         // The party's own playback must not trip the guest lock that stops the user driving the player.
         connection.allowInternalSync = true
         try {
-            connection.playQueue(ListQueue(title = null, items = items, startIndex = if (inQueue) queue!!.index else 0, position = position), force = true)
+            connection.playQueue(ListQueue(title = null, items = items, startIndex = if (inQueue) queue!!.index else 0),
+                force = true, playWhenReady = false)
         } finally {
             connection.allowInternalSync = false
         }
-        if (!playing) scope.launch { delay(250); echoUntil = SystemClock.elapsedRealtime() + ECHO_WINDOW_MS; connection.pause() }
+    }
+
+    private inline fun withPlayerChange(change: () -> Unit) {
+        applyingPlayerState = true
+        echoUntil = SystemClock.elapsedRealtime() + ECHO_WINDOW_MS
+        try { change() } finally { applyingPlayerState = false }
+    }
+
+    private fun setLocalPlayback(state: JamLocalPlayback) = update { it.copy(localPlayback = state) }
+
+    private fun restorePlaybackSpeed() {
+        originalPlaybackParameters?.let { parameters -> listenedPlayer?.playbackParameters = parameters }
+        originalPlaybackParameters = null
+        speedCorrectionUntil = 0L
+    }
+
+    fun retryAudio() {
+        val connection = bridge.playerConnection.value ?: return
+        if (_session.value == null) return
+        detached = false
+        locallyPaused = false
+        bridge.setJamRecovery(JamMediaRecovery.NONE)
+        connection.service.resetJamAudioRecovery()
+        setLocalPlayback(JamLocalPlayback.PREPARING)
+        withPlayerChange { connection.player.prepare() }
+        _session.value?.let { applyRemote(it.playback) }
     }
 
     private fun startReconcile() {
@@ -582,7 +734,9 @@ class JamManager @Inject constructor(
      */
     private fun reconcile(playback: PartyPlayback) {
         val now = SystemClock.elapsedRealtime()
-        if (now < intentQuietUntil || now < echoUntil || detached || !clock.synced) return
+        if (speedCorrectionUntil > 0L && now >= speedCorrectionUntil) restorePlaybackSpeed()
+        if (now < intentQuietUntil || now < echoUntil || detached || !clock.isFresh(now)) return
+        if (bridge.jamRecovery.value != JamMediaRecovery.NONE) return
         if (startJob?.isActive == true || deferredPlayJob?.isActive == true) return
         val player = bridge.playerConnection.value?.player ?: return
         val track = playback.track ?: return
@@ -597,19 +751,32 @@ class JamManager @Inject constructor(
             player.playbackSuppressionReason != Player.PLAYBACK_SUPPRESSION_REASON_NONE
         ) {
             driftStrikes = 0
+            restorePlaybackSpeed()
             return
         }
-        val target = JamSync.positionAt(playback, clock.serverNow(System.currentTimeMillis()))
-        if (abs(player.currentPosition - target) <= DRIFT_LIMIT_MS) {
+        val target = JamSync.positionAt(playback, clock.serverNow(now))
+        val error = target - player.currentPosition
+        val softLimit = maxOf(250L, clock.uncertaintyMs() * 2)
+        if (abs(error) <= softLimit) {
             driftStrikes = 0
+            restorePlaybackSpeed()
+            return
+        }
+        if (abs(error) < DRIFT_LIMIT_MS) {
+            if (originalPlaybackParameters == null && player.playbackParameters.speed == 1f && now >= driftCooldownUntil) {
+                originalPlaybackParameters = player.playbackParameters
+                player.playbackParameters = PlaybackParameters(if (error > 0) 1.02f else 0.98f, player.playbackParameters.pitch)
+                speedCorrectionUntil = now + 10_000L
+                driftCooldownUntil = now + 16_000L
+            }
             return
         }
         if (now < driftCooldownUntil || ++driftStrikes < DRIFT_STRIKES) return
         Timber.tag(TAG).i("Correcting ${player.currentPosition - target}ms of drift")
         driftStrikes = 0
         driftCooldownUntil = now + DRIFT_COOLDOWN_MS
-        echoUntil = now + ECHO_WINDOW_MS
-        player.seekTo(target)
+        restorePlaybackSpeed()
+        withPlayerChange { player.seekTo(target) }
     }
 
     /**
@@ -620,13 +787,12 @@ class JamManager @Inject constructor(
         val connection = bridge.playerConnection.value ?: return
         if (!clock.synced) return
         echoUntil = SystemClock.elapsedRealtime() + ECHO_WINDOW_MS
-        connection.pause()
+        withPlayerChange { connection.pause() }
         deferredPlayJob?.cancel()
         deferredPlayJob = scope.launch {
             delay(DEFERRED_PLAY_TIMEOUT_MS)
-            Timber.tag(TAG).w("Party never echoed the play; starting locally")
-            echoUntil = SystemClock.elapsedRealtime() + ECHO_WINDOW_MS
-            connection.play()
+            Timber.tag(TAG).w("Party did not echo play; requesting authoritative state")
+            socket?.send("""{"type":"sync"}""")
         }
     }
 
@@ -648,7 +814,19 @@ class JamManager @Inject constructor(
     // ---- local player -> party -------------------------------------------------------------
 
     private val playerListener = object : Player.Listener {
-        private fun suppressed() = SystemClock.elapsedRealtime() < echoUntil || !canSend()
+        private fun suppressed() = applyingPlayerState || SystemClock.elapsedRealtime() < echoUntil ||
+            bridge.jamRecovery.value != JamMediaRecovery.NONE || !canSend()
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            val session = _session.value ?: return
+            if (bridge.jamRecovery.value != JamMediaRecovery.NONE || startJob?.isActive == true) return
+            if (playbackState == Player.STATE_BUFFERING && !detached && !locallyPaused) {
+                restorePlaybackSpeed()
+                setLocalPlayback(JamLocalPlayback.RECOVERING)
+            } else if (playbackState == Player.STATE_READY && session.localPlayback == JamLocalPlayback.RECOVERING) {
+                applyRemote(session.playback)
+            }
+        }
 
         /** A guest's own change while the host holds the controls: undo it and say why. */
         private fun refused(): Boolean {
@@ -662,16 +840,24 @@ class JamManager @Inject constructor(
         }
 
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-            if (SystemClock.elapsedRealtime() < echoUntil) return
             val session = _session.value ?: return
             val player = listenedPlayer ?: return
+            if (applyingPlayerState) return
+            if (bridge.jamRecovery.value != JamMediaRecovery.NONE) {
+                if (playWhenReady && reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) retryAudio()
+                return
+            }
             if (!playWhenReady && reason != Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) {
                 // One person taking a call must not stop the music for everyone. See [detached].
                 detached = true
+                setLocalPlayback(JamLocalPlayback.LOCALLY_PAUSED)
+                restorePlaybackSpeed()
                 startJob?.cancel()
                 deferredPlayJob?.cancel()
                 return
             }
+            if (SystemClock.elapsedRealtime() < echoUntil) return
+            if (startJob?.isActive == true && !playWhenReady) return
             if (playWhenReady && detached) {
                 // Coming back is a catch-up, not a control: the gap belongs to this device alone.
                 detached = false
@@ -680,6 +866,7 @@ class JamManager @Inject constructor(
             }
             if (!session.canControl) {
                 locallyPaused = !playWhenReady
+                if (locallyPaused) setLocalPlayback(JamLocalPlayback.LOCALLY_PAUSED)
                 // Rejoins where the party has got to, or pauses again if the party itself is paused.
                 if (playWhenReady) applyRemote(session.playback)
                 return
@@ -696,15 +883,21 @@ class JamManager @Inject constructor(
             if (detached || locallyPaused || listenedPlayer?.currentMediaItem?.metadata?.isLocalFile == true) return
             val playback = _session.value?.playback ?: return
             // Two devices normally sit a little apart; only a real move of the playhead is a seek.
-            val partyAt = JamSync.positionAt(playback, clock.serverNow(System.currentTimeMillis()))
+            val partyAt = JamSync.positionAt(playback, clock.serverNow(SystemClock.elapsedRealtime()))
             if (clock.synced && abs(newPosition.positionMs - partyAt) <= SEEK_REPORT_FLOOR_MS) return
             control("seek") { put("positionMs", newPosition.positionMs) }
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             if (mediaItem == null) return
+            if (loadingTrackId == mediaItem.mediaId && startJob?.isActive == true) return
             // A listener reaching the end of a song first simply waits for the party to move on.
-            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO && _session.value?.canControl == false) return
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO && _session.value?.canControl == false) {
+                withPlayerChange { listenedPlayer?.pause() }
+                setLocalPlayback(JamLocalPlayback.SCHEDULED)
+                socket?.send("""{"type":"sync"}""")
+                return
+            }
             if (refused() || suppressed()) return
             val session = _session.value ?: return
             if (session.playback.track?.videoId == mediaItem.mediaId) return
@@ -732,6 +925,7 @@ class JamManager @Inject constructor(
         }
 
         override fun onTimelineChanged(timeline: androidx.media3.common.Timeline, reason: Int) {
+            if (startJob?.isActive == true) return
             if (reason != Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED || refused() || suppressed()) return
             queueSendJob?.cancel()
             queueSendJob = scope.launch {
@@ -744,6 +938,42 @@ class JamManager @Inject constructor(
     // Declared after [playerListener] on purpose: the collector below runs immediately on the main
     // thread, and a listener that is still null makes ExoPlayer throw a NullPointerException.
     init {
+        scope.launch {
+            bridge.jamTimingRevision.drop(1).collect {
+                if (_session.value == null) return@collect
+                restorePlaybackSpeed()
+                driftStrikes = 0
+                clock.reset()
+                pendingPings.clear()
+                socket?.let(::sendClockPing)
+            }
+        }
+        scope.launch {
+            var wasRecovering = false
+            bridge.jamRecovery.collect { recovery ->
+                if (_session.value == null) return@collect
+                when (recovery) {
+                    JamMediaRecovery.RECOVERING -> {
+                        wasRecovering = true
+                        ++transitionGeneration
+                        startJob?.cancel()
+                        restorePlaybackSpeed()
+                        setLocalPlayback(JamLocalPlayback.RECOVERING)
+                    }
+                    JamMediaRecovery.UNAVAILABLE -> {
+                        wasRecovering = false
+                        ++transitionGeneration
+                        startJob?.cancel()
+                        restorePlaybackSpeed()
+                        setLocalPlayback(JamLocalPlayback.UNAVAILABLE)
+                    }
+                    JamMediaRecovery.NONE -> if (wasRecovering) {
+                        wasRecovering = false
+                        _session.value?.let { applyRemote(it.playback) }
+                    }
+                }
+            }
+        }
         // The rest of the app locks its player controls off this one flag, whatever kind of room it is.
         scope.launch {
             var before: Boolean? = null
@@ -763,7 +993,10 @@ class JamManager @Inject constructor(
         scope.launch {
             bridge.playerConnection.collectLatest { connection ->
                 listenedPlayer?.removeListener(playerListener)
+                restorePlaybackSpeed()
+                preparedForSession = false
                 listenedPlayer = connection?.player?.also { it.addListener(playerListener) }
+                _session.value?.let { applyRemote(it.playback) }
             }
         }
     }
@@ -814,6 +1047,10 @@ class JamManager @Inject constructor(
     private fun canSend(): Boolean = _session.value?.let { it.connected && it.canControl } == true
 
     private fun control(action: String, build: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit) {
+        if (_session.value?.connected != true) {
+            _message.value = "Reconnecting. Try the control again once connected."
+            return
+        }
         val webSocket = socket ?: return
         intentQuietUntil = SystemClock.elapsedRealtime() + INTENT_QUIET_MS
         val frame = buildJsonObject {
@@ -821,7 +1058,36 @@ class JamManager @Inject constructor(
             put("action", action)
             build()
         }
-        client.send(webSocket, frame)
+        if (!client.send(webSocket, frame)) {
+            resolvePendingControl()
+            _message.value = "Control could not be sent. Reconnecting."
+            webSocket.cancel()
+            lost(webSocket)
+            return
+        }
+        update { it.copy(controlPending = true) }
+        pendingControlJob?.cancel()
+        val generation = sessionGeneration
+        pendingControlJob = scope.launch {
+            delay(INTENT_QUIET_MS)
+            if (generation != sessionGeneration) return@launch
+            intentQuietUntil = 0L
+            socket?.send("""{"type":"sync"}""")
+            delay(3_000L)
+            if (generation == sessionGeneration && _session.value?.controlPending == true) {
+                update { it.copy(controlPending = false) }
+                _message.value = "Could not confirm the control. Reconnecting to the party."
+                socket?.let { it.cancel(); lost(it) }
+            }
+        }
+    }
+
+    private fun resolvePendingControl() {
+        intentQuietUntil = 0L
+        pendingControlJob?.cancel()
+        pendingControlJob = null
+        deferredPlayJob?.cancel()
+        update { it.copy(controlPending = false) }
     }
 
     // ---- conversions -----------------------------------------------------------------------

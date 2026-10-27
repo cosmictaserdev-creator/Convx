@@ -27,10 +27,10 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.convx.music.ui.utils.stackBlur
+import com.convx.music.utils.ArtworkProcessing
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /** Tiny on purpose: upscaling a 24px bitmap gives a smooth gradient with no visible texture or edge. */
@@ -53,13 +53,15 @@ fun ArtworkBlurMesh(
     LaunchedEffect(cacheKey) {
         if (baked != null) return@LaunchedEffect
         val source = model ?: return@LaunchedEffect
-        val request = ImageRequest.Builder(context).data(source).size(MESH_DECODE_PX).allowHardware(false).build()
-        val bitmap = context.imageLoader.execute(request).image?.toBitmap() ?: return@LaunchedEffect
-        val field = withContext(Dispatchers.Default) {
-            bitmap.copy(Bitmap.Config.ARGB_8888, true).stackBlur(MESH_BLUR_RADIUS).let { finish?.invoke(it) ?: it }
+        baked = ArtworkProcessing.cached("mesh|$cacheKey", { meshBitmapCache.get(cacheKey) }) {
+            val request = ImageRequest.Builder(context).data(source).size(MESH_DECODE_PX).allowHardware(false).build()
+            val bitmap = context.imageLoader.execute(request).image?.toBitmap() ?: return@cached null
+            val field = withContext(ArtworkProcessing.dispatcher) {
+                bitmap.copy(Bitmap.Config.ARGB_8888, true).stackBlur(MESH_BLUR_RADIUS).let { finish?.invoke(it) ?: it }
+            }
+            meshBitmapCache.put(cacheKey, field)
+            field
         }
-        meshBitmapCache.put(cacheKey, field)
-        baked = field
     }
 
     val paint = remember { Paint(Paint.FILTER_BITMAP_FLAG) }

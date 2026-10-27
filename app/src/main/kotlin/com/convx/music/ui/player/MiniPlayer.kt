@@ -169,7 +169,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
-import com.convx.music.core.isBluetoothHeadphoneConnected
+import com.convx.music.core.rememberHeadphoneConnected
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Speaker
@@ -259,8 +259,7 @@ private fun NewMiniPlayer(
     }
     val isCasting by castHandler?.isCasting?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-    val isBluetoothConnected = isBluetoothHeadphoneConnected(context)
+    val isBluetoothConnected by rememberHeadphoneConnected()
     var showAudioDeviceBottomSheet by remember { mutableStateOf(false) }
     var showRoutePopover by remember { mutableStateOf(false) }
 

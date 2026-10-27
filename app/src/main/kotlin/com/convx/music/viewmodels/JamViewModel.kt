@@ -50,6 +50,11 @@ class JamViewModel @Inject constructor(private val manager: JamManager) : ViewMo
     fun join(code: String, name: String, avatarUrl: String?) = viewModelScope.launch { manager.join(code, name, avatarUrl) }
 
     fun leave() = manager.leave()
+    fun retryAudio() = manager.retryAudio()
+
+    var consistentSource: Boolean
+        get() = manager.consistentSource
+        set(value) { manager.consistentSource = value }
 
     fun setHostOnlyControl(enabled: Boolean) = manager.setHostOnlyControl(enabled)
 

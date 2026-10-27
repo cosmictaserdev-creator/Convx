@@ -21,6 +21,7 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 
 /**
@@ -52,7 +53,10 @@ fun rememberArtworkTint(thumbnailUrl: String?): List<Color> {
 
     LaunchedEffect(thumbnailUrl) {
         if (thumbnailUrl == null) return@LaunchedEffect
-        if (artworkTintCache.get(thumbnailUrl) != null) return@LaunchedEffect
+        artworkTintCache.get(thumbnailUrl)?.let {
+            extractedColors = it
+            return@LaunchedEffect
+        }
         withContext(Dispatchers.IO) {
             try {
                 val request = ImageRequest.Builder(context)
@@ -75,6 +79,8 @@ fun rememberArtworkTint(thumbnailUrl: String?): List<Color> {
                             extractedColors = colors
                         }
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
                 reportException(e)
             }

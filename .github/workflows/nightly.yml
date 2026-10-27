@@ -71,33 +71,46 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          ./gradlew assembleUniversalGmsRelease assembleArm32GmsRelease -Pnightly=true -PnightlyRun=${{ github.run_number }} --no-configuration-cache --console=plain --warning-mode summary -x lint
+          ./gradlew assembleUniversalGmsRelease assembleArm32GmsRelease assembleUniversalFossRelease assembleArm32FossRelease -Pnightly=true -PnightlyRun=${{ github.run_number }} -PgithubUpdater=true --no-configuration-cache --console=plain --warning-mode summary -x lint
 
       - name: Upload Signed APK
         uses: actions/upload-artifact@v4
         with:
           name: convx-gms-nightly
-          path: app/build/outputs/apk/universalGms/release/*.apk
+          path: app/build/outputs/apk/*/release/*.apk
 
       # One rolling pre-release: the tag moves to each new build and the same
       # release is updated, so the README link never changes and no tags pile up.
       - name: Publish nightly pre-release
         env:
           GH_TOKEN: ${{ github.token }}
+          UPDATER_IMAGE_URL: ${{ vars.UPDATER_IMAGE_URL }}
         run: |
           VERSION=$(sed -n 's/^VERSION_MAJOR=//p' version.properties).$(sed -n 's/^VERSION_MINOR=//p' version.properties).$(sed -n 's/^VERSION_PATCH=//p' version.properties)
           TAG="${VERSION}-nightly"
           TITLE="Convx ${VERSION} Nightly"
+          NOTES=".github/release-notes/${TAG}.md"
+          if [ ! -f "$NOTES" ]; then
+            NOTES="${RUNNER_TEMP}/convx-nightly-notes.md"
+            printf '# Convx %s Nightly\n\nPre-release build from the main branch. Nightly builds may be unstable.\n' "$VERSION" > "$NOTES"
+          fi
           APK=$(find app/build/outputs/apk/universalGms/release -name '*.apk' | head -n 1)
-          cp "$APK" "convx-${TAG}.apk"
+          cp "$APK" convx-universal-gms.apk
           APK32=$(find app/build/outputs/apk/arm32Gms/release -name '*.apk' | head -n 1)
-          cp "$APK32" "convx-arm32-${TAG}.apk"
+          cp "$APK32" convx-arm32-gms.apk
+          APK_FOSS=$(find app/build/outputs/apk/universalFoss/release -name '*.apk' | head -n 1)
+          cp "$APK_FOSS" convx-universal-foss.apk
+          APK32_FOSS=$(find app/build/outputs/apk/arm32Foss/release -name '*.apk' | head -n 1)
+          cp "$APK32_FOSS" convx-arm32-foss.apk
+          VERSION_CODE=$(python3 -c 'import sys; a,b,c=(int(v) for v in sys.argv[1].split(".")); print((a*10000+b*100+c)*10000)' "$VERSION")
+          IMAGE_ARGS=()
+          if [ -n "${UPDATER_IMAGE_URL:-}" ]; then IMAGE_ARGS+=(--image "$UPDATER_IMAGE_URL"); fi
+          python3 tools/publish_updater_metadata.py --version "$VERSION" --display-version "nightly-r${{ github.run_number }}" --version-code "$VERSION_CODE" --nightly-run "${{ github.run_number }}" --release-notes "$NOTES" --output updater.json "${IMAGE_ARGS[@]}" convx-universal-gms.apk convx-arm32-gms.apk convx-universal-foss.apk convx-arm32-foss.apk
           git tag -f "$TAG" "$GITHUB_SHA"
           git push -f origin "refs/tags/$TAG"
-          NOTES=".github/release-notes/${TAG}.md"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes-file "$NOTES" --prerelease
-            gh release upload "$TAG" "convx-${TAG}.apk" "convx-arm32-${TAG}.apk" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release upload "$TAG" convx-universal-gms.apk convx-arm32-gms.apk convx-universal-foss.apk convx-arm32-foss.apk updater.json --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create "$TAG" "convx-${TAG}.apk" "convx-arm32-${TAG}.apk" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes-file "$NOTES" --prerelease --latest=false
+            gh release create "$TAG" convx-universal-gms.apk convx-arm32-gms.apk convx-universal-foss.apk convx-arm32-foss.apk updater.json --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes-file "$NOTES" --prerelease --latest=false
           fi

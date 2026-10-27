@@ -250,6 +250,8 @@ fun getAllSearchableSettings(): List<SearchableSetting> {
         SearchableSetting("Lyrics sources", null, "Lyrics", "settings/lyrics"),
         SearchableSetting("Provider order and availability", null, "Lyrics", "settings/lyrics"),
         SearchableSetting(stringResource(R.string.lyrics_glow_effect), null, "Lyrics", "settings/lyrics"),
+        SearchableSetting(stringResource(R.string.flamingo_bright_singing_words), stringResource(R.string.lyrics_style_flamingo), "Lyrics", "settings/lyrics"),
+        SearchableSetting(stringResource(R.string.flamingo_word_swell), stringResource(R.string.lyrics_style_flamingo), "Lyrics", "settings/lyrics"),
         SearchableSetting(stringResource(R.string.lyrics_romanize_as_main), null, "Lyrics", "settings/content/romanization"),
         SearchableSetting(stringResource(R.string.lyrics_romanize_japanese), null, "Lyrics", "settings/content/romanization"),
         SearchableSetting(stringResource(R.string.lyrics_romanize_korean), null, "Lyrics", "settings/content/romanization"),

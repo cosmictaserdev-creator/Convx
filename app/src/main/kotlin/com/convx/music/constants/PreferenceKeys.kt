@@ -631,6 +631,9 @@ val TranslateLanguageKey = stringPreferencesKey("translateLanguage")
 val DeeplApiKey = stringPreferencesKey("deeplApiKey")
 val DeeplFormalityKey = stringPreferencesKey("deeplFormality")
 val LyricsGlowEffectKey = booleanPreferencesKey("lyricsGlowEffect")
+val FlamingoBrightSingingWordsKey = booleanPreferencesKey("flamingoBrightSingingWords")
+val FlamingoWordSwellKey = booleanPreferencesKey("flamingoWordSwell")
+val FlamingoGlowColorKey = intPreferencesKey("flamingoGlowColor")
 val AppleMusicLyricsBlurKey = booleanPreferencesKey("appleMusicLyricsBlur")
 val LyricsStandardBlurKey = booleanPreferencesKey("lyricsStandardBlur")
 
@@ -686,6 +689,7 @@ val DjReverbTypeKey = stringPreferencesKey("djReverbType")
 val DjDelayTypeKey = stringPreferencesKey("djDelayType")
 val StemQualityKey = stringPreferencesKey("stemQuality")
 val DemucsModelUrlKey = stringPreferencesKey("demucsModelUrl")
+val DemucsAutoDownloadKey = booleanPreferencesKey("demucsAutoDownload")
 /** Opens or closes fullscreen lyrics with one tap. Off keeps the two-tap flow. */
 val OneTapFullscreenLyricsKey = booleanPreferencesKey("oneTapFullscreenLyrics")
 /** Controls collapse toward the top by default; false collapses them toward the bottom. */

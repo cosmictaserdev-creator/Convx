@@ -51,6 +51,11 @@ internal class AppIntentRouter(
     }
 
     fun handleDeepLinkIntent(intent: Intent, navController: NavHostController) {
+        if (intent.getBooleanExtra("open_update", false)) {
+            intent.removeExtra("open_update")
+            navController.navigate("update") { launchSingleTop = true }
+            return
+        }
         if (handleDebugIntent(intent, navController)) return
 
         val uri = intent.data ?: intent.extras?.getString(Intent.EXTRA_TEXT)?.toUri() ?: return

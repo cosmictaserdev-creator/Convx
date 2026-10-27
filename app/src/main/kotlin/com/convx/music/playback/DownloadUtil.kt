@@ -178,6 +178,7 @@ constructor(
                         HlsJoinDataSource(
                             YTPlayerUtils.httpClient,
                             RangedUpstreamDataSource(OkHttpDataSource.Factory(YTPlayerUtils.httpClient)),
+                            java.io.File(appContext.cacheDir, "hlsjoin"),
                         )
                     },
                 ),
@@ -332,7 +333,8 @@ constructor(
     // Separate joined HLS bytes from any cached YouTube rendition.
     private fun DataSpec.withStream(url: String): DataSpec =
         if (url.startsWith(HlsJoinDataSource.SCHEME + ":")) {
-            buildUpon().setUri(url.toUri()).setKey("$key#hlsjoin")
+            // "#hlsjoin2": joins cached before seek indexes were written must not be reused.
+            buildUpon().setUri(url.toUri()).setKey("$key#hlsjoin2")
                 .setFlags(flags or DataSpec.FLAG_DONT_CACHE_IF_LENGTH_UNKNOWN).build()
         } else withUri(url.toUri())
 

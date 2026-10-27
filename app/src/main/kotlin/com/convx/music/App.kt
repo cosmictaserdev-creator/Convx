@@ -61,6 +61,7 @@ import java.net.Authenticator
 import java.net.PasswordAuthentication
 import java.net.Proxy
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -131,13 +132,6 @@ class App : Application(), SingletonImageLoader.Factory {
         // Warm the preference mirror off Main so the first composition avoids its blocking read.
         applicationScope.launch(Dispatchers.IO) { dataStore.warmPreferenceMirror() }
         applicationScope.launch(Dispatchers.IO) { com.convx.music.ai.AiDefaults.keepLegacyProvider(this@App) }
-        // Spotify's native engine: report whether it loaded, without ever failing startup over it.
-        applicationScope.launch(Dispatchers.IO) {
-            val loaded = runCatching { com.music.spotify.nativecore.NativeBridge.initContext(this@App) }
-            timber.log.Timber.tag("SpotifyEngine").i(
-                if (loaded.isSuccess) "native engine loaded" else "native engine unavailable: ${loaded.exceptionOrNull()}",
-            )
-        }
 
         CrashHandler.install(this)
 
@@ -154,9 +148,23 @@ class App : Application(), SingletonImageLoader.Factory {
             cachedCoilCacheSize = dataStore.data.map { it[MaxImageCacheSizeKey] ?: 512 }.first()
         }
 
-        applicationScope.launch {
+        applicationScope.launch(Dispatchers.IO) {
             initializeSettings()
             observeSettingsChanges()
+        }
+    }
+
+    private val deferredInitializationStarted = AtomicBoolean(false)
+
+    /** Optional integrations start only after the activity has drawn and Main is idle. */
+    internal fun initializeAfterFirstDraw() {
+        if (!deferredInitializationStarted.compareAndSet(false, true)) return
+        applicationScope.launch(Dispatchers.IO) {
+            val loaded = runCatching { com.music.spotify.nativecore.NativeBridge.initContext(this@App) }
+            Timber.tag("SpotifyEngine").i(
+                if (loaded.isSuccess) "native engine loaded" else "native engine unavailable: ${loaded.exceptionOrNull()}",
+            )
+            com.convx.music.playback.smart.DemucsModel.autoDownloadIfWanted(this@App)
         }
     }
 
@@ -384,14 +392,14 @@ class App : Application(), SingletonImageLoader.Factory {
             if (cacheSize == 0) {
                 diskCachePolicy(CachePolicy.DISABLED)
             } else {
-                diskCache(
+                diskCache {
                     DiskCache.Builder()
                         // Keep artwork in filesDir: Android can clear cacheDir under storage pressure,
                         // including downloaded thumbnails. Coil still enforces the configured size cap.
                         .directory(filesDir.resolve("coil"))
                         .maxSizeBytes(cacheSize * 1024 * 1024L)
                         .build()
-                )
+                }
             }
         }.build()
     }

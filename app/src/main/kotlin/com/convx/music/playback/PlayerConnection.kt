@@ -269,7 +269,7 @@ class PlayerConnection(
     val queueReplacedForUndo = MutableStateFlow<Queue?>(null)
 
     /** [force] bypasses the queue replacement prompt. */
-    fun playQueue(queue: Queue, force: Boolean = false) {
+    fun playQueue(queue: Queue, force: Boolean = false, playWhenReady: Boolean = true) {
         if (playbackLockedByRoom) {
             Timber.tag(TAG).d("playQueue blocked - Listen Together guest without control")
             playbackBlockedByRoom.value = true
@@ -286,7 +286,7 @@ class PlayerConnection(
         // Forced replacements already reflect a deliberate choice.
         val previousQueue = if (!force && isReplace) snapshotCurrentQueue() else null
         try {
-            service.playQueue(queue)
+            service.playQueue(queue, playWhenReady = playWhenReady)
             previousQueue?.let { queueReplacedForUndo.value = it }
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Error in playQueue")

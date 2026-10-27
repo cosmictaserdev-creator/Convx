@@ -273,6 +273,7 @@ private fun StartParty(viewModel: JamViewModel, busy: Boolean, avatarUrl: String
     var code by remember { mutableStateOf("") }
     var server by remember { mutableStateOf(viewModel.serverUrl) }
     var serverOpen by remember { mutableStateOf(false) }
+    var consistentSource by remember { mutableStateOf(viewModel.consistentSource) }
     var preview by remember { mutableStateOf<PartyPreview?>(null) }
     var missing by remember { mutableStateOf(false) }
     val lastCode = remember { viewModel.lastCode }
@@ -305,6 +306,14 @@ private fun StartParty(viewModel: JamViewModel, busy: Boolean, avatarUrl: String
         color = IosTheme.colors.secondaryLabel,
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
     )
+
+    Section(title = null) {
+        SwitchRow(
+            stringResource(R.string.jam_consistent_source),
+            stringResource(R.string.jam_consistent_source_desc),
+            consistentSource,
+        ) { enabled -> consistentSource = enabled; viewModel.consistentSource = enabled }
+    }
 
     AnimatedVisibility(lastPreview != null, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
         val last = lastPreview
@@ -468,6 +477,11 @@ private fun StartParty(viewModel: JamViewModel, busy: Boolean, avatarUrl: String
 private fun InParty(session: JamSession, activity: List<PartyActivity>, viewModel: JamViewModel) {
     PartyHeader(session, viewModel)
 
+    if (session.localPlayback == com.convx.music.jam.JamLocalPlayback.UNAVAILABLE) {
+        Text(stringResource(R.string.jam_audio_unavailable), color = IosTheme.colors.secondaryLabel)
+        OutlinedButton(onClick = viewModel::retryAudio) { Text(stringResource(R.string.jam_retry_audio)) }
+    }
+
     if (!session.canControl) {
         Spacer(Modifier.height(12.dp))
         Row(
@@ -582,7 +596,16 @@ private fun PartyHeader(session: JamSession, viewModel: JamViewModel) {
                 Box(Modifier.size(8.dp).background(dot, CircleShape))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    stringResource(if (session.connected) R.string.jam_connected else R.string.jam_reconnecting),
+                    stringResource(when {
+                        !session.connected -> R.string.jam_reconnecting
+                        session.controlPending -> R.string.jam_control_pending
+                        session.localPlayback == com.convx.music.jam.JamLocalPlayback.PREPARING -> R.string.jam_preparing_audio
+                        session.localPlayback == com.convx.music.jam.JamLocalPlayback.SCHEDULED -> R.string.jam_waiting_start
+                        session.localPlayback == com.convx.music.jam.JamLocalPlayback.RECOVERING -> R.string.jam_recovering_audio
+                        session.localPlayback == com.convx.music.jam.JamLocalPlayback.UNAVAILABLE -> R.string.jam_audio_unavailable
+                        session.localPlayback == com.convx.music.jam.JamLocalPlayback.LOCALLY_PAUSED -> R.string.jam_locally_paused
+                        else -> R.string.jam_connected
+                    }),
                     style = IosTheme.typography.footnote,
                     color = IosTheme.colors.secondaryLabel,
                 )

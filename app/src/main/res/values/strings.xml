@@ -253,6 +253,15 @@
     <string name="demucs_ready">Demucs model is ready</string>
     <string name="demucs_download_failed">Could not download the model</string>
     <string name="demucs_incompatible">This model is not compatible and was removed</string>
+    <string name="demucs_corrupt">The download was damaged and was removed. Try again.</string>
+    <string name="demucs_notice_default">Leave the link as it is to download htdemucs (%1$s), or paste another htdemucs ONNX link. Meta\'s Demucs weights are licensed CC BY-NC 4.0, for non-commercial use only. Splitting is slow and heavy on the battery, and makes four stem files per song instead of two; leave the phone charging. The model is checked after download and removed if it doesn\'t work.</string>
+    <string name="demucs_auto_download">Download model automatically</string>
+    <string name="demucs_auto_download_desc">On Wi-Fi, gets the Demucs model in the background and resumes if interrupted</string>
+    <string name="stem_lab">Stem lab (debug)</string>
+    <string name="stem_lab_split_now_playing">Split now playing with every separator</string>
+    <string name="stem_lab_desc">Saves each stem of “%1$s” to Music/Convx Stem Lab. Tap again to stop.</string>
+    <string name="stem_lab_nothing_playing">Play a downloaded or cached song first</string>
+    <string name="stem_lab_saved">Saved to %1$s</string>
     <string name="stems_storage">Stems on this device (tap to delete)</string>
     <string name="analyze_song">Analyze for AutoMix</string>
     <string name="analyze_album">Analyze album for AutoMix</string>
@@ -767,4 +776,20 @@
     <string name="playlist_load_failed">Couldn?t load this playlist.</string>
     <string name="lyrics_centered_scroll_description">Smooth centered scrolling, with word animation when timing is available</string>
     <string name="lyrics_style_flamingo">Flamingo</string>
+    <string name="flamingo_bright_singing_words">Bright singing words</string>
+    <string name="flamingo_bright_singing_words_desc">Keep singing words bright as they smoothly fill. Turn off for softer light on held notes.</string>
+    <string name="flamingo_word_swell">Word swell</string>
+    <string name="flamingo_word_swell_desc">Gently enlarge each word while it is being sung.</string>
+    <string name="flamingo_glow_color">Glow color</string>
+    <string name="flamingo_glow_color_desc">Choose the halo color around sung words.</string>
+    <string name="lyrics_recenter">Recenter lyrics</string>
+    <string name="jam_consistent_source">Use original YouTube audio</string>
+    <string name="jam_consistent_source_desc">Keeps this device on the shared recording. Alternate providers and existing downloads are bypassed; network access may be needed.</string>
+    <string name="jam_control_pending">Confirming control…</string>
+    <string name="jam_preparing_audio">Preparing audio…</string>
+    <string name="jam_waiting_start">Waiting for the shared start…</string>
+    <string name="jam_recovering_audio">Recovering audio on this device…</string>
+    <string name="jam_audio_unavailable">Audio unavailable on this device. The party continues.</string>
+    <string name="jam_locally_paused">Paused on this device</string>
+    <string name="jam_retry_audio">Retry audio</string>
 </resources>

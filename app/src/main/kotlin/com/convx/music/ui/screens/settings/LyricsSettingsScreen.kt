@@ -5,21 +5,32 @@
 
 package com.convx.music.ui.screens.settings
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.convx.music.R
 import com.convx.music.constants.AppleMusicLyricsBlurKey
 import com.convx.music.constants.LyricsGlowEffectKey
+import com.convx.music.constants.FlamingoBrightSingingWordsKey
+import com.convx.music.constants.FlamingoWordSwellKey
+import com.convx.music.constants.FlamingoGlowColorKey
 import com.convx.music.constants.LyricsStandardBlurKey
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
@@ -30,6 +41,7 @@ import com.convx.music.utils.rememberEnumPreference
 import com.convx.music.constants.LyricsAnimationStyle
 import com.convx.music.constants.LyricsAnimationStyleKey
 import com.convx.music.ui.component.EnumDialog
+import com.convx.music.ui.component.ColorPickerDialog
 import com.convx.music.ui.component.lyricsStyleLabel
 import androidx.compose.runtime.saveable.rememberSaveable
 
@@ -52,8 +64,30 @@ fun LyricsSettingsScreen(navController: NavController) {
     val credentials = remember(context) { context.getSharedPreferences("lyrics_credentials", android.content.Context.MODE_PRIVATE) }
     var paxKey by remember { mutableStateOf(credentials.getString("paxsenix_api_key", "").orEmpty()) }
     val (glow, onGlowChange) = rememberPreference(LyricsGlowEffectKey, defaultValue = true)
+    val (brightSingingWords, onBrightSingingWordsChange) = rememberPreference(FlamingoBrightSingingWordsKey, defaultValue = true)
+    val (wordSwell, onWordSwellChange) = rememberPreference(FlamingoWordSwellKey, defaultValue = true)
+    val (glowColorInt, onGlowColorChange) = rememberPreference(FlamingoGlowColorKey, defaultValue = Color.White.toArgb())
+    val glowColor = Color(glowColorInt)
+    var showGlowColorPicker by rememberSaveable { mutableStateOf(false) }
     val (appleBlur, onAppleBlurChange) = rememberPreference(AppleMusicLyricsBlurKey, defaultValue = true)
     val (standardBlur, onStandardBlurChange) = rememberPreference(LyricsStandardBlurKey, defaultValue = false)
+
+    if (showGlowColorPicker) {
+        ColorPickerDialog(
+            initialColor = glowColor,
+            title = stringResource(R.string.flamingo_glow_color),
+            onDismiss = { showGlowColorPicker = false },
+            onConfirm = {
+                onGlowColorChange(it.toArgb())
+                showGlowColorPicker = false
+            },
+            defaultColor = Color.White,
+            onReset = {
+                onGlowColorChange(Color.White.toArgb())
+                showGlowColorPicker = false
+            },
+        )
+    }
 
     SettingsPage(navController = navController, title = stringResource(R.string.lyrics), horizontalPadding = 16.dp) {
         IosSettingsGroup(title = stringResource(R.string.lyrics_animation_style), items = listOf(
@@ -65,6 +99,39 @@ fun LyricsSettingsScreen(navController: NavController) {
             ),
         ))
         LyricsFontSettings()
+        if (animationStyle == LyricsAnimationStyle.FLAMINGO) {
+            IosSettingsGroup(title = stringResource(R.string.lyrics_style_flamingo), items = listOf(
+                IosSettingsItem(
+                    icon = painterResource(R.drawable.lyrics),
+                    title = { Text(stringResource(R.string.flamingo_bright_singing_words)) },
+                    description = { Text(stringResource(R.string.flamingo_bright_singing_words_desc)) },
+                    trailingContent = { Switch(checked = brightSingingWords, onCheckedChange = onBrightSingingWordsChange) },
+                    onClick = { onBrightSingingWordsChange(!brightSingingWords) },
+                ),
+                IosSettingsItem(
+                    icon = painterResource(R.drawable.lyrics),
+                    title = { Text(stringResource(R.string.flamingo_word_swell)) },
+                    description = { Text(stringResource(R.string.flamingo_word_swell_desc)) },
+                    trailingContent = { Switch(checked = wordSwell, onCheckedChange = onWordSwellChange) },
+                    onClick = { onWordSwellChange(!wordSwell) },
+                ),
+                IosSettingsItem(
+                    icon = painterResource(R.drawable.palette),
+                    title = { Text(stringResource(R.string.flamingo_glow_color)) },
+                    description = { Text(stringResource(R.string.flamingo_glow_color_desc)) },
+                    trailingContent = {
+                        Box(
+                            Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(glowColor)
+                                .border(1.dp, Color.Gray, CircleShape),
+                        )
+                    },
+                    onClick = { showGlowColorPicker = true },
+                ),
+            ))
+        }
         IosSettingsGroup(title = "Lyrics sources", items = listOf(
             IosSettingsItem(
                 icon = painterResource(R.drawable.lyrics),

@@ -330,6 +330,9 @@ private const val VideoLoopBucketMs = 100L
 /** Upper bound on waiting for the player sheet before opening the queue inside it. */
 private const val PARENT_SHEET_SETTLE_TIMEOUT_MS = 1_000L
 
+/** Glow background redraw steps per 20s cycle: 600 = one step per ~33ms. */
+private const val GLOW_STEPS = 600
+
 /** Strength of white content added onto the background under `additiveChrome`. Below full so
  *  the blend doesn't clip to plain white and wash out the background's colour. */
 private const val AdditiveChromeContentAlpha = 1f
@@ -1080,13 +1083,18 @@ fun BottomSheetPlayer(
                                 } else {
                                     remember { mutableFloatStateOf(0f) }
                                 }
+                                // The 20s cycle barely moves per vsync: redraw ~30fps (6 shaders a
+                                // frame) instead of every frame on 90-120Hz panels.
+                                val glowStep = remember(progress) {
+                                    derivedStateOf { (progress.value * GLOW_STEPS).toInt() }
+                                }
 
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .graphicsLayer { alpha = backgroundAlpha() }
                                         .drawBehind {
-                                            val p = progress.value
+                                            val p = glowStep.value / GLOW_STEPS.toFloat()
                                             val width = size.width
                                             val height = size.height
                                             val baseColor = Color(0xFF050505)

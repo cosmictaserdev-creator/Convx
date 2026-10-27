@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build_stable:
-    name: Build Universal GMS Stable Release
+    name: Build GitHub APK variants
     runs-on: ubuntu-latest
 
     steps:
@@ -69,13 +69,27 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          ./gradlew assembleUniversalGmsRelease --no-configuration-cache --console=plain --warning-mode summary -x lint
+          ./gradlew assembleUniversalGmsRelease assembleArm32GmsRelease assembleUniversalFossRelease assembleArm32FossRelease -PgithubUpdater=true --no-configuration-cache --console=plain --warning-mode summary -x lint
 
-      - name: Upload APK to Release
+      - name: Prepare APKs and updater metadata
+        env:
+          UPDATER_IMAGE_URL: ${{ vars.UPDATER_IMAGE_URL }}
+        run: |
+          VERSION=$(sed -n 's/^VERSION_MAJOR=//p' version.properties).$(sed -n 's/^VERSION_MINOR=//p' version.properties).$(sed -n 's/^VERSION_PATCH=//p' version.properties)
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          test "${TAG#v}" = "$VERSION"
+          VERSION_CODE=$(python3 -c 'import sys; a,b,c=(int(v) for v in sys.argv[1].split(".")); print((a*10000+b*100+c)*10000+9999)' "$VERSION")
+          cp app/build/outputs/apk/universalGms/release/*.apk convx-universal-gms.apk
+          cp app/build/outputs/apk/arm32Gms/release/*.apk convx-arm32-gms.apk
+          cp app/build/outputs/apk/universalFoss/release/*.apk convx-universal-foss.apk
+          cp app/build/outputs/apk/arm32Foss/release/*.apk convx-arm32-foss.apk
+          IMAGE_ARGS=()
+          if [ -n "${UPDATER_IMAGE_URL:-}" ]; then IMAGE_ARGS+=(--image "$UPDATER_IMAGE_URL"); fi
+          python3 tools/publish_updater_metadata.py --version "$VERSION" --version-code "$VERSION_CODE" --release-notes ".github/release-notes/$TAG.md" --output updater.json "${IMAGE_ARGS[@]}" convx-universal-gms.apk convx-arm32-gms.apk convx-universal-foss.apk convx-arm32-foss.apk
+
+      - name: Upload APKs and updater metadata to Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          APK_PATH=$(find app/build/outputs/apk -name '*.apk' | head -n 1)
-          mv "$APK_PATH" "convx-${TAG}.apk"
-          gh release upload "$TAG" "convx-${TAG}.apk" --repo "${{ github.repository }}" --clobber
+          gh release upload "$TAG" convx-universal-gms.apk convx-arm32-gms.apk convx-universal-foss.apk convx-arm32-foss.apk updater.json --repo "${{ github.repository }}" --clobber

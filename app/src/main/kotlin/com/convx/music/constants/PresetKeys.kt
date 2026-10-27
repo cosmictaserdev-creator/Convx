@@ -105,6 +105,8 @@ object PresetKeys {
     val LYRICS: List<Preferences.Key<*>> = listOf(
         LyricsTextPositionKey,
         LyricsGlowEffectKey,
+        FlamingoBrightSingingWordsKey,
+        FlamingoWordSwellKey,
         AppleMusicLyricsBlurKey,
         LyricsStandardBlurKey,
         LyricsAnimationStyleKey,
@@ -256,6 +258,8 @@ val presetKeyTypes: Map<String, PrefType> = mapOf(
         "canvasThumbnailAnimation" to PrefType.BOOL,
         "lyricsTextPosition" to PrefType.STRING,
         "lyricsGlowEffect" to PrefType.BOOL,
+        "flamingoBrightSingingWords" to PrefType.BOOL,
+        "flamingoWordSwell" to PrefType.BOOL,
         "appleMusicLyricsBlur" to PrefType.BOOL,
         "lyricsStandardBlur" to PrefType.BOOL,
         "lyricsAnimationStyle" to PrefType.STRING,

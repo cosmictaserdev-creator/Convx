@@ -10,20 +10,21 @@ import kotlin.math.max
 /**
  * This device's offset from the party server's clock, measured the way NTP does it.
  *
- * Each `ping` carries the device clock; the `pong` echoes it with the server's. With round trip
- * `rtt` the offset is `serverMs - (t0 + t1) / 2`, wrong by at most half the round trip, so the
- * sample with the smallest round trip is the one to trust (it is the least wrong).
+ * Send/receive readings use device monotonic time; the echoed wire timestamp only identifies
+ * the request. With round trip `rtt`, offset is `serverMs - (t0 + t1) / 2`. The lowest-latency
+ * sample minimizes network-delay uncertainty, though asymmetric paths still introduce error.
  */
-class JamClock(private val maxSamples: Int = 12) {
-    private data class Sample(val rtt: Long, val offset: Long)
+class JamClock(private val maxSamples: Int = 12, private val maxAgeMs: Long = 60_000L) {
+    private data class Sample(val rtt: Long, val offset: Long, val receivedMs: Long)
 
     private val samples = ArrayDeque<Sample>()
 
     @Synchronized
     fun observe(clientSentMs: Long, serverMs: Long, receivedMs: Long) {
         val rtt = receivedMs - clientSentMs
-        if (rtt < 0) return
-        samples.addLast(Sample(rtt, serverMs - (clientSentMs + receivedMs) / 2))
+        if (rtt < 0 || rtt > 10_000L) return
+        expire(receivedMs)
+        samples.addLast(Sample(rtt, serverMs - (clientSentMs + receivedMs) / 2, receivedMs))
         while (samples.size > maxSamples) samples.removeFirst()
     }
 
@@ -36,7 +37,24 @@ class JamClock(private val maxSamples: Int = 12) {
         @Synchronized get() = samples.isNotEmpty()
 
     /** The server's current time according to the device clock plus the measured offset. */
-    fun serverNow(deviceNow: Long): Long = deviceNow + offsetMs()
+    @Synchronized
+    fun serverNow(deviceNow: Long): Long {
+        expire(deviceNow)
+        return deviceNow + offsetMs()
+    }
+
+    @Synchronized
+    fun isFresh(deviceNow: Long): Boolean {
+        expire(deviceNow)
+        return samples.isNotEmpty()
+    }
+
+    @Synchronized
+    fun uncertaintyMs(): Long = samples.minByOrNull { it.rtt }?.rtt?.div(2) ?: Long.MAX_VALUE
+
+    private fun expire(now: Long) {
+        while (samples.isNotEmpty() && now - samples.first().receivedMs > maxAgeMs) samples.removeFirst()
+    }
 
     @Synchronized
     fun reset() = samples.clear()
