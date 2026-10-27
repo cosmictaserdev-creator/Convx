@@ -3,7 +3,6 @@ package com.convx.music.di
 import com.convx.music.library.libraryCoreModule
 import com.convx.music.search.searchHistoryModule
 
-/** Every Koin module the Android app starts with; [KoinGraphTest] verifies the same list. */
 val appModules = listOf(
     chartsPresentationModule,
     catalogPresentationModule,

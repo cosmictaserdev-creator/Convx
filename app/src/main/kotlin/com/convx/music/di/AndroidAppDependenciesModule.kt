@@ -65,7 +65,7 @@ val androidAppDependenciesModule = module {
     single<MusicDatabase> { InternalDatabase.newInstance(androidContext()) }
     single<InternalDatabase> { get<MusicDatabase>().delegate }
     single<DatabaseDao> { get<InternalDatabase>().dao }
-    // Shared library actions must use the signed-in global client, not a fresh one.
+    // Must be the signed-in global client; a new instance has no session.
     single<InnertubeRepository> { YouTube }
     single<MusicLibraryRemoteDataSource> { InnertubeMusicLibraryDataSource(get()) }
     single<MusicPlaylistRemoteDataSource> { InnertubeMusicPlaylistDataSource(get()) }

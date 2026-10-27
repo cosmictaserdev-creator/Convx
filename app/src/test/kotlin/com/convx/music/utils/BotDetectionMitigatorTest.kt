@@ -51,7 +51,6 @@ class BotDetectionMitigatorTest {
     @Test
     fun `notifyPlaybackFailure returns true for a guest bot-detection failure`() {
         assertTrue(BotDetectionMitigator.notifyPlaybackFailure(isLoggedIn = false, errorMessage = "Sign in to confirm you're not a bot"))
-        // Unrelated stream errors must not rotate the guest session.
         assertFalse(BotDetectionMitigator.notifyPlaybackFailure(isLoggedIn = false, errorMessage = "Missing stream expire time"))
     }
 }
