@@ -1,32 +1,23 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+
 plugins {
-    alias(libs.plugins.hilt) apply (false)
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.kmp.library) apply false
+    alias(libs.plugins.compose.multiplatform) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.ksp) apply (false)
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.protobufPlugin) apply false
-}
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven { setUrl("https://jitpack.io") }
-        maven { setUrl("https://maven.aliyun.com/repository/public") }
-    }
-    dependencies {
-        classpath(libs.gradle)
-        classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
-    }
 }
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-// Kotlin 2.3.10 emits metadata format 2.4.0. Hilt/KSP pull in an older
-// kotlin-metadata-jvm transitively that only reads up to 2.3.0, which fails with
-// "Provided Metadata instance has version 2.4.0, while maximum supported version is
-// 2.3.0" during Hilt's annotation processing. Force the whole build onto a
-// kotlin-metadata-jvm release that understands 2.4.x metadata.
+// Keep metadata consumers on a reader that understands the current compiler output.
 allprojects {
     configurations.all {
         resolutionStrategy {
@@ -36,6 +27,12 @@ allprojects {
 }
 
 subprojects {
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        extensions.configure<KotlinMultiplatformExtension> {
+            jvmToolchain(21)
+        }
+    }
+
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         compilerOptions {
             if (project.findProperty("enableComposeCompilerReports") == "true") {

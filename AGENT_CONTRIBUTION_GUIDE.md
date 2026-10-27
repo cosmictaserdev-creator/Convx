@@ -26,7 +26,7 @@ The repository is a Gradle multi-module Android project. Current modules are:
 
 `listen-together-server/` is a separate server component. Keep Android changes out of it unless the task requires coordinated server behavior.
 
-Before placing code, inspect the current module and neighboring implementation. The codebase is the source of truth when a generic bundled skill suggests a different setup. In particular, Convx uses Hilt; do not introduce Koin because a bundled reference skill uses it. Do not migrate a feature to a new architecture as part of an unrelated change.
+Before placing code, inspect the current module and neighboring implementation. The codebase is the source of truth when a generic bundled skill suggests a different setup. The KMP migration has selected Koin for dependency injection across Android and the new clients. Move the existing Hilt graph incrementally with each feature migration; do not add Hilt bindings for features already migrated to Koin. Do not migrate a feature to a new architecture as part of an unrelated change.
 
 ## Contribution owner and scope
 
@@ -40,7 +40,7 @@ Do not mention another application or project as the source of an implementation
 - Use low-level design deliberately: make responsibilities explicit, keep dependencies pointed toward stable contracts, encapsulate mutable state, and expose the smallest useful API.
 - Reuse existing project abstractions before introducing a new one. Avoid duplicate state, parallel implementations, speculative frameworks, and abstractions used only once without a clear boundary.
 - Keep UI rendering, state coordination, domain rules, persistence, and remote access in their existing responsibilities. Composables render state and report actions. ViewModels coordinate screen state. Data access stays behind the existing data/service boundaries.
-- Inject dependencies through the existing Hilt setup. Keep constructors explicit and avoid service locators or hidden global mutable state.
+- Use Koin for new shared/KMP code and Android features. The Android app uses Koin as its only dependency injection container. Keep one composition root per app, constructors explicit, and shared code free of platform-specific dependencies.
 - Preserve coroutine cancellation. Do not swallow `CancellationException`; handle expected failures explicitly and present useful recoverable states.
 - Prefer immutable state and stable item keys for lazy lists. Avoid work, allocations, or state reads that cause avoidable recompositions, especially inside frequently recomposed or scrolling content.
 - Use current stable Android/Kotlin/Compose APIs already supported by this repository. Check the version catalog and existing patterns before adding or upgrading a dependency. Do not add experimental APIs without a concrete need and suitable opt-in.
@@ -147,7 +147,7 @@ The complete skill folders are checked into [`contributor/skills/`](contributor/
 - [Android performance](contributor/skills/android-performance-skill/SKILL.md) — profiling and performance guidance.
 - [Android presentation / MVI](contributor/skills/android-presentation-mvi/SKILL.md) — state and ViewModel patterns; follow local code where it differs.
 - [Android testing](contributor/skills/android-testing/SKILL.md) — unit, UI, and integration test guidance.
-- [Android dependency injection](contributor/skills/android-di-koin/SKILL.md) — reference only; Convx uses Hilt, so do not introduce Koin.
+- [Android dependency injection](contributor/skills/android-di-koin/SKILL.md) — Koin module definitions, app assembly, and Compose ViewModel injection for migrated Android/KMP features.
 
 ### Animation and interaction design
 

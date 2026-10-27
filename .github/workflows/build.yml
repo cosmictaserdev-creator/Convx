@@ -2,6 +2,11 @@ name: CI & Debug Build
 
 on:
   workflow_dispatch:
+    inputs:
+      test_release:
+        description: Build a signed Universal GMS release APK for manual testing
+        type: boolean
+        default: true
   push:
     branches: [ '**' ]
     paths-ignore:
@@ -16,7 +21,7 @@ jobs:
   build_debug:
     name: Build Universal GMS Debug
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]' && !(github.event_name == 'workflow_dispatch' && inputs.test_release)
     steps:
       - uses: actions/checkout@v4
 
@@ -54,8 +59,106 @@ jobs:
         run: |
           ./gradlew assembleUniversalGmsDebug --no-configuration-cache --console=plain --warning-mode summary
 
+      - name: Test backup archive validation and rollback
+        run: ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.viewmodels.BackupArchiveEntryPolicyTest --tests com.convx.music.viewmodels.AtomicFileReplacementTest --no-configuration-cache --console=plain
+
+      - name: Test network storage and playback routing
+        run: |
+          ./gradlew :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest --no-configuration-cache --console=plain
+          ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
+
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: app-universal-gms-debug
           path: app/build/outputs/apk/universalGms/debug/*.apk
+
+  test_release:
+    name: Signed Android test release
+    if: github.event_name == 'workflow_dispatch' && inputs.test_release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - name: Prepare Android SDK
+        run: |
+          chmod +x gradlew
+          sdkmanager "platforms;android-37" "build-tools;36.0.0" "ndk;27.0.12077973"
+      - name: Prepare signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in KEYSTORE_BASE64 STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing release-signing secret: $name"
+              exit 1
+            fi
+          done
+          mkdir -p app/keystore "$HOME/.android"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > app/keystore/release.keystore
+          keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android \
+            -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+            -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+      - name: Test network storage and routing
+        run: |
+          ./gradlew :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest --no-configuration-cache --console=plain
+          ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
+      - name: Build release APK
+        env:
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
+        run: ./gradlew :app:assembleUniversalGmsRelease --no-configuration-cache --console=plain --warning-mode summary
+      - name: Verify APK and record build
+        env:
+          BUILD_COMMIT: ${{ github.sha }}
+          BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p test-release
+          apks=(app/build/outputs/apk/universalGms/release/*.apk)
+          test "${#apks[@]}" -eq 1
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "${apks[0]}"
+          cp "${apks[0]}" test-release/convx-universal-gms-test-release.apk
+          (cd test-release && sha256sum *.apk > SHA256SUMS)
+          printf 'Commit: %s\nRun: %s\nVariant: universalGmsRelease\n' "$BUILD_COMMIT" "$BUILD_URL" > test-release/build.txt
+          printf '### Android test release\n\nCommit: `%s`\n\nDownload the APK under **Artifacts** on this run.\n' "$BUILD_COMMIT" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload signed test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: convx-universal-gms-test-release-${{ github.run_number }}
+          path: test-release/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-network-tests-${{ github.run_number }}
+          path: |
+            shared-kmp/domain/network-storage/build/reports/tests/
+            shared-kmp/data/network-storage/build/reports/tests/
+            app/build/reports/tests/testUniversalFossDebugUnitTest/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Remove signing material
+        if: always()
+        run: rm -f app/keystore/release.keystore

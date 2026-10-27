@@ -124,6 +124,7 @@ app/keystore/
 !/contributor/skills/**/*.md
 !SECURITY.md
 !docs/CODEBASE_REVIEW_2026-10.md
+!docs/NETWORK_STORAGE_PLAYBACK_FIXES.md
 !.github/CONTRIBUTING.md
 !automation/**/*.md
 !.github/pull_request_template.md
@@ -181,3 +182,7 @@ sh.exe.stackdump
 /Convx*Analytics.xlsx
 skills-lock.json
 renovate.json
+
+!docs/KMP_DESKTOP_PROGRESS.md
+
+__pycache__/
