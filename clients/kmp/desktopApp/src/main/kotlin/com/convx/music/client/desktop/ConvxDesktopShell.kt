@@ -141,7 +141,7 @@ import dev.chrisbanes.haze.HazeProgressive
 import dev.chrisbanes.haze.blur.HazeBlurStyle
 import dev.chrisbanes.haze.blur.hazeBlur
 import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.materials.HazeMaterials
+import dev.chrisbanes.haze.blur.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import com.convx.music.catalog.CatalogEntry
 import com.convx.music.catalog.CatalogId

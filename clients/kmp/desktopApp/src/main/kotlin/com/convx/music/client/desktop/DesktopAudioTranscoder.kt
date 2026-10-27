@@ -9,6 +9,8 @@ import com.convx.music.playback.PcmSamples
 import com.convx.music.playback.smart.TrackAnalysis
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.FFmpegFrameRecorder
+import org.bytedeco.javacv.FrameGrabber
+import org.bytedeco.ffmpeg.global.avcodec.*
 import org.bytedeco.ffmpeg.global.avutil.*
 import java.io.IOException
 import java.nio.file.Files
@@ -47,12 +49,22 @@ internal class DesktopAudioTranscoder : AutoCloseable {
                     var completed = false
                     try {
                         grabber.setOption("rw_timeout", READ_TIMEOUT_MICROS.toString())
+                        // JavaCV's default SHORT mode narrows every frame to 16-bit.
+                        grabber.sampleMode = FrameGrabber.SampleMode.RAW
                         grabber.start()
                         check(grabber.sampleRate > 0 && grabber.audioChannels > 0) {
                             "The audio stream has no supported audio track."
                         }
                         recorder.format = "wav"
-                        recorder.audioCodecName = pcmCodec(grabber)
+                        val codec = pcmCodec(grabber)
+                        recorder.audioCodecName = codec
+                        recorder.sampleFormat = when (codec) {
+                            "pcm_u8" -> AV_SAMPLE_FMT_U8
+                            "pcm_s16le" -> AV_SAMPLE_FMT_S16
+                            "pcm_f32le" -> AV_SAMPLE_FMT_FLT
+                            "pcm_f64le" -> AV_SAMPLE_FMT_DBL
+                            else -> AV_SAMPLE_FMT_S32
+                        }
                         recorder.sampleRate = grabber.sampleRate
                         recorder.audioChannels = grabber.audioChannels
                         recorder.start()
@@ -179,13 +191,13 @@ internal class DesktopAudioTranscoder : AutoCloseable {
     }
 
     private fun pcmCodec(grabber: FFmpegFrameGrabber): String {
-        val context = grabber.formatContext
-        val sourceBits = context?.let { streamContext ->
+        val audio = grabber.formatContext?.let { streamContext ->
             (0 until streamContext.nb_streams()).asSequence().map { streamContext.streams(it).codecpar() }
-                .firstOrNull { it.codec_type() == AVMEDIA_TYPE_AUDIO }?.let {
-                    it.bits_per_raw_sample().takeIf { bits -> bits > 0 } ?: it.bits_per_coded_sample()
-                }
-        } ?: 0
+                .firstOrNull { it.codec_type() == AVMEDIA_TYPE_AUDIO }
+        }
+        val sourceBits = audio?.let { it.bits_per_raw_sample().takeIf { bits -> bits > 0 } ?: it.bits_per_coded_sample() } ?: 0
+        // Lossy decoders return float, which many Java Sound output lines cannot open.
+        if (audio == null || !isLossless(audio.codec_id())) return "pcm_s16le"
         return when (grabber.sampleFormat) {
             AV_SAMPLE_FMT_U8, AV_SAMPLE_FMT_U8P -> "pcm_u8"
             AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16P -> "pcm_s16le"
@@ -195,6 +207,10 @@ internal class DesktopAudioTranscoder : AutoCloseable {
             else -> throw IOException("The decoder returned an unsupported PCM sample format.")
         }
     }
+
+    private fun isLossless(codecId: Int): Boolean =
+        codecId in AV_CODEC_ID_PCM_S16LE until AV_CODEC_ID_ADPCM_IMA_QT ||
+            codecId in setOf(AV_CODEC_ID_FLAC, AV_CODEC_ID_ALAC, AV_CODEC_ID_WAVPACK, AV_CODEC_ID_APE, AV_CODEC_ID_TTA)
 
     private fun validateDecodedDuration(file: Path, expectedDurationMs: Long?) {
         val decodedDurationMs = try {
