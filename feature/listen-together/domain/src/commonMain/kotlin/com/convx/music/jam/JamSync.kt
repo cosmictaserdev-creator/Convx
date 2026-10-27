@@ -5,6 +5,8 @@
 
 package com.convx.music.jam
 
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlin.math.max
 
 /**
@@ -18,46 +20,45 @@ class JamClock(private val maxSamples: Int = 12, private val maxAgeMs: Long = 60
     private data class Sample(val rtt: Long, val offset: Long, val receivedMs: Long)
 
     private val samples = ArrayDeque<Sample>()
+    private val lock = SynchronizedObject()
 
-    @Synchronized
     fun observe(clientSentMs: Long, serverMs: Long, receivedMs: Long) {
         val rtt = receivedMs - clientSentMs
         if (rtt < 0 || rtt > 10_000L) return
-        expire(receivedMs)
-        samples.addLast(Sample(rtt, serverMs - (clientSentMs + receivedMs) / 2, receivedMs))
-        while (samples.size > maxSamples) samples.removeFirst()
+        synchronized(lock) {
+            expire(receivedMs)
+            samples.addLast(Sample(rtt, serverMs - (clientSentMs + receivedMs) / 2, receivedMs))
+            while (samples.size > maxSamples) samples.removeFirst()
+        }
     }
 
     /** `serverNow - deviceNow`; 0 until the first pong lands. */
-    @Synchronized
-    fun offsetMs(): Long = samples.minByOrNull { it.rtt }?.offset ?: 0L
+    fun offsetMs(): Long = synchronized(lock) { offsetLocked() }
 
     /** False until the first pong: a position computed before then rests on the device's own clock. */
     val synced: Boolean
-        @Synchronized get() = samples.isNotEmpty()
+        get() = synchronized(lock) { samples.isNotEmpty() }
 
     /** The server's current time according to the device clock plus the measured offset. */
-    @Synchronized
-    fun serverNow(deviceNow: Long): Long {
+    fun serverNow(deviceNow: Long): Long = synchronized(lock) {
         expire(deviceNow)
-        return deviceNow + offsetMs()
+        deviceNow + offsetLocked()
     }
 
-    @Synchronized
-    fun isFresh(deviceNow: Long): Boolean {
+    fun isFresh(deviceNow: Long): Boolean = synchronized(lock) {
         expire(deviceNow)
-        return samples.isNotEmpty()
+        samples.isNotEmpty()
     }
 
-    @Synchronized
-    fun uncertaintyMs(): Long = samples.minByOrNull { it.rtt }?.rtt?.div(2) ?: Long.MAX_VALUE
+    fun uncertaintyMs(): Long = synchronized(lock) { samples.minByOrNull { it.rtt }?.rtt?.div(2) ?: Long.MAX_VALUE }
 
     private fun expire(now: Long) {
         while (samples.isNotEmpty() && now - samples.first().receivedMs > maxAgeMs) samples.removeFirst()
     }
 
-    @Synchronized
-    fun reset() = samples.clear()
+    fun reset() = synchronized(lock) { samples.clear() }
+
+    private fun offsetLocked(): Long = samples.minByOrNull { it.rtt }?.offset ?: 0L
 }
 
 object JamSync {

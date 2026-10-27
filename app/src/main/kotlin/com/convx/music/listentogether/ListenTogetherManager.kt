@@ -1825,7 +1825,7 @@ class ListenTogetherManager(
             id = id,
             title = title,
             artists = listOf(Artist(id = "", name = artist)),
-            album = if (album != null) Album(id = "", title = album) else null,
+            album = album?.let { Album(id = "", title = it) },
             duration = (duration / 1000).toInt(),
             thumbnailUrl = thumbnail,
             suggestedBy = suggestedBy

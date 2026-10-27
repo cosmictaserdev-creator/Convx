@@ -92,7 +92,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
-      - run: ./gradlew -p clients/kmp :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest :modules-core:desktopTest :modules-runtime:desktopTest :modules-presentation:compileKotlinDesktop :lyrics-core:desktopTest :canvas-core:desktopTest :playback-core:desktopTest :playback-data:desktopTest :playback-presentation:desktopTest :history-core:desktopTest :library-core:desktopTest :library-data:desktopTest :search-core:desktopTest :catalog-core:desktopTest :account-core:desktopTest :account-presentation:desktopTest :catalog-presentation:desktopTest :design-system:desktopTest :innertube:desktopTest :shared:desktopTest --no-configuration-cache --console=plain
+      - run: ./gradlew -p clients/kmp :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest :modules-core:desktopTest :modules-runtime:desktopTest :modules-presentation:compileKotlinDesktop :lyrics-core:desktopTest :canvas-core:desktopTest :playback-core:desktopTest :playback-data:desktopTest :playback-presentation:desktopTest :history-core:desktopTest :library-core:desktopTest :library-data:desktopTest :search-core:desktopTest :catalog-core:desktopTest :account-core:desktopTest :account-presentation:desktopTest :catalog-presentation:desktopTest :design-system:desktopTest :listen-together-core:desktopTest :innertube:desktopTest :shared:desktopTest --no-configuration-cache --console=plain
 
   android-linkage:
     name: Android shared screen linkage
@@ -126,7 +126,7 @@ jobs:
           xcodebuild -version
       - name: Test shared module protocols and JavaScript runtime on iOS
         timeout-minutes: 20
-        run: ./gradlew -p clients/kmp :network-storage-core:iosSimulatorArm64Test :network-storage-transports:iosSimulatorArm64Test :network-storage-presentation:iosSimulatorArm64Test :modules-core:iosSimulatorArm64Test :modules-runtime:iosSimulatorArm64Test --no-configuration-cache --console=plain
+        run: ./gradlew -p clients/kmp :network-storage-core:iosSimulatorArm64Test :network-storage-transports:iosSimulatorArm64Test :network-storage-presentation:iosSimulatorArm64Test :modules-core:iosSimulatorArm64Test :modules-runtime:iosSimulatorArm64Test :listen-together-core:iosSimulatorArm64Test --no-configuration-cache --console=plain
       - name: Build shared framework for simulator
         run: ./gradlew -p clients/kmp :shared:linkDebugFrameworkIosSimulatorArm64 --no-configuration-cache --console=plain
       - name: Boot the iPhone simulator

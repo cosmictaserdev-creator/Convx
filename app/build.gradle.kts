@@ -355,6 +355,7 @@ dependencies {
     implementation(project(":playback-core"))
     implementation(project(":playback-presentation"))
     implementation(project(":history-core"))
+    implementation(project(":listen-together-core"))
     implementation(project(":library-core"))
     implementation(project(":search-core"))
     implementation(project(":design-system"))

@@ -3,7 +3,7 @@ package com.convx.music.jam
 import kotlinx.coroutines.delay
 
 /** Waiting never starts a player. The caller rechecks ownership and projects the latest timeline afterward. */
-internal class JamPlaybackScheduler(
+class JamPlaybackScheduler(
     private val nowMs: () -> Long,
     private val sleep: suspend (Long) -> Unit = { delay(it) },
 ) {

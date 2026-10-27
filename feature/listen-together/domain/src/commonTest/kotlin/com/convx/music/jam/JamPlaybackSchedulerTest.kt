@@ -1,14 +1,14 @@
 package com.convx.music.jam
 
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import kotlinx.coroutines.test.runTest
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.test.Test
 
 class JamPlaybackSchedulerTest {
     @Test
-    fun replacingATrackWhileBufferingCancelsItsStart() = runBlocking {
+    fun replacingATrackWhileBufferingCancelsItsStart() = runTest {
         var now = 0L
         var current = true
         val scheduler = JamPlaybackScheduler({ now }) { elapsed -> now += elapsed; current = false }
@@ -16,7 +16,7 @@ class JamPlaybackSchedulerTest {
     }
 
     @Test
-    fun bufferingHasABoundedDeadline() = runBlocking {
+    fun bufferingHasABoundedDeadline() = runTest {
         var now = 0L
         val scheduler = JamPlaybackScheduler({ now }) { now += it }
         assertFalse(scheduler.awaitReady({ true }, { false }, timeoutMs = 250))
@@ -24,7 +24,7 @@ class JamPlaybackSchedulerTest {
     }
 
     @Test
-    fun slowResolutionCatchesUpToTheCurrentTimeline() = runBlocking {
+    fun slowResolutionCatchesUpToTheCurrentTimeline() = runTest {
         var now = 0L
         val playback = PartyPlayback(isPlaying = true, anchorMs = 350)
         val scheduler = JamPlaybackScheduler({ now }) { now += it }
@@ -34,7 +34,7 @@ class JamPlaybackSchedulerTest {
     }
 
     @Test
-    fun aPreparedTrackNeverStartsBeforeItsDeadline() = runBlocking {
+    fun aPreparedTrackNeverStartsBeforeItsDeadline() = runTest {
         var now = 0L
         val scheduler = JamPlaybackScheduler({ now }) { now += it }
         assertTrue(scheduler.awaitStart({ true }) { 750L - now })
@@ -42,7 +42,7 @@ class JamPlaybackSchedulerTest {
     }
 
     @Test
-    fun leavingWhileWaitingForScheduledStartCancelsIt() = runBlocking {
+    fun leavingWhileWaitingForScheduledStartCancelsIt() = runTest {
         var now = 0L
         var current = true
         val scheduler = JamPlaybackScheduler({ now }) { now += it; current = false }
