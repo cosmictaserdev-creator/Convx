@@ -1,11 +1,11 @@
 package com.convx.music.eq
 
+import com.convx.music.playback.EqualizerProfileParser
 import androidx.media3.common.C
 import androidx.media3.common.audio.AudioProcessor
 import com.convx.music.eq.audio.CustomEqualizerAudioProcessor
 import com.convx.music.eq.data.ParametricEQ
 import com.convx.music.eq.data.ParametricEQBand
-import com.convx.music.eq.data.ParametricEQParser
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -73,9 +73,9 @@ class CustomEqualizerAudioProcessorTest {
 
     @Test
     fun `non finite frequency gain and bandwidth are rejected`() {
-        assertTrue(ParametricEQParser.validate(ParametricEQ(0.0, listOf(ParametricEQBand(Double.NaN, 0.0)))).isNotEmpty())
-        assertTrue(ParametricEQParser.validate(ParametricEQ(0.0, listOf(ParametricEQBand(1000.0, Double.POSITIVE_INFINITY)))).isNotEmpty())
-        assertTrue(ParametricEQParser.validate(ParametricEQ(0.0, listOf(ParametricEQBand(1000.0, 0.0, Double.NaN)))).isNotEmpty())
+        assertTrue(EqualizerProfileParser.validate(ParametricEQ(0.0, listOf(ParametricEQBand(Double.NaN, 0.0)))).isNotEmpty())
+        assertTrue(EqualizerProfileParser.validate(ParametricEQ(0.0, listOf(ParametricEQBand(1000.0, Double.POSITIVE_INFINITY)))).isNotEmpty())
+        assertTrue(EqualizerProfileParser.validate(ParametricEQ(0.0, listOf(ParametricEQBand(1000.0, 0.0, Double.NaN)))).isNotEmpty())
     }
 
     private fun samples(vararg values: Int) = ByteBuffer.allocateDirect(values.size * 2).order(ByteOrder.nativeOrder()).apply {

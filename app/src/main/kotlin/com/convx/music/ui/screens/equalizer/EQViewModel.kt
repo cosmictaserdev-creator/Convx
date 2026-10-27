@@ -1,10 +1,10 @@
 package com.convx.music.ui.screens.equalizer
 
+import com.convx.music.playback.EqualizerProfileParser
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.eq.EqualizerService
 import com.convx.music.eq.data.EQProfileRepository
-import com.convx.music.eq.data.ParametricEQParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -99,9 +99,9 @@ class EQViewModel(
             try {
                 val content = inputStream.bufferedReader().use { it.readText() }
 
-                val parametricEQ = ParametricEQParser.parseText(content)
+                val parametricEQ = EqualizerProfileParser.parseText(content)
 
-                val validationErrors = ParametricEQParser.validate(parametricEQ)
+                val validationErrors = EqualizerProfileParser.validate(parametricEQ)
                 if (validationErrors.isNotEmpty()) {
                     onError(Exception("Invalid EQ file: ${validationErrors.first()}"))
                     return@launch
