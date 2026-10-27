@@ -18,17 +18,17 @@ core/                   Shared by every feature
 feature/<name>/         One folder per feature, split by layer
   domain/               Models and contracts, pure commonMain (:<name>-core)
   data/                 Implementations: network, Room, files (:<name>-data)
-  ui/                   State holders and Compose UI (:<name>-presentation)
+  presentation/         State holders and Compose UI (:<name>-presentation)
 
-canvas/ lyrics/ spine/ network-storage/ spotify/ integrations/ artwork/
+canvas/ spine/ network-storage/ spotify/ integrations/ artwork/
                         Android-only libraries the app still uses
 ```
 
-Features today: account, canvas, catalog, history, library, lyrics, modules, network-storage, playback, search.
+Features today: account, canvas, catalog, history, library, listen-together, lyrics, modules, network-storage, playback, search.
 
 ## Rules
 
-- Dependencies point `ui -> domain <- data`. `domain` never imports Android, Media3, Room, Java networking or NewPipe.
+- Dependencies point `presentation -> domain <- data`. `domain` never imports Android, Media3, Room, Java networking or NewPipe.
 - Platform work (stream resolution, playback engine, secure storage) sits behind a `domain` interface and is implemented per host.
 - Each host owns its Koin composition root. The Android app's list is `app/.../di/AppModules.kt`; `KoinGraphTest` fails the build when a binding is missing.
 - A fix in `core/` or `feature/*` reaches every client that depends on that module. A fix in `app/` reaches Android only.
@@ -40,4 +40,4 @@ Gradle project names did not change when the folders moved, so `project(":playba
 ## Not done yet
 
 - `clients/kmp` is still a second Gradle build with its own version catalog. Merge it into the root build once iOS CI is back as the safety net.
-- The Android-only libraries at the root (`lyrics/`, `canvas/`, ...) should fold into their `feature/` folders as they become multiplatform.
+- The Android-only libraries at the root (`canvas/`, `spine/`, ...) should fold into their `feature/` folders as they become multiplatform.
