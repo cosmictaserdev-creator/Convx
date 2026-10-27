@@ -132,7 +132,7 @@ Recheck the official compatibility table at implementation time. As of this plan
 
 ### Database and preferences
 
-Keep the Android DB name, schema, version, and migrations stable. Test upgrades from released schemas before changing Android persistence. Room 2.8.4 with bundled SQLite 2.6.2 is selected for new clients; it has a separate schema and is wired through `shared-kmp/data/library` behind common repository contracts.
+Keep the Android DB name, schema, version, and migrations stable. Test upgrades from released schemas before changing Android persistence. Room 2.8.4 with bundled SQLite 2.6.2 is selected for new clients; it has a separate schema and is wired through `feature/library/data` behind common repository contracts.
 
 1. Keep the shipping Android Room 2.8.4 database and current migration chain in the Android adapter.
 2. Evolve the new-client Room KMP schema only with checked-in snapshots and migration tests on Android, desktop, and iOS.

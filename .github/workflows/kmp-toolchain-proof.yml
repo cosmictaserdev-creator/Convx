@@ -4,9 +4,9 @@ on:
   pull_request:
     paths:
       - 'clients/kmp/**'
-      - 'shared-kmp/**'
+      - 'core/**'
+      - 'feature/**'
       - 'spine/**'
-      - 'hig/**'
       - 'shared/**'
       - 'iosApp/**'
       - 'desktopApp/**'
@@ -39,9 +39,9 @@ on:
     branches: ['**']
     paths:
       - 'clients/kmp/**'
-      - 'shared-kmp/**'
+      - 'core/**'
+      - 'feature/**'
       - 'spine/**'
-      - 'hig/**'
       - 'shared/**'
       - 'iosApp/**'
       - 'desktopApp/**'

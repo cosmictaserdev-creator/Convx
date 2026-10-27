@@ -154,8 +154,8 @@ jobs:
         with:
           name: android-network-tests-${{ github.run_number }}
           path: |
-            shared-kmp/domain/network-storage/build/reports/tests/
-            shared-kmp/data/network-storage/build/reports/tests/
+            feature/network-storage/domain/build/reports/tests/
+            feature/network-storage/data/build/reports/tests/
             app/build/reports/tests/testUniversalFossDebugUnitTest/
           if-no-files-found: ignore
           retention-days: 14
