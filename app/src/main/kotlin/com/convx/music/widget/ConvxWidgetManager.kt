@@ -45,18 +45,14 @@ import com.convx.music.R
 import com.convx.music.db.MusicDatabase
 import com.convx.music.lyrics.LyricsEntry
 import com.convx.music.lyrics.LyricsUtils
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ConvxWidgetManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+class ConvxWidgetManager(
+    private val context: Context,
     private val database: MusicDatabase
 ) {
     private val imageLoader by lazy {

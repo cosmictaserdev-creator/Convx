@@ -7,18 +7,19 @@ package com.convx.music.viewmodels
 
 import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase as AndroidSQLiteDatabase
 import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.convx.music.MainActivity
 import com.convx.music.R
 import com.convx.music.db.InternalDatabase
+import com.convx.music.db.INTERNAL_DATABASE_VERSION
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.ArtistEntity
 import com.convx.music.db.entities.Song
 import com.convx.music.db.entities.SongEntity
 import com.convx.music.extensions.div
-import com.convx.music.extensions.tryOrNull
 import com.convx.music.extensions.zipInputStream
 import com.convx.music.extensions.zipOutputStream
 import com.convx.music.playback.MusicService
@@ -27,15 +28,14 @@ import com.convx.music.playback.MusicService.Companion.PERSISTENT_PLAYBACK_SNAPS
 import com.convx.music.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
 import com.convx.music.playback.MusicService.Companion.PERSISTENT_PLAYER_STATE_FILE
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.InputStream
+import java.nio.file.Files
 import java.util.zip.ZipEntry
-import javax.inject.Inject
 import kotlin.system.exitProcess
 
 data class CsvImportState(
@@ -51,8 +51,7 @@ data class ConvertedSongLog(
     val artists: String,
 )
 
-@HiltViewModel
-class BackupRestoreViewModel @Inject constructor(
+class BackupRestoreViewModel(
     val database: MusicDatabase,
 ) : ViewModel() {
     fun backup(context: Context, uri: Uri) {
@@ -90,79 +89,177 @@ class BackupRestoreViewModel @Inject constructor(
     }
 
     fun restore(context: Context, uri: Uri) {
+        var databaseClosed = false
+        var restoreCommitted = false
         runCatching {
             Timber.tag("RESTORE").i("Starting restore from URI: $uri")
-            context.applicationContext.contentResolver.openInputStream(uri)?.use { raw ->
-                raw.zipInputStream().use { inputStream ->
-                    var entry = tryOrNull { inputStream.nextEntry } // prevent ZipException
-                    var foundAny = false
-                    while (entry != null) {
-                        Timber.tag("RESTORE").i("Found zip entry: ${entry.name}")
-                        if (restoreArchiveEntry(entry.name, inputStream, context)) foundAny = true
-                        entry = tryOrNull { inputStream.nextEntry } // prevent ZipException
-                    }
-                    if (!foundAny) {
-                        Timber.tag("RESTORE").w("No expected entries found in archive")
+            val appContext = context.applicationContext
+            val databaseFile = File(database.openHelper.writableDatabase.path)
+            val stagedFiles = linkedMapOf<File, StagedFileReplacement>()
+            try {
+                val raw = appContext.contentResolver.openInputStream(uri)
+                    ?: error("Could not open backup archive")
+                raw.use { archive ->
+                    archive.zipInputStream().use { inputStream ->
+                        var entry = inputStream.nextEntry
+                        while (entry != null) {
+                            Timber.tag("RESTORE").i("Found zip entry: ${entry.name}")
+                            stageArchiveEntry(
+                                entryName = entry.name,
+                                inputStream = inputStream,
+                                context = appContext,
+                                databaseFile = databaseFile,
+                                stagedFiles = stagedFiles,
+                            )
+                            inputStream.closeEntry()
+                            entry = inputStream.nextEntry
+                        }
                     }
                 }
-            } ?: run {
-                Timber.tag("RESTORE").e("Could not open input stream for uri: $uri")
+
+                check(stagedFiles.isNotEmpty()) { "Backup archive contains no supported files" }
+                val settingsFile = appContext.filesDir.resolve("datastore").resolve(SETTINGS_FILENAME)
+                stagedFiles[settingsFile.canonicalFile]?.let {
+                    BackupArchiveStagedSettingsValidator.validate(it.stagedFile)
+                }
+                stagedFiles.values.firstOrNull { it.destinationFile.canonicalFile == databaseFile.canonicalFile }
+                    ?.let { validateStagedDatabase(appContext, it.stagedFile) }
+
+                if (stagedFiles.values.any { it.destinationFile.canonicalFile == databaseFile.canonicalFile }) {
+                    appContext.stopService(Intent(appContext, MusicService::class.java))
+                    runBlocking(Dispatchers.IO) { database.checkpoint() }
+                    com.convx.music.utils.CrashHandler.databaseCloseExpected = true
+                    databaseClosed = true
+                    database.close()
+                    deleteDatabaseSidecars(databaseFile, required = true)
+                }
+
+                AtomicFileReplacement.commit(stagedFiles.values.toList())
+                restoreCommitted = true
+            } finally {
+                stagedFiles.values.forEach { replacement ->
+                    replacement.stagedFile.delete()
+                    if (replacement.destinationFile.canonicalFile == databaseFile.canonicalFile) {
+                        deleteDatabaseSidecars(replacement.stagedFile)
+                    }
+                }
             }
 
-            context.stopService(Intent(context, MusicService::class.java))
-            context.filesDir.resolve(PERSISTENT_QUEUE_FILE).delete()
-            context.filesDir.resolve(PERSISTENT_AUTOMIX_FILE).delete()
-            context.filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE).delete()
-            context.filesDir.resolve(PERSISTENT_PLAYBACK_SNAPSHOT_FILE).delete()
-            context.startActivity(Intent(context, MainActivity::class.java))
+            appContext.stopService(Intent(appContext, MusicService::class.java))
+            clearPersistedPlaybackState(appContext)
+            restartApplication(appContext)
             exitProcess(0)
         }.onFailure {
             reportException(it)
             Timber.tag("RESTORE").e(it, "Restore failed")
             Toast.makeText(context, R.string.restore_failed, Toast.LENGTH_SHORT).show()
+            if (databaseClosed || restoreCommitted) {
+                restartApplication(context.applicationContext)
+                exitProcess(0)
+            }
         }
     }
 
-    private fun restoreArchiveEntry(
+    private fun stageArchiveEntry(
         entryName: String,
         inputStream: InputStream,
         context: Context,
-    ): Boolean = when (entryName) {
-        SETTINGS_FILENAME -> {
-            Timber.tag("RESTORE").i("Restoring settings to datastore")
-            (context.filesDir / "datastore" / SETTINGS_FILENAME).outputStream().use { outputStream ->
-                inputStream.copyTo(outputStream)
-            }
-            true
-        }
-
-        InternalDatabase.DB_NAME -> {
-            Timber.tag("RESTORE").i("Restoring DB (entry = $entryName)")
-            // Capture the path before closing Room.
-            val dbPath = database.openHelper.writableDatabase.path
-            runBlocking(Dispatchers.IO) { database.checkpoint() }
-            // Mark shutdown as expected so active Flow collectors do not report a crash.
-            com.convx.music.utils.CrashHandler.databaseCloseExpected = true
-            database.close()
-            Timber.tag("RESTORE").i("Overwriting DB at path: $dbPath")
-            FileOutputStream(dbPath).use { outputStream -> inputStream.copyTo(outputStream) }
-            Timber.tag("RESTORE").i("DB overwrite complete")
-            true
-        }
-
-        else -> {
-            if (!entryName.startsWith("$HOME_BACKGROUND_ZIP_DIR/")) {
-                Timber.tag("RESTORE").i("Skipping unexpected entry: $entryName")
-                false
-            } else {
-                Timber.tag("RESTORE").i("Restoring home background file: $entryName")
-                val fileName = entryName.removePrefix("$HOME_BACKGROUND_ZIP_DIR/")
-                context.filesDir.resolve(fileName).outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
+        databaseFile: File,
+        stagedFiles: MutableMap<File, StagedFileReplacement>,
+    ) {
+        val destinationFile = when (entryName) {
+            SETTINGS_FILENAME -> context.filesDir.resolve("datastore").resolve(SETTINGS_FILENAME)
+            InternalDatabase.DB_NAME -> databaseFile
+            else -> {
+                if (!entryName.startsWith("$HOME_BACKGROUND_ZIP_DIR/")) {
+                    Timber.tag("RESTORE").i("Skipping unexpected entry: $entryName")
+                    return
                 }
-                true
+                val fileName = BackupArchiveEntryPolicy.backgroundFileName(entryName)
+                if (fileName == null) {
+                    Timber.tag("RESTORE").w("Skipping invalid home background entry: $entryName")
+                    return
+                }
+                context.filesDir.resolve(fileName)
             }
         }
+
+        val canonicalDestination = destinationFile.canonicalFile
+        val replacement = stagedFiles[canonicalDestination] ?: run {
+            val parent = canonicalDestination.parentFile ?: error("Restore destination has no parent")
+            check(parent.isDirectory || parent.mkdirs()) { "Could not create restore directory: $parent" }
+            val stagedFile = Files.createTempFile(
+                parent.toPath(),
+                "convx-restore-${canonicalDestination.name}-",
+                ".staged",
+            ).toFile()
+            StagedFileReplacement(stagedFile, canonicalDestination).also {
+                stagedFiles[canonicalDestination] = it
+            }
+        }
+
+        Timber.tag("RESTORE").i("Staging archive entry: $entryName")
+        replacement.stagedFile.outputStream().buffered().use { outputStream ->
+            inputStream.copyTo(outputStream)
+        }
+    }
+
+    private fun validateStagedDatabase(context: Context, stagedFile: File) {
+        val source = AndroidSQLiteDatabase.openDatabase(
+            stagedFile.absolutePath,
+            null,
+            AndroidSQLiteDatabase.OPEN_READONLY,
+        )
+        val sourceVersion = try {
+            source.version
+        } finally {
+            source.close()
+        }
+        require(sourceVersion in 1..INTERNAL_DATABASE_VERSION) {
+            "Unsupported backup database version: $sourceVersion"
+        }
+
+        val stagedDatabase = InternalDatabase.newInstance(
+            context = context,
+            databaseName = stagedFile.name,
+            allowDestructiveMigrationOnDowngrade = false,
+        )
+        try {
+            val migratedVersion = stagedDatabase.openHelper.writableDatabase.version
+            check(migratedVersion == INTERNAL_DATABASE_VERSION) {
+                "Backup database did not migrate to version $INTERNAL_DATABASE_VERSION"
+            }
+            runBlocking(Dispatchers.IO) { stagedDatabase.checkpoint() }
+        } finally {
+            stagedDatabase.close()
+        }
+    }
+
+    private fun deleteDatabaseSidecars(databaseFile: File, required: Boolean = false) {
+        listOf("-wal", "-shm", "-journal").forEach { suffix ->
+            val sidecar = File(databaseFile.absolutePath + suffix)
+            if (sidecar.exists()) {
+                val deleted = sidecar.delete()
+                check(deleted || !sidecar.exists() || !required) {
+                    "Could not remove database sidecar: $sidecar"
+                }
+            }
+        }
+    }
+
+    private fun clearPersistedPlaybackState(context: Context) {
+        context.filesDir.resolve(PERSISTENT_QUEUE_FILE).delete()
+        context.filesDir.resolve(PERSISTENT_AUTOMIX_FILE).delete()
+        context.filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE).delete()
+        context.filesDir.resolve(PERSISTENT_PLAYBACK_SNAPSHOT_FILE).delete()
+    }
+
+    private fun restartApplication(context: Context) {
+        context.startActivity(
+            Intent(context, MainActivity::class.java).addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK,
+            ),
+        )
     }
 
     fun previewCsvFile(context: Context, uri: Uri): CsvImportState {

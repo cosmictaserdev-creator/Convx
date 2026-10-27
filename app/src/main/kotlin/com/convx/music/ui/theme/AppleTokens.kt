@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import com.convx.music.ui.ios.compat.LocalContentColor
+import com.convx.music.designsystem.ConvxDesignTokens
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -18,13 +19,13 @@ import androidx.compose.ui.unit.sp
  * Apple Music design tokens — single source of truth for colors, shapes, motion, and contrast helpers.
  */
 object AppleTokens {
-    val AccentRed = Color(0xFFFA2D48)
+    val AccentRed = ConvxDesignTokens.Colors.AccentRed
 
     // Surfaces — Apple-style soft dark greys, not pure black (pure black is an OLED opt-in via PureBlack).
-    val Bg = Color(0xFF121212)
-    val BgElevated = Color(0xFF1A1A1A)
-    val Card = Color(0xFF1C1C1E)
-    val CardSecondary = Color(0xFF2C2C2E)
+    val Bg = ConvxDesignTokens.Colors.Background
+    val BgElevated = ConvxDesignTokens.Colors.BackgroundElevated
+    val Card = ConvxDesignTokens.Colors.Card
+    val CardSecondary = ConvxDesignTokens.Colors.CardSecondary
 
     /**
      * Hairline rule derived from the current content color, so it stays visible on light and
@@ -38,39 +39,39 @@ object AppleTokens {
         @Composable get() = LocalMetadataColor.current
 
     /** Horizontal screen gutter. The only gutter. */
-    val Gutter = 20.dp
+    val Gutter = ConvxDesignTokens.Metrics.ContentGutter
     /** Gap between siblings in a grid or list. */
-    val ItemGap = 16.dp
+    val ItemGap = ConvxDesignTokens.Metrics.ItemGap
     /** Gap between a section and the next section's header. */
-    val SectionGap = 24.dp
+    val SectionGap = ConvxDesignTokens.Metrics.SectionGap
     /** Gap between stacked text lines inside one item. */
-    val TextGap = 2.dp
+    val TextGap = ConvxDesignTokens.Metrics.TextGap
 
     // Type scale — design-pinned sizes, not Material scale: tile-grid alignment depends on title/subtitle matching exactly.
 
     // Each size carries its own line height — Compose's derived leading lands taller than the design at every step.
 
     /** Screen title ("Listen Now"). */
-    val TitleLarge = 34.sp
-    val TitleLargeLineHeight = 41.sp
+    val TitleLarge = ConvxDesignTokens.Type.ScreenTitle
+    val TitleLargeLineHeight = ConvxDesignTokens.Type.ScreenTitleLineHeight
     /** Section header ("Recently Played"). */
-    val SectionHeader = 22.sp
-    val SectionHeaderLineHeight = 28.sp
+    val SectionHeader = ConvxDesignTokens.Type.SectionHeader
+    val SectionHeaderLineHeight = ConvxDesignTokens.Type.SectionHeaderLineHeight
     /** Tile title and list-row primary text. */
-    val ItemTitle = 15.sp
-    val ItemTitleLineHeight = 20.sp
+    val ItemTitle = ConvxDesignTokens.Type.ItemTitle
+    val ItemTitleLineHeight = ConvxDesignTokens.Type.ItemTitleLineHeight
     /** Tile subtitle, row metadata. */
-    val ItemSubtitle = 13.sp
-    val ItemSubtitleLineHeight = 18.sp
+    val ItemSubtitle = ConvxDesignTokens.Type.ItemSubtitle
+    val ItemSubtitleLineHeight = ConvxDesignTokens.Type.ItemSubtitleLineHeight
     /** Speed dial captions. */
-    val Caption = 12.sp
-    val CaptionLineHeight = 16.sp
+    val Caption = ConvxDesignTokens.Type.Caption
+    val CaptionLineHeight = ConvxDesignTokens.Type.CaptionLineHeight
 
     // Shapes — four corners, no more. All continuous (squircle) curvature — see [AppShapes].
-    val Artwork = 8.dp
+    val Artwork = ConvxDesignTokens.Metrics.ArtworkCorner
     val Control = 8.dp
-    val CardCorner = 14.dp
-    val CardCornerLarge = 18.dp
+    val CardCorner = ConvxDesignTokens.Metrics.CardCorner
+    val CardCornerLarge = ConvxDesignTokens.Metrics.LargeCardCorner
 
     // Motion — modelled on SwiftUI `.smooth` (0.5s natural period, zero bounce).
     // Compose takes stiffness where SwiftUI takes a period: stiffness = (2*pi / period)^2.

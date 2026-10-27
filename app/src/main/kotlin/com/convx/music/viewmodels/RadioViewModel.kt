@@ -7,17 +7,13 @@ import com.convx.music.constants.HideExplicitKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.Song
 import com.convx.music.utils.dataStore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 
-@HiltViewModel
-class RadioViewModel @Inject constructor(
-    @ApplicationContext context: Context,
+class RadioViewModel(
+    context: Context,
     database: MusicDatabase,
 ) : ViewModel() {
     val recentStations = combine(

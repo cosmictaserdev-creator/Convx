@@ -51,7 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -89,8 +89,8 @@ private const val ACTIVITY_SHOWN = 6
 /** Listen together: one code, everyone hears the same song at the same moment. */
 @Composable
 fun JamScreen(navController: NavController, asTab: Boolean = false) {
-    val viewModel: JamViewModel = hiltViewModel()
-    val homeViewModel: HomeViewModel = hiltViewModel()
+    val viewModel: JamViewModel = koinViewModel()
+    val homeViewModel: HomeViewModel = koinViewModel()
     val session by viewModel.session.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()

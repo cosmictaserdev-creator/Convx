@@ -5,108 +5,134 @@
 
 package com.convx.music.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.convx.music.constants.HideVideoSongsKey
-import com.convx.music.constants.DataSaverEnabledKey
-import com.convx.music.constants.PlaylistSongSortDescendingKey
-import com.convx.music.constants.PlaylistSongSortType
-import com.convx.music.constants.PlaylistSongSortTypeKey
-import com.convx.music.db.MusicDatabase
-import com.convx.music.db.entities.PlaylistSong
-import com.convx.music.extensions.reversed
-import com.convx.music.extensions.toEnum
+import com.convx.music.library.PlaylistCommands
+import com.convx.music.library.ObservePlaylist
+import com.convx.music.library.PlaylistEntryReference
+import com.convx.music.library.LocalPlaylistSongDataSource
+import com.convx.music.library.LocalPlaylistSong
+import com.convx.music.library.PlaylistDisplayPreferences
+import com.convx.music.library.PlaylistDisplayPreferencesRepository
+import com.convx.music.library.PendingPlaylistDeletionRepository
+import com.convx.music.library.PlaylistTrack
+import com.convx.music.library.PlaylistTrackOrder
+import com.convx.music.library.orderPlaylistTracks
 import com.convx.music.utils.SyncUtils
-import com.convx.music.utils.dataStore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.music.innertube.YouTube
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.Collator
 import java.util.Locale
-import javax.inject.Inject
 
-@HiltViewModel
-class LocalPlaylistViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
-    database: MusicDatabase,
+class LocalPlaylistViewModel(
+    localPlaylistSongDataSource: LocalPlaylistSongDataSource,
+    private val playlistDisplayPreferencesRepository: PlaylistDisplayPreferencesRepository,
+    private val pendingPlaylistDeletionRepository: PendingPlaylistDeletionRepository,
+    private val playlistCommands: PlaylistCommands,
+    private val observePlaylist: ObservePlaylist,
     private val syncUtils: SyncUtils,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val playlistId = requireNotNull(savedStateHandle.get<String>("playlistId")) { "Missing playlistId" }
     val thumbArg = savedStateHandle.get<String>("thumb")?.takeIf { it.isNotEmpty() }
-    val playlist =
-        database
-            .playlist(playlistId)
-            .stateIn(viewModelScope, SharingStarted.Lazily, null)
-    val playlistSongs: StateFlow<List<PlaylistSong>> =
+    val playlistDetail = observePlaylist(playlistId)
+        .stateIn(viewModelScope, SharingStarted.Lazily, null)
+    val playlistDisplayPreferences = playlistDisplayPreferencesRepository.observe()
+        .stateIn(viewModelScope, SharingStarted.Lazily, PlaylistDisplayPreferences())
+    val playlistSongs: StateFlow<List<LocalPlaylistSong>> =
         combine(
-            database.playlistSongs(playlistId),
-            context.dataStore.data
-                .map {
-                    Triple(
-                        it[PlaylistSongSortTypeKey].toEnum(PlaylistSongSortType.CUSTOM),
-                        it[PlaylistSongSortDescendingKey] ?: true,
-                        (it[HideVideoSongsKey] ?: false) || (it[DataSaverEnabledKey] ?: false)
-                    )
-                }.distinctUntilChanged(),
-        ) { songs, (sortType, sortDescending, hideVideoSongs) ->
-            val filteredSongs = if (hideVideoSongs) {
-                songs.filter { !it.song.song.isVideo }
-            } else {
-                songs
+            localPlaylistSongDataSource.observeSongs(playlistId),
+            playlistDisplayPreferences,
+        ) { songs, preferences ->
+            val collator = Collator.getInstance(Locale.getDefault()).apply {
+                strength = Collator.PRIMARY
             }
-            when (sortType) {
-                PlaylistSongSortType.CUSTOM -> filteredSongs
-                PlaylistSongSortType.CREATE_DATE -> filteredSongs.sortedBy { it.map.id }
-                PlaylistSongSortType.NAME -> {
-                    val collator = Collator.getInstance(Locale.getDefault())
-                    collator.strength = Collator.PRIMARY
-                    filteredSongs.sortedWith(compareBy(collator) { it.song.song.title })
-                }
-                PlaylistSongSortType.ARTIST -> {
-                    val collator = Collator.getInstance(Locale.getDefault())
-                    collator.strength = Collator.PRIMARY
-                    filteredSongs
-                        .sortedWith(compareBy(collator) { song -> song.song.artists.joinToString("") { it.name } })
-                        .groupBy { it.song.album?.title }
-                        .flatMap { (_, songsByAlbum) ->
-                            songsByAlbum.sortedBy {
-                                it.song.artists.joinToString(
-                                    ""
-                                ) { it.name }
-                            }
-                        }
-                }
-
-                PlaylistSongSortType.PLAY_TIME -> filteredSongs.sortedBy { it.song.song.totalPlayTime }
-            }.reversed(sortDescending && sortType != PlaylistSongSortType.CUSTOM)
+            val orderedEntryIds = orderPlaylistTracks(
+                tracks = songs.map(LocalPlaylistSong::track),
+                order = preferences.order,
+                descending = preferences.descending,
+                hideVideos = preferences.hideVideos,
+                compareText = { first, second -> collator.compare(first, second) },
+            ).map(PlaylistTrack::entryId)
+            val songsByEntryId = songs.associateBy { it.track.entryId }
+            orderedEntryIds.mapNotNull(songsByEntryId::get)
         }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun setPlaylistTrackOrder(order: PlaylistTrackOrder) {
+        viewModelScope.launch { playlistDisplayPreferencesRepository.setOrder(order) }
+    }
+
+    fun setPlaylistTrackDescending(descending: Boolean) {
+        viewModelScope.launch { playlistDisplayPreferencesRepository.setDescending(descending) }
+    }
 
     init {
         refresh()
 
-        viewModelScope.launch {
-            // Normalize the stored custom order, not the current display order. The
-            // latter may be sorted by title/artist and would overwrite positions.
-            val sortedSongs = database.playlistSongs(playlistId).first()
-                .sortedWith(compareBy({ it.map.position }, { it.map.id }))
-            database.transaction {
-                sortedSongs.forEachIndexed { index, playlistSong ->
-                    if (playlistSong.map.position != index) {
-                        update(playlistSong.map.copy(position = index))
-                    }
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            playlistCommands.normalizePlaylistSongPositions(playlistId)
+        }
+    }
+
+    fun updatePlaylist(name: String, description: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (playlistCommands.updatePlaylist(playlistId, name, description)) {
+                observePlaylist(playlistId).first()?.browseId?.let { YouTube.renamePlaylist(it, name) }
+            }
+        }
+    }
+
+    fun deletePlaylist() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val browseId = observePlaylist(playlistId).first()?.browseId
+            if (!playlistCommands.deletePlaylist(playlistId) || browseId == null) return@launch
+            // Record remote deletion before the request so a concurrent saved-playlist
+            // sync cannot restore the row while the request is in flight.
+            pendingPlaylistDeletionRepository.recordPendingDelete(browseId)
+            YouTube.deletePlaylist(browseId)
+        }
+    }
+
+    fun clearPlaylistSongs() {
+        viewModelScope.launch(Dispatchers.IO) {
+            playlistCommands.clearPlaylistSongs(playlistId)
+        }
+    }
+
+    fun movePlaylistSong(fromPosition: Int, toPosition: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val order = playlistCommands.movePlaylistSong(playlistId, fromPosition, toPosition)
+            val browseId = observePlaylist(playlistId).first()?.browseId ?: return@launch
+            val successorIndex = if (fromPosition > toPosition) toPosition else toPosition + 1
+            val successorSetVideoId = order.getOrNull(successorIndex)?.setVideoId
+            order.getOrNull(fromPosition)?.setVideoId?.let { setVideoId ->
+                YouTube.moveSongPlaylist(browseId, setVideoId, successorSetVideoId)
+            }
+        }
+    }
+
+    fun removePlaylistSong(entryId: Int, songId: String, position: Int, setVideoId: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val removal = playlistCommands.removePlaylistSong(
+                PlaylistEntryReference(
+                    playlistId = playlistId,
+                    id = entryId.toString(),
+                    songId = songId,
+                    position = position,
+                    setVideoId = setVideoId,
+                ),
+            )
+            if (!removal.removed) return@launch
+            val browseId = observePlaylist(playlistId).first()?.browseId ?: return@launch
+            removal.setVideoId?.let { setVideoId ->
+                YouTube.removeFromPlaylist(browseId, songId, setVideoId)
             }
         }
     }
@@ -117,7 +143,7 @@ constructor(
      */
     fun refresh() {
         viewModelScope.launch {
-            playlist.first { it != null }?.playlist?.browseId?.let { browseId ->
+            observePlaylist(playlistId).first()?.browseId?.let { browseId ->
                 syncUtils.syncPlaylist(browseId, playlistId)
             }
         }

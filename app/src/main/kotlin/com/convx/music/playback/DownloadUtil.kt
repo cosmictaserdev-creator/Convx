@@ -37,15 +37,12 @@ import com.convx.music.constants.AudioQualityKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.FormatEntity
 import com.convx.music.db.entities.SongEntity
-import com.convx.music.di.DownloadCache
-import com.convx.music.di.PlayerCache
 import com.convx.music.ui.utils.resize
 import com.convx.music.constants.AutoDownloadOnLikeKey
 import com.convx.music.constants.SaveDownloadsToMusicFolderKey
 import com.convx.music.utils.YTPlayerUtils
 import com.convx.music.utils.enumPreference
 import com.convx.music.utils.get
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -77,19 +74,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import java.util.concurrent.Executor
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @UnstableApi
-@Singleton
-class DownloadUtil
-@Inject
-constructor(
-    @ApplicationContext context: Context,
+class DownloadUtil(
+    context: Context,
     val database: MusicDatabase,
     val databaseProvider: DatabaseProvider,
-    @DownloadCache val downloadCache: SimpleCache,
-    @PlayerCache val playerCache: SimpleCache,
+    val downloadCache: SimpleCache,
+    val playerCache: SimpleCache,
     private val lyricsHelper: com.convx.music.lyrics.LyricsHelper,
 ) {
     private val connectivityManager = context.getSystemService<ConnectivityManager>()!!

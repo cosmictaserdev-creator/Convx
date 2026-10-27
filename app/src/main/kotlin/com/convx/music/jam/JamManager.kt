@@ -22,7 +22,7 @@ import com.convx.music.listentogether.JamMediaRecovery
 import com.convx.music.models.MediaMetadata
 import com.convx.music.playback.PlayerConnection
 import com.convx.music.playback.queues.ListQueue
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.convx.music.di.ValueProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -53,8 +53,6 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import timber.log.Timber
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -77,11 +75,10 @@ data class JamSession(
 
 enum class JamLocalPlayback { PREPARING, SCHEDULED, PLAYING, PAUSED, RECOVERING, LOCALLY_PAUSED, UNAVAILABLE }
 
-@Singleton
-class JamManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+class JamManager(
+    private val context: Context,
     private val bridge: ListenTogetherPlayerConnectionBridge,
-    private val classic: dagger.Lazy<com.convx.music.listentogether.ListenTogetherManager>,
+    private val classic: ValueProvider<com.convx.music.listentogether.ListenTogetherManager>,
 ) {
     companion object {
         private const val TAG = "Jam"

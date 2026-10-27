@@ -16,6 +16,7 @@ import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import com.convx.music.db.MusicDatabase
 import com.convx.music.extensions.currentMetadata
 import com.convx.music.extensions.getCurrentQueueIndex
@@ -23,6 +24,7 @@ import com.convx.music.extensions.getQueueWindows
 import com.convx.music.extensions.metadata
 import com.convx.music.extensions.togglePlayPause
 import com.convx.music.playback.MusicService.MusicBinder
+import com.convx.music.playback.PlaybackRepeatMode
 import com.convx.music.constants.AskBeforeReplacingQueueKey
 import com.convx.music.playback.queues.ListQueue
 import com.convx.music.playback.queues.Queue
@@ -33,9 +35,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -56,7 +61,7 @@ class PlayerConnection(
     binder: MusicBinder,
     val database: MusicDatabase,
     scope: CoroutineScope,
-) : Player.Listener {
+) : Player.Listener, PlaybackController {
     private val connectionJob = SupervisorJob(scope.coroutineContext[Job])
     private val scope = CoroutineScope(scope.coroutineContext + connectionJob)
     private companion object {
@@ -65,6 +70,7 @@ class PlayerConnection(
     }
 
     val service = binder.service
+    override val sleepTimer: PlaybackSleepTimer get() = service.sleepTimer.sharedPolicy
     private val appContext = context.applicationContext
     private val playerReadinessFlow = service.isPlayerReady
     
@@ -196,6 +202,11 @@ class PlayerConnection(
     val canSkipPrevious = MutableStateFlow(true)
     val canSkipNext = MutableStateFlow(true)
 
+    private val mutablePlaybackSnapshot = MutableStateFlow(PlaybackSnapshot.EMPTY)
+    override val playbackSnapshot: StateFlow<PlaybackSnapshot> = mutablePlaybackSnapshot.asStateFlow()
+    private val mutableQueueSnapshot = MutableStateFlow(PlaybackQueueSnapshot.EMPTY)
+    override val queueSnapshot: StateFlow<PlaybackQueueSnapshot> = mutableQueueSnapshot.asStateFlow()
+
     val requestShowLyrics = MutableStateFlow(false)
     val requestShowQueue = MutableStateFlow(false)
 
@@ -230,6 +241,16 @@ class PlayerConnection(
                  updateAttachedPlayer(player)
             }
 
+            scope.launch {
+                while (true) {
+                    publishPlaybackSnapshot()
+                    val castHandler = service.castConnectionHandler
+                    val castIsPlaying = castHandler?.isCasting?.value == true &&
+                        castHandler.castIsPlaying.value
+                    delay(if (attachedPlayer?.isPlaying == true || castIsPlaying) 250L else 1_000L)
+                }
+            }
+
             Timber.tag(TAG).d("PlayerConnection flow observer registered")
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Failed to initialize PlayerConnection listener or state")
@@ -252,6 +273,9 @@ class PlayerConnection(
         currentMediaItemIndex.value = newPlayer.currentMediaItemIndex
         shuffleModeEnabled.value = newPlayer.shuffleModeEnabled
         repeatMode.value = newPlayer.repeatMode
+        publishQueueSnapshot(newPlayer)
+        updateCanSkipPreviousAndNext()
+        publishPlaybackSnapshot()
         
         Timber.tag(TAG).d("Attached to new player instance: $newPlayer")
     }
@@ -410,7 +434,7 @@ class PlayerConnection(
     /**
      * Toggle play/pause - handles Cast when active
      */
-    fun togglePlayPause() {
+    override fun togglePlayPause() {
         try {
             val castHandler = service.castConnectionHandler
             if (castHandler?.isCasting?.value == true) {
@@ -430,7 +454,7 @@ class PlayerConnection(
     /**
      * Start playback - handles Cast when active
      */
-    fun play() {
+    override fun play() {
         try {
             val castHandler = service.castConnectionHandler
             if (castHandler?.isCasting?.value == true) {
@@ -451,7 +475,7 @@ class PlayerConnection(
     /**
      * Pause playback - handles Cast when active
      */
-    fun pause() {
+    override fun pause() {
         try {
             val castHandler = service.castConnectionHandler
             if (castHandler?.isCasting?.value == true) {
@@ -467,16 +491,129 @@ class PlayerConnection(
     /**
      * Seek to position - handles Cast when active
      */
-    fun seekTo(position: Long) {
+    override fun seekTo(positionMs: Long) {
         try {
             val castHandler = service.castConnectionHandler
             if (castHandler?.isCasting?.value == true) {
-                castHandler.seekTo(position)
+                castHandler.seekTo(positionMs)
             } else {
-                player.seekTo(position)
+                player.seekTo(positionMs)
             }
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Error in seekTo")
+        }
+    }
+
+    override fun setRepeatMode(mode: PlaybackRepeatMode) {
+        try {
+            player.repeatMode = when (mode) {
+                PlaybackRepeatMode.OFF -> Player.REPEAT_MODE_OFF
+                PlaybackRepeatMode.ONE -> Player.REPEAT_MODE_ONE
+                PlaybackRepeatMode.ALL -> Player.REPEAT_MODE_ALL
+            }
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error in setRepeatMode")
+        }
+    }
+
+    override fun setShuffleEnabled(enabled: Boolean) {
+        try {
+            player.shuffleModeEnabled = enabled
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error in setShuffleEnabled")
+        }
+    }
+
+    override fun moveQueueItem(fromIndex: Int, toIndex: Int) {
+        if (playbackLockedByRoom) {
+            playbackBlockedByRoom.value = true
+            return
+        }
+        try {
+            val currentPlayer = player
+            if (
+                fromIndex !in 0 until currentPlayer.mediaItemCount ||
+                toIndex !in 0 until currentPlayer.mediaItemCount ||
+                fromIndex == toIndex
+            ) return
+            if (currentPlayer.shuffleModeEnabled) {
+                val indices = currentPlayer.getQueueWindows().map { it.firstPeriodIndex }
+                val movedIndices = moveQueueIndices(indices, fromIndex, toIndex)
+                currentPlayer.setShuffleOrder(
+                    DefaultShuffleOrder(movedIndices.toIntArray(), System.currentTimeMillis()),
+                )
+            } else {
+                currentPlayer.moveMediaItem(fromIndex, toIndex)
+            }
+            publishQueueSnapshot(currentPlayer)
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error moving queue item from $fromIndex to $toIndex")
+        }
+    }
+
+    override fun removeQueueItem(index: Int) {
+        if (playbackLockedByRoom) {
+            playbackBlockedByRoom.value = true
+            return
+        }
+        try {
+            val currentPlayer = player
+            if (index in 0 until currentPlayer.mediaItemCount) {
+                currentPlayer.removeMediaItem(index)
+                publishQueueSnapshot(currentPlayer)
+            }
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error removing queue item at $index")
+        }
+    }
+
+    override fun removeQueueItemsAfterCurrent() {
+        if (playbackLockedByRoom) {
+            playbackBlockedByRoom.value = true
+            return
+        }
+        try {
+            val currentPlayer = player
+            val firstRemovedIndex = currentPlayer.currentMediaItemIndex + 1
+            if (firstRemovedIndex < currentPlayer.mediaItemCount) {
+                currentPlayer.removeMediaItems(firstRemovedIndex, currentPlayer.mediaItemCount)
+            }
+            publishQueueSnapshot(currentPlayer)
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error removing queue items after the current item")
+        }
+    }
+
+    override fun playQueueItem(index: Int) {
+        if (playbackLockedByRoom) {
+            playbackBlockedByRoom.value = true
+            return
+        }
+        try {
+            val currentPlayer = player
+            if (index !in 0 until currentPlayer.mediaItemCount) return
+            currentPlayer.seekTo(index, 0L)
+            if (currentPlayer.playbackState == Player.STATE_IDLE || currentPlayer.playbackState == Player.STATE_ENDED) {
+                currentPlayer.prepare()
+            }
+            currentPlayer.playWhenReady = true
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error playing queue item at $index")
+        }
+    }
+
+    /** Restores a removed Android media item for the queue screen's undo action. */
+    fun restoreQueueItem(item: MediaItem, targetIndex: Int) {
+        if (playbackLockedByRoom) {
+            playbackBlockedByRoom.value = true
+            return
+        }
+        try {
+            player.addMediaItem(item)
+            val appendedIndex = player.mediaItemCount - 1
+            moveQueueItem(appendedIndex, targetIndex.coerceIn(0, appendedIndex))
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error restoring queue item at $targetIndex")
         }
     }
 
@@ -484,7 +621,7 @@ class PlayerConnection(
     private var skipCommitJob: kotlinx.coroutines.Job? = null
 
     /** Coalesces rapid transport taps into one timeline jump. */
-    fun requestSkip(forward: Boolean) {
+    override fun requestSkip(forward: Boolean) {
         pendingSkip += if (forward) 1 else -1
         skipCommitJob?.cancel()
         skipCommitJob = scope.launch {
@@ -592,6 +729,7 @@ class PlayerConnection(
     override fun onPlaybackStateChanged(state: Int) {
         playbackState.value = state
         error.value = player.playerError
+        publishPlaybackSnapshot()
     }
 
     override fun onPlayWhenReadyChanged(
@@ -599,6 +737,19 @@ class PlayerConnection(
         reason: Int,
     ) {
         playWhenReady.value = newPlayWhenReady
+        publishPlaybackSnapshot()
+    }
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        publishPlaybackSnapshot()
+    }
+
+    override fun onPositionDiscontinuity(
+        oldPosition: Player.PositionInfo,
+        newPosition: Player.PositionInfo,
+        reason: Int,
+    ) {
+        publishPlaybackSnapshot()
     }
 
     override fun onMediaItemTransition(
@@ -608,6 +759,7 @@ class PlayerConnection(
         mediaMetadata.value = mediaItem?.metadata
         currentMediaItemIndex.value = player.currentMediaItemIndex
         currentWindowIndex.value = player.getCurrentQueueIndex()
+        publishQueueSnapshot(player)
         updateCanSkipPreviousAndNext()
     }
 
@@ -619,6 +771,7 @@ class PlayerConnection(
         queueTitle.value = service.queueTitle
         currentMediaItemIndex.value = player.currentMediaItemIndex
         currentWindowIndex.value = player.getCurrentQueueIndex()
+        publishQueueSnapshot(player)
         updateCanSkipPreviousAndNext()
     }
 
@@ -655,6 +808,78 @@ class PlayerConnection(
             canSkipPrevious.value = false
             canSkipNext.value = false
         }
+        publishPlaybackSnapshot()
+    }
+
+    private fun publishPlaybackSnapshot() {
+        val currentPlayer = attachedPlayer ?: return
+        val metadata = currentPlayer.currentMediaItem?.metadata
+        val activeCastHandler = service.castConnectionHandler?.takeIf { it.isCasting.value }
+        val castIsPlaying = activeCastHandler?.castIsPlaying?.value == true
+        val castIsBuffering = activeCastHandler?.castIsBuffering?.value == true
+        val playerDuration = currentPlayer.duration.takeIf { it >= 0L }
+        val metadataDuration = metadata?.duration
+            ?.takeIf { it >= 0 }
+            ?.toLong()
+            ?.times(1_000L)
+        val castDuration = activeCastHandler?.castDuration?.value?.takeIf { it > 0L }
+        val durationMs = if (activeCastHandler != null) {
+            castDuration ?: metadataDuration
+        } else {
+            playerDuration ?: metadataDuration
+        }
+
+        mutablePlaybackSnapshot.value = PlaybackSnapshot(
+            track = metadata?.let {
+                PlaybackTrackSnapshot(
+                    id = it.id,
+                    title = it.title,
+                    artists = it.artists.map { artist -> artist.name },
+                    artworkUrl = it.thumbnailUrl,
+                )
+            },
+            phase = when {
+                castIsBuffering -> PlaybackPhase.BUFFERING
+                currentPlayer.playbackState == Player.STATE_BUFFERING -> PlaybackPhase.BUFFERING
+                currentPlayer.playbackState == Player.STATE_READY -> PlaybackPhase.READY
+                currentPlayer.playbackState == Player.STATE_ENDED -> PlaybackPhase.ENDED
+                else -> PlaybackPhase.IDLE
+            },
+            playWhenReady = if (activeCastHandler != null) castIsPlaying else currentPlayer.playWhenReady,
+            isPlaying = if (activeCastHandler != null) castIsPlaying && !castIsBuffering else currentPlayer.isPlaying,
+            positionMs = if (activeCastHandler != null) {
+                activeCastHandler.castPosition.value.coerceAtLeast(0L)
+            } else {
+                currentPlayer.currentPosition.coerceAtLeast(0L)
+            },
+            durationMs = durationMs,
+            mediaItemIndex = currentPlayer.currentMediaItemIndex,
+            mediaItemCount = currentPlayer.mediaItemCount,
+            repeatMode = when (currentPlayer.repeatMode) {
+                Player.REPEAT_MODE_ONE -> PlaybackRepeatMode.ONE
+                Player.REPEAT_MODE_ALL -> PlaybackRepeatMode.ALL
+                else -> PlaybackRepeatMode.OFF
+            },
+            shuffleEnabled = currentPlayer.shuffleModeEnabled,
+            canSkipPrevious = canSkipPrevious.value,
+            canSkipNext = canSkipNext.value,
+        )
+    }
+
+    private fun publishQueueSnapshot(currentPlayer: Player) {
+        mutableQueueSnapshot.value = PlaybackQueueSnapshot(
+            entries = (0 until currentPlayer.mediaItemCount).map { index ->
+                val item = currentPlayer.getMediaItemAt(index)
+                val metadata = item.mediaMetadata
+                PlaybackQueueEntry(
+                    id = item.mediaId,
+                    title = metadata.title?.toString()?.takeIf(String::isNotBlank) ?: item.mediaId,
+                    artists = listOfNotNull(metadata.artist?.toString()?.takeIf(String::isNotBlank)),
+                    artworkUrl = metadata.artworkUri?.toString(),
+                )
+            },
+            currentIndex = currentPlayer.currentMediaItemIndex,
+        )
     }
 
     fun dispose() {

@@ -63,7 +63,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
@@ -81,7 +81,8 @@ import com.convx.music.constants.ListThumbnailSize
 import com.convx.music.db.entities.ArtistEntity
 import com.convx.music.db.entities.Event
 import com.convx.music.db.entities.SpeedDialItem
-import com.convx.music.db.entities.PlaylistSong
+import com.convx.music.library.PlaylistCommands
+import com.convx.music.library.PlaylistEntryReference
 import com.convx.music.db.entities.Song
 import com.convx.music.extensions.toMediaItem
 import com.convx.music.models.toMediaMetadata
@@ -103,13 +104,14 @@ import com.convx.music.viewmodels.CachePlaylistViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 
 @Composable
 fun SongMenu(
     originalSong: Song,
     event: Event? = null,
     navController: NavController,
-    playlistSong: PlaylistSong? = null,
+    playlistEntry: PlaylistEntryReference? = null,
     playlistBrowseId: String? = null,
     onDismiss: () -> Unit,
     isFromCache: Boolean = false,
@@ -117,6 +119,7 @@ fun SongMenu(
     val context = LocalContext.current
     val ringtoneViewModel = com.convx.music.LocalRingtoneViewModel.current
     val database = LocalDatabase.current.get()
+    val playlistCommands = koinInject<PlaylistCommands>()
     val playerConnection = LocalPlayerConnection.current ?: return
     val songState = database.song(originalSong.id).collectAsState(initial = originalSong)
     val song = songState.value ?: originalSong
@@ -129,7 +132,7 @@ fun SongMenu(
     val scope = rememberCoroutineScope()
     var refetchIconDegree by remember { mutableFloatStateOf(0f) }
 
-    val cacheViewModel = hiltViewModel<CachePlaylistViewModel>()
+    val cacheViewModel = koinViewModel<CachePlaylistViewModel>()
 
     val rotationAnimation by animateFloatAsState(
         targetValue = refetchIconDegree,
@@ -626,7 +629,7 @@ fun SongMenu(
                             )
                         )
                     }
-                    if (playlistSong != null) {
+                    if (playlistEntry != null) {
                         add(
                             IosMenuItemData(
                                 title = { Text(text = stringResource(R.string.remove_from_playlist)) },
@@ -634,24 +637,14 @@ fun SongMenu(
                                     SymbolIcon(symbol = sf("trash"), contentDescription = null)
                                 },
                                 onClick = {
-                                    database.transaction {
-                                        coroutineScope.launch {
-                                            playlistBrowseId?.let { playlistId ->
-                                                if (playlistSong.map.setVideoId != null) {
-                                                    YouTube.removeFromPlaylist(
-                                                        playlistId,
-                                                        playlistSong.map.songId,
-                                                        playlistSong.map.setVideoId
-                                                    )
-                                                }
+                                    coroutineScope.launch(Dispatchers.IO) {
+                                        val removal = playlistCommands.removePlaylistSong(playlistEntry)
+                                        val browseId = playlistBrowseId ?: return@launch
+                                        if (removal.removed) {
+                                            removal.setVideoId?.let { setVideoId ->
+                                                YouTube.removeFromPlaylist(browseId, playlistEntry.songId, setVideoId)
                                             }
                                         }
-                                        move(
-                                            playlistSong.map.playlistId,
-                                            playlistSong.map.position,
-                                            Int.MAX_VALUE
-                                        )
-                                        delete(playlistSong.map.copy(position = Int.MAX_VALUE))
                                     }
                                     onDismiss()
                                 }

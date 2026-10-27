@@ -12,7 +12,6 @@ import com.convx.music.constants.SongSortType
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.Song
 import com.convx.music.utils.LocalAudioScanner
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,11 +19,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /** Songs stored on this phone (MediaStore), for Library's Local page. */
-@HiltViewModel
-class AppleLocalSongsViewModel @Inject constructor(
+class AppleLocalSongsViewModel(
     private val database: MusicDatabase,
 ) : ViewModel() {
     private val order = MutableStateFlow(SongSortType.NAME to false)

@@ -65,7 +65,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -107,6 +107,7 @@ import com.convx.music.constants.SongSortTypeKey
 import com.convx.music.db.entities.Artist
 import com.convx.music.db.entities.LocalItem
 import com.convx.music.db.entities.Song
+import com.convx.music.library.PlaylistSummary
 import com.convx.music.extensions.toMediaItem
 import com.convx.music.playback.DownloadTarget
 import com.convx.music.playback.downloadSongs
@@ -388,10 +389,10 @@ private fun ArtRow(
 // Playlists
 
 @Composable
-fun ApplePlaylistsPage(navController: NavController, onBack: () -> Unit, viewModel: LibraryPlaylistsViewModel = hiltViewModel()) {
+fun ApplePlaylistsPage(navController: NavController, onBack: () -> Unit, viewModel: LibraryPlaylistsViewModel = koinViewModel()) {
     val allPlaylists by viewModel.allPlaylists.collectAsStateWithLifecycle()
     val localOnly = com.convx.music.LocalLocalOnlyMode.current
-    val playlists = allPlaylists.filter { !localOnly || it.playlist.browseId == null }
+    val playlists = allPlaylists
     val ytmSync by rememberPreference(com.convx.music.constants.YtmSyncKey, true)
     androidx.compose.runtime.LaunchedEffect(ytmSync, localOnly) { if (ytmSync && !localOnly) viewModel.sync() }
     var viewType by rememberEnumPreference(PlaylistViewTypeKey, LibraryViewType.LIST)
@@ -435,20 +436,28 @@ fun ApplePlaylistsPage(navController: NavController, onBack: () -> Unit, viewMod
         }
         if (viewType == LibraryViewType.LIST) {
             items(playlists, key = { it.id }, contentType = { "row" }) { playlist ->
-                LibraryItemMenu(playlist, onOpen = { navController.navigate(localPlaylistRoute(playlist.id, playlist.thumbnails.firstOrNull())) }) {
+                LibraryItemMenu(
+                    item = playlist,
+                    onOpen = { navController.navigate(localPlaylistRoute(playlist.id, playlist.artworkUrls.firstOrNull())) },
+                    onTogglePin = { viewModel.togglePin(playlist.id) },
+                ) {
                     ArtRow(
-                        art = playlist.thumbnails.firstOrNull(),
+                        art = playlist.artworkUrls.firstOrNull(),
                         artworkId = playlist.id,
                         artSize = 60.dp,
                         rowHeight = 76.dp,
-                        title = playlist.title,
+                        title = playlist.name,
                         subtitle = pluralStringResource(R.plurals.n_song, playlist.songCount, playlist.songCount),
                     )
                 }
             }
         } else {
-            gridItems(playlists) { item ->
-                LibraryItemMenu(item, onOpen = { navController.navigate(localPlaylistRoute(item.id, (item as com.convx.music.db.entities.Playlist).thumbnails.firstOrNull())) }) {
+            playlistGridItems(playlists) { item ->
+                LibraryItemMenu(
+                    item = item,
+                    onOpen = { navController.navigate(localPlaylistRoute(item.id, item.artworkUrls.firstOrNull())) },
+                    onTogglePin = { viewModel.togglePin(item.id) },
+                ) {
                     RecentTile(item)
                 }
             }
@@ -471,10 +480,22 @@ private fun LazyListScope.gridItems(list: List<LocalItem>, tile: @Composable (Lo
     }
 }
 
+private fun LazyListScope.playlistGridItems(list: List<PlaylistSummary>, tile: @Composable (PlaylistSummary) -> Unit) {
+    items(list.chunked(2), key = { "grid_" + it.first().id }, contentType = { "grid_row" }) { pair ->
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 10.dp),
+        ) {
+            pair.forEach { Box(Modifier.weight(1f)) { tile(it) } }
+            if (pair.size == 1) Spacer(Modifier.weight(1f))
+        }
+    }
+}
+
 // Artists
 
 @Composable
-fun AppleArtistsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLibraryViewModel = hiltViewModel()) {
+fun AppleArtistsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLibraryViewModel = koinViewModel()) {
     val artists by viewModel.localArtists.collectAsStateWithLifecycle()
     val localOnly by viewModel.localOnly.collectAsStateWithLifecycle()
     val permission = com.convx.music.ui.component.rememberLocalAudioPermission { }
@@ -522,7 +543,7 @@ fun AppleArtistsPage(navController: NavController, onBack: () -> Unit, viewModel
 // Albums
 
 @Composable
-fun AppleAlbumsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLibraryViewModel = hiltViewModel()) {
+fun AppleAlbumsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLibraryViewModel = koinViewModel()) {
     val albums by viewModel.localAlbums.collectAsStateWithLifecycle()
     val localOnly by viewModel.localOnly.collectAsStateWithLifecycle()
     val permission = com.convx.music.ui.component.rememberLocalAudioPermission { }
@@ -565,7 +586,7 @@ fun AppleAlbumsPage(navController: NavController, onBack: () -> Unit, viewModel:
 // Standard and local songs share the same list screen.
 
 @Composable
-fun AppleSongsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLibraryViewModel = hiltViewModel()) {
+fun AppleSongsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLibraryViewModel = koinViewModel()) {
     val permission = com.convx.music.ui.component.rememberLocalAudioPermission { }
     val songs by viewModel.localSongs.collectAsStateWithLifecycle()
     val localOnly by viewModel.localOnly.collectAsStateWithLifecycle()
@@ -589,7 +610,7 @@ fun AppleSongsPage(navController: NavController, onBack: () -> Unit, viewModel: 
 
 /** Songs saved on this phone: the same list, behind a permission prompt when needed. */
 @Composable
-fun AppleLocalSongsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLocalSongsViewModel = hiltViewModel()) {
+fun AppleLocalSongsPage(navController: NavController, onBack: () -> Unit, viewModel: AppleLocalSongsViewModel = koinViewModel()) {
     val context = LocalContext.current
     val songs by viewModel.songs.collectAsStateWithLifecycle()
     val scanning by viewModel.scanning.collectAsStateWithLifecycle()

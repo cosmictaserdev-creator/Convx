@@ -23,7 +23,7 @@ import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
@@ -41,7 +41,7 @@ import zone.ien.hig.CupertinoButton
 import zone.ien.hig.CupertinoButtonDefaults
 
 @Composable
-fun UpdateScreen(navController: NavHostController, viewModel: UpdateViewModel = hiltViewModel()) {
+fun UpdateScreen(navController: NavHostController, viewModel: UpdateViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { viewModel.check(manual = true) }
     Column(Modifier.fillMaxSize().background(AppTheme.colorScheme.background).windowInsetsPadding(WindowInsets.safeDrawing)) {

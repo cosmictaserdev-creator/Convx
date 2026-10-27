@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyRow
 import com.convx.music.ui.screens.search.CategoryTile
 import com.convx.music.ui.screens.search.AppleSearchViewModel
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -721,7 +721,7 @@ internal fun LazyListScope.moodAndGenresSection(
             )
         }
         item(key = "mood_and_genres_list", contentType = "mood_grid") {
-            val tiles: AppleSearchViewModel = hiltViewModel()
+            val tiles: AppleSearchViewModel = koinViewModel()
             val art by tiles.art.collectAsStateWithLifecycle()
             LazyHorizontalGrid(
                 rows = GridCells.Fixed(2),

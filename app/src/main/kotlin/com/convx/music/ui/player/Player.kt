@@ -281,7 +281,6 @@ import com.convx.music.ui.utils.ShowOffsetDialog
 import com.convx.music.utils.makeTimeString
 import com.convx.music.utils.rememberEnumPreference
 import com.convx.music.utils.rememberPreference
-import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -3457,11 +3456,7 @@ fun InlineLyricsView(
             delay(500)
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    val entryPoint = EntryPointAccessors.fromApplication(
-                        context.applicationContext,
-                        com.convx.music.di.LyricsHelperEntryPoint::class.java
-                    )
-                    val lyricsHelper = entryPoint.lyricsHelper()
+                    val lyricsHelper = org.koin.core.context.GlobalContext.get().get<com.convx.music.lyrics.LyricsHelper>()
                     val fetchedLyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
                     database.withTransaction {
                         if (this.lyrics(mediaMetadata.id).first() == null)

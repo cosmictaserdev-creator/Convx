@@ -42,7 +42,6 @@ import com.convx.music.ui.component.PreferenceEntry
 import com.convx.music.ui.component.PreferenceGroupTitle
 import com.convx.music.ui.component.SwitchPreference
 import com.convx.music.ui.theme.ConvxTheme
-import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Per-widget configuration, launched by the launcher via APPWIDGET_CONFIGURE when
@@ -52,7 +51,6 @@ import dagger.hilt.android.AndroidEntryPoint
  * RESULT_OK with the widget id, and we must return RESULT_CANCELED on back so a
  * half-configured widget isn't left on the home screen.
  */
-@AndroidEntryPoint
 class WidgetConfigActivity : ComponentActivity() {
 
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID

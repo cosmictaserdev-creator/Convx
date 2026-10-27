@@ -1,6 +1,7 @@
 package com.convx.music.utils.cipher
 
 import com.music.innertube.YouTube
+import com.convx.music.utils.toJavaProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -15,7 +16,7 @@ object PlayerJsFetcher {
     private const val CACHE_TTL_MS = 6 * 60 * 60 * 1000L // 6 hours
 
     private val httpClient = OkHttpClient.Builder()
-        .proxy(YouTube.proxy)
+        .proxy(YouTube.proxy.toJavaProxy())
         .build()
 
     // Regex to extract player hash from iframe_api response

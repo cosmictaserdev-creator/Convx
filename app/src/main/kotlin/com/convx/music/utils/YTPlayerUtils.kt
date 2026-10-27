@@ -48,6 +48,7 @@ import com.convx.music.utils.cipher.CipherDeobfuscator
 import com.convx.music.utils.YTPlayerUtils.MAIN_CLIENT
 import com.convx.music.utils.YTPlayerUtils.STREAM_FALLBACK_CLIENTS
 import com.convx.music.utils.YTPlayerUtils.validateStatus
+import com.music.innertube.AudioStreamProbeResult
 import com.convx.music.utils.potoken.PoTokenGenerator
 import com.convx.music.utils.potoken.PoTokenResult
 import com.convx.music.utils.sabr.EjsNTransformSolver
@@ -247,7 +248,7 @@ object YTPlayerUtils {
             }
         })
         .proxySelector(object : ProxySelector() {
-            override fun select(uri: URI?): List<Proxy> = listOfNotNull(YouTube.proxy ?: Proxy.NO_PROXY)
+            override fun select(uri: URI?): List<Proxy> = listOf(YouTube.proxy.toJavaProxy() ?: Proxy.NO_PROXY)
             override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {
                 Timber.tag(TAG).e(ioe, "Proxy connection failed for URI: $uri")
             }
@@ -993,7 +994,7 @@ object YTPlayerUtils {
                     break@clientLoop
                 }
 
-                if (validateStatus(streamUrl)) {
+                if (validateStatus(streamUrl, format?.contentLength)) {
                     Timber.tag(logTag).d("Stream validated successfully with client: ${currentClient.clientName}")
                     PlaybackLogManager.log(PlaybackLogLevel.INFO, "Stream validated", currentClient.clientName)
                     Timber.tag(TAG).i("Playback: client=${currentClient.clientName}, videoId=$videoId")
@@ -1009,7 +1010,7 @@ object YTPlayerUtils {
                             val nTransformed = CipherDeobfuscator.transformNParamInUrl(streamUrl)
                             if (nTransformed != streamUrl) {
                                 Timber.tag(logTag).d("CipherDeobfuscator n-transform applied, re-validating...")
-                                if (validateStatus(nTransformed)) {
+                                if (validateStatus(nTransformed, format?.contentLength)) {
                                     Timber.tag(logTag).d("N-transformed URL VALIDATED OK!")
                                     streamUrl = nTransformed
                                     nTransformWorked = true
@@ -1109,31 +1110,10 @@ object YTPlayerUtils {
             .onFailure { Timber.tag(logTag).e(it, "Failed to fetch metadata") }
     }
 
-    private fun validateStatus(url: String): Boolean {
-        Timber.tag(logTag).d("Validating stream URL status")
-        try {
-            // Use a one-byte ranged GET: YouTube can accept HEAD for a stream it won't serve.
-            val requestBuilder = okhttp3.Request.Builder()
-                .get()
-                .url(url)
-                .header("Range", "bytes=0-0")
-                .header("User-Agent", YouTubeClient.USER_AGENT_WEB)
-
-            // Do NOT add Cookie header — googlevideo.com CDN rejects account cookies with 403.
-            // Stream URLs are already authenticated via signed URL parameters.
-
-            // use {} rather than leaking the (1-byte) body back into the pool unread.
-            // 206 is the honoured range; a server that ignores Range answers 200. Both
-            // mean bytes are being served, which is the only thing this asks.
-            val (isSuccessful, code) = httpClient.newCall(requestBuilder.build()).execute()
-                .use { it.isSuccessful to it.code }
-            Timber.tag(logTag).d("Stream URL validation result: ${if (isSuccessful) "Success" else "Failed"} ($code)")
-            return isSuccessful
-        } catch (e: Exception) {
-            Timber.tag(logTag).e(e, "Stream URL validation failed with exception")
-            reportException(e)
-        }
-        return false
+    private suspend fun validateStatus(url: String, contentLength: Long?): Boolean {
+        val result = YouTube.probeAudioStream(url, contentLength)
+        Timber.tag(logTag).d("Stream URL validation result: $result")
+        return result == AudioStreamProbeResult.RANGE_READABLE || result == AudioStreamProbeResult.PROGRESSIVE_READABLE
     }
     data class SignatureTimestampResult(
         val timestamp: Int?,

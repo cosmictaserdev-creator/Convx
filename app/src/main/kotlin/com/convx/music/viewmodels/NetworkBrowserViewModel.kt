@@ -16,16 +16,13 @@ import com.convx.storage.domain.NetworkEntry
 import com.convx.storage.domain.NetworkMedia
 import com.convx.storage.domain.NetworkServer
 import com.convx.storage.domain.RemotePath
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** Folder-by-folder browsing of one SMB or WebDAV source; songs are added to the library as they are played. */
-@HiltViewModel
-class NetworkBrowserViewModel @Inject constructor(
+class NetworkBrowserViewModel(
     private val repository: NetworkMusicRepository,
     private val database: MusicDatabase,
 ) : ViewModel() {

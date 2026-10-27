@@ -104,14 +104,17 @@ import com.convx.music.constants.PlayerBackgroundStyle
 import com.convx.music.constants.PlayerBackgroundStyleKey
 import com.convx.music.constants.SelectedThemeColorKey
 import com.convx.music.constants.ShowHistoryButtonKey
-import com.convx.music.constants.PauseListenHistoryKey
 import com.convx.music.constants.ShowStatsButtonKey
 import com.convx.music.constants.SideBarCollapsedKey
 import com.convx.music.constants.SlimNavBarHeight
 import com.convx.music.constants.SlimNavBarKey
 import com.convx.music.constants.UseNewMiniPlayerDesignKey
 import com.convx.music.db.MusicDatabase
-import com.convx.music.history.HistoryLocalDataSource
+import com.convx.music.di.ValueProvider
+import com.convx.music.history.ListenHistoryRepository
+import com.convx.music.history.ListenHistorySettingsRepository
+import com.convx.music.history.ListenHistorySettingsState
+import com.convx.music.library.ObservePlaylists
 import com.convx.music.extensions.toEnum
 import com.convx.music.playback.DownloadUtil
 import com.convx.music.playback.PlayerConnection
@@ -219,10 +222,12 @@ internal fun AppRootContent(
     activity: MainActivity,
     intentRouter: AppIntentRouter,
     playerConnection: PlayerConnection?,
-    database: dagger.Lazy<MusicDatabase>,
-    downloadUtil: dagger.Lazy<DownloadUtil>,
-    syncUtils: dagger.Lazy<SyncUtils>,
-    historyDataSource: dagger.Lazy<HistoryLocalDataSource>,
+    database: ValueProvider<MusicDatabase>,
+    downloadUtil: ValueProvider<DownloadUtil>,
+    syncUtils: ValueProvider<SyncUtils>,
+    listenHistoryRepository: ValueProvider<ListenHistoryRepository>,
+    listenHistorySettingsRepository: ValueProvider<ListenHistorySettingsRepository>,
+    observePlaylists: ObservePlaylists,
 ) {
     AppStartupEffects(activity, playerConnection)
 
@@ -368,7 +373,7 @@ internal fun AppRootContent(
                 )
             }
 
-            val search = rememberAppSearchController(navController, database, localOnlyMode, activity.lifecycleScope)
+            val search = rememberAppSearchController(navController, localOnlyMode, activity.lifecycleScope)
             val (query, onQueryChange) = search.query
             var searchKeyboardActive by search.keyboardActive
 
@@ -700,7 +705,14 @@ internal fun AppRootContent(
                 }
             }
 
-            val pauseListenHistory by rememberPreference(PauseListenHistoryKey, defaultValue = false)
+            val listenHistorySettingsFlow = remember(listenHistorySettingsRepository) {
+                listenHistorySettingsRepository.get().observe()
+            }
+            val listenHistorySettings by listenHistorySettingsFlow.collectAsStateWithLifecycle(
+                initialValue = ListenHistorySettingsState.Loading,
+            )
+            val pauseListenHistory =
+                (listenHistorySettings as? ListenHistorySettingsState.Ready)?.settings?.paused == true
             val (historyButtonEnabled) = rememberPreference(ShowHistoryButtonKey, defaultValue = true)
             val (showStatsButton) = rememberPreference(ShowStatsButtonKey, defaultValue = true)
             var hasHistory by remember { mutableStateOf<Boolean?>(null) }
@@ -711,7 +723,7 @@ internal fun AppRootContent(
                 }
 
                 withFrameNanos { }
-                historyDataSource.get().observeEventCount().collect { hasHistory = it > 0 }
+                listenHistoryRepository.get().observeEventCount().collect { hasHistory = it > 0 }
             }
             val showHistoryButton =
                 historyButtonEnabled && (!pauseListenHistory || hasHistory == true)
@@ -965,7 +977,7 @@ internal fun AppRootContent(
                             // Each screen owns its back button; a global one would duplicate it.
                             // Sidebar sections include phone top-bar items and playlists with bookmarkedAt set.
                             val sidebarSections = rememberSideBarSections(
-                                database, showHistoryButton, showStatsButton,
+                                observePlaylists, showHistoryButton, showStatsButton,
                                 listenTogetherInTopBar, navController, onLibraryFilterChange,
                             )
 

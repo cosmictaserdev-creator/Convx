@@ -1526,6 +1526,9 @@ interface DatabaseDao {
     @Query("DELETE FROM search_history")
     fun clearSearchHistory()
 
+    @Query("DELETE FROM search_history WHERE id = :entryId")
+    fun deleteSearchHistory(entryId: Long)
+
     // Recognition History
     @Transaction
     @Query("SELECT * FROM recognition_history ORDER BY recognizedAt DESC")

@@ -29,8 +29,6 @@ import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
 import com.convx.music.R
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -54,7 +52,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
 
 @Serializable
 data class SpotifySession(
@@ -95,9 +92,8 @@ private data class PlaylistImportData(
     val thumbnailUrl: String?
 )
 
-@HiltViewModel
-class SpotifyImportViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class SpotifyImportViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {

@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.offline.Download
 import com.convx.music.LocalListenTogetherManager
 import com.convx.music.R
-import com.convx.music.db.entities.Playlist
-import com.convx.music.db.entities.PlaylistSong
+import com.convx.music.library.PlaylistDetail
+import com.convx.music.library.LocalPlaylistSong
 import com.convx.music.ui.component.IosMenuGroup
 import com.convx.music.ui.component.IosMenuItemData
 
@@ -31,8 +31,8 @@ import com.convx.music.ui.component.IosMenuItemData
  */
 @Composable
 fun LocalPlaylistMenu(
-    playlist: Playlist,
-    songs: List<PlaylistSong>,
+    playlist: PlaylistDetail,
+    songs: List<LocalPlaylistSong>,
     context: Context,
     downloadState: Int,
     onEdit: () -> Unit,
@@ -85,7 +85,7 @@ fun LocalPlaylistMenu(
         )
     }
 
-    val isYouTubePlaylist = playlist.playlist.browseId != null
+    val isYouTubePlaylist = playlist.browseId != null
 
     val menuItems = buildList {
         add(
@@ -137,7 +137,7 @@ fun LocalPlaylistMenu(
 
         add(downloadMenuItem)
 
-        if (playlist.playlist.isEditable) {
+        if (playlist.isEditable) {
             add(
                 IosMenuItemData(
                     title = { Text(stringResource(R.string.modify_with_ai)) },
@@ -164,11 +164,9 @@ fun LocalPlaylistMenu(
                     SymbolIcon(symbol = sf("square.and.arrow.up"), contentDescription = null)
                 },
                 onClick = {
-                    val shareText = if (isYouTubePlaylist) {
-                        "https://music.youtube.com/playlist?list=${playlist.playlist.browseId}"
-                    } else {
-                        songs.joinToString("\n") { it.song.song.title }
-                    }
+                    val shareText = playlist.browseId?.let { browseId ->
+                        "https://music.youtube.com/playlist?list=$browseId"
+                    } ?: songs.joinToString("\n") { it.song.song.title }
                     val sendIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
                         putExtra(Intent.EXTRA_TEXT, shareText)

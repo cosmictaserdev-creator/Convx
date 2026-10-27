@@ -1,12 +1,14 @@
 package com.convx.music.lyrics
 
 /** Background vocals and simultaneous duet rows must not move the scroll anchor backwards. */
-internal fun primaryLyricLineIndex(lines: List<LyricsEntry>, positionMs: Long): Int {
-    val latest = lines.indexOfLast { !it.isBackground && it.time <= positionMs && it.text.isNotBlank() }
-    if (latest < 0) return -1
-    val time = lines[latest].time
-    return lines.indexOfFirst { !it.isBackground && it.time == time && it.text.isNotBlank() }
-}
+internal fun primaryLyricLineIndex(lines: List<LyricsEntry>, positionMs: Long): Int =
+    findPrimaryLyricLineIndex(
+        lines = lines,
+        positionMs = positionMs,
+        timeMs = LyricsEntry::time,
+        isBackground = LyricsEntry::isBackground,
+        text = LyricsEntry::text,
+    )
 
 /** Keeps the source line's spaces and punctuation attached to the timed runs that precede them. */
 fun LyricsEntry.wordsWithSpacing(): List<WordTimestamp> {

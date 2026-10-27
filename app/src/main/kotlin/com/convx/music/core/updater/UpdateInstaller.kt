@@ -10,8 +10,6 @@ import android.content.pm.PackageInstaller
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.convx.music.R
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,15 +19,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
-import javax.inject.Inject
-import javax.inject.Singleton
 
 data class InstallOutcome(val phase: UpdatePhase, val error: UpdateFailure? = null)
 
-@Singleton
-class UpdateInstaller @Inject constructor(
-    @ApplicationContext private val context: Context,
+class UpdateInstaller(
+    private val context: Context,
     private val store: UpdateStore,
     private val verifier: ApkVerifier,
 ) {
@@ -132,9 +129,8 @@ class UpdateInstaller @Inject constructor(
     }
 }
 
-@AndroidEntryPoint
-class UpdateInstallReceiver : BroadcastReceiver() {
-    @Inject lateinit var installer: UpdateInstaller
+class UpdateInstallReceiver : BroadcastReceiver(), KoinComponent {
+    private val installer: UpdateInstaller by inject()
     override fun onReceive(context: Context, intent: Intent) {
         val pending = goAsync()
         installer.onResult(intent, pending::finish)

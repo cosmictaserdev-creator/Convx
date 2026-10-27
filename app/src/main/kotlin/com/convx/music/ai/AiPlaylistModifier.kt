@@ -9,11 +9,10 @@ import android.content.Context
 import com.music.innertube.SearchFilter
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
-import com.convx.music.db.InternalDatabase
 import com.convx.music.db.MusicDatabase
-import com.convx.music.db.entities.PlaylistSong
 import com.convx.music.db.entities.PlaylistSongMap
 import com.convx.music.db.entities.SongEntity
+import com.convx.music.library.LocalPlaylistSong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -22,14 +21,13 @@ import org.json.JSONObject
 object AiPlaylistModifier {
 
     suspend fun modifyPlaylist(
+        database: MusicDatabase,
         context: Context,
         playlistId: String,
-        currentSongs: List<PlaylistSong>,
+        currentSongs: List<LocalPlaylistSong>,
         userPrompt: String,
         onLog: suspend (String) -> Unit
     ) = withContext(Dispatchers.IO) {
-        val database = InternalDatabase.newInstance(context)
-
         onLog("Connecting to AI Provider...")
 
         val currentPlaylistJson = currentSongs.toPlaylistJson()
@@ -91,7 +89,7 @@ object AiPlaylistModifier {
         }
     }
 
-    private fun List<PlaylistSong>.toPlaylistJson(): String = JSONArray().apply {
+    private fun List<LocalPlaylistSong>.toPlaylistJson(): String = JSONArray().apply {
         forEach { playlistSong ->
             put(JSONObject().apply {
                 put("id", playlistSong.map.id)
@@ -103,7 +101,7 @@ object AiPlaylistModifier {
 
     private suspend fun removeSongs(
         database: MusicDatabase,
-        currentSongs: List<PlaylistSong>,
+        currentSongs: List<LocalPlaylistSong>,
         removeIds: JSONArray
     ) {
         val mapsById = currentSongs.associate { it.map.id to it.map }
@@ -117,7 +115,7 @@ object AiPlaylistModifier {
     private suspend fun addSongs(
         database: MusicDatabase,
         playlistId: String,
-        currentSongs: List<PlaylistSong>,
+        currentSongs: List<LocalPlaylistSong>,
         additions: JSONArray,
         onLog: suspend (String) -> Unit
     ) {

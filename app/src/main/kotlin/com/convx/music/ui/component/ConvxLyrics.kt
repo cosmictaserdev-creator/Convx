@@ -112,9 +112,10 @@ fun ConvxLyricsLine(
     }
 
     // Segment the line into words with their own time windows
-    val wordData = remember(entry.text, entry.words, activeDuration) {
+    val entryWords = entry.words.orEmpty()
+    val wordData = remember(entry.text, entryWords, activeDuration) {
         val isHindiText = com.convx.music.lyrics.LyricsUtils.isHindi(entry.text)
-        if (!isHindiText && entry.words != null && entry.words.isNotEmpty()) {
+        if (!isHindiText && entryWords.isNotEmpty()) {
             // Use precise word timestamps if available
             entry.wordsWithSpacing().mapIndexed { index, word ->
                 val wordStart = ((word.startTime * 1000).toLong() - entry.time).coerceAtLeast(0L)

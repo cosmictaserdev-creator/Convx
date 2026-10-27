@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,7 +49,7 @@ fun FloatingUpdaterHost(visible: Boolean, backdrop: Backdrop, onDetails: () -> U
 }
 
 @Composable
-private fun FloatingUpdater(visible: Boolean, backdrop: Backdrop, onDetails: () -> Unit, viewModel: UpdateViewModel = hiltViewModel()) {
+private fun FloatingUpdater(visible: Boolean, backdrop: Backdrop, onDetails: () -> Unit, viewModel: UpdateViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     if (visible) LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.check() }
     // Re-check snooze policy on return to Home without creating a polling timer.

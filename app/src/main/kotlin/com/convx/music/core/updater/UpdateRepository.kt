@@ -13,7 +13,6 @@ import androidx.work.workDataOf
 import com.convx.music.BuildConfig
 import com.convx.music.core.UpdateNotificationHelper
 import com.convx.music.core.updater.downloadmanager.UpdateDownloadWorker
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,12 +31,9 @@ import java.io.File
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class UpdateRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+class UpdateRepository(
+    private val context: Context,
     private val source: GitHubReleaseSource,
     private val store: UpdateStore,
     private val installer: UpdateInstaller,

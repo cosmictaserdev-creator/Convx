@@ -5,21 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.convx.music.eq.EqualizerService
 import com.convx.music.eq.data.EQProfileRepository
 import com.convx.music.eq.data.ParametricEQParser
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.InputStream
-import javax.inject.Inject
 
 /**
  * ViewModel for EQ Screen
  * Manages EQ profiles and applies them to the EqualizerService
  */
-@HiltViewModel
-class EQViewModel @Inject constructor(
+class EQViewModel(
     private val eqProfileRepository: EQProfileRepository,
     private val equalizerService: EqualizerService
 ) : ViewModel() {

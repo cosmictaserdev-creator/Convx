@@ -27,19 +27,13 @@ import com.convx.music.models.ItemsPage
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import com.convx.music.utils.PageCaches
-import javax.inject.Inject
 
-@HiltViewModel
-class OnlineSearchViewModel
-@Inject
-constructor(
-    @ApplicationContext val context: Context,
+class OnlineSearchViewModel(
+    val context: Context,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val query = try {

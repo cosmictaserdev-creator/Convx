@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -22,7 +22,7 @@ import com.convx.music.ui.ios.compat.TextButton
 import com.convx.music.viewmodels.SongInsightViewModel
 
 @Composable
-fun SongInsightScreen(navController: NavController, viewModel: SongInsightViewModel = hiltViewModel()) {
+fun SongInsightScreen(navController: NavController, viewModel: SongInsightViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LifecycleResumeEffect(viewModel) {
         viewModel.refreshConfiguration()

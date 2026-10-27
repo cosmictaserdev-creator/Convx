@@ -60,7 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
@@ -118,7 +118,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val updateAvailable = getUpdateAvailableState(context) && getAutoUpdateCheckSetting(context)
-    val homeViewModel: HomeViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = koinViewModel()
     val accountName by homeViewModel.accountName.collectAsStateWithLifecycle()
     val accountImageUrl by homeViewModel.accountImageUrl.collectAsStateWithLifecycle()
     val onAction = rememberSettingsActionHandler(navController)

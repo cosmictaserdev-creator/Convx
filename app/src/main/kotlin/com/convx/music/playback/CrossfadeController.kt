@@ -27,12 +27,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.roundToLong
-import kotlin.math.sin
 
 @UnstableApi
 class CrossfadeController(
@@ -540,7 +537,7 @@ class CrossfadeController(
         val incomingFadeCapMs = remainingIncomingMs?.div(3) ?: Long.MAX_VALUE
         val fadeDurationMs = minOf(fadeMs, incomingFadeCapMs).coerceAtLeast(1L)
         val elapsedMs = (incomingPlayer.currentPosition - incomingCueTimeMs).coerceAtLeast(0L)
-        val fadeProgress = (elapsedMs.toFloat() / fadeDurationMs).coerceIn(0f, 1f)
+        val fadeProgress = CrossfadeEnvelope.progress(elapsedMs, fadeDurationMs)
 
         incomingPlayer.volume = riseGain(fadeProgress)
         outgoingPlayer.volume = if (djEngine?.holdsTail == true) 1f else fallGain(fadeProgress)
@@ -652,8 +649,10 @@ class CrossfadeController(
 
     private fun fadeFor(duration: Long): Long {
         val configured = configuredFadeMs()
-        if (duration == C.TIME_UNSET || duration <= 0L) return configured
-        return minOf(configured, duration / 3).coerceAtLeast(0L)
+        val outgoingDuration = duration.takeUnless { it == C.TIME_UNSET }
+            ?.takeIf { it > 0L }
+            ?: 0L
+        return CrossfadeEnvelope.durationMs(configured, outgoingDuration)
     }
 
     private fun rideFilters(progress: Float) {
@@ -745,11 +744,9 @@ class CrossfadeController(
             incomingPlaybackRate != 1.0
         )
 
-    private fun riseGain(progress: Float): Float =
-        sin(progress.coerceIn(0f, 1f) * PI.toFloat() / 2f)
+    private fun riseGain(progress: Float): Float = CrossfadeEnvelope.incomingGain(progress)
 
-    private fun fallGain(progress: Float): Float =
-        cos(progress.coerceIn(0f, 1f) * PI.toFloat() / 2f)
+    private fun fallGain(progress: Float): Float = CrossfadeEnvelope.outgoingGain(progress)
 
     private companion object {
         const val TAG = "ConvxCrossfade"

@@ -22,7 +22,6 @@ import com.convx.music.models.toMediaMetadata
 import com.convx.music.playback.PlayerConnection
 import com.convx.music.playback.queues.YouTubeQueue
 import com.convx.music.utils.dataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,14 +34,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Connects Listen Together room events to local playback and sync. */
-@Singleton
-class ListenTogetherManager @Inject constructor(
+class ListenTogetherManager(
     private val client: ListenTogetherClient,
-    @ApplicationContext private val context: Context,
+    private val context: Context,
     private val playerConnectionBridge: ListenTogetherPlayerConnectionBridge,
 ) {
     companion object {

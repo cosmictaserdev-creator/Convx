@@ -17,12 +17,11 @@ import com.music.innertube.utils.YouTubeUrlParser
 import com.convx.music.constants.HideExplicitKey
 import com.convx.music.constants.HideVideoSongsKey
 import com.convx.music.constants.DataSaverEnabledKey
-import com.convx.music.db.MusicDatabase
-import com.convx.music.db.entities.SearchHistory
+import com.convx.music.search.SearchHistoryEntry
+import com.convx.music.search.SearchHistoryRepository
+import com.convx.music.search.mergeSearchSuggestions
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,15 +29,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class OnlineSearchSuggestionViewModel
-@Inject
-constructor(
-    @ApplicationContext val context: Context,
-    private val database: MusicDatabase,
+class OnlineSearchSuggestionViewModel(
+    val context: Context,
+    private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
     val query = MutableStateFlow("")
     private val _viewState = MutableStateFlow(SearchSuggestionViewState())
@@ -56,7 +51,7 @@ constructor(
     }
 
     private fun historySuggestions(): Flow<SearchSuggestionViewState> =
-        database.searchHistory().map { history -> SearchSuggestionViewState(history = history) }
+        searchHistoryRepository.observeHistory().map { history -> SearchSuggestionViewState(history = history) }
 
     private suspend fun searchSuggestions(query: String): Flow<SearchSuggestionViewState> {
         val parsedUrl = YouTubeUrlParser.parse(query)
@@ -66,11 +61,9 @@ constructor(
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false) ||
             context.dataStore.get(DataSaverEnabledKey, false)
 
-        return database.searchHistory(query)
-            .map { it.take(3) }
+        return searchHistoryRepository.observeHistory(query)
             .map { history ->
-                val historyQueries = history.mapTo(mutableSetOf()) { it.query }
-                val suggestions = result?.queries.orEmpty().filterNot { it in historyQueries }
+                val candidates = mergeSearchSuggestions(history, result?.queries.orEmpty())
                 val recommendedItems = result?.recommendedItems.orEmpty()
                     .distinctBy { it.id }
                     .filter { it.id != parsedItem?.id }
@@ -78,8 +71,8 @@ constructor(
                     .filterVideoSongs(hideVideoSongs)
 
                 SearchSuggestionViewState(
-                    history = history,
-                    suggestions = suggestions,
+                    history = candidates.history,
+                    suggestions = candidates.providerQueries,
                     items = listOfNotNull(parsedItem) + recommendedItems,
                     isFromLink = parsedUrl != null,
                 )
@@ -101,10 +94,18 @@ constructor(
             null
         }
     }
+
+    fun deleteHistory(entry: SearchHistoryEntry) {
+        viewModelScope.launch { searchHistoryRepository.delete(entry.id) }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch { searchHistoryRepository.clear() }
+    }
 }
 
 data class SearchSuggestionViewState(
-    val history: List<SearchHistory> = emptyList(),
+    val history: List<SearchHistoryEntry> = emptyList(),
     val suggestions: List<String> = emptyList(),
     val items: List<YTItem> = emptyList(),
     val isFromLink: Boolean = false,

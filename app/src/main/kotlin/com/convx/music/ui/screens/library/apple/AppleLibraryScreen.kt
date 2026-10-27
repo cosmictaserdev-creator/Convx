@@ -51,7 +51,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -87,6 +88,8 @@ import com.convx.music.db.entities.LocalItem
 import com.convx.music.db.entities.Playlist
 import com.convx.music.db.entities.Song
 import com.convx.music.extensions.toMediaItem
+import com.convx.music.library.PlaylistSummary
+import com.convx.music.library.LocalPlaylistSongDataSource
 import com.convx.music.playback.DownloadTarget
 import com.convx.music.playback.downloadSongs
 import com.convx.music.playback.queues.ListQueue
@@ -151,7 +154,7 @@ enum class AppleLibraryDestination { Playlists, Artists, Albums, Songs, Local, D
 fun AppleLibraryScreen(
     navController: NavController,
     onOpen: (AppleLibraryDestination) -> Unit,
-    viewModel: AppleLibraryViewModel = hiltViewModel(),
+    viewModel: AppleLibraryViewModel = koinViewModel(),
 ) {
     val pinned by viewModel.pinned.collectAsStateWithLifecycle()
     val recent by viewModel.recentlyAdded.collectAsStateWithLifecycle()
@@ -475,12 +478,35 @@ internal fun RecentTile(item: LocalItem) {
     }
 }
 
-/** The preview card content: large cover, title, artist in the accent (reference). */
 @Composable
-private fun PreviewCard(item: LocalItem) {
-    Cover(item.cover, 12.dp)
+internal fun RecentTile(item: PlaylistSummary) {
+    val cover = item.artworkUrls.firstOrNull()
+    Column {
+        Cover(cover, 10.dp, Modifier.sharedArtworkSource(item.id, cover))
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = item.name,
+            style = SfStyle(15.sp, 20.sp, tracking = (-0.23).sp),
+            color = IosTheme.colors.label,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = pluralStringResource(R.plurals.n_song, item.songCount, item.songCount),
+            style = SfStyle(15.sp, 20.sp, tracking = (-0.23).sp),
+            color = IosTheme.colors.secondaryLabel,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/** The preview card content: large cover, title, and supporting text. */
+@Composable
+private fun PreviewCard(cover: String?, title: String, subtitle: String) {
+    Cover(cover, 12.dp)
     Text(
-        text = item.title,
+        text = title,
         style = SfStyle(15.sp, 20.sp, FontWeight.SemiBold, (-0.23).sp),
         color = IosTheme.colors.label,
         maxLines = 1,
@@ -488,7 +514,7 @@ private fun PreviewCard(item: LocalItem) {
         modifier = Modifier.padding(top = 10.dp, start = 2.dp),
     )
     Text(
-        text = item.subtitle(),
+        text = subtitle,
         style = SfStyle(13.sp, 18.sp, tracking = (-0.08).sp),
         color = IosTheme.colors.secondaryLabel,
         maxLines = 1,
@@ -504,51 +530,137 @@ private fun PreviewCard(item: LocalItem) {
  */
 @Composable
 internal fun LibraryItemMenu(
+    item: PlaylistSummary,
+    onOpen: () -> Unit,
+    onTogglePin: suspend () -> Unit,
+    modifier: Modifier = Modifier,
+    controller: com.convx.music.ui.ios.component.AppleMenuController? = null,
+    content: @Composable () -> Unit,
+) {
+    val localPlaylistSongDataSource = koinInject<LocalPlaylistSongDataSource>()
+    LibraryItemMenu(
+        item = LibraryMenuItem(
+            title = item.name,
+            cover = item.artworkUrls.firstOrNull(),
+            subtitle = pluralStringResource(R.plurals.n_song, item.songCount, item.songCount),
+            loadSongs = { localPlaylistSongDataSource.loadSongs(item.id).map { it.song } },
+            shareUrl = item.browseId?.let { "https://music.youtube.com/playlist?list=$it" },
+            isPinned = item.pinnedAtEpochMillis != null,
+            pinLabel = R.string.pin_playlist,
+            unpinLabel = R.string.unpin_playlist,
+            onTogglePin = onTogglePin,
+        ),
+        onOpen = onOpen,
+        modifier = modifier,
+        controller = controller,
+        content = content,
+    )
+}
+
+@Composable
+internal fun LibraryItemMenu(
     item: LocalItem,
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
     controller: com.convx.music.ui.ios.component.AppleMenuController? = null,
     content: @Composable () -> Unit,
 ) {
-    val context = LocalContext.current
     val database = LocalDatabase.current.get()
+    val localPlaylistSongDataSource = koinInject<LocalPlaylistSongDataSource>()
+    val album = item as? Album
+    val playlist = item as? Playlist
+    val onTogglePin: (suspend () -> Unit)? = when {
+        playlist != null -> suspend { database.query { update(playlist.playlist.togglePin()) } }
+        album != null -> suspend { database.query { update(album.album.togglePin()) } }
+        else -> null
+    }
+    LibraryItemMenu(
+        item = LibraryMenuItem(
+            title = item.title,
+            cover = item.cover,
+            subtitle = item.subtitle(),
+            loadSongs = {
+                when (item) {
+                    is Album -> withContext(Dispatchers.IO) { database.albumSongs(item.id).first() }
+                    is Playlist -> localPlaylistSongDataSource.loadSongs(item.id).map { it.song }
+                    else -> emptyList()
+                }
+            },
+            shareUrl = when (item) {
+                is Album -> item.album.playlistId?.let { "https://music.youtube.com/playlist?list=$it" }
+                is Playlist -> item.playlist.shareLink
+                else -> null
+            },
+            isFavourite = album?.album?.bookmarkedAt != null,
+            onToggleFavourite = album?.let { { database.query { update(it.album.toggleLike()) } } },
+            isPinned = when (item) {
+                is Album -> item.album.pinnedAt != null
+                is Playlist -> item.playlist.pinnedAt != null
+                else -> null
+            },
+            pinLabel = when (item) {
+                is Album -> R.string.pin_album
+                is Playlist -> R.string.pin_playlist
+                else -> null
+            },
+            unpinLabel = when (item) {
+                is Album -> R.string.unpin_album
+                is Playlist -> R.string.unpin_playlist
+                else -> null
+            },
+            onTogglePin = onTogglePin,
+        ),
+        onOpen = onOpen,
+        modifier = modifier,
+        controller = controller,
+        content = content,
+    )
+}
+
+private data class LibraryMenuItem(
+    val title: String,
+    val cover: String?,
+    val subtitle: String,
+    val loadSongs: suspend () -> List<Song>,
+    val shareUrl: String? = null,
+    val isFavourite: Boolean? = null,
+    val onToggleFavourite: (() -> Unit)? = null,
+    val isPinned: Boolean? = null,
+    val pinLabel: Int? = null,
+    val unpinLabel: Int? = null,
+    val onTogglePin: (suspend () -> Unit)? = null,
+)
+
+@Composable
+private fun LibraryItemMenu(
+    item: LibraryMenuItem,
+    onOpen: () -> Unit,
+    modifier: Modifier,
+    controller: com.convx.music.ui.ios.component.AppleMenuController?,
+    content: @Composable () -> Unit,
+) {
+    val context = LocalContext.current
     val playerConnection = LocalPlayerConnection.current
     val downloadUtil = LocalDownloadUtil.current.get()
     val scope = rememberCoroutineScope()
     var addToPlaylist by remember { mutableStateOf(false) }
 
-    suspend fun songs(): List<Song> = withContext(Dispatchers.IO) {
-        when (item) {
-            is Album -> database.albumSongs(item.id).first()
-            is Playlist -> database.playlistSongs(item.id).first().map { it.song }
-            else -> emptyList()
-        }
-    }
     fun withSongs(block: (List<Song>) -> Unit) {
-        scope.launch { songs().takeIf { it.isNotEmpty() }?.let(block) }
+        scope.launch { item.loadSongs().takeIf { it.isNotEmpty() }?.let(block) }
     }
-    fun glyph(v: SfSymbol): @Composable (Color) -> Unit = { tint ->
-        IosGlyph(v, tint = tint, box = 20.dp)
-    }
-
-    val shareUrl = when (item) {
-        is Album -> item.album.playlistId?.let { "https://music.youtube.com/playlist?list=$it" }
-        is Playlist -> item.playlist.shareLink
-        else -> null
-    }
-    val favourite = (item as? Album)?.album?.bookmarkedAt != null
+    fun glyph(v: SfSymbol): @Composable (Color) -> Unit = { tint -> IosGlyph(v, tint = tint, box = 20.dp) }
 
     val quick = listOfNotNull(
         IosMenuItem(stringResource(R.string.action_download), icon = glyph(sf("SFArrowDownToLine"))) {
-            withSongs { s -> downloadSongs(context, s.map { DownloadTarget(it.id, it.song.title) }, downloadUtil.downloads.value) }
+            withSongs { songs -> downloadSongs(context, songs.map { DownloadTarget(it.id, it.song.title) }, downloadUtil.downloads.value) }
         },
-        (item as? Album)?.let { album ->
+        item.onToggleFavourite?.let { toggleFavourite ->
             IosMenuItem(
                 stringResource(R.string.favorite),
-                icon = glyph(if (favourite) sf("SFStarFill") else sf("SFStar")),
-            ) { database.query { update(album.album.toggleLike()) } }
+                icon = glyph(if (item.isFavourite == true) sf("SFStarFill") else sf("SFStar")),
+            ) { toggleFavourite() }
         },
-        shareUrl?.let { url ->
+        item.shareUrl?.let { url ->
             IosMenuItem(stringResource(R.string.share), icon = glyph(sf("SFSquareAndArrowUp"))) {
                 context.startActivity(
                     Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url), null),
@@ -556,30 +668,26 @@ internal fun LibraryItemMenu(
             }
         },
     )
+    val pinAction = item.onTogglePin?.let { togglePin ->
+        val label = if (item.isPinned == true) item.unpinLabel else item.pinLabel
+        label?.let {
+            IosMenuItem(stringResource(it), icon = glyph(sf("SFPin"))) { scope.launch { togglePin() } }
+        }
+    }
     val sections = listOf(
         IosMenuSection(
             listOf(
                 IosMenuItem(stringResource(R.string.play), icon = glyph(sf("SFPlay"))) {
-                    withSongs { playerConnection?.playQueue(ListQueue(title = item.title, items = it.map(Song::toMediaItem))) }
+                    withSongs { songs -> playerConnection?.playQueue(ListQueue(title = item.title, items = songs.map(Song::toMediaItem))) }
                 },
                 IosMenuItem(stringResource(R.string.shuffle), icon = glyph(sf("SFShuffle"))) {
-                    withSongs { playerConnection?.playQueue(ListQueue(title = item.title, items = it.shuffled().map(Song::toMediaItem))) }
+                    withSongs { songs -> playerConnection?.playQueue(ListQueue(title = item.title, items = songs.shuffled().map(Song::toMediaItem))) }
                 },
             ),
         ),
         IosMenuSection(
             listOfNotNull(
-                when (item) {
-                    is Playlist -> IosMenuItem(
-                        stringResource(if (item.playlist.pinnedAt != null) R.string.unpin_playlist else R.string.pin_playlist),
-                        icon = glyph(sf("SFPin")),
-                    ) { database.query { update(item.playlist.togglePin()) } }
-                    is Album -> IosMenuItem(
-                        stringResource(if (item.album.pinnedAt != null) R.string.unpin_album else R.string.pin_album),
-                        icon = glyph(sf("SFPin")),
-                    ) { database.query { update(item.album.togglePin()) } }
-                    else -> null
-                },
+                pinAction,
                 IosMenuItem(stringResource(R.string.add_to_playlist_ellipsis), icon = glyph(sf("SFTextBadgePlus"))) {
                     addToPlaylist = true
                 },
@@ -588,32 +696,31 @@ internal fun LibraryItemMenu(
         IosMenuSection(
             listOf(
                 IosMenuItem(stringResource(R.string.play_next), icon = glyph(sf("SFTextLineFirstAndArrowtriangleForward"))) {
-                    withSongs { playerConnection?.playNext(it.map(Song::toMediaItem)) }
+                    withSongs { songs -> playerConnection?.playNext(songs.map(Song::toMediaItem)) }
                 },
                 IosMenuItem(stringResource(R.string.play_last), icon = glyph(sf("SFTextLineLastAndArrowtriangleForward"))) {
-                    withSongs { playerConnection?.addToQueue(it.map(Song::toMediaItem)) }
+                    withSongs { songs -> playerConnection?.addToQueue(songs.map(Song::toMediaItem)) }
                 },
             ),
         ),
     )
 
     com.convx.music.ui.utils.ArtworkSourceHost(modifier, fromLibrary = true) { sourceModifier ->
-    AppleContextMenu(
-        sections = sections,
-        quickActions = quick,
-        preview = { PreviewCard(item) },
-        onClick = onOpen,
-        modifier = sourceModifier,
-        controller = controller,
-        content = content,
-    )
+        AppleContextMenu(
+            sections = sections,
+            quickActions = quick,
+            preview = { PreviewCard(item.cover, item.title, item.subtitle) },
+            onClick = onOpen,
+            modifier = sourceModifier,
+            controller = controller,
+            content = content,
+        )
     }
 
-    // Only composed while open: it builds a ViewModel, and every cover owns one of these.
     if (addToPlaylist) {
         AddToPlaylistDialog(
             isVisible = true,
-            onGetSong = { songs().map { it.id } },
+            onGetSong = { item.loadSongs().map { it.id } },
             onDismiss = { addToPlaylist = false },
         )
     }

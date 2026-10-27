@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
@@ -53,7 +53,7 @@ fun LocalMusicFoldersEntry(count: Int?, navController: NavController) {
 }
 
 @Composable
-fun LocalFoldersScreen(navController: NavController, viewModel: LocalMusicViewModel = hiltViewModel()) {
+fun LocalFoldersScreen(navController: NavController, viewModel: LocalMusicViewModel = koinViewModel()) {
     val context = LocalContext.current
     val folders by viewModel.folders.collectAsStateWithLifecycle()
     val scanning by viewModel.isScanning.collectAsStateWithLifecycle()

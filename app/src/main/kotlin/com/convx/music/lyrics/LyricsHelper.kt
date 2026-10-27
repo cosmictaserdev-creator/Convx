@@ -16,7 +16,6 @@ import com.convx.music.models.MediaMetadata
 import com.convx.music.utils.NetworkConnectivityObserver
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -29,12 +28,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import javax.inject.Inject
 
-class LyricsHelper
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+class LyricsHelper(
+    private val context: Context,
     private val networkConnectivity: NetworkConnectivityObserver,
     private val providerRepository: LyricsProviderRepository,
 ) {

@@ -40,7 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.music.innertube.YouTube
 import com.music.innertube.utils.parseCookieString
 import com.convx.music.LocalDatabase
@@ -62,6 +62,7 @@ import com.convx.music.utils.rememberPreference
 import com.convx.music.viewmodels.PlaylistsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -72,7 +73,7 @@ fun AddToPlaylistDialog(
     initialTextFieldValue: String? = null,
     onGetSong: suspend (Playlist) -> List<String>, // list of song ids. Songs should be inserted to database in this function.
     onDismiss: () -> Unit,
-    viewModel: PlaylistsViewModel = hiltViewModel()
+    viewModel: PlaylistsViewModel = koinViewModel()
 ) {
     val database = LocalDatabase.current.get()
     val coroutineScope = rememberCoroutineScope()
@@ -96,8 +97,8 @@ fun AddToPlaylistDialog(
     var showDuplicateDialog by remember {
         mutableStateOf(false)
     }
-    var selectedPlaylist by remember {
-        mutableStateOf<Playlist?>(null)
+    var selectedPlaylistId by remember {
+        mutableStateOf<String?>(null)
     }
     var songIds by remember {
         mutableStateOf<List<String>?>(null) // list is not saveable
@@ -112,7 +113,7 @@ fun AddToPlaylistDialog(
         if (searchQuery.isBlank()) {
             playlists
         } else {
-            playlists.filter { it.playlist.name.contains(searchQuery, ignoreCase = true) }
+            playlists.filter { it.name.contains(searchQuery, ignoreCase = true) }
         }
     }
 
@@ -221,17 +222,18 @@ fun AddToPlaylistDialog(
                     playlist = playlist,
                     shape = listItemShape(index = index + 1, count = totalItemsCount),
                     modifier = Modifier.clickable {
-                        selectedPlaylist = playlist
+                        selectedPlaylistId = playlist.id
                         coroutineScope.launch(Dispatchers.IO) {
-                            val playlistSongIds = songIds ?: onGetSong(playlist).also { songIds = it }
-                            duplicates = database.playlistDuplicates(playlist.id, playlistSongIds)
+                            val roomPlaylist = database.playlist(playlist.id).firstOrNull() ?: return@launch
+                            val playlistSongIds = songIds ?: onGetSong(roomPlaylist).also { songIds = it }
+                            duplicates = viewModel.duplicateSongIds(playlist.id, playlistSongIds)
                             if (duplicates.isNotEmpty()) {
                                 showDuplicateDialog = true
                             } else {
                                 onDismiss()
-                                database.addSongToPlaylist(playlist, playlistSongIds)
+                                viewModel.addSongs(playlist.id, playlistSongIds)
 
-                                playlist.playlist.browseId?.let { plist ->
+                                roomPlaylist.playlist.browseId?.let { plist ->
                                     playlistSongIds.forEach {
                                         YouTube.addToPlaylist(plist, it)
                                     }
@@ -253,7 +255,7 @@ fun AddToPlaylistDialog(
                 coroutineScope.launch(Dispatchers.IO) {
                     val newPlaylist = database.playlist(playlistId).first() ?: return@launch
                     val ids = songIds ?: onGetSong(newPlaylist)
-                    database.addSongToPlaylist(newPlaylist, ids)
+                    viewModel.addSongs(newPlaylist.id, ids)
                     // A synced playlist is empty on YouTube; without this the next sync drops the songs.
                     newPlaylist.playlist.browseId?.let { remote -> ids.forEach { YouTube.addToPlaylist(remote, it) } }
                     onDismiss()
@@ -271,11 +273,11 @@ fun AddToPlaylistDialog(
                         onClick = {
                             showDuplicateDialog = false
                             onDismiss()
-                            selectedPlaylist?.let { playlist ->
+                            selectedPlaylistId?.let { playlistId ->
                                 songIds?.let { playlistSongIds ->
-                                    database.transaction {
-                                        addSongToPlaylist(
-                                            playlist,
+                                    coroutineScope.launch(Dispatchers.IO) {
+                                        viewModel.addSongs(
+                                            playlistId,
                                             playlistSongIds.filterNot { it in duplicates },
                                         )
                                     }
@@ -290,10 +292,10 @@ fun AddToPlaylistDialog(
                         onClick = {
                             showDuplicateDialog = false
                             onDismiss()
-                            selectedPlaylist?.let { playlist ->
+                            selectedPlaylistId?.let { playlistId ->
                                 songIds?.let { playlistSongIds ->
-                                    database.transaction {
-                                        addSongToPlaylist(playlist, playlistSongIds)
+                                    coroutineScope.launch(Dispatchers.IO) {
+                                        viewModel.addSongs(playlistId, playlistSongIds)
                                     }
                                 }
                             }

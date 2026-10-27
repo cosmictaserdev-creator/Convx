@@ -8,7 +8,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.convx.music.R
 import com.convx.music.ui.component.DefaultDialog
@@ -24,7 +24,7 @@ import com.convx.music.viewmodels.AppleMusicImportViewModel
 @Composable
 fun AppleMusicPlaylistImport(
     navController: NavController,
-    viewModel: AppleMusicImportViewModel = hiltViewModel(),
+    viewModel: AppleMusicImportViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val exportPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->

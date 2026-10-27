@@ -10,12 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.convx.music.jam.JamManager
 import com.convx.music.jam.PartyPreview
 import com.convx.music.jam.PartyStats
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-@HiltViewModel
-class JamViewModel @Inject constructor(private val manager: JamManager) : ViewModel() {
+class JamViewModel(private val manager: JamManager) : ViewModel() {
     val session = manager.session
     val busy = manager.busy
     val message = manager.message

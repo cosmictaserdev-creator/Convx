@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavController
@@ -74,7 +74,7 @@ fun UpdateSettings(
     scrollBehavior: TopAppBarScrollBehavior
 ) {
     val context = LocalContext.current
-    val updateViewModel: UpdateViewModel = hiltViewModel()
+    val updateViewModel: UpdateViewModel = koinViewModel()
     var autoUpdateEnabled by remember { mutableStateOf(getAutoUpdateCheckSetting(context)) }
     var updateNotificationsEnabled by remember { mutableStateOf(getUpdateNotificationsSetting(context)) }
     val alertsPaused = com.convx.music.core.updater.AUTOMATIC_UPDATE_ALERTS_PAUSED

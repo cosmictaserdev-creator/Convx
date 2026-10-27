@@ -5,7 +5,6 @@ import com.convx.music.db.entities.LyricsEntity
 import com.convx.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
 import com.convx.music.models.MediaMetadata
 import com.convx.music.utils.dataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -22,14 +21,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withTimeout
-import javax.inject.Inject
-import javax.inject.Singleton
 
 enum class LyricsProviderStatus { NOT_FETCHED, FETCHING, FOUND, NOT_FOUND, FAILED, DISABLED, UNSUPPORTED }
 
 /** Shared by automatic lookup and the lyrics page, so choosing a source reuses its request. */
-@Singleton
-class LyricsProviderRepository @Inject constructor(@ApplicationContext private val context: Context) {
+class LyricsProviderRepository(private val context: Context) {
     private data class SongKey(val id: String, val title: String, val artist: String, val duration: Int, val album: String?)
     private data class Key(val song: SongKey, val provider: String)
     private class Attempt(val work: Deferred<Result<String>>) {

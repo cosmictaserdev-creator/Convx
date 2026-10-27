@@ -67,6 +67,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.koin.androidx.compose.koinViewModel
 import coil3.compose.AsyncImage
 import androidx.media3.common.C
 import com.convx.music.LocalPlayerConnection
@@ -857,7 +858,7 @@ private fun PlayerV2Content(
                         .background(adaptivePrimary.copy(alpha = 0.3f))
                         .clickable { state.collapseSoft() }
                 )
-                val partyViewModel: com.convx.music.viewmodels.JamViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+                val partyViewModel: com.convx.music.viewmodels.JamViewModel = koinViewModel()
                 val party by partyViewModel.session.collectAsStateWithLifecycle()
                 party?.let { PartyChip(it.code, it.members.size, adaptivePrimary) { state.collapseSoft(); navController.navigate("listen_together/party") } }
                 if (showVideoSwitch) {

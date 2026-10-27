@@ -20,6 +20,7 @@ import com.convx.music.models.toMediaMetadata
 import com.convx.music.playback.PlayerConnection
 import com.convx.music.playback.queues.YouTubeQueue
 import com.convx.music.listentogether.ListenTogetherManager
+import com.convx.music.di.ValueProvider
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
@@ -29,14 +30,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import dagger.Lazy
 
 /** Routes a share/open-with/notification intent to the right screen or playback action. */
 internal class AppIntentRouter(
     private val activity: MainActivity,
     private val currentPlayerConnection: () -> PlayerConnection?,
-    private val listenTogetherManagerProvider: Lazy<ListenTogetherManager>,
-    private val partyManagerProvider: Lazy<com.convx.music.jam.JamManager>,
+    private val listenTogetherManagerProvider: ValueProvider<ListenTogetherManager>,
+    private val partyManagerProvider: ValueProvider<com.convx.music.jam.JamManager>,
 ) {
 
     private val allowedIdPattern = Regex("^[A-Za-z0-9_\\-]+$")

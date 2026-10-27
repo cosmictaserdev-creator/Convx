@@ -114,6 +114,7 @@ private val ReplayEase = CubicBezierEasing(0.2f, 0.9f, 0.25f, 1f)
 @Composable
 fun ReplayStory(
     state: WrappedState,
+    manager: WrappedManager,
     isMuted: Boolean,
     onToggleMute: () -> Unit,
     onPageAudio: (WrappedScreenType) -> Unit,
@@ -186,7 +187,7 @@ fun ReplayStory(
             modifier = Modifier.fillMaxSize(),
         ) { kind ->
             Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
-                PageContent(kind, state)
+                PageContent(kind, state, manager)
             }
         }
         ReplayChrome(
@@ -203,7 +204,7 @@ fun ReplayStory(
 }
 
 @Composable
-private fun BoxScope.PageContent(kind: ReplayPage.Kind, s: WrappedState) {
+private fun BoxScope.PageContent(kind: ReplayPage.Kind, s: WrappedState, manager: WrappedManager) {
     val nf = remember { NumberFormat.getIntegerInstance() }
     when (kind) {
         ReplayPage.Kind.Loading -> LoadingPulse()
@@ -238,7 +239,7 @@ private fun BoxScope.PageContent(kind: ReplayPage.Kind, s: WrappedState) {
             art = s.topAlbum?.thumbnailUrl,
             circle = false,
         )
-        ReplayPage.Kind.Summary -> SummaryPage(s, nf)
+        ReplayPage.Kind.Summary -> SummaryPage(s, nf, manager)
     }
 }
 
@@ -543,7 +544,7 @@ private fun BoxScope.AlbumOrbitPage(arts: List<String?>) {
 }
 
 @Composable
-private fun BoxScope.SummaryPage(s: WrappedState, nf: NumberFormat) {
+private fun BoxScope.SummaryPage(s: WrappedState, nf: NumberFormat, manager: WrappedManager) {
     Column(Modifier.align(Alignment.TopStart).padding(start = 20.dp, end = 20.dp, top = 64.dp)) {
         Rise(100) { Text("Your Replay", style = HeadlineStyle) }
         Spacer(Modifier.height(20.dp))
@@ -562,7 +563,6 @@ private fun BoxScope.SummaryPage(s: WrappedState, nf: NumberFormat) {
             }
         }
     }
-    val manager = LocalWrappedManager.current
     val creation = s.playlistCreationState
     val imageName = remember { if (kotlin.random.Random.nextBoolean()) "convx_wrapped_v1" else "convx_wrapped_v2" }
     Box(

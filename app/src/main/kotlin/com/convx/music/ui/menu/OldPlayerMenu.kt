@@ -49,7 +49,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import androidx.media3.common.Player
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
@@ -61,10 +60,10 @@ import com.convx.music.LocalListenTogetherManager
 import com.convx.music.LocalPlayerConnection
 import com.convx.music.R
 import com.convx.music.constants.ListItemHeight
-import com.convx.music.extensions.toggleRepeatMode
 import com.convx.music.listentogether.RoomRole
 import com.convx.music.models.MediaMetadata
 import com.convx.music.playback.ExoDownloadService
+import com.convx.music.playback.PlaybackRepeatMode
 import com.convx.music.ui.component.BottomSheetState
 import com.convx.music.ui.component.ListDialog
 import com.convx.music.ui.component.IosMenuGroup
@@ -117,8 +116,9 @@ fun OldPlayerMenu(
 
     val currentSong by playerConnection.currentSong.collectAsState(initial = null)
     val librarySong by database.song(mediaMetadata.id).collectAsState(initial = null)
-    val repeatMode by playerConnection.repeatMode.collectAsStateWithLifecycle()
-    val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+    val playbackSnapshot by playerConnection.playbackSnapshot.collectAsStateWithLifecycle()
+    val repeatMode = playbackSnapshot.repeatMode
+    val shuffleModeEnabled = playbackSnapshot.shuffleEnabled
     val (saavnEnabled) = rememberPreference(EnableSaavnStreamingKey, defaultValue = false)
 
     val artists = remember(mediaMetadata.artists) {
@@ -298,7 +298,7 @@ fun OldPlayerMenu(
                                     SymbolIcon(symbol = sf("shuffle"), contentDescription = null, size = 24.dp, tint = if (shuffleModeEnabled) AppTheme.colorScheme.primary else androidx.compose.material3.LocalContentColor.current)
                                 },
                                 onClick = {
-                                    playerConnection.player.shuffleModeEnabled = !shuffleModeEnabled
+                                    playerConnection.toggleShuffle()
                                     onDismiss()
                                 }
                             )
@@ -377,18 +377,18 @@ fun OldPlayerMenu(
                                     Icon(
                                         painter = painterResource(
                                             when (repeatMode) {
-                                                Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                                                Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
+                                                PlaybackRepeatMode.OFF, PlaybackRepeatMode.ALL -> R.drawable.repeat
+                                                PlaybackRepeatMode.ONE -> R.drawable.repeat_one
                                                 else -> R.drawable.repeat
                                             }
                                         ),
                                         contentDescription = null,
                                         modifier = Modifier.size(24.dp),
-                                        tint = if (repeatMode != Player.REPEAT_MODE_OFF) AppTheme.colorScheme.primary else androidx.compose.material3.LocalContentColor.current
+                                        tint = if (repeatMode != PlaybackRepeatMode.OFF) AppTheme.colorScheme.primary else androidx.compose.material3.LocalContentColor.current
                                     )
                                 },
                                 onClick = {
-                                    playerConnection.player.toggleRepeatMode()
+                                    playerConnection.cycleRepeatMode()
                                 }
                             )
                         )

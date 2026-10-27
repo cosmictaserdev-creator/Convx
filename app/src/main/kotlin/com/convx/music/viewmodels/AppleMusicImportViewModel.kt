@@ -22,10 +22,7 @@ import com.music.innertube.models.SongItem
 import com.music.spotify.SpotifyMapper
 import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
-import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -88,11 +85,10 @@ data class AppleMusicImportState(
     val error: Int? = null,
 )
 
-@HiltViewModel
-class AppleMusicImportViewModel @Inject constructor(
+class AppleMusicImportViewModel(
     private val database: MusicDatabase,
     private val syncUtils: SyncUtils,
-    @ApplicationContext private val context: Context,
+    private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(AppleMusicImportState())
     val state = mutableState.asStateFlow()
@@ -118,7 +114,7 @@ class AppleMusicImportViewModel @Inject constructor(
 
     fun load() {
         if (state.value.busy) return
-        val link = ApplePlaylistLink.parse(state.value.url)
+        val link = ApplePlaylistLink.parse(state.value.url, defaultStorefront = AppleMusicCatalog.storefront)
         if (link == null) {
             mutableState.update { it.copy(error = R.string.apple_music_invalid_link) }
             return

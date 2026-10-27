@@ -9,11 +9,8 @@ import com.convx.music.playback.PlayerConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ListenTogetherPlayerConnectionBridge @Inject constructor() {
+class ListenTogetherPlayerConnectionBridge {
     private val _playerConnection = MutableStateFlow<PlayerConnection?>(null)
     val playerConnection: StateFlow<PlayerConnection?> = _playerConnection.asStateFlow()
 

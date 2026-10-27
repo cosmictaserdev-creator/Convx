@@ -4,13 +4,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.pm.PackageInfoCompat
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.security.MessageDigest
 import java.util.zip.ZipFile
-import javax.inject.Inject
 
-class ApkVerifier @Inject constructor(@ApplicationContext private val context: Context) {
+class ApkVerifier(private val context: Context) {
     @Suppress("DEPRECATION")
     fun verify(file: File, asset: UpdateAsset) {
         if (!file.isFile || file.length() != asset.size) throw UpdateException(UpdateFailure.VERIFICATION)

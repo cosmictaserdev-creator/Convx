@@ -61,6 +61,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import com.convx.music.LocalAmbientBackgroundColor
+import com.convx.music.designsystem.ConvxDesignTokens
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
@@ -100,14 +101,13 @@ import com.convx.music.constants.MiniBarTabStyleKey
 import com.convx.music.constants.MiniPlayerWaveformKey
 import com.convx.music.constants.SwipeSensitivityKey
 import com.convx.music.constants.SwipeThumbnailKey
-import androidx.media3.common.Player
 import com.convx.music.extensions.togglePlayPause
-import com.convx.music.extensions.toggleRepeatMode
 import com.convx.music.ui.component.AnimatedPlayPauseIcon
 import com.convx.music.ui.component.ScrollingWaveformSeekBar
 import com.convx.music.ui.component.floatingtabbar.SearchBarRowHeight
 import com.convx.music.ui.component.floatingtabbar.clipWhilePressed
 import com.convx.music.ui.component.rememberPlaybackFraction
+import com.convx.music.playback.PlaybackRepeatMode
 import androidx.compose.ui.graphics.isSpecified
 import com.convx.music.LocalAmbientBackgroundColor
 import com.convx.music.ui.component.asSoftIconTint
@@ -203,8 +203,9 @@ fun FloatingMiniPlayer(
     val context = LocalContext.current
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
-    val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
-    val repeatMode by playerConnection.repeatMode.collectAsStateWithLifecycle()
+    val playbackSnapshot by playerConnection.playbackSnapshot.collectAsStateWithLifecycle()
+    val shuffleModeEnabled = playbackSnapshot.shuffleEnabled
+    val repeatMode = playbackSnapshot.repeatMode
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
     val canSkipNext by playerConnection.canSkipNext.collectAsStateWithLifecycle()
 
@@ -421,14 +422,14 @@ fun FloatingMiniPlayer(
     ) {
         // Only the tablet pill changes height, so only it scales content to its measured height.
         val animatedHeightPx by animateIntAsState(
-            targetValue = if (tabStyle) measuredHeightPx else with(density) { 64.dp.roundToPx() },
+            targetValue = if (tabStyle) measuredHeightPx else with(density) { ConvxDesignTokens.Metrics.MiniPlayerHeight.roundToPx() },
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
             label = "miniPlayerMeasuredHeight",
         )
         val measuredHeight = with(density) { animatedHeightPx.toDp() }
-        val artSize = if (tabStyle) (measuredHeight * 0.6f).coerceIn(36.dp, 60.dp) else 38.dp
+        val artSize = if (tabStyle) (measuredHeight * 0.6f).coerceIn(36.dp, 60.dp) else ConvxDesignTokens.Metrics.MiniPlayerArtworkSize
         val artCornerRadius = artSize * 0.22f
-        val controlSize = if (tabStyle) (measuredHeight * 0.55f).coerceIn(36.dp, 52.dp) else 36.dp
+        val controlSize = if (tabStyle) (measuredHeight * 0.55f).coerceIn(36.dp, 52.dp) else ConvxDesignTokens.Metrics.MiniPlayerControlSize
 
         // Keep one layout during the morph; read animated width in layout/draw to avoid recomposition.
         // The row writes this field before measuring children, so they use the same frame's width.
@@ -509,8 +510,8 @@ fun FloatingMiniPlayer(
                             Text(
                                 text = mediaMetadata?.title.orEmpty(),
                                 style = AppTheme.typography.bodyMedium,
-                                fontSize = 15.sp,
-                                lineHeight = 20.sp,
+                                fontSize = ConvxDesignTokens.Type.MiniPlayerTitle,
+                                lineHeight = ConvxDesignTokens.Type.MiniPlayerTitleLineHeight,
                                 fontWeight = FontWeight.SemiBold,
                                 letterSpacing = (-0.23).sp,
                                 color = contentColor,
@@ -529,8 +530,8 @@ fun FloatingMiniPlayer(
                         Text(
                             text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
                             style = AppTheme.typography.bodySmall,
-                            fontSize = 11.sp,
-                            lineHeight = 13.sp,
+                            fontSize = ConvxDesignTokens.Type.MiniPlayerArtist,
+                            lineHeight = ConvxDesignTokens.Type.MiniPlayerArtistLineHeight,
                             letterSpacing = 0.06.sp,
                             color = contentColor.copy(alpha = 0.7f),
                             maxLines = 1,
@@ -594,7 +595,7 @@ fun FloatingMiniPlayer(
                 val iconSize = controlSize * 0.5f
                 val playIconSize = controlSize * 0.6f
                 IconButton(
-                    onClick = { playerConnection.player.shuffleModeEnabled = !shuffleModeEnabled },
+                    onClick = { playerConnection.toggleShuffle() },
                     modifier = Modifier.size(controlSize),
                 ) {
                     SymbolIcon(symbol = sf("SFShuffle"), contentDescription = stringResource(R.string.shuffle_label), modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark), tint = transportTint)
@@ -634,10 +635,10 @@ fun FloatingMiniPlayer(
                     )
                 }
                 IconButton(
-                    onClick = { playerConnection.player.toggleRepeatMode() },
+                    onClick = { playerConnection.cycleRepeatMode() },
                     modifier = Modifier.size(controlSize),
                 ) {
-                    SymbolIcon(symbol = if (repeatMode == Player.REPEAT_MODE_ONE) sf("SFRepeat1") else sf("SFRepeat"), contentDescription = stringResource(R.string.repeat_mode_all), modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark), tint = if (repeatMode != Player.REPEAT_MODE_OFF) transportTint else transportTint.copy(alpha = 0.4f))
+                    SymbolIcon(symbol = if (repeatMode == PlaybackRepeatMode.ONE) sf("SFRepeat1") else sf("SFRepeat"), contentDescription = stringResource(R.string.repeat_mode_all), modifier = Modifier.size(iconSize).flamingoChrome(useGlass && isDark), tint = if (repeatMode != PlaybackRepeatMode.OFF) transportTint else transportTint.copy(alpha = 0.4f))
                 }
 
                 Spacer(Modifier.width(8.dp))
@@ -685,8 +686,8 @@ fun FloatingMiniPlayer(
                         Text(
                             text = mediaMetadata?.title.orEmpty(),
                             style = AppTheme.typography.bodyMedium,
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp,
+                            fontSize = ConvxDesignTokens.Type.MiniPlayerTitle,
+                            lineHeight = ConvxDesignTokens.Type.MiniPlayerTitleLineHeight,
                             fontWeight = FontWeight.SemiBold,
                             letterSpacing = (-0.23).sp,
                             color = contentColor,
@@ -696,8 +697,8 @@ fun FloatingMiniPlayer(
                         Text(
                             text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
                             style = AppTheme.typography.bodySmall,
-                            fontSize = 11.sp,
-                            lineHeight = 13.sp,
+                            fontSize = ConvxDesignTokens.Type.MiniPlayerArtist,
+                            lineHeight = ConvxDesignTokens.Type.MiniPlayerArtistLineHeight,
                             letterSpacing = 0.06.sp,
                             color = contentColor.copy(alpha = 0.7f),
                             maxLines = 1,

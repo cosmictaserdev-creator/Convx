@@ -13,8 +13,6 @@ import com.music.innertube.YouTube
 import com.music.innertube.models.AlbumItem
 import com.convx.music.db.MusicDatabase
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -27,14 +25,10 @@ import kotlinx.coroutines.withTimeoutOrNull
 import com.convx.music.utils.Wikipedia
 import com.convx.music.utils.AppleMusicAboutAlbum
 import com.convx.music.utils.ArtistWordmarkAssets
-import javax.inject.Inject
 import java.io.File
 
-@HiltViewModel
-class AlbumViewModel
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+class AlbumViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

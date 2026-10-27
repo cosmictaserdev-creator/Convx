@@ -19,11 +19,9 @@ import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
 import com.convx.music.R
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 
-@AndroidEntryPoint
 class ExoDownloadService : DownloadService(
     NOTIFICATION_ID,
     1000L,
@@ -31,8 +29,7 @@ class ExoDownloadService : DownloadService(
     R.string.downloading,
     0
 ) {
-    @Inject
-    lateinit var downloadUtil: DownloadUtil
+    private val downloadUtil: DownloadUtil by inject()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == REMOVE_ALL_PENDING_DOWNLOADS) {

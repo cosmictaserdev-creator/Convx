@@ -72,13 +72,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.music.innertube.utils.parseCookieString
 import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.R
-import com.convx.music.ui.menu.PlaylistMenu
 import com.convx.music.constants.CONTENT_TYPE_HEADER
 import com.convx.music.constants.CONTENT_TYPE_PLAYLIST
 import com.convx.music.constants.GridItemSize
@@ -112,6 +111,7 @@ import com.convx.music.ui.component.LibraryPlaylistListItem
 import com.convx.music.ui.component.LocalMenuState
 import com.convx.music.ui.component.PlaylistGridItem
 import com.convx.music.ui.component.PlaylistListItem
+import com.convx.music.ui.component.rememberLibraryPlaylistMenuAction
 import com.convx.music.ui.component.SortHeader
 import com.convx.music.utils.rememberEnumPreference
 import com.convx.music.utils.rememberPreference
@@ -130,7 +130,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun LibraryPlaylistsScreen(
     navController: NavController,
     filterContent: @Composable () -> Unit,
-    viewModel: LibraryPlaylistsViewModel = hiltViewModel(),
+    viewModel: LibraryPlaylistsViewModel = koinViewModel(),
     initialTextFieldValue: String? = null,
     allowSyncing: Boolean = true,
 ) {
@@ -153,6 +153,7 @@ fun LibraryPlaylistsScreen(
     val (libraryIconsOnly) = rememberPreference(LibraryIconsOnlyKey, defaultValue = true)
 
     val playlists by viewModel.allPlaylists.collectAsStateWithLifecycle()
+    val loadPlaylistForMenu = remember(viewModel) { viewModel::loadPlaylistForMenu }
 
     val topSize by viewModel.topValue.collectAsState(initial = 50)
 
@@ -330,15 +331,15 @@ fun LibraryPlaylistsScreen(
     // needs the resulting count too.
     // Synced (online) playlists lead; ones made on this device follow below a divider.
     val (onlinePlaylists, devicePlaylists) = remember(playlists) {
-        playlists.distinctBy { it.id }.partition { it.playlist.browseId != null }
+        playlists.distinctBy { it.id }.partition { it.browseId != null }
     }
     val visiblePlaylists = remember(onlinePlaylists, devicePlaylists) { onlinePlaylists + devicePlaylists }
     val showDivider = onlinePlaylists.isNotEmpty() && devicePlaylists.isNotEmpty()
 
     // Keep pinned playlists in the regular list; this separate list feeds the pinned row.
     val pinnedPlaylists = remember(visiblePlaylists) {
-        visiblePlaylists.filter { it.playlist.pinnedAt != null }
-            .sortedByDescending { it.playlist.pinnedAt }
+        visiblePlaylists.filter { it.pinnedAtEpochMillis != null }
+            .sortedByDescending { it.pinnedAtEpochMillis }
     }
 
     Box(
@@ -392,22 +393,20 @@ fun LibraryPlaylistsScreen(
                                     .animateItem(),
                             ) {
                                 items(pinnedPlaylists, key = { "pinned_${it.id}" }) { playlist ->
+                                    val openMenu = rememberLibraryPlaylistMenuAction(
+                                        playlist.id,
+                                        menuState,
+                                        coroutineScope,
+                                        loadPlaylistForMenu,
+                                    )
                                     PlaylistGridItem(
                                         playlist = playlist,
                                         fillMaxWidth = false,
                                         modifier = Modifier
                                             .width(150.dp)
                                             .combinedBounceClick(
-                                                onClick = { navController.navigate(localPlaylistRoute(playlist.id, playlist.thumbnailUrl)) },
-                                                onLongClick = {
-                                                    menuState.show {
-                                                        PlaylistMenu(
-                                                            playlist = playlist,
-                                                            coroutineScope = coroutineScope,
-                                                            onDismiss = menuState::dismiss,
-                                                        )
-                                                    }
-                                                },
+                                                onClick = { navController.navigate(localPlaylistRoute(playlist.id, null)) },
+                                                onLongClick = openMenu,
                                             ),
                                     )
                                 }
@@ -524,6 +523,7 @@ fun LibraryPlaylistsScreen(
                                 menuState = menuState,
                                 coroutineScope = coroutineScope,
                                 playlist = playlist,
+                                loadPlaylist = loadPlaylistForMenu,
                                 modifier = Modifier.animateItem()
                             )
                         }
@@ -540,6 +540,7 @@ fun LibraryPlaylistsScreen(
                                 menuState = menuState,
                                 coroutineScope = coroutineScope,
                                 playlist = playlist,
+                                loadPlaylist = loadPlaylistForMenu,
                                 modifier = Modifier.animateItem()
                             )
                         }
@@ -615,22 +616,20 @@ fun LibraryPlaylistsScreen(
                                     .animateItem(),
                             ) {
                                 items(pinnedPlaylists, key = { "pinned_${it.id}" }) { playlist ->
+                                    val openMenu = rememberLibraryPlaylistMenuAction(
+                                        playlist.id,
+                                        menuState,
+                                        coroutineScope,
+                                        loadPlaylistForMenu,
+                                    )
                                     PlaylistGridItem(
                                         playlist = playlist,
                                         fillMaxWidth = false,
                                         modifier = Modifier
                                             .width(150.dp)
                                             .combinedBounceClick(
-                                                onClick = { navController.navigate(localPlaylistRoute(playlist.id, playlist.thumbnailUrl)) },
-                                                onLongClick = {
-                                                    menuState.show {
-                                                        PlaylistMenu(
-                                                            playlist = playlist,
-                                                            coroutineScope = coroutineScope,
-                                                            onDismiss = menuState::dismiss,
-                                                        )
-                                                    }
-                                                },
+                                                onClick = { navController.navigate(localPlaylistRoute(playlist.id, null)) },
+                                                onLongClick = openMenu,
                                             ),
                                     )
                                 }
@@ -747,6 +746,7 @@ fun LibraryPlaylistsScreen(
                                 menuState = menuState,
                                 coroutineScope = coroutineScope,
                                 playlist = playlist,
+                                loadPlaylist = loadPlaylistForMenu,
                                 modifier = Modifier.animateItem()
                             )
                         }
@@ -767,6 +767,7 @@ fun LibraryPlaylistsScreen(
                                 menuState = menuState,
                                 coroutineScope = coroutineScope,
                                 playlist = playlist,
+                                loadPlaylist = loadPlaylistForMenu,
                                 modifier = Modifier.animateItem()
                             )
                         }
@@ -797,7 +798,7 @@ fun LibraryPlaylistsScreen(
             itemCount = visiblePlaylists.size,
             sectionIndexMap = if (sortType == PlaylistSortType.NAME) {
                 remember(visiblePlaylists) {
-                    buildAlphabetSectionIndex(visiblePlaylists) { it.playlist.name }
+                    buildAlphabetSectionIndex(visiblePlaylists) { it.name }
                 }
             } else {
                 null

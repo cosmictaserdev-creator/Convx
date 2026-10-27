@@ -60,8 +60,6 @@ import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 enum class ConnectionState {
     DISCONNECTED,
@@ -138,8 +136,7 @@ sealed class ListenTogetherEvent {
     data class QueueTrackAdded(val title: String, val addedBy: String?) : ListenTogetherEvent()
 }
 
-@Singleton
-class ListenTogetherClient @Inject constructor(
+class ListenTogetherClient(
     private val context: Context
 ) {
     companion object {

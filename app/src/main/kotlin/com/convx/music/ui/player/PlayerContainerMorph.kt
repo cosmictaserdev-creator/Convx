@@ -100,20 +100,15 @@ fun Modifier.registerMiniControlsNextRect(): Modifier = onGloballyPositioned {
 
 /** Mini title/buttons track across the first three tenths, then hand over. */
 fun playerSheetMiniContentAlpha(progress: Float): Float =
-    1f - easeOutCubic((progress / PLAYER_MINI_FADE_END).coerceIn(0f, 1f))
+    com.convx.music.playback.presentation.PlayerMorphGeometry.miniContentAlpha(progress)
 
 /** Full-player recording fades in from a tenth to six tenths, ease-in. */
 fun playerSheetPageAlpha(progress: Float): Float =
-    easeInCubic(
-        (
-            (progress - PLAYER_CONTENT_APPEAR_START) /
-                (PLAYER_CONTENT_APPEAR_END - PLAYER_CONTENT_APPEAR_START)
-            ).coerceIn(0f, 1f),
-    )
+    com.convx.music.playback.presentation.PlayerMorphGeometry.pageAlpha(progress)
 
 /** Full-player background leads across the first fifth, ease-in. */
 fun playerSheetBackgroundAlpha(progress: Float): Float =
-    easeInCubic((progress / PLAYER_LAYER_HANDOFF_PROGRESS).coerceIn(0f, 1f))
+    com.convx.music.playback.presentation.PlayerMorphGeometry.backgroundAlpha(progress)
 
 /**
  * Draws the mini and full player layers in one container during the sheet morph.
@@ -278,8 +273,8 @@ fun PlayerContainerMorphOverlay(
 }
 
 /** How much the landing pill flattens at the bottom of its dip, and widens with it. */
-private const val LANDING_SQUASH = 0.14f
-private const val LANDING_SPREAD = 0.04f
+private const val LANDING_SQUASH = com.convx.music.designsystem.MotionTokens.PlayerLandingSquash
+private const val LANDING_SPREAD = com.convx.music.designsystem.MotionTokens.PlayerLandingSpread
 
 /**
  * The card during a close landing: the pill's own rect carried [PlayerMorph.landingDipPx]

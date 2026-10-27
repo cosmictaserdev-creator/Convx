@@ -16,7 +16,6 @@ import com.convx.music.lyrics.LyricsHelper
 import com.convx.music.lyrics.LyricsResult
 import com.convx.music.models.MediaMetadata
 import com.convx.music.utils.NetworkConnectivityObserver
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,12 +23,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class LyricsMenuViewModel
-@Inject
-constructor(
+class LyricsMenuViewModel(
     private val lyricsHelper: LyricsHelper,
     val database: MusicDatabase,
     private val networkConnectivity: NetworkConnectivityObserver,

@@ -30,12 +30,15 @@ import coil3.request.bitmapConfig
 import coil3.request.crossfade
 import com.convx.music.utils.ArtworkQualityInterceptor
 import com.music.innertube.YouTube
+import com.music.innertube.InnertubeProxySettings
+import com.music.innertube.ProxyType
 import com.music.innertube.models.IpVersion
 import com.music.innertube.models.YouTubeLocale
 import com.music.kugou.KuGou
 import com.music.lastfm.LastFM
 import com.convx.music.constants.*
-import com.convx.music.di.ApplicationScope
+import com.convx.music.di.ValueProvider
+import com.convx.music.di.appModules
 import com.convx.music.extensions.toEnum
 import com.convx.music.extensions.toInetSocketAddress
 import com.convx.music.utils.CrashHandler
@@ -47,7 +50,10 @@ import com.convx.music.utils.migrateSharedPreferencesToMMKV
 import com.convx.music.utils.warmPreferenceMirror
 import com.convx.music.utils.reportException
 import com.tencent.mmkv.MMKV
-import dagger.hilt.android.HiltAndroidApp
+import com.convx.storage.data.NetworkMusicRepository
+import org.koin.core.context.GlobalContext
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -62,20 +68,22 @@ import java.net.PasswordAuthentication
 import java.net.Proxy
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
 
-@HiltAndroidApp
 class App : Application(), SingletonImageLoader.Factory {
 
-    @Inject
-    @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
-    @Inject
-    lateinit var networkRepository: dagger.Lazy<com.convx.storage.data.NetworkMusicRepository>
+    private lateinit var networkRepository: ValueProvider<NetworkMusicRepository>
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidContext(this@App)
+            modules(appModules)
+        }
+        val appKoin = GlobalContext.get()
+        applicationScope = appKoin.get()
+        networkRepository = ValueProvider { appKoin.get() }
         com.music.spotify.SpotifyAuth.initialize(this)
         // The recovery activity runs in its own process. Do not reopen the database,
         // preferences, native caches or playback integrations that may have crashed.
@@ -229,7 +237,12 @@ class App : Application(), SingletonImageLoader.Factory {
             }
             try {
                 settings[ProxyUrlKey]?.takeIf { it.isNotBlank() }?.let {
-                    YouTube.proxy = Proxy(type, it.toInetSocketAddress())
+                    val address = it.toInetSocketAddress()
+                    YouTube.proxy = InnertubeProxySettings(
+                        type = if (type == Proxy.Type.SOCKS) ProxyType.SOCKS else ProxyType.HTTP,
+                        host = address.hostString,
+                        port = address.port,
+                    )
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {

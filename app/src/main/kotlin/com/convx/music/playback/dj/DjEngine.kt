@@ -38,15 +38,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-data class TrackAnalysis(
-    val grid: BeatGrid,
-    val key: MusicalKey? = null,
-    val energyProfile: ByteArray = ByteArray(0),
-) {
-    override fun equals(other: Any?): Boolean = this === other
-    override fun hashCode(): Int = System.identityHashCode(this)
-}
-
 data class DjState(
     val enabled: Boolean = false,
     val currentBpm: Float = 0f,

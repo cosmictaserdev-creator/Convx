@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.sfsymbols.SfSymbol
@@ -49,7 +49,7 @@ internal val FolderSymbol: String by lazy {
 fun NetworkBrowserScreen(
     navController: NavController,
     serverId: String,
-    viewModel: NetworkBrowserViewModel = hiltViewModel(),
+    viewModel: NetworkBrowserViewModel = koinViewModel(),
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val servers by viewModel.servers.collectAsStateWithLifecycle()

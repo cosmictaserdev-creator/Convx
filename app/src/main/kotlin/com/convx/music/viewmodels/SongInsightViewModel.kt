@@ -11,8 +11,6 @@ import com.convx.music.constants.OpenRouterApiKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 data class SongInsightState(
     val title: String = "",
@@ -35,9 +32,8 @@ data class SongInsightState(
     val summary: String? = null,
 )
 
-@HiltViewModel
-class SongInsightViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class SongInsightViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

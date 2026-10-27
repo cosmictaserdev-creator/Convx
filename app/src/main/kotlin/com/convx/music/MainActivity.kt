@@ -33,7 +33,10 @@ import com.convx.music.constants.DisableScreenshotKey
 import com.convx.music.constants.SYSTEM_DEFAULT
 import com.convx.music.constants.StopMusicOnTaskClearKey
 import com.convx.music.db.MusicDatabase
-import com.convx.music.history.HistoryLocalDataSource
+import com.convx.music.di.ValueProvider
+import com.convx.music.history.ListenHistoryRepository
+import com.convx.music.history.ListenHistorySettingsRepository
+import com.convx.music.library.ObservePlaylists
 import com.convx.music.playback.DownloadUtil
 import com.convx.music.playback.MusicService
 import com.convx.music.playback.PlaybackServiceConnector
@@ -42,15 +45,13 @@ import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.setAppLocale
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Locale
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_PLAY_INTRO = "com.convx.music.extra.PLAY_INTRO"
@@ -58,26 +59,15 @@ class MainActivity : ComponentActivity() {
         internal const val ACTION_LIBRARY = "com.convx.music.action.LIBRARY"
     }
 
-    @Inject
-    lateinit var database: dagger.Lazy<MusicDatabase>
-
-    @Inject
-    lateinit var downloadUtil: dagger.Lazy<DownloadUtil>
-
-    @Inject
-    lateinit var syncUtils: dagger.Lazy<SyncUtils>
-
-    @Inject
-    lateinit var historyDataSource: dagger.Lazy<HistoryLocalDataSource>
-
-    @Inject
-    lateinit var listenTogetherManager: dagger.Lazy<com.convx.music.listentogether.ListenTogetherManager>
-
-    @Inject
-    lateinit var partyManager: dagger.Lazy<com.convx.music.jam.JamManager>
-
-    @Inject
-    lateinit var playbackServiceConnector: PlaybackServiceConnector
+    private val database: MusicDatabase by inject()
+    private val downloadUtil: DownloadUtil by inject()
+    private val syncUtils: SyncUtils by inject()
+    private val listenHistoryRepository: ListenHistoryRepository by inject()
+    private val listenHistorySettingsRepository: ListenHistorySettingsRepository by inject()
+    private val observePlaylists: ObservePlaylists by inject()
+    private val listenTogetherManager: com.convx.music.listentogether.ListenTogetherManager by inject()
+    private val partyManager: com.convx.music.jam.JamManager by inject()
+    private val playbackServiceConnector: PlaybackServiceConnector by inject()
 
     private var pendingIntent: Intent? = null
 
@@ -190,10 +180,12 @@ class MainActivity : ComponentActivity() {
                     activity = this@MainActivity,
                     intentRouter = deepLinkRouter,
                     playerConnection = playerConnection,
-                    database = database,
-                    downloadUtil = downloadUtil,
-                    syncUtils = syncUtils,
-                    historyDataSource = historyDataSource,
+                    database = ValueProvider { database },
+                    downloadUtil = ValueProvider { downloadUtil },
+                    syncUtils = ValueProvider { syncUtils },
+                    listenHistoryRepository = ValueProvider { listenHistoryRepository },
+                    listenHistorySettingsRepository = ValueProvider { listenHistorySettingsRepository },
+                    observePlaylists = observePlaylists,
                 )
                 if (showIntro) com.convx.music.ui.component.ConvxIntro(onFinished = { showIntro = false })
             }
@@ -211,6 +203,11 @@ class MainActivity : ComponentActivity() {
     }
 
     internal val deepLinkRouter by lazy {
-        AppIntentRouter(this, { playerConnection }, listenTogetherManager, partyManager)
+        AppIntentRouter(
+            this,
+            { playerConnection },
+            ValueProvider { listenTogetherManager },
+            ValueProvider { partyManager },
+        )
     }
 }

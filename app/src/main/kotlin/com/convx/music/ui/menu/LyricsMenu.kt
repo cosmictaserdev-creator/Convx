@@ -63,7 +63,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.convx.music.LocalDatabase
 import com.convx.music.R
 import com.convx.music.db.entities.LyricsEntity
@@ -100,7 +100,7 @@ fun LyricsMenu(
     mediaMetadataProvider: () -> MediaMetadata,
     onDismiss: () -> Unit,
     onShowOffsetDialog: () -> Unit = {},
-    viewModel: LyricsMenuViewModel = hiltViewModel(),
+    viewModel: LyricsMenuViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val database = LocalDatabase.current.get()

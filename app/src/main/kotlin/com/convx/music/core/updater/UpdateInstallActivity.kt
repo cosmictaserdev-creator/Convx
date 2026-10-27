@@ -22,15 +22,13 @@ import com.convx.music.R
 import com.convx.music.ui.ios.compat.CircularProgressIndicator
 import com.convx.music.ui.ios.compat.Text
 import com.convx.music.ui.theme.ConvxTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class UpdateInstallActivity : ComponentActivity() {
-    @Inject lateinit var installer: UpdateInstaller
+    private val installer: UpdateInstaller by inject()
     private val permission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (packageManager.canRequestPackageInstalls()) startInstall() else finish()
     }

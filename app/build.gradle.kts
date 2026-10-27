@@ -20,9 +20,8 @@ val appVersionName = "$appVersionMajor.$appVersionMinor.$appVersionPatch"
 
 plugins {
     id("com.android.application")
-    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.protobufPlugin)
 }
@@ -166,6 +165,8 @@ android {
         unitTests.isReturnDefaultValues = true
     }
 
+    sourceSets.getByName("androidTest").assets.srcDir("$projectDir/schemas")
+
     kotlin {
         jvmToolchain(21)
         compilerOptions {
@@ -267,7 +268,7 @@ dependencies {
     implementation(libs.concurrent.futures)
 
     implementation(libs.activity)
-    implementation(libs.hilt.navigation)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.datastore)
     "universalImplementation"(libs.mmkv)
     "arm64Implementation"(libs.mmkv)
@@ -296,7 +297,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.exifinterface)
 
-    implementation(libs.coil)
+    implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
@@ -340,9 +341,9 @@ dependencies {
 
     implementation(libs.apache.lang3)
 
-    implementation(libs.hilt)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
     implementation(libs.jsoup)
-    ksp(libs.hilt.compiler)
 
     implementation(project(":innertube"))
     implementation(project(":lyrics"))
@@ -351,6 +352,12 @@ dependencies {
     implementation(project(":artwork"))
     implementation(project(":network-storage"))
     implementation(project(":canvas"))
+    implementation(project(":playback-core"))
+    implementation(project(":playback-presentation"))
+    implementation(project(":history-core"))
+    implementation(project(":library-core"))
+    implementation(project(":search-core"))
+    implementation(project(":design-system"))
     implementation(project(":spine"))
     implementation(project(":hig"))
 
@@ -379,6 +386,12 @@ dependencies {
     implementation(libs.onnxruntime)
 
     testImplementation(libs.junit)
+    testImplementation(libs.koin.test)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.junit)
 }
 
 

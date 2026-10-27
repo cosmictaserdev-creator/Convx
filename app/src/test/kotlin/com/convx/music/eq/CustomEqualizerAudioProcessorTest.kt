@@ -18,6 +18,7 @@ class CustomEqualizerAudioProcessorTest {
         val processor = CustomEqualizerAudioProcessor()
         processor.applyProfile(ParametricEQ(-6.020599913, listOf(ParametricEQBand(16000.0, 6.0))))
         processor.configure(AudioProcessor.AudioFormat(22050, 1, C.ENCODING_PCM_16BIT))
+        processor.flush()
         processor.queueInput(samples(10000))
         assertEquals(5000, processor.output.order(ByteOrder.nativeOrder()).short.toInt())
     }
@@ -38,14 +39,17 @@ class CustomEqualizerAudioProcessorTest {
         val reused = CustomEqualizerAudioProcessor().apply {
             applyProfile(profile)
             configure(AudioProcessor.AudioFormat(44100, 1, C.ENCODING_PCM_16BIT))
+            flush()
             queueInput(samples(10000, 0, 0, 0))
             output
             flush()
             configure(AudioProcessor.AudioFormat(96000, 1, C.ENCODING_PCM_16BIT))
+            flush()
         }
         val fresh = CustomEqualizerAudioProcessor().apply {
             applyProfile(profile)
             configure(AudioProcessor.AudioFormat(96000, 1, C.ENCODING_PCM_16BIT))
+            flush()
         }
         reused.queueInput(samples(10000, 0, 0, 0))
         fresh.queueInput(samples(10000, 0, 0, 0))
@@ -56,6 +60,7 @@ class CustomEqualizerAudioProcessorTest {
     fun `bit perfect bypass is exact and restores tuning`() {
         val processor = CustomEqualizerAudioProcessor().apply {
             configure(AudioProcessor.AudioFormat(48000, 1, C.ENCODING_PCM_16BIT))
+            flush()
             applyProfile(ParametricEQ(-6.0, listOf(ParametricEQBand(1000.0, 0.0))))
             forceBypass = true
         }

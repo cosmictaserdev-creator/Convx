@@ -4,11 +4,8 @@ import com.tencent.mmkv.MMKV
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class UpdateStore @Inject constructor() {
+class UpdateStore {
     private val prefs get() = MMKV.mmkvWithID("github_updater")
     private val json = Json { ignoreUnknownKeys = true }
     var release: UpdateRelease?

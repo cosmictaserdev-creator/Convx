@@ -15,27 +15,21 @@ import com.convx.music.constants.HideVideoSongsKey
 import com.convx.music.constants.DataSaverEnabledKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.Song
-import com.convx.music.di.DownloadCache
-import com.convx.music.di.PlayerCache
 import com.convx.music.extensions.filterExplicit
 import com.convx.music.extensions.filterVideoSongs
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import javax.inject.Inject
 
-@HiltViewModel
-class CachePlaylistViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class CachePlaylistViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
-    @PlayerCache private val playerCache: SimpleCache,
-    @DownloadCache private val downloadCache: SimpleCache,
+    private val playerCache: SimpleCache,
+    private val downloadCache: SimpleCache,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val thumbArg = savedStateHandle.get<String>("thumb")?.takeIf { it.isNotEmpty() }

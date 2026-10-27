@@ -9,12 +9,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URI
-import javax.inject.Inject
-import javax.inject.Singleton
 import java.io.ByteArrayOutputStream
 
-@Singleton
-class GitHubReleaseSource @Inject constructor() {
+class GitHubReleaseSource {
     private var cachedBody: String? = null
     private var etag: String? = null
     private var blockedUntil = 0L
