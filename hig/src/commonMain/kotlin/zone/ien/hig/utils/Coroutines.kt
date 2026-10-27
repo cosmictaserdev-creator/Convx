@@ -18,11 +18,11 @@
 
 package zone.ien.hig.utils
 
-import kotlinx.coroutines.android.awaitFrame as platformAwaitFrame
+import androidx.compose.runtime.withFrameNanos
 
 /**
  * Suspends the current coroutine until the next frame is ready.
  */
 suspend fun awaitFrame() {
-    platformAwaitFrame()
+    withFrameNanos { }
 }

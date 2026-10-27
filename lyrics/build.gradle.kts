@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.music.lyrics"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -23,6 +23,8 @@ kotlin {
 }
 
 dependencies {
+    api(project(":lyrics-core"))
+    api(libs.coroutines.core)
     implementation(project(":innertube"))
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)

@@ -389,7 +389,6 @@ internal fun FullscreenPopupProperties(
     usePlatformDefaultWidth: Boolean = true,
 ): DialogProperties =
     DialogProperties(
-        decorFitsSystemWindows = true,
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = dismissOnClickOutside,
         usePlatformDefaultWidth = usePlatformDefaultWidth,
