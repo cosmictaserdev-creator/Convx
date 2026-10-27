@@ -12,6 +12,7 @@ import com.convx.music.constants.EnableSimpMusicKey
 import com.convx.music.constants.EnableUnisonKey
 import com.convx.music.constants.EnableYouLyPlusKey
 import com.convx.music.constants.PreferredLyricsProvider
+import com.convx.music.lyrics.bitchord.PaxSenix
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 
@@ -41,6 +42,8 @@ object LyricsProviderSettings {
         context.dataStore[enabledKey(provider.id)] ?: true
 
     fun initialize(context: Context, provider: LyricsProvider) {
-        provider.initialize(context.applicationContext)
+        if (provider !is BitChordLyricsProvider) return
+        val credentials = context.applicationContext.getSharedPreferences("lyrics_credentials", Context.MODE_PRIVATE)
+        PaxSenix.setApiKey(credentials.getString("paxsenix_api_key", "").orEmpty())
     }
 }

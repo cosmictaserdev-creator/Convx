@@ -34,7 +34,6 @@ import com.music.innertube.InnertubeProxySettings
 import com.music.innertube.ProxyType
 import com.music.innertube.models.IpVersion
 import com.music.innertube.models.YouTubeLocale
-import com.music.kugou.KuGou
 import com.music.lastfm.LastFM
 import com.convx.music.constants.*
 import com.convx.music.di.ValueProvider
@@ -210,10 +209,6 @@ class App : Application(), SingletonImageLoader.Factory {
                 ?: languageTag.takeIf { it in LanguageCodeToName }
                 ?: "en"
         )
-
-        if (languageTag == "zh-TW") {
-            KuGou.useTraditionalChinese = true
-        }
 
         LastFM.initialize(
             apiKey = BuildConfig.LASTFM_API_KEY.takeIf { it.isNotEmpty() } ?: "",

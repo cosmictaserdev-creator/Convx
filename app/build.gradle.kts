@@ -346,7 +346,7 @@ dependencies {
     implementation(libs.jsoup)
 
     implementation(project(":innertube"))
-    implementation(project(":lyrics"))
+    implementation(project(":lyrics-data"))
     implementation(project(":integrations"))
     implementation(project(":spotify"))
     implementation(project(":artwork"))

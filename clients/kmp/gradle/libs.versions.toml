@@ -43,6 +43,7 @@ haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
 haze-blur-materials = { module = "dev.chrisbanes.haze:haze-blur-materials", version.ref = "haze" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+ksoup = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.6" }
 jetpackSfSymbols = { module = "com.github.cosmictaserdev-creator.Jetpack_SF_Symbols:sfsymbols", version.ref = "jetpackSfSymbols" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
