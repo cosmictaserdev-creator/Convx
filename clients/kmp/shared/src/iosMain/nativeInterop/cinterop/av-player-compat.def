@@ -1,0 +1,5 @@
+package = com.convx.music.client.ios.avplayercompat
+language = Objective-C
+headers = AVPlayerCompat.h
+compilerOpts = -framework AVFoundation -framework CoreMedia
+linkerOpts = -framework AVFoundation -framework CoreMedia

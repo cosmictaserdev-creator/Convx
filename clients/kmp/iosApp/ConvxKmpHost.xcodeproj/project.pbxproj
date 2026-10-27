@@ -1,0 +1,164 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* ContentView.swift */; };
+		A10000000000000000000002 /* ConvxKmpHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* ConvxKmpHostApp.swift */; };
+		A10000000000000000000003 /* ConvxShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* ConvxShared.framework */; };
+		B10000000000000000000010 /* ConvxWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000010; };
+		B10000000000000000000011 /* WatchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011; };
+		B10000000000000000000012 /* WatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012; };
+		B10000000000000000000013 /* WatchLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013; };
+		B10000000000000000000014 /* WatchNowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000014; };
+        B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B20000000000000000000001; };
+        B10000000000000000000099 = {isa = PBXBuildFile; fileRef = B20000000000000000000099; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* ConvxKmpHostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvxKmpHostApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* ConvxShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ConvxShared.framework; path = ../../shared/build/bin/iosSimulatorArm64/debugFramework/ConvxShared.framework; sourceTree = "<group>"; };
+		A20000000000000000000004 /* ConvxKmpHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConvxKmpHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000010 /* ConvxWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvxWatchApp.swift; sourceTree = "<group>"; };
+		B20000000000000000000011 /* WatchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModels.swift; sourceTree = "<group>"; };
+		B20000000000000000000012 /* WatchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSession.swift; sourceTree = "<group>"; };
+		B20000000000000000000013 /* WatchLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLibraryView.swift; sourceTree = "<group>"; };
+		B20000000000000000000014 /* WatchNowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNowPlayingView.swift; sourceTree = "<group>"; };
+        B20000000000000000000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSession.swift; sourceTree = "<group>"; };
+        B20000000000000000000099 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConvxWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+        B20000000000000000000098 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000003 /* ConvxShared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+        B30000000000000000000002 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+        B30000000000000000000004 = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = "$(CONTENTS_FOLDER_PATH)/Watch"; dstSubfolderSpec = 16; files = (B10000000000000000000099, ); name = "Embed Watch Content"; runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXCopyFilesBuildPhase section */
+/* Begin PBXContainerItemProxy section */
+        B90000000000000000000001 = {isa = PBXContainerItemProxy; containerPortal = A60000000000000000000001; proxyType = 1; remoteGlobalIDString = B50000000000000000000001; remoteInfo = ConvxWatch; };
+/* End PBXContainerItemProxy section */
+/* Begin PBXTargetDependency section */
+        B90000000000000000000002 = {isa = PBXTargetDependency; target = B50000000000000000000001; targetProxy = B90000000000000000000001; };
+/* End PBXTargetDependency section */
+/* Begin PBXGroup section */
+		A40000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A40000000000000000000002 /* ConvxKmpHost */,
+				A40000000000000000000003 /* Products */,
+                B40000000000000000000001 /* ConvxWatch */,
+			);
+			sourceTree = "<group>";
+		};
+		A40000000000000000000002 /* ConvxKmpHost */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000001 /* ContentView.swift */,
+				A20000000000000000000002 /* ConvxKmpHostApp.swift */,
+                B20000000000000000000001 /* PhoneWatchSession.swift */,
+				A20000000000000000000003 /* ConvxShared.framework */,
+			);
+			path = ConvxKmpHost;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000004 /* ConvxKmpHost.app */,
+                B20000000000000000000099 /* ConvxWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+        B40000000000000000000001 = {isa = PBXGroup; children = (B20000000000000000000010, B20000000000000000000011, B20000000000000000000012, B20000000000000000000013, B20000000000000000000014, B20000000000000000000098, ); path = ../watchApp/ConvxWatch; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A50000000000000000000001 /* ConvxKmpHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A80000000000000000000002 /* Build configuration list for PBXNativeTarget "ConvxKmpHost" */;
+			buildPhases = (
+				A30000000000000000000002 /* Sources */,
+				A30000000000000000000001 /* Frameworks */,
+				A30000000000000000000003 /* Resources */,
+                B30000000000000000000004 /* Embed Watch Content */,
+			);
+			buildRules = ();
+			dependencies = (B90000000000000000000002, );
+			name = ConvxKmpHost;
+			productName = ConvxKmpHost;
+			productReference = A20000000000000000000004 /* ConvxKmpHost.app */;
+			productType = "com.apple.product-type.application";
+		};
+        B50000000000000000000001 = {isa = PBXNativeTarget; buildConfigurationList = B80000000000000000000001; buildPhases = (B30000000000000000000001, B30000000000000000000002, B30000000000000000000003, ); buildRules = (); dependencies = (); name = ConvxWatch; productName = ConvxWatch; productReference = B20000000000000000000099; productType = "com.apple.product-type.application"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A60000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {A50000000000000000000001 = {CreatedOnToolsVersion = 16.0; }; };
+			};
+			buildConfigurationList = A80000000000000000000001 /* Build configuration list for PBXProject "ConvxKmpHost" */;
+			compatibilityVersion = "Xcode 14.0";
+			mainGroup = A40000000000000000000001;
+			productRefGroup = A40000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (A50000000000000000000001 /* ConvxKmpHost */, B50000000000000000000001 /* ConvxWatch */, );
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A30000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+        B30000000000000000000003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A30000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* ContentView.swift in Sources */,
+				A10000000000000000000002 /* ConvxKmpHostApp.swift in Sources */,
+                B10000000000000000000001 /* PhoneWatchSession.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+        B30000000000000000000001 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B10000000000000000000010, B10000000000000000000011, B10000000000000000000012, B10000000000000000000013, B10000000000000000000014, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A70000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; }; name = Debug; };
+		A70000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; }; name = Release; };
+		A70000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../shared/build/bin/iosSimulatorArm64/debugFramework"; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = ConvxKmpHost/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = com.convx.music.client.ioshost; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SUPPORTED_PLATFORMS = "iphonesimulator iphoneos"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Debug; };
+		A70000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../shared/build/bin/iosSimulatorArm64/debugFramework"; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = ConvxKmpHost/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = com.convx.music.client.ioshost; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SUPPORTED_PLATFORMS = "iphonesimulator iphoneos"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Release; };
+        B70000000000000000000001 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = ../watchApp/ConvxWatch/Info.plist; PRODUCT_BUNDLE_IDENTIFIER = com.convx.music.client.ioshost.watchkitapp; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = watchos; SUPPORTED_PLATFORMS = "watchsimulator watchos"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 4; WATCHOS_DEPLOYMENT_TARGET = 10.0; SKIP_INSTALL = YES;}; name = Debug; };
+        B70000000000000000000002 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = ../watchApp/ConvxWatch/Info.plist; PRODUCT_BUNDLE_IDENTIFIER = com.convx.music.client.ioshost.watchkitapp; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = watchos; SUPPORTED_PLATFORMS = "watchsimulator watchos"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 4; WATCHOS_DEPLOYMENT_TARGET = 10.0; SKIP_INSTALL = YES;}; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A80000000000000000000001 /* Build configuration list for PBXProject "ConvxKmpHost" */ = {isa = XCConfigurationList; buildConfigurations = (A70000000000000000000001 /* Debug */, A70000000000000000000002 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A80000000000000000000002 /* Build configuration list for PBXNativeTarget "ConvxKmpHost" */ = {isa = XCConfigurationList; buildConfigurations = (A70000000000000000000003 /* Debug */, A70000000000000000000004 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+        B80000000000000000000001 = {isa = XCConfigurationList; buildConfigurations = (B70000000000000000000001, B70000000000000000000002, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+
+	};
+	rootObject = A60000000000000000000001 /* Project object */;
+}

@@ -1,0 +1,288 @@
+name: KMP client validation
+
+on:
+  pull_request:
+    paths:
+      - 'clients/kmp/**'
+      - 'shared-kmp/**'
+      - 'spine/**'
+      - 'hig/**'
+      - 'shared/**'
+      - 'iosApp/**'
+      - 'desktopApp/**'
+      - 'androidHost/**'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsSyncLevel.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsEntry.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricTimeline.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/TimedLyricsParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LrcParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricLine.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricGaps.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/SyllableRuns.kt'
+      - 'lyrics/src/test/**'
+      - 'app/src/main/kotlin/com/convx/music/playback/ShuffleOrderPolicy.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackSnapshot.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackController.kt'
+      - 'app/src/test/kotlin/com/convx/music/playback/ShuffleOrderPolicyTest.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/ApplePlaylistLink.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicPlaylistMapper.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/CanvasArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtist.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicDataMapper.kt'
+      - 'gradle/libs.versions.toml'
+      - 'gradle/wrapper/**'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - '.github/workflows/kmp-toolchain-proof.yml'
+  push:
+    branches: ['**']
+    paths:
+      - 'clients/kmp/**'
+      - 'shared-kmp/**'
+      - 'spine/**'
+      - 'hig/**'
+      - 'shared/**'
+      - 'iosApp/**'
+      - 'desktopApp/**'
+      - 'androidHost/**'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsSyncLevel.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsEntry.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricTimeline.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/TimedLyricsParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LrcParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricLine.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricGaps.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/SyllableRuns.kt'
+      - 'lyrics/src/test/**'
+      - 'app/src/main/kotlin/com/convx/music/playback/ShuffleOrderPolicy.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackSnapshot.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackController.kt'
+      - 'app/src/test/kotlin/com/convx/music/playback/ShuffleOrderPolicyTest.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/ApplePlaylistLink.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicPlaylistMapper.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/CanvasArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtist.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicDataMapper.kt'
+      - 'gradle/libs.versions.toml'
+      - 'gradle/wrapper/**'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - '.github/workflows/kmp-toolchain-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kmp-toolchain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  common-tests:
+    name: Common tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+      - run: ./gradlew -p clients/kmp :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest :modules-core:desktopTest :modules-runtime:desktopTest :modules-presentation:compileKotlinDesktop :lyrics-core:desktopTest :canvas-core:desktopTest :playback-core:desktopTest :playback-data:desktopTest :playback-presentation:desktopTest :history-core:desktopTest :library-core:desktopTest :library-data:desktopTest :search-core:desktopTest :catalog-core:desktopTest :account-core:desktopTest :account-presentation:desktopTest :catalog-presentation:desktopTest :design-system:desktopTest :innertube:desktopTest :shared:desktopTest --no-configuration-cache --console=plain
+
+  android-linkage:
+    name: Android shared screen linkage
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+      - run: ./gradlew -p clients/kmp :androidHost:assembleDebug --no-configuration-cache --console=plain
+
+  ios-simulator:
+    name: iOS simulator host
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+      - name: Select and verify Xcode 16.4
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
+      - name: Test shared module protocols and JavaScript runtime on iOS
+        timeout-minutes: 20
+        run: ./gradlew -p clients/kmp :network-storage-core:iosSimulatorArm64Test :network-storage-transports:iosSimulatorArm64Test :network-storage-presentation:iosSimulatorArm64Test :modules-core:iosSimulatorArm64Test :modules-runtime:iosSimulatorArm64Test --no-configuration-cache --console=plain
+      - name: Build shared framework for simulator
+        run: ./gradlew -p clients/kmp :shared:linkDebugFrameworkIosSimulatorArm64 --no-configuration-cache --console=plain
+      - name: Boot the iPhone simulator
+        timeout-minutes: 5
+        run: |
+          SIMULATOR_ID="$(xcrun simctl list devices available --json | python3 -c 'import json,sys; devices=json.load(sys.stdin)["devices"]; print(next(device["udid"] for runtime in devices.values() for device in runtime if device["name"].startswith("iPhone")))')"
+          echo "Using iOS simulator $SIMULATOR_ID"
+          echo "SIMULATOR_ID=$SIMULATOR_ID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$SIMULATOR_ID" || true
+          xcrun simctl bootstatus "$SIMULATOR_ID" -b
+      - name: Build the SwiftUI host
+        timeout-minutes: 5
+        run: |
+          xcodebuild -project clients/kmp/iosApp/ConvxKmpHost.xcodeproj -scheme ConvxKmpHost -destination "platform=iOS Simulator,id=$SIMULATOR_ID" -derivedDataPath "$RUNNER_TEMP/convx-ios-derived" ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=YES CODE_SIGN_IDENTITY=- build
+      - name: Verify the built iOS host plist
+        run: |
+          APP_PATH="$RUNNER_TEMP/convx-ios-derived/Build/Products/Debug-iphonesimulator/ConvxKmpHost.app"
+          plutil -lint "$APP_PATH/Info.plist"
+          plutil -p "$APP_PATH/Info.plist"
+          plutil -extract CADisableMinimumFrameDurationOnPhone raw -o - "$APP_PATH/Info.plist" | grep -qx true
+          mkdir -p "$RUNNER_TEMP/convx-ios-simulator-diagnostics"
+          cp "$APP_PATH/Info.plist" "$RUNNER_TEMP/convx-ios-simulator-diagnostics/Info.plist"
+      - name: Configure the iPhone simulator status bar
+        timeout-minutes: 1
+        run: |
+          xcrun simctl status_bar "$SIMULATOR_ID" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
+
+      - name: Install the SwiftUI host
+        timeout-minutes: 8
+        run: |
+          APP_PATH="$RUNNER_TEMP/convx-ios-derived/Build/Products/Debug-iphonesimulator/ConvxKmpHost.app"
+          xcrun simctl install "$SIMULATOR_ID" "$APP_PATH"
+
+      - name: Launch the SwiftUI host
+        timeout-minutes: 2
+        run: |
+          xcrun simctl launch "$SIMULATOR_ID" com.convx.music.client.ioshost
+      - name: Wait for the Compose UI to appear
+        timeout-minutes: 2
+        run: sleep 60
+      - name: Capture the simulator preview
+        timeout-minutes: 2
+        run: |
+          xcrun simctl io "$SIMULATOR_ID" screenshot "$RUNNER_TEMP/convx-ios-simulator-preview.png"
+      - name: Verify the Convx UI is visible
+        timeout-minutes: 2
+        run: |
+          swift clients/kmp/iosApp/ci/VerifySimulatorPreview.swift "$RUNNER_TEMP/convx-ios-simulator-preview.png"
+      - name: Verify iOS Keychain session round trip in the signed host
+        timeout-minutes: 3
+        run: |
+          xcrun simctl terminate "$SIMULATOR_ID" com.convx.music.client.ioshost || true
+          xcrun simctl launch "$SIMULATOR_ID" com.convx.music.client.ioshost --convx-keychain-probe
+          sleep 10
+          xcrun simctl io "$SIMULATOR_ID" screenshot "$RUNNER_TEMP/convx-ios-keychain-probe.png"
+          swift clients/kmp/iosApp/ci/VerifyKeychainSession.swift "$RUNNER_TEMP/convx-ios-keychain-probe.png"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: convx-ios-keychain-probe
+          path: ${{ runner.temp }}/convx-ios-keychain-probe.png
+          if-no-files-found: ignore
+      - name: Collect simulator startup diagnostics
+        if: always()
+        timeout-minutes: 2
+        run: |
+          DIAGNOSTICS_DIR="$RUNNER_TEMP/convx-ios-simulator-diagnostics"
+          mkdir -p "$DIAGNOSTICS_DIR"
+          xcrun simctl spawn "$SIMULATOR_ID" log show --style compact --last 10m --predicate 'process == "ConvxKmpHost"' > "$DIAGNOSTICS_DIR/ConvxKmpHost.log" 2>&1 || true
+          xcrun simctl spawn "$SIMULATOR_ID" launchctl list > "$DIAGNOSTICS_DIR/launchctl.txt" 2>&1 || true
+          find "$HOME/Library/Logs/DiagnosticReports" -type f -name 'ConvxKmpHost*' -mmin -15 -exec cp {} "$DIAGNOSTICS_DIR/" \; 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: convx-ios-simulator-preview
+          path: ${{ runner.temp }}/convx-ios-simulator-preview.png
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: convx-ios-simulator-diagnostics
+          path: ${{ runner.temp }}/convx-ios-simulator-diagnostics/
+          if-no-files-found: ignore
+
+  desktop-packaging:
+    name: Desktop packaging (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-15, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Report macOS architecture
+        if: runner.os == 'macOS'
+        run: uname -m
+      - name: Make Gradle wrapper executable on Unix
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+      - name: Package desktop app on Unix
+        if: runner.os != 'Windows'
+        run: ./gradlew -p clients/kmp :desktopApp:createDistributable --no-configuration-cache --console=plain
+      - name: Package desktop app on Windows
+        if: runner.os == 'Windows'
+        run: .\gradlew.bat -p clients/kmp :desktopApp:createDistributable --no-configuration-cache --console=plain
+      - name: Install Linux Secret Service probe dependencies
+        if: runner.os == 'Linux'
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends dbus-x11 gnome-keyring libsecret-tools xdotool xvfb
+      - name: Verify desktop secure session storage on macOS
+        if: runner.os == 'macOS'
+        timeout-minutes: 5
+        run: ./gradlew -p clients/kmp :desktopApp:run --args="--convx-secure-storage-probe" --no-configuration-cache --console=plain
+      - name: Verify desktop secure session storage on Windows
+        if: runner.os == 'Windows'
+        timeout-minutes: 5
+        run: .\gradlew.bat -p clients/kmp :desktopApp:run --args="--convx-secure-storage-probe" --no-configuration-cache --console=plain
+      - name: Verify desktop secure session storage on Linux
+        if: runner.os == 'Linux'
+        timeout-minutes: 8
+        run: |
+          xvfb-run --auto-servernum dbus-run-session -- bash -c '
+            set -e
+            eval "$(gnome-keyring-daemon --start --components=secrets)"
+            handled_dialog_pid=""
+            ./gradlew --no-daemon -p clients/kmp :desktopApp:run --args="--convx-secure-storage-probe" --no-configuration-cache --console=plain &
+            probe_pid=$!
+            for attempt in $(seq 1 60); do
+              if ! kill -0 "$probe_pid" 2>/dev/null; then break; fi
+              dialog_pid="$(pgrep -fn "[g]cr-prompter" || true)"
+              if [ -n "$dialog_pid" ] && [ "$dialog_pid" != "$handled_dialog_pid" ]; then
+                dialog_window="$(xdotool search --onlyvisible --pid "$dialog_pid" . 2>/dev/null | head -n 1 || true)"
+                if [ -n "$dialog_window" ]; then
+                  xdotool windowfocus --sync "$dialog_window"
+                  xdotool key --clearmodifiers ctrl+a
+                  xdotool type --clearmodifiers --delay 20 "convx-ci-keyring"
+                  xdotool key Tab
+                  xdotool key --clearmodifiers ctrl+a
+                  xdotool type --clearmodifiers --delay 20 "convx-ci-keyring"
+                  xdotool key Return
+                  handled_dialog_pid="$dialog_pid"
+                fi
+              fi
+              sleep 1
+            done
+            wait "$probe_pid"
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: convx-desktop-${{ matrix.os }}
+          path: clients/kmp/desktopApp/build/compose/binaries/main/app/**
+          if-no-files-found: error
