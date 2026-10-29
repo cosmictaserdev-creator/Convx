@@ -42,7 +42,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isFinite
 import com.convx.music.ui.component.shapes.ContinuousCapsule
 import com.convx.music.ui.component.shapes.ContinuousRoundedRectangle
 import com.convx.music.ui.ios.component.IosText
@@ -53,6 +55,10 @@ import com.convx.music.ui.ios.foundation.LocalIosContentColor
 /**
  * The action strip at the top of a menu sheet, drawn as SwiftUI's ControlGroup does it:
  * ONE capsule split into equal segments by hairlines, not a row of separate cards.
+ *
+ * A phone sheet is only about 320dp inside its inset. Cells narrower than
+ * [MenuActionMinCellWidth] crush the labels ("Add S…"). Wider cells wrap onto another
+ * row instead of packing every icon together.
  */
 @Composable
 fun NewActionGrid(
@@ -64,16 +70,19 @@ fun NewActionGrid(
     val colors = IosTheme.colors
     // Inside the menu panel the quick actions sit bare on the panel (iOS 27 clip).
     val inPanel = LocalInMenuPanel.current
+    // The panel drops the hairline, so the gap itself has to separate the icons.
+    val gap = if (inPanel) 12.dp else 0.dp
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val columnCount = minOf(columns.coerceAtLeast(1), (maxWidth / 88.dp).toInt().coerceAtLeast(1))
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        val columnCount = menuActionColumnCount(maxWidth, MenuActionMinCellWidth, gap, columns)
+        Column(verticalArrangement = Arrangement.spacedBy(if (inPanel) 12.dp else 8.dp)) {
             actions.chunked(columnCount).forEach { row ->
                 Row(
                     modifier = Modifier.fillMaxWidth().then(
                         if (inPanel) Modifier else Modifier.clip(ContinuousCapsule())
                             .background(colors.secondarySystemGroupedBackground),
                     ),
+                    horizontalArrangement = Arrangement.spacedBy(gap),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     row.forEachIndexed { index, action ->
@@ -87,6 +96,22 @@ fun NewActionGrid(
             }
         }
     }
+}
+
+/** Narrowest action cell that still fits a two-line caption such as "Add to playlist". */
+internal val MenuActionMinCellWidth = 120.dp
+
+/**
+ * How many actions fit across [width] without going under [minCell], and never above
+ * [requestedColumns]. An unbounded width (a menu still being measured) keeps the request.
+ */
+internal fun menuActionColumnCount(width: Dp, minCell: Dp, gap: Dp, requestedColumns: Int): Int {
+    val requested = requestedColumns.coerceAtLeast(1)
+    if (!width.isFinite || width <= 0.dp) return requested
+    val step = minCell + gap
+    if (step <= 0.dp) return requested
+    val fitted = ((width + gap) / step).toInt().coerceAtLeast(1)
+    return minOf(requested, fitted)
 }
 
 @Composable
@@ -110,7 +135,7 @@ private fun ActionSegment(action: NewAction, modifier: Modifier) {
         modifier = modifier
             .clickable(enabled = action.enabled, interactionSource = null, indication = null) { performAction = true }
             .alpha(if (action.enabled) 1f else 0.4f)
-            .padding(vertical = 12.dp, horizontal = 4.dp)
+            .padding(vertical = 12.dp, horizontal = 8.dp)
             .semantics { role = Role.Button },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp),
