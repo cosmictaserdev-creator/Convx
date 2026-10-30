@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/banner dark.png" width="1000" alt="Convx poster with the words Just Listen and a phone displaying the music player">
+  <img src="assets/banner%20dark.png" width="1000" alt="Convx poster with the words Just Listen and a phone displaying the music player">
   <h1>Convx</h1>
   <p><strong>An open-source Android music player with a calm, glass-inspired interface.</strong></p>
   <p>
