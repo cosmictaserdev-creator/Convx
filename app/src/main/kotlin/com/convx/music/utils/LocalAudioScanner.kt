@@ -226,7 +226,7 @@ object LocalAudioScanner {
         dateAdded: Long,
         dateModified: Long,
     ): Boolean {
-        val artistId = "local_artist_${artistName.hashCode()}"
+        val artistNames = ArtistSplitter.split(artistName).ifEmpty { listOf(artistName) }
         val albumId = "local_album_${albumName.hashCode()}"
         val durationSeconds = (durationMs / 1000).toInt()
         val song = SongEntity(
@@ -247,8 +247,11 @@ object LocalAudioScanner {
             // Song, artist, and album rows reference each other, so save them atomically.
             database.withTransaction {
                 upsert(song)
-                insert(ArtistEntity(id = artistId, name = artistName, isLocal = true))
-                insert(SongArtistMap(songId = songId, artistId = artistId, position = 0))
+                artistNames.forEachIndexed { index, name ->
+                    val artistId = "local_artist_${name.hashCode()}"
+                    insert(ArtistEntity(id = artistId, name = name, isLocal = true))
+                    insert(SongArtistMap(songId = songId, artistId = artistId, position = index))
+                }
                 if (albumName.isNotBlank()) {
                     insert(
                         AlbumEntity(
