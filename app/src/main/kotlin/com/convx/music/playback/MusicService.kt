@@ -1090,6 +1090,8 @@ class MusicService :
     private fun restorePersistentPlaybackState() {
         if (!dataStore.get(PersistentQueueKey, true)) return
 
+        // Any queue started before the restore finishes (for example by a car) wins over it.
+        val restoreRequestVersion = queueRequestVersion
         persistenceScope.launch {
             val snapshot = readPersistedPlaybackSnapshot() ?: return@launch
             scope.launch {
@@ -1108,11 +1110,42 @@ class MusicService :
                     val restoredQueue = withContext(Dispatchers.IO) {
                         savedQueue.toQueue(database)
                     }
-                    playQueue(queue = restoredQueue, playWhenReady = false)
+                    if (restoreRequestVersion == queueRequestVersion) {
+                        playQueue(queue = restoredQueue, playWhenReady = false)
+                    }
                 }
             }
         }
     }
+
+    /** The saved queue, without changing playback; shown as the car's and system's "recent" item. */
+    suspend fun savedPlaybackQueue(): MediaSession.MediaItemsWithStartPosition? =
+        readSavedQueue()?.toMediaItemsWithStartPosition()
+
+    /**
+     * Takes over the saved queue for a play request that arrived with nothing loaded, such as a
+     * car connecting or a headset button. The session sets the returned items on the player.
+     */
+    suspend fun resumeSavedPlayback(): MediaSession.MediaItemsWithStartPosition? {
+        val savedQueue = readSavedQueue() ?: return null
+        val restoredQueue = withContext(Dispatchers.IO) { savedQueue.toQueue(database) }
+        queueRequestVersion++
+        currentQueue = restoredQueue
+        queueTitle = savedQueue.title
+        return savedQueue.toMediaItemsWithStartPosition()
+    }
+
+    private suspend fun readSavedQueue(): PersistQueue? {
+        if (!dataStore.get(PersistentQueueKey, true)) return null
+        return withContext(Dispatchers.IO) { readPersistedPlaybackSnapshot()?.queue }
+            ?.takeIf { it.items.isNotEmpty() }
+    }
+
+    private fun PersistQueue.toMediaItemsWithStartPosition() = MediaSession.MediaItemsWithStartPosition(
+        items.map { it.toMediaItem() },
+        mediaItemIndex.coerceIn(items.indices),
+        position.coerceAtLeast(0L),
+    )
 
     private fun readPersistedPlaybackSnapshot(): PersistedPlaybackSnapshot? {
         val store = PlaybackStateStore(filesDir.resolve(PERSISTENT_PLAYBACK_SNAPSHOT_FILE))
@@ -1320,13 +1353,14 @@ class MusicService :
 
     private fun initializeMediaSession() {
         mediaLibrarySessionCallback.apply {
+            service = this@MusicService
             toggleLike = ::toggleLike
             toggleStartRadio = ::toggleStartRadio
             toggleLibrary = ::toggleLibrary
         }
         mediaSession =
             MediaLibrarySession
-                .Builder(this, player, mediaLibrarySessionCallback)
+                .Builder(this, CarArtworkPlayer(this, player), mediaLibrarySessionCallback)
                 .setSessionActivity(
                     PendingIntent.getActivity(
                         this,
@@ -1336,6 +1370,7 @@ class MusicService :
                     ),
                 ).setBitmapLoader(CoilBitmapLoader(this, scope))
                 .build()
+        mediaLibrarySessionCallback.observeLibraryChanges(mediaSession)
         player.repeatMode = dataStore.get(RepeatModeKey, REPEAT_MODE_OFF)
 
         if (dataStore.get(RememberShuffleAndRepeatKey, true)) {
@@ -4228,7 +4263,7 @@ class MusicService :
         _playerFlow.value = player
 
         try {
-            (mediaSession as MediaSession).player = player
+            (mediaSession as MediaSession).player = CarArtworkPlayer(this, player)
         } catch (e: Exception) {
             timber.log.Timber.e(e, "Failed to swap player in MediaSession")
         }
@@ -4362,6 +4397,17 @@ class MusicService :
         private const val IdleStopMs = 10 * 60_000L
         private const val CastInitDelayMs = 3_000L
         const val ROOT = "root"
+        const val RECENT = "recent"
+        const val HOME = "home"
+        const val LIBRARY = "library"
+        const val EXPLORE = "explore"
+        const val CHARTS = "charts"
+        const val HOME_RECENT = "home_recent"
+        const val QUICK_PICKS = "quick_picks"
+        const val ONLINE_SONG = "online_song"
+        const val YOUTUBE_ALBUM = "youtube_album"
+        const val YOUTUBE_ARTIST = "youtube_artist"
+        const val MOOD = "mood"
         const val SONG = "song"
         const val ARTIST = "artist"
         const val ALBUM = "album"

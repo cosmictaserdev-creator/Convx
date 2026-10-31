@@ -441,6 +441,12 @@
         </provider>
 
         <provider
+            android:name=".playback.CarArtworkProvider"
+            android:authorities="${applicationId}.car.artwork"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+
+        <provider
             android:name="com.dpi.DensityScaler"
             android:authorities="${applicationId}.com.dpi.DensityScaler"
             android:enabled="true"
