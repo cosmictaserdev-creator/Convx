@@ -1360,7 +1360,7 @@ class MusicService :
         }
         mediaSession =
             MediaLibrarySession
-                .Builder(this, player, mediaLibrarySessionCallback)
+                .Builder(this, CarArtworkPlayer(this, player), mediaLibrarySessionCallback)
                 .setSessionActivity(
                     PendingIntent.getActivity(
                         this,
@@ -4263,7 +4263,7 @@ class MusicService :
         _playerFlow.value = player
 
         try {
-            (mediaSession as MediaSession).player = player
+            (mediaSession as MediaSession).player = CarArtworkPlayer(this, player)
         } catch (e: Exception) {
             timber.log.Timber.e(e, "Failed to swap player in MediaSession")
         }

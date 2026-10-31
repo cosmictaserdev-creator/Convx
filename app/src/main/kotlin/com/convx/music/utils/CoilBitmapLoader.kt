@@ -17,6 +17,7 @@ import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
 import coil3.toBitmap
+import com.convx.music.playback.CarArtworkProvider
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,8 +59,9 @@ class CoilBitmapLoader(
 
     override fun loadBitmap(uri: Uri): ListenableFuture<Bitmap> =
         scope.future(Dispatchers.IO) {
+            // Session artwork is re-served for car hosts; load the original at full size here.
             val request = ImageRequest.Builder(context)
-                .data(uri)
+                .data(CarArtworkProvider.sourceUri(context, uri) ?: uri)
                 .allowHardware(false)
                 .build()
 

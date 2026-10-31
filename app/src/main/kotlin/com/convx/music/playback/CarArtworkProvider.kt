@@ -143,6 +143,12 @@ class CarArtworkProvider : ContentProvider() {
                 .build()
         }
 
+        /** The original artwork behind an [artworkUri] result, or null for any other URI. */
+        fun sourceUri(context: Context, uri: Uri): Uri? {
+            if (uri.scheme != ContentResolver.SCHEME_CONTENT || uri.authority != authority(context)) return null
+            return uri.getQueryParameter(SOURCE_PARAMETER)?.let(Uri::parse)?.takeIf(::isSupportedSource)
+        }
+
         /** Lets [packageName] read every artwork URI served by this provider. */
         fun grantReadAccess(context: Context, packageName: String) {
             if (packageName == context.packageName) return
