@@ -674,8 +674,20 @@ class MusicService :
             warmUpcoming = streamResolver::prefetchUpcoming,
         )
         crossfade?.start()
-
-        // Keep the transition-path pref snapshot warm (see cached* fields).
+        com.convx.music.playback.haptics.MusicHaptics(
+            context = this,
+            scope = scope,
+            player = { player },
+            settings = dataStore.data.map { prefs ->
+                com.convx.music.playback.haptics.HapticSettings(
+                    enabled = prefs[com.convx.music.constants.MusicHapticsKey] ?: false,
+                    sensitivity = prefs[com.convx.music.constants.MusicHapticsSensitivityKey] ?: 0.5f,
+                    strength = prefs[com.convx.music.constants.MusicHapticsStrengthKey] ?: 0.5f,
+                )
+            },
+        )
+        
+    // Keep the transition-path pref snapshot warm (see cached* fields).
         scope.launch {
             dataStore.data.collect { prefs ->
                 cachedRepeatMode = prefs[RepeatModeKey] ?: REPEAT_MODE_OFF
