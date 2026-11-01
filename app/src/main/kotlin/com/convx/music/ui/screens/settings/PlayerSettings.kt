@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Slider
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,9 @@ import com.convx.music.constants.AutoSkipNextOnErrorKey
 import com.convx.music.constants.CrossfadeEnabledKey
 import com.convx.music.constants.EnableGoogleCastKey
 import com.convx.music.constants.KeepScreenOn
+import com.convx.music.constants.MusicHapticsKey
+import com.convx.music.constants.MusicHapticsSensitivityKey
+import com.convx.music.constants.MusicHapticsStrengthKey
 import com.convx.music.constants.PauseOnMute
 import com.convx.music.constants.PersistentQueueKey
 import com.convx.music.constants.RememberShuffleAndRepeatKey
@@ -117,6 +121,18 @@ fun PlayerSettings(
     val (keepScreenOn, onKeepScreenOnChange) = rememberPreference(
         KeepScreenOn,
         defaultValue = false
+    )
+    val (musicHaptics, onMusicHapticsChange) = rememberPreference(
+        MusicHapticsKey,
+        defaultValue = false
+    )
+    val (hapticSensitivity, onHapticSensitivityChange) = rememberPreference(
+        MusicHapticsSensitivityKey,
+        defaultValue = 0.5f
+    )
+    val (hapticStrength, onHapticStrengthChange) = rememberPreference(
+        MusicHapticsStrengthKey,
+        defaultValue = 0.5f
     )
     var showAudioQualityDialog by remember {
         mutableStateOf(false)
@@ -349,6 +365,47 @@ fun PlayerSettings(
                             onClick = { navController.navigate("settings/scan_music") }
                         ))
                     }
+                )
+
+                Spacer(modifier = Modifier.height(27.dp))
+
+                IosSettingsGroup(
+                    title = "Music haptics",
+                    items = listOf(
+                        IosSettingsItem(
+                            title = { Text("Feel the beat") },
+                            description = { Text("Vibrate to the beat of songs stored on this device") },
+                            trailingContent = {
+                                Switch(
+                                    checked = musicHaptics,
+                                    onCheckedChange = onMusicHapticsChange
+                                )
+                            },
+                            onClick = { onMusicHapticsChange(!musicHaptics) }
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Sensitivity") },
+                            description = {
+                                Slider(
+                                    value = hapticSensitivity,
+                                    onValueChange = onHapticSensitivityChange,
+                                    valueRange = 0f..1f
+                                )
+                            },
+                            enabled = musicHaptics
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Strength") },
+                            description = {
+                                Slider(
+                                    value = hapticStrength,
+                                    onValueChange = onHapticStrengthChange,
+                                    valueRange = 0f..1f
+                                )
+                            },
+                            enabled = musicHaptics
+                        )
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(27.dp))
