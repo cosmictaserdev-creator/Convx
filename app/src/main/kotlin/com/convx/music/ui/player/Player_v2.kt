@@ -14,6 +14,8 @@ import com.convx.music.ui.component.heroSideLiveBlur
 import com.convx.music.ui.utils.VibrantChromeInk
 import com.convx.music.ui.utils.vibrantChrome
 import com.convx.music.ui.ios.compat.AppTheme
+import com.convx.music.ui.ios.compat.IosAlertAction
+import com.convx.music.ui.ios.compat.IosAlertDialog
 import com.composables.sfsymbols.SfSymbols
 import com.composables.sfsymbols.monochrome.SFAirplayAudio
 import com.composables.sfsymbols.monochrome.SFHeadphones
@@ -328,6 +330,7 @@ private fun PlayerV2Content(
     val currentLyrics by ui.currentLyrics
     val menuState = LocalMenuState.current
     var showV2Options by remember { mutableStateOf(false) }
+    var showArtistPicker by remember { mutableStateOf(false) }
     var showRoutePopover by remember { mutableStateOf(false) }
     // Same condition as LyricsMenu's "Translate with AI" entry.
     val lyricsAiProvider by rememberPreference(com.convx.music.constants.AiProviderKey, "OpenRouter")
@@ -696,6 +699,18 @@ private fun PlayerV2Content(
             !(LocalTabView.current && compactPlayerInTabView)
     // The wide layout has room for the controls beside the pane, so lyrics and the queue never hide them.
     val controlsShown = controlsVisible || isWidePlayerLayout
+    if (showArtistPicker) {
+        IosAlertDialog(
+            onDismissRequest = { showArtistPicker = false },
+            title = "Choose artist",
+            actions = mediaMetadata?.artists.orEmpty().filter { it.id != null }.map { artist ->
+                IosAlertAction(title = artist.name) {
+                    state.collapseSoft()
+                    navController.navigate("artist/${artist.id}")
+                }
+            },
+        )
+    }
 
     Box(
         modifier = modifier
@@ -744,8 +759,13 @@ private fun PlayerV2Content(
                 fontWeight = FontWeight.Normal,
                 scroll = !state.isCollapsed,
                 modifier = artistModifier.clickable {
-                    state.collapseSoft()
-                    mediaMetadata?.artists?.firstOrNull()?.id?.let { navController.navigate("artist/$it") }
+    val tappable = mediaMetadata?.artists.orEmpty().filter { it.id != null }
+    if (tappable.size > 1) {
+        showArtistPicker = true
+    } else {
+        state.collapseSoft()
+        tappable.firstOrNull()?.id?.let { navController.navigate("artist/$it") }
+    }
                 }
             )
             DjReadout(
