@@ -131,6 +131,8 @@ val MusicHapticsKey = booleanPreferencesKey("musicHaptics")
 val MusicHapticsSensitivityKey = floatPreferencesKey("musicHapticsSensitivity")
 val MusicHapticsStrengthKey = floatPreferencesKey("musicHapticsStrength")
 val MusicHapticsLeadKey = floatPreferencesKey("musicHapticsLeadMs")
+val VisualizerEnabledKey = booleanPreferencesKey("liveVisualizer")
+val VisualizerDelayKey = floatPreferencesKey("liveVisualizerDelayMs")
 val DeveloperModeKey = booleanPreferencesKey("developerMode")
 val EnableSettingsPopupKey = booleanPreferencesKey("enableSettingsPopup")
 
