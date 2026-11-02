@@ -7,6 +7,9 @@ package com.convx.music.playback.haptics
 import android.content.Context
 import android.media.AudioAttributes
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Process
 import android.os.SystemClock
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
@@ -14,14 +17,16 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.net.toUri
 import androidx.media3.common.Player
+import com.convx.music.constants.MusicHapticsLeadKey
+import com.convx.music.utils.dataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import kotlin.math.max
 
 data class HapticSettings(
     val enabled: Boolean = false,
@@ -34,12 +39,13 @@ data class HapticSettings(
 /**
  * Vibrates to the beat of songs stored on this device.
  *
- * Each song is decoded once, its hits are found ahead of time, and playback only schedules the
- * next pulse against the player's live position. Every pulse re-reads that position, so seeks,
- * pauses and speed changes correct the timing within one beat.
+ * Each song is decoded once and its hits are found ahead of time. The app's main thread only
+ * reads the player's position a few times a second; a separate high-priority thread then fires
+ * every pulse against that position using the system clock, so a busy screen or a slow
+ * vibration call cannot make the beat stutter. A seek, pause or speed change is noticed at the
+ * next position reading and the pulses are lined up again.
  *
- * It watches the player on its own (a light check a few times a second), so it only needs to be
- * created once while the service starts. Everything runs on [scope]'s (main) thread.
+ * It watches the player on its own, so it only needs to be created once while the service starts.
  */
 class MusicHaptics(
     private val context: Context,
@@ -47,20 +53,32 @@ class MusicHaptics(
     private val player: () -> Player,
     settings: Flow<HapticSettings>,
 ) {
+    // Main thread only.
     private var current = HapticSettings()
-    private var gain = 1f
-
     private var currentId: String? = null
     private var analyzed: HapticTrack? = null
-    private var track: HapticTrack? = null
     private var analysisJob: Job? = null
-    private var timerJob: Job? = null
-    private var pendingIndex = -1
-    private var dueAt = 0L
     private val cache = object : LinkedHashMap<String, HapticTrack>(16, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, HapticTrack>?): Boolean =
             size > CACHE_SIZE
     }
+
+    @Volatile private var gain = 1f
+
+    /** How much earlier than the beat to fire, on top of [LEAD_MS]; set by the user. */
+    @Volatile private var userLeadMs = DEFAULT_LEAD_MS
+
+    // Timing thread only.
+    private val thread = HandlerThread("MusicHaptics", Process.THREAD_PRIORITY_URGENT_AUDIO).also { it.start() }
+    private val handler = Handler(thread.looper)
+    private var timerId: String? = null
+    private var track: HapticTrack? = null
+    private var anchored = false
+    private var anchorPos = 0L
+    private var anchorUptime = 0L
+    private var anchorSpeed = 1f
+    private var nextIndex = 0
+    private val fireRunnable = Runnable { fire() }
 
     private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= 31) {
         context.getSystemService(VibratorManager::class.java)?.defaultVibrator
@@ -76,37 +94,36 @@ class MusicHaptics(
             if (!next.enabled) {
                 stop()
             } else {
-                analyzed?.let { track = it.select(next.sensitivity) }
+                val id = currentId
+                val base = analyzed
+                if (id != null && base != null) {
+                    val selected = base.select(next.sensitivity)
+                    handler.post { setTrack(id, selected) }
+                }
                 refresh()
             }
         }
     }
 
+    private val leadJob: Job = scope.launch {
+        context.dataStore.data
+            .map { it[MusicHapticsLeadKey] ?: DEFAULT_LEAD_MS.toFloat() }
+            .distinctUntilChanged()
+            .collect { value ->
+                userLeadMs = value.toLong().coerceIn(0L, 300L)
+                handler.post { reschedule() }
+            }
+    }
+
     private val watchJob: Job = scope.launch {
         while (true) {
             delay(WATCH_INTERVAL_MS)
-            tick()
+            refresh()
         }
     }
 
-    /** Leaves a pending pulse alone while it still matches the player's position. */
-    private fun tick() {
-        if (!current.enabled) return
-        val pulses = track
-        val active = player()
-        if (timerJob?.isActive == true && pulses != null && active.isPlaying &&
-            pendingIndex in 0 until pulses.size && active.currentMediaItem?.mediaId == currentId
-        ) {
-            val speed = active.playbackParameters.speed.takeIf { it > 0f } ?: 1f
-            val expected = ((pulses.times[pendingIndex] - active.currentPosition) / speed).toLong() - LEAD_MS
-            val actual = dueAt - SystemClock.uptimeMillis()
-            if (abs(expected - actual) <= 60) return
-        }
-        refresh()
-    }
-
-    /** Re-reads what is playing and reschedules the next pulse. */
-    fun refresh() {
+    /** Main thread: reads what is playing and hands the position to the timing thread. */
+    private fun refresh() {
         if (!current.enabled) return
         val active = player()
         val id = active.currentMediaItem?.mediaId
@@ -117,72 +134,108 @@ class MusicHaptics(
         if (id != currentId) {
             currentId = id
             analyzed = null
-            track = null
-            timerJob?.cancel()
             analysisJob?.cancel()
+            handler.post { setTrack(id, null) }
             val cached = cache[id]
             if (cached != null) {
                 analyzed = cached
-                track = cached.select(current.sensitivity)
+                val selected = cached.select(current.sensitivity)
+                handler.post { setTrack(id, selected) }
             } else {
                 analysisJob = scope.launch {
                     val result = analyzeHaptics(context, id.toUri())
                     if (currentId != id) return@launch
                     if (result != null) cache[id] = result
                     analyzed = result
-                    track = result?.select(current.sensitivity)
-                    schedule()
+                    val selected = result?.select(current.sensitivity)
+                    handler.post { setTrack(id, selected) }
                 }
-                return
             }
         }
-        schedule()
+        val position = active.currentPosition
+        val uptime = SystemClock.uptimeMillis()
+        val speed = active.playbackParameters.speed.takeIf { it > 0f } ?: 1f
+        val playing = active.isPlaying
+        handler.post { onSnapshot(id, position, uptime, speed, playing) }
     }
 
     private fun stop() {
-        timerJob?.cancel()
+        if (currentId == null) return
         analysisJob?.cancel()
         currentId = null
         analyzed = null
-        track = null
+        handler.post { clear() }
     }
 
-    private fun schedule(from: Int = 0) {
-        timerJob?.cancel()
-        val pulses = track ?: return
-        val active = player()
-        if (!active.isPlaying) return
-        val position = active.currentPosition
-        val index = max(from, pulses.indexAt(position + LEAD_MS))
-        if (index >= pulses.size) return
-        val speed = active.playbackParameters.speed.takeIf { it > 0f } ?: 1f
-        val wait = ((pulses.times[index] - position) / speed).toLong()
-        val id = currentId
-        val pause = max(0L, wait - LEAD_MS)
-        pendingIndex = index
-        dueAt = SystemClock.uptimeMillis() + pause
-        timerJob = scope.launch {
-            delay(pause)
-            fire(index, id)
+    // ---- Timing thread ----
+
+    private fun setTrack(id: String, newTrack: HapticTrack?) {
+        if (id != timerId) {
+            timerId = id
+            anchored = false
         }
+        track = newTrack
+        reschedule()
     }
 
-    private fun fire(index: Int, id: String?) {
-        if (id != currentId) return
-        val pulses = track ?: return
-        if (index >= pulses.size) return
-        val active = player()
-        if (!active.isPlaying || active.currentMediaItem?.mediaId != id) return
-        // A late timer or a position correction makes the pulse stale.
-        val offset = pulses.times[index] - active.currentPosition - LEAD_MS
-        if (offset > 40) {
-            schedule()
+    private fun clear() {
+        handler.removeCallbacks(fireRunnable)
+        timerId = null
+        track = null
+        anchored = false
+    }
+
+    private fun onSnapshot(id: String, positionMs: Long, uptimeMs: Long, speed: Float, playing: Boolean) {
+        if (id != timerId) return
+        if (!playing) {
+            anchored = false
+            handler.removeCallbacks(fireRunnable)
             return
         }
-        if (offset >= -40) {
+        val drift = if (anchored) abs(predict(uptimeMs) - positionMs) else Long.MAX_VALUE
+        if (!anchored || drift > RESYNC_MS || speed != anchorSpeed) {
+            anchorPos = positionMs
+            anchorUptime = uptimeMs
+            anchorSpeed = speed
+            anchored = true
+            reschedule()
+        }
+    }
+
+    /** Where the song is at [uptimeMs], extrapolated from the last anchor. */
+    private fun predict(uptimeMs: Long): Long = anchorPos + ((uptimeMs - anchorUptime) * anchorSpeed).toLong()
+
+    /** The clock time at which pulse [index] should start, including the lead. */
+    private fun fireTime(pulses: HapticTrack, index: Int): Long {
+        val lead = LEAD_MS + userLeadMs
+        return anchorUptime + ((pulses.times[index] - lead - anchorPos) / anchorSpeed).toLong()
+    }
+
+    private fun reschedule() {
+        handler.removeCallbacks(fireRunnable)
+        val pulses = track ?: return
+        if (!anchored) return
+        val lead = LEAD_MS + userLeadMs
+        val now = SystemClock.uptimeMillis()
+        val index = pulses.indexAt(predict(now) + lead - (STALE_MS * anchorSpeed).toLong())
+        nextIndex = index
+        if (index < pulses.size) handler.postAtTime(fireRunnable, fireTime(pulses, index))
+    }
+
+    private fun fire() {
+        val pulses = track ?: return
+        if (!anchored) return
+        val index = nextIndex
+        if (index >= pulses.size) return
+        // A pulse that is already too late would land off the beat, so it is dropped.
+        if (SystemClock.uptimeMillis() - fireTime(pulses, index) <= STALE_MS) {
             pulse((pulses.intensity[index] / 255f * gain).coerceIn(0f, 1f), pulses.sharpness[index] / 255f)
         }
-        schedule(index + 1)
+        val now = SystemClock.uptimeMillis()
+        var next = index + 1
+        while (next < pulses.size && fireTime(pulses, next) < now - STALE_MS) next++
+        nextIndex = next
+        if (next < pulses.size) handler.postAtTime(fireRunnable, fireTime(pulses, next))
     }
 
     private fun pulse(intensity: Float, sharpness: Float) {
@@ -235,16 +288,30 @@ class MusicHaptics(
 
     fun release() {
         settingsJob.cancel()
+        leadJob.cancel()
         watchJob.cancel()
-        stop()
+        analysisJob?.cancel()
+        currentId = null
+        analyzed = null
+        handler.post { clear() }
+        thread.quitSafely()
         cache.clear()
     }
 
     private companion object {
-        /** Motors need a moment to spin up, so pulses fire slightly early. */
+        /** Motors need a moment to spin up, so pulses always fire slightly early. */
         const val LEAD_MS = 12L
+
+        /** The user's extra lead before they change it, in milliseconds. */
+        const val DEFAULT_LEAD_MS = 30L
+
+        /** A pulse more than this late is dropped instead of firing off the beat. */
+        const val STALE_MS = 40L
+
+        /** The position must drift this far from the prediction before pulses are re-aligned. */
+        const val RESYNC_MS = 35L
+        const val WATCH_INTERVAL_MS = 200L
         const val CACHE_SIZE = 8
-        const val WATCH_INTERVAL_MS = 250L
 
         /** The lowest amplitude that reliably moves an eccentric-mass motor. */
         const val MIN_AMPLITUDE = 70
