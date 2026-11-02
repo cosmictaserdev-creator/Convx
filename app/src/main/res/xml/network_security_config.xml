@@ -11,7 +11,7 @@
         <domain>localhost</domain>
         <domain>127.0.0.1</domain>
         <domain>10.0.2.2</domain>
-        <domain>192.168.1.5</domain>
+        <domain>100.72.245.75</domain>
     </domain-config>
     <!-- Debug-only: lets a debug build be MITM-inspected (PCAPdroid, mitmproxy) for
          diagnosing network issues. Never applies to release builds regardless of
