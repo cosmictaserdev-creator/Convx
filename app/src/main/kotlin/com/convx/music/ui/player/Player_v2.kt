@@ -712,6 +712,12 @@ private fun PlayerV2Content(
                 }
             }
     ) {
+        if (!state.isCollapsed) {
+            MusicBarsVisualizer(
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(200.dp),
+                color = adaptivePrimary,
+            )
+        }
         CompositionLocalProvider(
             LocalPooledGlass provides null,
         ) {
