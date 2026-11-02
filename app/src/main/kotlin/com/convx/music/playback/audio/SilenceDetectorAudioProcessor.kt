@@ -30,6 +30,7 @@ class SilenceDetectorAudioProcessor(
     private var channelCount = 0
     private var encoding = C.ENCODING_INVALID
     private var minimumSilentFrames = 0L
+    private val spectrumTap = SpectrumTap()
 
     private var outputBuffer: ByteBuffer = EMPTY_BUFFER
     private var inputEnded = false
@@ -82,6 +83,10 @@ class SilenceDetectorAudioProcessor(
             detectSilence(inputBuffer, generation)
         } else {
             clearSilenceState()
+        }
+
+        if (LiveSpectrum.active && encoding == C.ENCODING_PCM_16BIT && sampleRate > 0 && channelCount > 0) {
+            spectrumTap.feed(inputBuffer, sampleRate, channelCount)
         }
 
         outputBuffer = inputBuffer.slice().order(ByteOrder.nativeOrder())
@@ -159,6 +164,7 @@ class SilenceDetectorAudioProcessor(
     override fun flush() {
         outputBuffer = EMPTY_BUFFER
         inputEnded = false
+        spectrumTap.reset()
         clearSilenceState()
         trackingGeneration = resetGeneration.get()
     }
