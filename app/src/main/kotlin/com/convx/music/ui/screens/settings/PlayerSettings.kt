@@ -34,8 +34,11 @@ import com.convx.music.constants.CrossfadeEnabledKey
 import com.convx.music.constants.EnableGoogleCastKey
 import com.convx.music.constants.KeepScreenOn
 import com.convx.music.constants.MusicHapticsKey
+import com.convx.music.constants.MusicHapticsLeadKey
 import com.convx.music.constants.MusicHapticsSensitivityKey
 import com.convx.music.constants.MusicHapticsStrengthKey
+import com.convx.music.constants.VisualizerDelayKey
+import com.convx.music.constants.VisualizerEnabledKey
 import com.convx.music.constants.PauseOnMute
 import com.convx.music.constants.PersistentQueueKey
 import com.convx.music.constants.RememberShuffleAndRepeatKey
@@ -133,6 +136,18 @@ fun PlayerSettings(
     val (hapticStrength, onHapticStrengthChange) = rememberPreference(
         MusicHapticsStrengthKey,
         defaultValue = 0.5f
+    )
+    val (hapticLead, onHapticLeadChange) = rememberPreference(
+        MusicHapticsLeadKey,
+        defaultValue = 30f
+    )
+    val (liveVisualizer, onLiveVisualizerChange) = rememberPreference(
+        VisualizerEnabledKey,
+        defaultValue = false
+    )
+    val (visualizerDelay, onVisualizerDelayChange) = rememberPreference(
+        VisualizerDelayKey,
+        defaultValue = 220f
     )
     var showAudioQualityDialog by remember {
         mutableStateOf(false)
@@ -404,6 +419,47 @@ fun PlayerSettings(
                                 )
                             },
                             enabled = musicHaptics
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Timing: vibrate ${hapticLead.toInt()} ms early") },
+                            description = {
+                                Slider(
+                                    value = hapticLead,
+                                    onValueChange = onHapticLeadChange,
+                                    valueRange = 0f..200f
+                                )
+                            },
+                            enabled = musicHaptics
+                        )
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(27.dp))
+
+                IosSettingsGroup(
+                    title = "Live visualizer",
+                    items = listOf(
+                        IosSettingsItem(
+                            title = { Text("Bouncing bars") },
+                            description = { Text("Show bars that move with the music in the player") },
+                            trailingContent = {
+                                Switch(
+                                    checked = liveVisualizer,
+                                    onCheckedChange = onLiveVisualizerChange
+                                )
+                            },
+                            onClick = { onLiveVisualizerChange(!liveVisualizer) }
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Sync delay: ${visualizerDelay.toInt()} ms") },
+                            description = {
+                                Slider(
+                                    value = visualizerDelay,
+                                    onValueChange = onVisualizerDelayChange,
+                                    valueRange = 0f..600f
+                                )
+                            },
+                            enabled = liveVisualizer
                         )
                     )
                 )
