@@ -218,7 +218,8 @@ internal fun findHits(low: DoubleArray, high: DoubleArray, frameMs: Double): Hap
         val highRise = max(0.0, high[i] - high[i - 2])
         val bass = lowRise / (lowRise + highRise + 1e-9)
         val strength = sqrt((excess[n] / reference).coerceIn(0.0, 1.0))
-        times[n] = (i * frameMs).toInt()
+        // The rise is seen about two frames after the attack begins, so start there.
+        times[n] = (max(0, i - 2) * frameMs).toInt()
         intensity[n] = (255 * (0.3 + 0.7 * strength) * (0.65 + 0.35 * bass)).roundToInt().coerceIn(1, 255)
         sharpness[n] = (255 * (1 - bass)).roundToInt().coerceIn(0, 255)
     }
