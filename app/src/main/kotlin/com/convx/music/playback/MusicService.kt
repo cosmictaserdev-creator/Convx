@@ -3743,7 +3743,8 @@ class MusicService :
                     ResolvingMediaSource(mediaItem) {
                         val mediaId = mediaItem.mediaId
                         if (mediaId.startsWith("content://") || mediaId.startsWith("file://") ||
-                            mediaId.startsWith("/storage/")) return@ResolvingMediaSource progressive.createMediaSource(mediaItem)
+                            mediaId.startsWith("/storage/") ||
+                            mediaId.startsWith(com.convx.storage.domain.NetworkMediaUri.Scheme + "://")) return@ResolvingMediaSource progressive.createMediaSource(mediaItem)
                         val key = effectiveCacheKey(mediaId)
                         if (!bypassCacheForQualityChange.contains(mediaId) &&
                             (downloadCache.isCached(downloadKey(mediaId), 0, 1) || playerCache.isCached(key, 0, CHUNK_LENGTH))) {
