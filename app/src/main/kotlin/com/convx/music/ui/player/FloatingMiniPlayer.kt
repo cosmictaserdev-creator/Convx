@@ -100,6 +100,7 @@ import com.convx.music.constants.MiniBarTabStyleKey
 import com.convx.music.constants.MiniPlayerWaveformKey
 import com.convx.music.constants.SwipeSensitivityKey
 import com.convx.music.constants.SwipeThumbnailKey
+import com.convx.music.constants.SwipeDistanceKey
 import androidx.media3.common.Player
 import com.convx.music.extensions.togglePlayPause
 import com.convx.music.extensions.toggleRepeatMode
@@ -208,7 +209,7 @@ fun FloatingMiniPlayer(
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
     val canSkipNext by playerConnection.canSkipNext.collectAsStateWithLifecycle()
 
-    val swipeSensitivity by rememberPreference(SwipeSensitivityKey, 0.73f)
+    val swipeDistancePercent by rememberPreference(SwipeDistanceKey, 30)
     val swipeThumbnailPref by rememberPreference(SwipeThumbnailKey, true)
     val (tabStyle) = rememberPreference(MiniBarTabStyleKey, defaultValue = false)
     val miniPlayerWaveform by rememberPreference(MiniPlayerWaveformKey, defaultValue = false)
@@ -237,9 +238,9 @@ fun FloatingMiniPlayer(
     }
     // Express the commit distance as a screen-width fraction so sensitivity scales predictably.
     val configuration = LocalConfiguration.current
-    val autoSwipeThreshold = remember(swipeSensitivity, configuration.screenWidthDp, densityScale) {
-        val screenWidthPx = configuration.screenWidthDp * densityScale
-        (screenWidthPx * (0.45f - 0.33f * swipeSensitivity.coerceIn(0f, 1f))).roundToInt()
+    val autoSwipeThreshold = remember(swipeDistancePercent, configuration.screenWidthDp, densityScale) {
+    val screenWidthPx = configuration.screenWidthDp * densityScale
+    (screenWidthPx * swipeDistancePercent.coerceIn(10, 100) / 100f).roundToInt()
     }
 
     // Use Box because the parent relies on intrinsic sizing; BoxWithConstraints uses
