@@ -825,6 +825,7 @@ enum class CanvasSource {
     SPOTIFY,
 }
 val SwipeSensitivityKey = floatPreferencesKey("swipeSensitivity")
+val SwipeDistanceKey = intPreferencesKey("swipeDistancePercent")
 
 enum class SearchSource {
     LOCAL,
