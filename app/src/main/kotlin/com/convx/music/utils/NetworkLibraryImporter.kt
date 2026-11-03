@@ -42,7 +42,7 @@ object NetworkLibraryImporter {
 
     suspend fun insert(database: MusicDatabase, track: NetworkTrack): Boolean {
         if (database.getSongById(track.id) != null) return false
-        val artistName = track.artist?.takeIf { it.isNotBlank() } ?: "Unknown Artist"
+        val artistNames = ArtistSplitter.split(track.artist).ifEmpty { listOf("Unknown Artist") }
         val albumName = track.album.orEmpty()
         val artistId = "network_artist_${artistName.hashCode()}"
         val albumId = "network_album_${albumName.hashCode()}"
@@ -60,8 +60,11 @@ object NetworkLibraryImporter {
                         inLibrary = now,
                     ),
                 )
-                insert(ArtistEntity(id = artistId, name = artistName, isLocal = true))
-                insert(SongArtistMap(songId = track.id, artistId = artistId, position = 0))
+                artistNames.forEachIndexed { index, name ->
+                    val artistId = "network_artist_${name.hashCode()}"
+                    insert(ArtistEntity(id = artistId, name = name, isLocal = true))
+                    insert(SongArtistMap(songId = track.id, artistId = artistId, position = index))
+                }
                 if (albumName.isNotBlank()) {
                     insert(
                         AlbumEntity(
