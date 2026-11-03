@@ -73,6 +73,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -794,8 +795,15 @@ fun LazyItemScope.LyricItem(
                                             .drawBehind {
                                                 val intensity = currentLineChrome.value
                                                 if (intensity > 0.001f) {
-                                                    val radius = CornerRadius(size.height / 2f)
+                                                    // Grow the bubble over the text padding and cap the corner
+                                                    // radius: height / 2 turns a wrapped, multi-line lyric into a
+                                                    // circle that leaves the line ends outside it.
+                                                    val padX = 10.dp.toPx()
+                                                    val padY = 5.dp.toPx()
+                                                    val bubbleSize = androidx.compose.ui.geometry.Size(size.width + padX * 2, size.height + padY * 2)
+                                                    val radius = CornerRadius(minOf(bubbleSize.height / 2f, 28.dp.toPx()))
                                                     val accent = mainTextBasicColor
+                                                    translate(left = -padX, top = -padY) {
                                                     drawRoundRect(
                                                         brush = Brush.verticalGradient(
                                                             colors = listOf(
@@ -804,6 +812,7 @@ fun LazyItemScope.LyricItem(
                                                                 accent.copy(alpha = 0.035f * intensity),
                                                             ),
                                                         ),
+                                                        size = bubbleSize,
                                                         cornerRadius = radius,
                                                     )
                                                     drawRoundRect(
@@ -814,6 +823,7 @@ fun LazyItemScope.LyricItem(
                                                                 Color.White.copy(alpha = 0.04f * intensity),
                                                             ),
                                                         ),
+                                                        size = bubbleSize,
                                                         cornerRadius = radius,
                                                         style = Stroke(width = 1.dp.toPx()),
                                                     )
@@ -826,11 +836,12 @@ fun LazyItemScope.LyricItem(
                                                                 Color.Transparent,
                                                             ),
                                                         ),
-                                                        start = Offset(12.dp.toPx(), size.height - 1.dp.toPx()),
-                                                        end = Offset(size.width - 12.dp.toPx(), size.height - 1.dp.toPx()),
+                                                        start = Offset(12.dp.toPx(), bubbleSize.height - 1.dp.toPx()),
+                                                        end = Offset(bubbleSize.width - 12.dp.toPx(), bubbleSize.height - 1.dp.toPx()),
                                                         strokeWidth = 1.5.dp.toPx(),
                                                         cap = androidx.compose.ui.graphics.StrokeCap.Round,
                                                     )
+                                                    }
                                                 }
                                             }
                                             .clickable(
