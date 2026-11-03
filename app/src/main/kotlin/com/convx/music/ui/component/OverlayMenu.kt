@@ -189,7 +189,8 @@ fun OverlayMenu(
                 modifier = Modifier
                     .offset { IntOffset(left.roundToInt(), top.roundToInt()) }
                     .width(MenuWidth)
-                    .heightIn(max = maxHeight - 24.dp)
+                    // Never taller than the safe area, or a long menu runs under the nav bar.
+                    .heightIn(max = with(density) { (safeBottom - safeTop).coerceAtLeast(0f).toDp() })
                     .onSizeChanged { panelSize = it }
                     .graphicsLayer {
                         transformOrigin = origin
