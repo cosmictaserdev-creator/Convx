@@ -136,8 +136,11 @@ fun AppleMiniPlayer(
         spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow)
     }
 
-    val autoSwipeThreshold = remember(swipeSensitivity) {
-        (600 / (1f + kotlin.math.exp(-(-11.44748 * swipeSensitivity + 9.04945)))).roundToInt()
+    val swipeDistancePercent by rememberPreference(com.convx.music.constants.SwipeDistanceKey, 30)
+    val swipeScreenWidthPx = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp *
+    androidx.compose.ui.platform.LocalDensity.current.density
+    val autoSwipeThreshold = remember(swipeDistancePercent, swipeScreenWidthPx) {
+    (swipeScreenWidthPx * swipeDistancePercent.coerceIn(10, 100) / 100f).roundToInt()
     }
 
     val (gradientColors, onGradientColorsChange) = remember { mutableStateOf<List<Color>>(emptyList()) }
