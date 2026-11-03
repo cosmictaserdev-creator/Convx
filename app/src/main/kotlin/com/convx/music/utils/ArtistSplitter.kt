@@ -20,7 +20,7 @@ object ArtistSplitter {
     )
 
     private val separator = Regex(
-        """\s*(?:\u0000|;|/|,|&|\bfeat\.?|\bft\.?|\band\b)\s*""",
+        """\s*(?:\u0000|•|;|/|,|&|\bfeat\.?|\bft\.?|\band\b)\s*""",
         RegexOption.IGNORE_CASE,
     )
 
