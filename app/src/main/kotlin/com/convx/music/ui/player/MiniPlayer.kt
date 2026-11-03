@@ -141,6 +141,7 @@ import com.convx.music.constants.MiniPlayerHeight
 import com.convx.music.constants.PlayerBackgroundStyle
 import com.convx.music.constants.PureBlackMiniPlayerKey
 import com.convx.music.constants.SwipeSensitivityKey
+import com.convx.music.constants.SwipeDistanceKey
 import com.convx.music.constants.SwipeThumbnailKey
 import com.convx.music.constants.ThumbnailCornerRadius
 import com.convx.music.ui.component.shapes.ContinuousRoundedRectangle
@@ -219,9 +220,8 @@ fun MiniPlayer(
 }
 
 // Sensitivity scales the release distance from 45% to 12% of the screen width.
-private fun calculateSwipeThresholdPx(screenWidthPx: Float, sensitivity: Float): Int {
-    val widthFraction = 0.45f - 0.33f * sensitivity.coerceIn(0f, 1f)
-    return (screenWidthPx * widthFraction).roundToInt()
+private fun calculateSwipeThresholdPx(screenWidthPx: Float, percent: Int): Int =
+    (screenWidthPx * percent.coerceIn(10, 100) / 100f).roundToInt()
 }
 
 @Composable
@@ -264,7 +264,7 @@ private fun NewMiniPlayer(
     var showAudioDeviceBottomSheet by remember { mutableStateOf(false) }
     var showRoutePopover by remember { mutableStateOf(false) }
 
-    val swipeSensitivity by rememberPreference(SwipeSensitivityKey, 0.73f)
+    val swipeDistancePercent by rememberPreference(SwipeDistanceKey, 30)
     val swipeThumbnailPref by rememberPreference(SwipeThumbnailKey, true)
     
     // Disable swipe for Listen Together guests
@@ -291,8 +291,8 @@ private fun NewMiniPlayer(
         spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow)
     }
 
-    val autoSwipeThreshold = remember(swipeSensitivity, configuration.screenWidthDp, density) {
-        calculateSwipeThresholdPx(configuration.screenWidthDp * density, swipeSensitivity)
+    val autoSwipeThreshold = remember(swipeSensitivityPercent, configuration.screenWidthDp, density) {
+        calculateSwipeThresholdPx(configuration.screenWidthDp * density, swipeSensitivityPercent)
     }
 
     val (gradientColors, onGradientColorsChange) = remember { mutableStateOf<List<Color>>(emptyList()) }
