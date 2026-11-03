@@ -60,8 +60,9 @@ private fun V2MenuPopup(
     onDismiss: () -> Unit,
     sections: List<IosMenuSection>,
     quickActions: List<IosMenuItem> = emptyList(),
+    placement: V2Placement = AboveEnd
 ) {
-    V2Floating(onDismiss = onDismiss, placement = AboveEnd) {
+    V2Floating(onDismiss = onDismiss, placement = placement) {
         // Liquid glass, like every other floating player control.
         CompositionLocalProvider(com.convx.music.ui.ios.foundation.LocalMenuLiquid provides true) {
             CompositionLocalProvider(
@@ -74,6 +75,23 @@ private fun V2MenuPopup(
     }
 }
 
+/** Lists a song's artists in the same liquid-glass menu as the ellipsis button, so one can be picked. */
+@Composable
+fun V2ArtistPickerMenu(
+    artists: List<Pair<String, String>>,
+    onDismiss: () -> Unit,
+    onPick: (String) -> Unit,
+) {
+    V2MenuPopup(
+        onDismiss = onDismiss,
+        sections = listOf(
+            IosMenuSection(
+                items = artists.map { (id, name) -> IosMenuItem(title = name, onClick = { onPick(id) }) },
+            ),
+        ),
+        placement = AboveCenter,
+    )
+}
 private fun glyph(vector: ImageVector): @Composable (Color) -> Unit = { tint ->
     Icon(vector, null, tint = tint, modifier = Modifier.size(17.dp))
 }
