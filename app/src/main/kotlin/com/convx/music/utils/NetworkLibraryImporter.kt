@@ -44,7 +44,6 @@ object NetworkLibraryImporter {
         if (database.getSongById(track.id) != null) return false
         val artistNames = ArtistSplitter.split(track.artist).ifEmpty { listOf("Unknown Artist") }
         val albumName = track.album.orEmpty()
-        val artistId = "network_artist_${artistName.hashCode()}"
         val albumId = "network_album_${albumName.hashCode()}"
         val now = LocalDateTime.now()
         return try {
