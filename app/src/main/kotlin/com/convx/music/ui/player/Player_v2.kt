@@ -112,6 +112,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import com.convx.music.constants.SwipeSensitivityKey
+import com.convx.music.constants.SwipeDistanceKey
 import com.convx.music.constants.SwipeThumbnailKey
 import kotlin.math.roundToInt
 import kotlinx.coroutines.isActive
@@ -2175,14 +2176,14 @@ private fun rememberSwipeCardModifier(
     onCommit: (forward: Boolean) -> Unit,
 ): Modifier {
     val (swipeThumbnail) = rememberPreference(SwipeThumbnailKey, true)
-    val (swipeSensitivity) = rememberPreference(SwipeSensitivityKey, 0.73f)
+    val (swipeDistancePercent) = rememberPreference(SwipeDistanceKey, 30)
     val coroutineScope = rememberCoroutineScope()
     val density = androidx.compose.ui.platform.LocalDensity.current.density
     val configuration = LocalConfiguration.current
     val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
     val travelPx = configuration.screenWidthDp * density
-    val autoSwipeThreshold = remember(swipeSensitivity, configuration.screenWidthDp, density) {
-        travelPx * (0.45f - 0.33f * swipeSensitivity.coerceIn(0f, 1f))
+    val autoSwipeThreshold = remember(swipeDistancePercent, configuration.screenWidthDp, density) {
+    travelPx * swipeDistancePercent.coerceIn(10, 100) / 100f
     }
     val currentOnCommit by rememberUpdatedState(onCommit)
 
