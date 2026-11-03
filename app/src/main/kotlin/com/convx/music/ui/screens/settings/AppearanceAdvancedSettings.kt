@@ -122,6 +122,10 @@ fun AppearanceAdvancedSettings(
 ) {
     // Keep the mini-player setting in sync with the main pure-black setting.
     val (pureBlack, onPureBlackChangeRaw) = rememberPreference(PureBlackKey, defaultValue = false)
+    val (swipeDistance, onSwipeDistanceChange) = rememberPreference(
+    com.convx.music.constants.SwipeDistanceKey,
+    defaultValue = 30
+)
     val (_, onPureBlackMiniPlayerChange) = rememberPreference(PureBlackMiniPlayerKey, defaultValue = false)
     val onPureBlackChange: (Boolean) -> Unit = { enabled ->
         onPureBlackChangeRaw(enabled)
@@ -408,6 +412,28 @@ fun AppearanceAdvancedSettings(
 
                 Spacer(modifier = Modifier.height(27.dp))
 
+                IosSettingsGroup(
+    title = "Swipe to change song",
+    items = listOf(
+        IosSettingsItem(
+            icon = painterResource(R.drawable.swipe),
+            title = { Text("Slide distance: $swipeDistance% of screen") },
+            description = {
+                Column {
+                    Text("How far you must slide the mini player or cover to change song. 100% is the full width.")
+                    Slider(
+                        value = swipeDistance.toFloat(),
+                        onValueChange = { onSwipeDistanceChange((it / 10f).roundToInt() * 10) },
+                        valueRange = 10f..100f,
+                        steps = 8,
+                    )
+                }
+            },
+        ),
+    )
+)
+
+Spacer(modifier = Modifier.height(27.dp))
                 IosSettingsGroup(
                     title = stringResource(R.string.app_background_text_color),
                     items = listOf(
