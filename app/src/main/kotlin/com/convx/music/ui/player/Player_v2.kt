@@ -700,14 +700,13 @@ private fun PlayerV2Content(
     // The wide layout has room for the controls beside the pane, so lyrics and the queue never hide them.
     val controlsShown = controlsVisible || isWidePlayerLayout
     if (showArtistPicker) {
-        IosAlertDialog(
-            onDismissRequest = { showArtistPicker = false },
-            title = "Choose artist",
-            actions = mediaMetadata?.artists.orEmpty().filter { it.id != null }.map { artist ->
-                IosAlertAction(title = artist.name) {
-                    state.collapseSoft()
-                    navController.navigate("artist/${artist.id}")
-                }
+        V2ArtistPickerMenu(
+            artists = mediaMetadata?.artists.orEmpty().mapNotNull { artist -> artist.id?.let { it to artist.name } },
+            onDismiss = { showArtistPicker = false },
+            onPick = { id ->
+                showArtistPicker = false
+                state.collapseSoft()
+                navController.navigate("artist/$id")
             },
         )
     }
