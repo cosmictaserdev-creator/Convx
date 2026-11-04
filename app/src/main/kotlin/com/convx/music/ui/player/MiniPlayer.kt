@@ -219,10 +219,9 @@ fun MiniPlayer(
     }
 }
 
-// Sensitivity scales the release distance from 45% to 12% of the screen width.
+// The release distance is a chosen share (10..100%) of the screen width.
 private fun calculateSwipeThresholdPx(screenWidthPx: Float, percent: Int): Int =
     (screenWidthPx * percent.coerceIn(10, 100) / 100f).roundToInt()
-}
 
 @Composable
 private fun NewMiniPlayer(
@@ -291,8 +290,8 @@ private fun NewMiniPlayer(
         spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow)
     }
 
-    val autoSwipeThreshold = remember(swipeSensitivityPercent, configuration.screenWidthDp, density) {
-        calculateSwipeThresholdPx(configuration.screenWidthDp * density, swipeSensitivityPercent)
+    val autoSwipeThreshold = remember(swipeDistancePercent, configuration.screenWidthDp, density) {
+        calculateSwipeThresholdPx(configuration.screenWidthDp * density, swipeDistancePercent)
     }
 
     val (gradientColors, onGradientColorsChange) = remember { mutableStateOf<List<Color>>(emptyList()) }
@@ -780,7 +779,7 @@ private fun LegacyMiniPlayer(
     }
     val isCasting by castHandler?.isCasting?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
 
-    val swipeSensitivity by rememberPreference(SwipeSensitivityKey, 0.73f)
+    val swipeDistancePercent by rememberPreference(SwipeDistanceKey, 30)
     val swipeThumbnailPref by rememberPreference(SwipeThumbnailKey, true)
     
     // Disable swipe for Listen Together guests
@@ -804,9 +803,9 @@ private fun LegacyMiniPlayer(
     val animationSpec = remember {
         spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow)
     }
-
-    val autoSwipeThreshold = remember(swipeSensitivity, configuration.screenWidthDp, density) {
-        calculateSwipeThresholdPx(configuration.screenWidthDp * density, swipeSensitivity)
+    
+    val autoSwipeThreshold = remember(swipeDistancePercent, configuration.screenWidthDp, density) {
+    calculateSwipeThresholdPx(configuration.screenWidthDp * density, swipeDistancePercent)
     }
 
     val primaryColor = AppTheme.colorScheme.primary
