@@ -18,10 +18,13 @@ jobs:
   build_stable:
     name: Build Universal GMS Stable Release
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag || github.ref_name }}
           submodules: recursive
 
       - name: Set up JDK 21
@@ -71,11 +74,27 @@ jobs:
         run: |
           ./gradlew assembleUniversalGmsRelease --no-configuration-cache --console=plain --warning-mode summary -x lint
 
-      - name: Upload APK to Release
+      - name: Create GitHub Release if needed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          APK_PATH=$(find app/build/outputs/apk -name '*.apk' | head -n 1)
-          mv "$APK_PATH" "convx-${TAG}.apk"
-          gh release upload "$TAG" "convx-${TAG}.apk" --repo "${{ github.repository }}" --clobber
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --generate-notes \
+              --verify-tag \
+              --repo "$GITHUB_REPOSITORY"
+          fi
+
+      - name: Upload APK to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK_PATH="$(find app/build/outputs/apk/universalGms/release -type f -name '*.apk' -print -quit)"
+          if [ -z "$APK_PATH" ]; then
+            echo "No release APK found." >&2
+            exit 1
+          fi
+          cp "$APK_PATH" "convx-${TAG}.apk"
+          gh release upload "$TAG" "convx-${TAG}.apk" \
+            --clobber \
+            --repo "$GITHUB_REPOSITORY"
