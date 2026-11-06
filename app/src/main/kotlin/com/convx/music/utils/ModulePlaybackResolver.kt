@@ -160,7 +160,11 @@ internal object ModulePlaybackResolver {
             // Ask the stream endpoint for each requested tier first so the quality setting can
             // actually upgrade that result to FLAC when the add-on supports it.
             for (tier in tiers) {
-                val stream = ModuleManager.shared.getStreamUrl(
+                val stream = track.streamUrl?.takeIf(::validUrl)?.let {
+                    ModuleStreamResponse(streamUrl = it, track = com.music.spine.ModuleStreamTrack(
+                        id = track.id, format = track.format, audioQuality = track.audioQuality,
+                    ))
+                } ?: ModuleManager.shared.getStreamUrl(
                     loaded, track.id, settingsFor(tier), hostTier(tier),
                 ).getOrNull() ?: continue
                 val url = stream.streamUrl?.takeIf(::validUrl) ?: continue

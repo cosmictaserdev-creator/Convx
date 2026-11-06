@@ -5,14 +5,11 @@
 
 package com.convx.music.api
 
+import com.convx.music.ai.AiDefaults
+import com.convx.music.ai.AiRequests
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
 
 import java.util.concurrent.TimeUnit
 
@@ -22,7 +19,6 @@ object OpenRouterService {
         .readTimeout(90, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
-    private val JSON = "application/json; charset=utf-8".toMediaType()
 
     suspend fun translate(
         text: String,
@@ -114,38 +110,17 @@ $text
 Output MUST be a JSON array with EXACTLY $lineCount strings."""
                 }
                 
-                val messages = JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("role", "system")
-                        put("content", systemPrompt)
-                    })
-                    put(JSONObject().apply {
-                        put("role", "user")
-                        put("content", userPrompt)
-                    })
-                }
-
-                val jsonBody = JSONObject().apply {
-                    if (model.isNotBlank()) {
-                        put("model", model)
-                    }
-                    put("messages", messages)
-                    put("temperature", 0.3) // Lower temperature for more consistent output
-                    put("max_tokens", lineCount * 100) // Adequate tokens for translation
-                }
-
-                val request = Request.Builder()
-                    .url(baseUrl.ifBlank { "https://openrouter.ai/api/v1/chat/completions" })
-                    .apply {
-                        if (apiKey.isNotBlank()) {
-                            addHeader("Authorization", "Bearer ${apiKey.trim()}")
-                        }
-                    }
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("HTTP-Referer", "https://github.com/cosmictaserdev-creator/Convx")
-                    .addHeader("X-Title", "convx")
-                    .post(jsonBody.toString().toRequestBody(JSON))
-                    .build()
+                val request = AiRequests.chat(
+                    baseUrl = baseUrl.ifBlank { AiDefaults.BASE_URL },
+                    apiKey = apiKey,
+                    model = model,
+                    system = systemPrompt,
+                    user = userPrompt,
+                    // Reasoning models such as Groq's gpt-oss spend part of this on thinking first,
+                    // so a short song would otherwise come back empty.
+                    maxTokens = maxOf(lineCount * 100, 4096),
+                    temperature = 0.3,
+                )
 
                 val response = client.newCall(request).execute()
                 val responseBody = response.body.string()
@@ -158,7 +133,7 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
                         continue
                     }
                     
-                    val errorMsg = errorMessage(responseBody, response.code, response.message)
+                    val errorMsg = AiRequests.errorMessage(responseBody, response.code, response.message)
                     return@withContext Result.failure(Exception("Translation failed: $errorMsg"))
                 }
 
@@ -176,24 +151,8 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
         return@withContext Result.failure(Exception("Max retries exceeded"))
     }
 
-    private fun errorMessage(responseBody: String, statusCode: Int, statusMessage: String): String = try {
-        JSONObject(responseBody).optJSONObject("error")?.optString("message")
-            ?: "HTTP $statusCode: $statusMessage"
-    } catch (e: Exception) {
-        "HTTP $statusCode: $statusMessage"
-    }
-
     private fun parseTranslationResponse(responseBody: String, lineCount: Int): List<String>? {
-        val choices = JSONObject(responseBody).optJSONArray("choices") ?: return null
-        if (choices.length() == 0) return null
-
-        val content = choices.getJSONObject(0)
-            .optJSONObject("message")
-            ?.optString("content")
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
-            ?: return null
-
+        val content = AiRequests.text(responseBody)?.trim() ?: return null
         val translatedLines = parseTranslationContent(content) ?: return null
         return fitLineCount(translatedLines, lineCount)
     }

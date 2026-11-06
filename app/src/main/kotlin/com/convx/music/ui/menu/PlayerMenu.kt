@@ -106,6 +106,7 @@ import com.convx.music.ui.component.NewAction
 import com.convx.music.ui.component.NewActionGrid
 import com.convx.music.constants.EnableSaavnStreamingKey
 import com.convx.music.utils.rememberPreference
+import com.convx.music.ui.player.menuLabel
 import com.convx.music.ui.player.rememberSleepTimerState
 import com.convx.music.ui.player.SleepTimerDialogHost
 import kotlinx.coroutines.Dispatchers
@@ -349,6 +350,7 @@ fun PlayerMenu(
                     add(
                         IosMenuItemData(
                             title = { Text(text = stringResource(R.string.sleep_timer)) },
+                            description = sleepTimer.menuLabel?.let { label -> { Text(text = label) } },
                             icon = { SymbolIcon(symbol = sf("moon.zzz.fill"), contentDescription = null, size = 24.dp) },
                             onClick = {
                                 onDismiss()

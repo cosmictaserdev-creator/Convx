@@ -31,6 +31,10 @@ class JamClock(private val maxSamples: Int = 12) {
     @Synchronized
     fun offsetMs(): Long = samples.minByOrNull { it.rtt }?.offset ?: 0L
 
+    /** False until the first pong: a position computed before then rests on the device's own clock. */
+    val synced: Boolean
+        @Synchronized get() = samples.isNotEmpty()
+
     /** The server's current time according to the device clock plus the measured offset. */
     fun serverNow(deviceNow: Long): Long = deviceNow + offsetMs()
 
@@ -50,4 +54,58 @@ object JamSync {
     /** How long to wait before a resume anchored at [PartyPlayback.anchorMs] should actually start. */
     fun startDelayMs(playback: PartyPlayback, serverNow: Long): Long =
         if (playback.isPlaying) max(0L, playback.anchorMs - serverNow) else 0L
+}
+
+/** The smallest server action that turns the party's upcoming songs into this device's. */
+sealed interface QueueChange {
+    data object None : QueueChange
+    data object Clear : QueueChange
+
+    /** [localFrom] until [localTo] of the local upcoming list are new; [playNext] puts them right after the current song. */
+    data class Add(val localFrom: Int, val localTo: Int, val playNext: Boolean) : QueueChange
+
+    /** The song at [index] of the party's upcoming list is gone. */
+    data class Remove(val index: Int, val videoId: String) : QueueChange
+
+    /** One song moved within the upcoming list, both indices into it. */
+    data class Move(val from: Int, val to: Int, val videoId: String) : QueueChange
+
+    /** Anything else: send the whole list. */
+    data object Replace : QueueChange
+}
+
+object JamQueueDiff {
+    /** Compares video ids of the songs after the current one: [party] is what the server holds, [local] what this device has. */
+    fun between(party: List<String>, local: List<String>): QueueChange {
+        if (party == local) return QueueChange.None
+        if (local.isEmpty()) return QueueChange.Clear
+
+        if (local.size > party.size) {
+            val extra = local.size - party.size
+            if (local.subList(0, party.size) == party) return QueueChange.Add(party.size, local.size, playNext = false)
+            if (local.subList(extra, local.size) == party) return QueueChange.Add(0, extra, playNext = true)
+        }
+
+        if (local.size == party.size - 1) {
+            val at = party.indices.firstOrNull { it >= local.size || party[it] != local[it] } ?: return QueueChange.Replace
+            val id = party[at]
+            // The server removes the first copy of an id, so a repeated one cannot be removed unambiguously.
+            val removed = party.toMutableList().also { it.removeAt(at) }
+            if (removed == local && party.count { it == id } == 1) return QueueChange.Remove(at, id)
+        }
+
+        if (local.size == party.size) {
+            val a = party.indices.first { party[it] != local[it] }
+            val b = party.indices.last { party[it] != local[it] }
+            if (b > a) {
+                if (local[b] == party[a] && local.subList(a, b) == party.subList(a + 1, b + 1) && party.count { it == party[a] } == 1) {
+                    return QueueChange.Move(a, b, party[a])
+                }
+                if (local[a] == party[b] && local.subList(a + 1, b + 1) == party.subList(a, b) && party.count { it == party[b] } == 1) {
+                    return QueueChange.Move(b, a, party[b])
+                }
+            }
+        }
+        return QueueChange.Replace
+    }
 }

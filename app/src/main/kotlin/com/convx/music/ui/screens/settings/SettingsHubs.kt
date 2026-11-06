@@ -94,6 +94,8 @@ object SettingsHubs {
                         "Choose the playback control icons"),
                     SettingsLink("Canvas", R.drawable.canvas_art, { systemTeal }, route("settings/appearance/canvas"),
                         "Animated artwork behind the player", "video animated artwork"),
+                    SettingsLink("Ambient Mode", R.drawable.fullscreen, { systemIndigo }, route("settings/ambient"),
+                        "Canvas, lyrics and controls for a fullscreen listening view", "ambient fullscreen landscape canvas progress ring"),
                 ),
             ),
             SettingsLinkGroup(

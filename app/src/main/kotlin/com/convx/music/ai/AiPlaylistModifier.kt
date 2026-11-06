@@ -60,7 +60,7 @@ object AiPlaylistModifier {
         val jsonOutput = AiChatClient.complete(context, systemPrompt, userPrompt, onLog) ?: return@withContext
 
         onLog("Parsing AI response...")
-        val cleanJsonStr = jsonOutput.replace("```json", "").replace("```", "").trim()
+        val cleanJsonStr = AiRequests.jsonPart(jsonOutput, '{')
 
         val parsedJson = try {
             JSONObject(cleanJsonStr)

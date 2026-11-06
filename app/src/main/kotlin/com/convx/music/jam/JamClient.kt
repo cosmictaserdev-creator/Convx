@@ -9,6 +9,7 @@ package com.convx.music.jam
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -47,6 +48,34 @@ class JamClient(
 
     suspend fun join(baseUrl: String, code: String, request: JoinRequest): PartyMembership =
         post("${base(baseUrl)}/api/parties/${code.trim()}/join", json.encodeToString(request))
+
+    /** Who is in a party, before committing a device slot. Null when the code is unknown or unreachable. */
+    suspend fun preview(baseUrl: String, code: String): PartyPreview? = withContext(Dispatchers.IO) {
+        val request = Request.Builder().url("${base(baseUrl)}/api/parties/${code.trim()}/preview").build()
+        try {
+            http.newCall(request).execute().use {
+                if (it.isSuccessful) json.decodeFromString<PartyPreview>(it.body?.string().orEmpty()) else null
+            }
+        } catch (e: IOException) {
+            null
+        } catch (e: SerializationException) {
+            null
+        }
+    }
+
+    /** Parties and listeners on the server right now; null when it cannot be reached. Doubles as a health check. */
+    suspend fun stats(baseUrl: String): PartyStats? = withContext(Dispatchers.IO) {
+        val request = Request.Builder().url("${base(baseUrl)}/").build()
+        try {
+            http.newCall(request).execute().use {
+                if (it.isSuccessful) json.decodeFromString<PartyStats>(it.body?.string().orEmpty()) else null
+            }
+        } catch (e: IOException) {
+            null
+        } catch (e: SerializationException) {
+            null
+        }
+    }
 
     suspend fun leave(baseUrl: String, code: String, token: String) {
         withContext(Dispatchers.IO) {

@@ -118,7 +118,7 @@ value class PlayerIconSet(val overrides: Map<PlayerIconSlot, PlayerIconOverride>
             val map = buildMap {
                 PlayerIconSlot.entries.forEach { slot ->
                     val entry = obj.optJSONObject(slot.name) ?: return@forEach
-                    val file = entry.optString("file").takeIf { it.isNotEmpty() } ?: return@forEach
+                    val file = entry.optString("file").takeIf(DiySticker.Companion::isSafeFileName) ?: return@forEach
                     put(slot, PlayerIconOverride(file, entry.optBoolean("tint", false)))
                 }
             }

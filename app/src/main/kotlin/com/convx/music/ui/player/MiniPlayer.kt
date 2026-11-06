@@ -269,7 +269,7 @@ private fun NewMiniPlayer(
     
     // Disable swipe for Listen Together guests
     val listenTogetherManager = LocalListenTogetherManager.current
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val swipeThumbnail = swipeThumbnailPref && !isListenTogetherGuest
 
     val layoutDirection = LocalLayoutDirection.current
@@ -568,7 +568,7 @@ private fun NewMiniPlayerPlayButton(
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val castIsPlaying by castHandler?.castIsPlaying?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
     val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
 
     
@@ -785,7 +785,7 @@ private fun LegacyMiniPlayer(
     
     // Disable swipe for Listen Together guests
     val listenTogetherManager = LocalListenTogetherManager.current
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val swipeThumbnail = swipeThumbnailPref && !isListenTogetherGuest
 
     val layoutDirection = LocalLayoutDirection.current
@@ -952,7 +952,7 @@ private fun LegacyPlayPauseButton(
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val castIsPlaying by castHandler?.castIsPlaying?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
     val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
 
 

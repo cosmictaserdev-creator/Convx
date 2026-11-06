@@ -330,7 +330,7 @@ private fun PlayerV2Content(
     var showV2Options by remember { mutableStateOf(false) }
     var showRoutePopover by remember { mutableStateOf(false) }
     // Same condition as LyricsMenu's "Translate with AI" entry.
-    val lyricsAiProvider by rememberPreference(com.convx.music.constants.AiProviderKey, "OpenRouter")
+    val lyricsAiProvider by rememberPreference(com.convx.music.constants.AiProviderKey, com.convx.music.ai.AiDefaults.PROVIDER)
     val lyricsOpenRouterKey by rememberPreference(com.convx.music.constants.OpenRouterApiKey, "")
     val lyricsDeeplKey by rememberPreference(com.convx.music.constants.DeeplApiKey, "")
     val hasLyricsAiKey = if (lyricsAiProvider == "DeepL") lyricsDeeplKey.isNotBlank() else lyricsOpenRouterKey.isNotBlank()
@@ -791,6 +791,7 @@ private fun PlayerV2Content(
                             bottomSheetPageState.showFloating { ShowMediaInfo(it.id) }
                         },
                         onShareLyrics = { playerState = PlayerInternalState.LYRICS },
+                        sleepTimerLabel = { sleepTimer.menuLabel },
                         onOpenSleepTimer = { sleepTimer.showDialog.value = true },
                         onOpenAudioDevices = { showAudioDeviceBottomSheet = true },
                         onMore = {
@@ -1391,6 +1392,7 @@ private fun PlayerV2Content(
                                                         bottomSheetPageState.showFloating { ShowMediaInfo(it.id) }
                                                     },
                                                     onShareLyrics = { playerState = PlayerInternalState.LYRICS },
+                        sleepTimerLabel = { sleepTimer.menuLabel },
                         onOpenSleepTimer = { sleepTimer.showDialog.value = true },
                         onOpenAudioDevices = { showAudioDeviceBottomSheet = true },
                                                     onMore = {

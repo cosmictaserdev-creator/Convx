@@ -317,6 +317,11 @@ class SyncUtils @Inject constructor(
         }
     }
 
+    /** Fire-and-forget [uploadPlaylistToYouTube] that outlives the screen or ViewModel that started it. */
+    fun uploadPlaylistInBackground(playlistId: String, songIds: List<String>) {
+        syncScope.launch { uploadPlaylistToYouTube(playlistId, songIds) }
+    }
+
     fun syncAllAlbums() {
         enqueueOperations(SyncOperation.LikedAlbums, SyncOperation.UploadedAlbums)
     }

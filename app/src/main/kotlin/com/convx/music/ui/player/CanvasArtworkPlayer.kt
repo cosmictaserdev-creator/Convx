@@ -28,6 +28,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
@@ -57,6 +58,8 @@ fun CanvasArtworkPlayer(
     mediaId: String? = null,
     onExhausted: () -> Unit = {},
     onReady: () -> Unit = {},
+    resizeMode: Int = AspectRatioFrameLayout.RESIZE_MODE_FIT,
+    onVideoAspectRatio: (Float) -> Unit = {},
 ) {
     val context = LocalContext.current
     val primary = primaryUrl?.takeIf { it.isNotBlank() }
@@ -84,6 +87,7 @@ fun CanvasArtworkPlayer(
     var isVideoReady by remember(initial) { mutableStateOf(false) }
     val currentOnExhausted by rememberUpdatedState(onExhausted)
     val currentOnReady by rememberUpdatedState(onReady)
+    val currentOnVideoAspectRatio by rememberUpdatedState(onVideoAspectRatio)
 
     val mediaSourceFactory = rememberCanvasMediaSourceFactory()
     val exoPlayer =
@@ -140,6 +144,11 @@ fun CanvasArtworkPlayer(
                 override fun onRenderedFirstFrame() {
                     isVideoReady = true
                     currentOnReady()
+                    exoPlayer.videoSize.toAspectRatio().takeIf { it > 0f }?.let(currentOnVideoAspectRatio)
+                }
+
+                override fun onVideoSizeChanged(videoSize: VideoSize) {
+                    videoSize.toAspectRatio().takeIf { it > 0f }?.let(currentOnVideoAspectRatio)
                 }
             }
         exoPlayer.addListener(listener)
@@ -186,7 +195,7 @@ fun CanvasArtworkPlayer(
         factory = { viewContext ->
             AspectRatioFrameLayout(viewContext).apply {
                 layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                this.resizeMode = resizeMode
                 
                 val textureView = TextureView(viewContext).apply {
                     layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
@@ -197,10 +206,16 @@ fun CanvasArtworkPlayer(
             }
         },
         update = { view ->
-            // AspectRatioFrameLayout handles itself, no specific update needed here
+            if (view.resizeMode != resizeMode) view.resizeMode = resizeMode
         },
         modifier = modifier.graphicsLayer { this.alpha = alpha },
     )
+}
+
+internal fun VideoSize.toAspectRatio(): Float {
+    if (width <= 0 || height <= 0) return 0f
+    val effectiveWidth = width * pixelWidthHeightRatio
+    return if (effectiveWidth <= 0f) 0f else effectiveWidth / height
 }
 
 

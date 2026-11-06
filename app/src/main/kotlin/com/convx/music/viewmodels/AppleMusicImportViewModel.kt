@@ -20,6 +20,7 @@ import com.music.innertube.SearchFilter
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
 import com.music.spotify.SpotifyMapper
+import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -90,6 +91,7 @@ data class AppleMusicImportState(
 @HiltViewModel
 class AppleMusicImportViewModel @Inject constructor(
     private val database: MusicDatabase,
+    private val syncUtils: SyncUtils,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(AppleMusicImportState())
@@ -238,6 +240,7 @@ class AppleMusicImportViewModel @Inject constructor(
                         insert(PlaylistSongMap(playlistId = playlist.id, songId = song.id, position = index))
                     }
                 }
+                syncUtils.uploadPlaylistInBackground(playlist.id, songs.map { it.id })
                 withContext(Dispatchers.Main) {
                     mutableState.update { it.copy(visible = false, choosingDestination = false, busy = false, creatingPlaylist = false, ready = false, error = null) }
                     onCreated(playlist.id)

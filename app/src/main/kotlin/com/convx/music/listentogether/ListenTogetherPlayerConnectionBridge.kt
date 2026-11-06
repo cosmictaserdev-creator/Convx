@@ -17,7 +17,15 @@ class ListenTogetherPlayerConnectionBridge @Inject constructor() {
     private val _playerConnection = MutableStateFlow<PlayerConnection?>(null)
     val playerConnection: StateFlow<PlayerConnection?> = _playerConnection.asStateFlow()
 
+    /** True while a party's host holds the controls and this device is not the host. */
+    private val _partyLocked = MutableStateFlow(false)
+    val partyLocked: StateFlow<Boolean> = _partyLocked.asStateFlow()
+
     fun update(connection: PlayerConnection?) {
         _playerConnection.value = connection
+    }
+
+    fun setPartyLocked(locked: Boolean) {
+        _partyLocked.value = locked
     }
 }

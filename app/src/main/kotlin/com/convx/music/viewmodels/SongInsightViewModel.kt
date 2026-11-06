@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.ai.AiChatClient
+import com.convx.music.ai.AiDefaults
 import com.convx.music.constants.AiProviderKey
 import com.convx.music.constants.OpenRouterApiKey
 import com.convx.music.db.MusicDatabase
@@ -61,7 +62,8 @@ class SongInsightViewModel @Inject constructor(
 
     fun refreshConfiguration() {
         viewModelScope.launch(Dispatchers.IO) {
-            val configured = context.dataStore.get(AiProviderKey, "OpenRouter") != "Puter" &&
+            val provider = context.dataStore.get(AiProviderKey, AiDefaults.PROVIDER)
+            val configured = provider != "Puter" && provider !in AiDefaults.TRANSLATION_ONLY &&
                 context.dataStore.get(OpenRouterApiKey, "").isNotBlank()
             _state.update { it.copy(configured = configured) }
         }

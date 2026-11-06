@@ -38,20 +38,15 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.add
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -428,6 +423,7 @@ fun Lyrics(
     showLyrics: Boolean,
     // Changing this key resets the list and glides to the active line. Zero disables the intro.
     introKey: Int = 0,
+    textSizeOverride: Float? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val database = LocalDatabase.current.get()
@@ -459,15 +455,16 @@ fun Lyrics(
     val lyricsAnimationStyle by rememberEnumPreference(LyricsAnimationStyleKey, LyricsAnimationStyle.FLAMINGO)
     val lyricsFontSelection by rememberPreference(com.convx.music.constants.LyricsFontKey, "default")
     val lyricsFontFamily = com.convx.music.lyrics.rememberLyricsFont(lyricsFontSelection)
-    val lyricsTextSize by rememberPreference(LyricsTextSizeKey, 30f)
+    val storedLyricsTextSize by rememberPreference(LyricsTextSizeKey, 30f)
+    val lyricsTextSize = textSizeOverride ?: storedLyricsTextSize
     val lyricsLineSpacing by rememberPreference(LyricsLineSpacingKey, 1.3f)
     val lyricsStandardBlur by rememberPreference(LyricsStandardBlurKey, false)
     
     val openRouterApiKey by rememberPreference(OpenRouterApiKey, "")
     val deeplApiKey by rememberPreference(DeeplApiKey, "")
-    val aiProvider by rememberPreference(AiProviderKey, "OpenRouter")
-    val openRouterBaseUrl by rememberPreference(OpenRouterBaseUrlKey, "https://openrouter.ai/api/v1/chat/completions")
-    val openRouterModel by rememberPreference(OpenRouterModelKey, "google/gemini-2.5-flash-lite")
+    val aiProvider by rememberPreference(AiProviderKey, com.convx.music.ai.AiDefaults.PROVIDER)
+    val openRouterBaseUrl by rememberPreference(OpenRouterBaseUrlKey, com.convx.music.ai.AiDefaults.BASE_URL)
+    val openRouterModel by rememberPreference(OpenRouterModelKey, com.convx.music.ai.AiDefaults.MODEL)
     val translateLanguage by rememberPreference(TranslateLanguageKey, "en")
     val translateMode by rememberPreference(TranslateModeKey, "Literal")
     val deeplFormality by rememberPreference(DeeplFormalityKey, "default")
@@ -684,10 +681,14 @@ fun Lyrics(
     val usesArchiveTuneRenderer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
         lyricsAnimationStyle == LyricsAnimationStyle.ARCHIVE_TUNE &&
         lines.hasKaraokeTimings()
-    val usesFlamingoRenderer = lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO && lines.isNotEmpty()
-    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer
+    val usesFlamingoRenderer = (lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO ||
+            lyricsAnimationStyle == LyricsAnimationStyle.CONVX_1 ||
+            lyricsAnimationStyle == LyricsAnimationStyle.BITCHORD) && lines.isNotEmpty()
+    val usesCrawlRenderer = lyricsAnimationStyle == LyricsAnimationStyle.STAR_CRAWL && lines.isNotEmpty()
+    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer && !usesCrawlRenderer
 
     val lazyListState = rememberLazyListState()
+    val rubber = rememberLyricRubber(lazyListState)
     
     var isAutoScrollEnabled by rememberSaveable { mutableStateOf(true) }
 
@@ -778,7 +779,7 @@ fun Lyrics(
 
     suspend fun performSmoothPageScroll(targetIndex: Int, animate: Boolean = true) {
         if (targetIndex < 0) return
-        lazyListState.followLyricLine(targetIndex + if (hasProviderRow) 1 else 0, animate)
+        lazyListState.followLyricLine(targetIndex + if (hasProviderRow) 1 else 0, animate, rubber)
     }
     LaunchedEffect(introKey) {
         if (introKey == 0) return@LaunchedEffect
@@ -787,7 +788,7 @@ fun Lyrics(
         initialScrollDone = false
     }
     LaunchedEffect(currentLineIndex, lastPreviewTime, initialScrollDone, isAutoScrollEnabled, scrollLyrics, isSeeking, hasProviderRow, lines, lazyListState.layoutInfo.totalItemsCount) {
-        if (!isSynced || usesFlamingoRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
+        if (!isSynced || usesFlamingoRenderer || usesCrawlRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
         // The playhead-to-line lookup starts asynchronously. Don't interpret its
         // initial -1 as line zero and briefly jump to the start of the lyrics.
         if (currentLineIndex < 0) return@LaunchedEffect
@@ -831,21 +832,20 @@ fun Lyrics(
                 .padding(top = 56.dp),
         )
 
-        if (lyrics == LYRICS_NOT_FOUND) {
-            Box(
+        if (lyrics == LYRICS_NOT_FOUND || (lyrics != null && lines.all { it.text.isBlank() })) {
+            LyricsEmptyNote(fontFamily = lyricsFontFamily, color = AppTheme.colorScheme.secondary)
+        } else if (usesCrawlRenderer) {
+            val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
+            StarCrawlLyrics(
+                lines = lines,
+                fontFamily = lyricsFontFamily,
+                fontSize = lyricsTextSize,
+                positionMs = { (sliderPositionProvider() ?: playerConnection.player.currentPosition) + lyricsOffset },
+                isSynced = isSynced,
+                autoScrollEnabled = scrollLyrics,
+                onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    fontFamily = lyricsFontFamily,
-                    text = stringResource(R.string.lyrics_not_found),
-                    fontSize = 20.sp,
-                    color = AppTheme.colorScheme.secondary,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.alpha(0.5f)
-                )
-            }
+            )
         } else if (usesFlamingoRenderer) {
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
             FlamingoLyrics(
@@ -858,7 +858,8 @@ fun Lyrics(
                 useBlur = lyricsStandardBlur,
                 isSynced = isSynced,
                 autoScrollEnabled = scrollLyrics,
-                wordGlowEnabled = lyricsGlowEffect,
+                glow = lyricsGlowEffect,
+                artistName = mediaMetadata?.artists?.joinToString { it.name },
                 onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
                 modifier = Modifier.fillMaxSize().fadingEdge(vertical = 64.dp),
             )
@@ -893,10 +894,7 @@ fun Lyrics(
 
             LazyColumn(
                 state = lazyListState,
-                contentPadding = WindowInsets.systemBars
-                    .only(WindowInsetsSides.Top)
-                    .add(WindowInsets(top = maxHeight / 2, bottom = maxHeight / 2))
-                    .asPaddingValues(),
+                contentPadding = PaddingValues(vertical = maxHeight / 2),
                 modifier = Modifier
                     .fadingEdge(vertical = 64.dp)
                     .nestedScroll(remember {
@@ -971,6 +969,8 @@ fun Lyrics(
                         items = lines,
                         key = { index, item -> "$index-${item.time}" } // Add stable key
                     ) { index, item ->
+                    Box(Modifier.lyricRubber(rubber, index + if (hasProviderRow) 1 else 0)) {
+                    run {
                     val isSelected = selectedIndices.contains(index)
                     if ((lyricsAnimationStyle == LyricsAnimationStyle.BITCHORD ||
                             lyricsAnimationStyle == LyricsAnimationStyle.CONVX_1) &&
@@ -1042,7 +1042,7 @@ fun Lyrics(
                                 }
                             }
                         )
-                        return@itemsIndexed
+                        return@run
                     } else if (lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO) {
                         val currentLineTime = if (displayedCurrentLineIndex >= 0 && displayedCurrentLineIndex < lines.size) {
                             lines[displayedCurrentLineIndex].time
@@ -1109,7 +1109,7 @@ fun Lyrics(
                                 }
                             }
                         )
-                        return@itemsIndexed
+                        return@run
                     }
                     val itemModifier = Modifier
                         .fillMaxWidth()
@@ -1825,6 +1825,11 @@ fun Lyrics(
                             }
                         }
                     }
+                    }
+                    }
+                }
+                item(key = "lyrics_end") {
+                    LyricsEndNote(fontFamily = lyricsFontFamily, color = textColor)
                 }
             }
         }

@@ -392,6 +392,8 @@ fun ApplePlaylistsPage(navController: NavController, onBack: () -> Unit, viewMod
     val allPlaylists by viewModel.allPlaylists.collectAsStateWithLifecycle()
     val localOnly = com.convx.music.LocalLocalOnlyMode.current
     val playlists = allPlaylists.filter { !localOnly || it.playlist.browseId == null }
+    val ytmSync by rememberPreference(com.convx.music.constants.YtmSyncKey, true)
+    androidx.compose.runtime.LaunchedEffect(ytmSync, localOnly) { if (ytmSync && !localOnly) viewModel.sync() }
     var viewType by rememberEnumPreference(PlaylistViewTypeKey, LibraryViewType.LIST)
     var sortType by rememberEnumPreference(PlaylistSortTypeKey, PlaylistSortType.CREATE_DATE)
     var descending by rememberPreference(PlaylistSortDescendingKey, true)

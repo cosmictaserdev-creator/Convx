@@ -5,21 +5,18 @@
 
 package com.convx.music.api
 
+import com.convx.music.ai.AiDefaults
+import com.convx.music.ai.AiRequests
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
-import kotlinx.serialization.json.*
 import timber.log.Timber
 
 object OpenRouterStreamingService {
@@ -28,8 +25,6 @@ object OpenRouterStreamingService {
         .readTimeout(120, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
-    private val JSON = "application/json; charset=utf-8".toMediaType()
-    private val json = Json { ignoreUnknownKeys = true }
 
     fun streamTranslation(
         text: String,
@@ -119,34 +114,17 @@ $text
 Output MUST be a JSON array with EXACTLY $lineCount strings."""
         }
 
-        val messages = JSONArray().apply {
-            put(JSONObject().apply {
-                put("role", "system")
-                put("content", systemPrompt)
-            })
-            put(JSONObject().apply {
-                put("role", "user")
-                put("content", userPrompt)
-            })
-        }
-        val jsonBody = JSONObject().apply {
-            if (model.isNotBlank()) put("model", model)
-            put("messages", messages)
-            put("stream", true)
-            put("temperature", 0.3)
-            put("max_tokens", lineCount * 100)
-        }
-
-        return Request.Builder()
-            .url(baseUrl.ifBlank { "https://openrouter.ai/api/v1/chat/completions" })
-            .apply {
-                if (apiKey.isNotBlank()) addHeader("Authorization", "Bearer ${apiKey.trim()}")
-            }
-            .addHeader("Content-Type", "application/json")
-            .addHeader("HTTP-Referer", "https://github.com/cosmictaserdev-creator/Convx")
-            .addHeader("X-Title", "convx")
-            .post(jsonBody.toString().toRequestBody(JSON))
-            .build()
+        return AiRequests.chat(
+            baseUrl = baseUrl.ifBlank { AiDefaults.BASE_URL },
+            apiKey = apiKey,
+            model = model,
+            system = systemPrompt,
+            user = userPrompt,
+            // Reasoning models such as Groq's gpt-oss think before any text arrives.
+            maxTokens = maxOf(lineCount * 100, 4096),
+            temperature = 0.3,
+            stream = true,
+        )
     }
 
     private suspend fun FlowCollector<StreamChunk>.readStream(
@@ -161,30 +139,25 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
             if (!line.startsWith("data: ")) continue
 
             val data = line.substring(6)
-            if (data == "[DONE]") {
+            // Anthropic reports a failure that happens mid-stream as an error event.
+            if (data.contains("\"type\":\"error\"")) {
+                emit(StreamChunk.Error(AiRequests.errorMessage(data, 0, "stream error")))
+                return StreamContent("", sawDoneMarker = true)
+            }
+            if (AiRequests.isStreamEnd(data)) {
                 Timber.d("Streaming complete, received $chunkCount chunks")
                 val fullContent = content.toString()
                 emitTranslationResult(fullContent, expectedLineCount, logDetails = true)
                 return StreamContent(fullContent, sawDoneMarker = true)
             }
 
-            val chunk = parseContentChunk(data) ?: continue
+            val chunk = AiRequests.streamText(data) ?: continue
             content.append(chunk)
             chunkCount++
             emit(StreamChunk.Content(chunk))
         }
 
         return StreamContent(content.toString(), sawDoneMarker = false)
-    }
-
-    private fun parseContentChunk(data: String): String? = try {
-        val jsonObject = json.parseToJsonElement(data).jsonObject
-        val choices = jsonObject["choices"]?.jsonArray
-        choices?.get(0)?.jsonObject?.get("delta")?.jsonObject
-            ?.get("content")?.jsonPrimitive?.content
-    } catch (e: Exception) {
-        Timber.v("Ignored malformed chunk: ${e.message}")
-        null
     }
 
     private suspend fun FlowCollector<StreamChunk>.emitTranslationResult(
@@ -205,13 +178,8 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
             }
     }
 
-    private fun responseError(response: okhttp3.Response): String = try {
-        JSONObject(response.body.string())
-            .optJSONObject("error")?.optString("message")
-            ?: "HTTP ${response.code}: ${response.message}"
-    } catch (e: Exception) {
-        "HTTP ${response.code}: ${response.message}"
-    }
+    private fun responseError(response: okhttp3.Response): String =
+        AiRequests.errorMessage(runCatching { response.body.string() }.getOrDefault(""), response.code, response.message)
 
     private data class StreamContent(val text: String, val sawDoneMarker: Boolean)
 

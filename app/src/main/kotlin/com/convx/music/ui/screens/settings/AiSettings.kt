@@ -42,6 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.R
+import com.convx.music.ai.AiDefaults
+import com.convx.music.ai.AiKeyCheck
+import com.convx.music.ui.ios.compat.CircularProgressIndicator
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import com.convx.music.constants.AiProviderKey
 import com.convx.music.constants.DeeplApiKey
 import com.convx.music.constants.DeeplFormalityKey
@@ -63,18 +70,18 @@ fun AiSettings(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
-    var aiProvider by rememberPreference(AiProviderKey, "OpenRouter")
+    var aiProvider by rememberPreference(AiProviderKey, AiDefaults.PROVIDER)
     var openRouterApiKey by rememberPreference(OpenRouterApiKey, "")
-    var openRouterBaseUrl by rememberPreference(OpenRouterBaseUrlKey, "https://openrouter.ai/api/v1/chat/completions")
-    var openRouterModel by rememberPreference(OpenRouterModelKey, "google/gemini-3.1-flash-lite")
+    var openRouterBaseUrl by rememberPreference(OpenRouterBaseUrlKey, AiDefaults.BASE_URL)
+    var openRouterModel by rememberPreference(OpenRouterModelKey, AiDefaults.MODEL)
     var translateLanguage by rememberPreference(TranslateLanguageKey, "en")
     var translateMode by rememberPreference(TranslateModeKey, "Literal")
     var deeplApiKey by rememberPreference(DeeplApiKey, "")
     var deeplFormality by rememberPreference(DeeplFormalityKey, "default")
 
     val aiProviders = mapOf(
+        "Groq" to AiDefaults.BASE_URL,
         "OpenRouter" to "https://openrouter.ai/api/v1/chat/completions",
-        "Groq" to "https://api.groq.com/openai/v1/chat/completions",
         "OpenAI" to "https://api.openai.com/v1/chat/completions",
         "Perplexity" to "https://api.perplexity.ai/chat/completions",
         "Claude" to "https://api.anthropic.com/v1/messages",
@@ -86,8 +93,8 @@ fun AiSettings(
     )
 
     val providerHelpText = mapOf(
-        "OpenRouter" to stringResource(R.string.ai_provider_openrouter_help),
         "Groq" to stringResource(R.string.ai_provider_groq_help),
+        "OpenRouter" to stringResource(R.string.ai_provider_openrouter_help),
         "OpenAI" to stringResource(R.string.ai_provider_openai_help),
         "Perplexity" to stringResource(R.string.ai_provider_perplexity_help),
         "Claude" to stringResource(R.string.ai_provider_claude_help),
@@ -121,9 +128,9 @@ fun AiSettings(
             "gpt-4-turbo"
         ),
         "Claude" to listOf(
-            "claude-3-5-haiku-latest",
-            "claude-3-5-sonnet-latest",
-            "claude-3-opus-latest"
+            "claude-opus-5-5",
+            "claude-sonnet-5-5",
+            "claude-haiku-5-5"
         ),
         "Gemini" to listOf(
             "gemini-2.5-flash-lite",
@@ -168,6 +175,93 @@ fun AiSettings(
     var showBaseUrlDialog by rememberSaveable { mutableStateOf(false) }
     var showModelDialog by rememberSaveable { mutableStateOf(false) }
     var showCustomModelInput by rememberSaveable { mutableStateOf(false) }
+
+    // A key is tried against its provider before it is saved; a failed one reopens the box with what was typed.
+    val scope = rememberCoroutineScope()
+    var keyDraft by remember { mutableStateOf<String?>(null) }
+    var keyCheck by remember { mutableStateOf<KeyCheck?>(null) }
+    var checkJob by remember { mutableStateOf<Job?>(null) }
+
+    fun saveKey(provider: String, key: String) {
+        if (provider == "DeepL") deeplApiKey = key else openRouterApiKey = key
+    }
+
+    fun checkKey(provider: String, key: String) {
+        keyDraft = null
+        if (key.isBlank()) return saveKey(provider, "")
+        keyCheck = KeyCheck(provider, key, null)
+        checkJob?.cancel()
+        checkJob = scope.launch {
+            val result = AiKeyCheck.verify(provider, openRouterBaseUrl, openRouterModel, key)
+            if (result is AiKeyCheck.Result.Works) saveKey(provider, key)
+            keyCheck = KeyCheck(provider, key, result)
+        }
+    }
+
+    keyCheck?.let { check ->
+        val result = check.result
+        AlertDialog(
+            onDismissRequest = { if (result != null) keyCheck = null },
+            icon = {
+                SymbolIcon(
+                    symbol = sf(
+                        when (result) {
+                            null -> "key.fill"
+                            is AiKeyCheck.Result.Works -> "checkmark"
+                            is AiKeyCheck.Result.Fails -> "exclamationmark.circle"
+                        }
+                    ),
+                    contentDescription = null,
+                )
+            },
+            title = {
+                Text(
+                    stringResource(
+                        when (result) {
+                            null -> R.string.ai_key_checking
+                            is AiKeyCheck.Result.Works -> R.string.ai_key_works
+                            is AiKeyCheck.Result.Fails -> R.string.ai_key_failed
+                        }
+                    )
+                )
+            },
+            text = {
+                when (result) {
+                    null -> Box(Modifier.padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                    is AiKeyCheck.Result.Works -> Text(result.detail)
+                    is AiKeyCheck.Result.Fails -> Text(result.reason)
+                }
+            },
+            confirmButton = {
+                when (result) {
+                    null -> TextButton(onClick = { checkJob?.cancel(); keyCheck = null }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                    is AiKeyCheck.Result.Works -> TextButton(onClick = { keyCheck = null }) {
+                        Text(stringResource(android.R.string.ok))
+                    }
+                    is AiKeyCheck.Result.Fails -> TextButton(onClick = {
+                        keyDraft = check.key
+                        keyCheck = null
+                        if (check.provider == "DeepL") showDeeplApiKeyDialog = true else showApiKeyDialog = true
+                    }) {
+                        Text(stringResource(R.string.ai_key_edit))
+                    }
+                }
+            },
+            dismissButton = if (result is AiKeyCheck.Result.Fails) {
+                {
+                    TextButton(onClick = { saveKey(check.provider, check.key); keyCheck = null }) {
+                        Text(stringResource(R.string.ai_key_save_anyway))
+                    }
+                }
+            } else {
+                null
+            },
+        )
+    }
 
     if (showProviderHelpDialog) {
         AlertDialog(
@@ -294,12 +388,12 @@ fun AiSettings(
         TextFieldDialog(
             title = { Text(stringResource(R.string.ai_api_key)) },
             icon = { SymbolIcon(symbol = sf("key.fill"), contentDescription = null) },
-            initialTextFieldValue = TextFieldValue(text = openRouterApiKey),
+            initialTextFieldValue = TextFieldValue(text = keyDraft ?: openRouterApiKey),
             onDone = {
-                openRouterApiKey = it
                 showApiKeyDialog = false
+                checkKey(aiProvider, it.trim())
             },
-            onDismiss = { showApiKeyDialog = false }
+            onDismiss = { showApiKeyDialog = false; keyDraft = null }
         )
     }
 
@@ -307,12 +401,12 @@ fun AiSettings(
         TextFieldDialog(
             title = { Text("DeepL ${stringResource(R.string.ai_api_key)}") },
             icon = { SymbolIcon(symbol = sf("key.fill"), contentDescription = null) },
-            initialTextFieldValue = TextFieldValue(text = deeplApiKey),
+            initialTextFieldValue = TextFieldValue(text = keyDraft ?: deeplApiKey),
             onDone = {
-                deeplApiKey = it
                 showDeeplApiKeyDialog = false
+                checkKey("DeepL", it.trim())
             },
-            onDismiss = { showDeeplApiKeyDialog = false }
+            onDismiss = { showDeeplApiKeyDialog = false; keyDraft = null }
         )
     }
 
@@ -525,6 +619,9 @@ fun AiSettings(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-    
+
     }
 }
+
+/** A key being tried; [result] is null while the request is in flight. */
+private data class KeyCheck(val provider: String, val key: String, val result: AiKeyCheck.Result?)

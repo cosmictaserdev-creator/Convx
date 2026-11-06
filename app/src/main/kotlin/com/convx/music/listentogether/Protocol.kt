@@ -304,6 +304,12 @@ data class BufferCompletePayload(
     @SerialName("track_id") val trackId: String
 )
 
+/** [serverTime] is absent on servers that predate clock sync over ping. */
+@Serializable
+data class PongPayload(
+    @SerialName("server_time") val serverTime: Long? = null
+)
+
 @Serializable
 data class ErrorPayload(
     val code: String,

@@ -213,7 +213,7 @@ fun FloatingMiniPlayer(
     val (tabStyle) = rememberPreference(MiniBarTabStyleKey, defaultValue = false)
     val miniPlayerWaveform by rememberPreference(MiniPlayerWaveformKey, defaultValue = false)
     val listenTogetherManager = LocalListenTogetherManager.current
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val swipeEnabled = swipeThumbnailPref && !isListenTogetherGuest
 
     val layoutDirection = LocalLayoutDirection.current

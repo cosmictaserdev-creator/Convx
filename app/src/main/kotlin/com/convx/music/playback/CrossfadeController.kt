@@ -292,6 +292,7 @@ class CrossfadeController(
             duration = duration / 1000.0,
             fadeSeconds = fallbackSeconds,
             mode = CrossfadeMode.SMART,
+            albumSequential = !player.shuffleModeEnabled && nextIndex == player.currentMediaItemIndex + 1,
         )
         logPlanIfChanged(plan, currentItem, nextItem, currentAnalysis, nextAnalysis)
 
@@ -405,6 +406,7 @@ class CrossfadeController(
         durationMs = durationMs,
         title = mediaMetadata.title?.toString().orEmpty(),
         artist = mediaMetadata.artist?.toString().orEmpty(),
+        album = mediaMetadata.albumTitle?.toString().orEmpty(),
     )
 
     private fun begin(

@@ -130,6 +130,7 @@ class App : Application(), SingletonImageLoader.Factory {
 
         // Warm the preference mirror off Main so the first composition avoids its blocking read.
         applicationScope.launch(Dispatchers.IO) { dataStore.warmPreferenceMirror() }
+        applicationScope.launch(Dispatchers.IO) { com.convx.music.ai.AiDefaults.keepLegacyProvider(this@App) }
         // Spotify's native engine: report whether it loaded, without ever failing startup over it.
         applicationScope.launch(Dispatchers.IO) {
             val loaded = runCatching { com.music.spotify.nativecore.NativeBridge.initContext(this@App) }

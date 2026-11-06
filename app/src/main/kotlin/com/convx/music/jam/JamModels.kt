@@ -158,6 +158,13 @@ data class PartyPreviewMember(
     val isHost: Boolean = false,
 )
 
+/** How busy the party server is right now. */
+@Serializable
+data class PartyStats(
+    val parties: Int = 0,
+    val members: Int = 0,
+)
+
 /** The answer to a create or a join: the code, and this device's key to it. */
 @Serializable
 data class PartyMembership(

@@ -149,6 +149,8 @@ class ListenTogetherClient @Inject constructor(
         private const val INITIAL_RECONNECT_DELAY_MS = 1000L
         private const val MAX_RECONNECT_DELAY_MS = 120000L  // Cap at 2 minutes
         private const val PING_INTERVAL_MS = 25000L
+        private const val INITIAL_CLOCK_PINGS = 3
+        private const val INITIAL_CLOCK_PING_GAP_MS = 300L
         private const val MAX_LOG_ENTRIES = 500
         private const val SESSION_GRACE_PERIOD_MS = 10 * 60 * 1000L
 
@@ -578,6 +580,12 @@ class ListenTogetherClient @Inject constructor(
     private fun startPingJob() {
         pingJob?.cancel()
         pingJob = scope.launch {
+            // Pongs carry the server's clock and the estimate keeps the quickest one, so a few
+            // straight away have it measured before a join lands.
+            repeat(INITIAL_CLOCK_PINGS) {
+                sendMessageNoPayload(MessageTypes.PING)
+                delay(INITIAL_CLOCK_PING_GAP_MS)
+            }
             while (true) {
                 delay(PING_INTERVAL_MS)
                 sendMessageNoPayload(MessageTypes.PING)
@@ -900,6 +908,10 @@ class ListenTogetherClient @Inject constructor(
                 
                 MessageTypes.PONG -> {
                     log(LogLevel.DEBUG, "Pong received")
+                    // Measures the clock before any playback message arrives, so a guest joining
+                    // a playing room does not have to trust its own wall clock.
+                    val payload = codec.decodePayload(msgType, payloadBytes, detectedFormat) as? PongPayload
+                    payload?.serverTime?.let { serverClock.observe(it, System.currentTimeMillis()) }
                 }
                 
                 MessageTypes.RECONNECTED -> {
@@ -1275,10 +1287,10 @@ class ListenTogetherClient @Inject constructor(
                 position = action.position ?: state.position,
             )
             PlaybackActions.SEEK -> state.copy(position = action.position ?: state.position)
+            // The server keeps the play state across a song change, so the mirror does too.
             PlaybackActions.CHANGE_TRACK -> state.copy(
                 currentTrack = action.trackInfo,
-                isPlaying = false,
-                position = 0,
+                position = action.position ?: 0,
             )
             PlaybackActions.QUEUE_ADD -> {
                 val track = action.trackInfo
