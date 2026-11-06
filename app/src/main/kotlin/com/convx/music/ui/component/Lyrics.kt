@@ -673,6 +673,7 @@ fun Lyrics(
 
     var showProgressDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
+    var showLinePicker by remember { mutableStateOf(false) }
     var shareDialogData by remember { mutableStateOf<Triple<String, String, String>?>(null) }
 
     var showColorPickerDialog by remember { mutableStateOf(false) }
@@ -840,6 +841,23 @@ fun Lyrics(
                 .zIndex(1f)
                 .padding(top = 56.dp),
         )
+
+        if (lines.isNotEmpty() && (usesFisheyeRenderer || usesCrawlRenderer || usesFlamingoRenderer || usesArchiveTuneRenderer)) {
+            val shareLabel = stringResource(R.string.share_lyrics)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .zIndex(2f)
+                    .padding(end = 8.dp, bottom = 8.dp)
+                    .size(48.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(textColor.copy(alpha = 0.14f))
+                    .clickable(onClickLabel = shareLabel) { showLinePicker = true },
+            ) {
+                SymbolIcon(symbol = sf("square.and.arrow.up"), contentDescription = shareLabel, size = 20.dp, tint = textColor)
+            }
+        }
 
         if (lyrics == LYRICS_NOT_FOUND || (lyrics != null && lines.all { it.text.isBlank() })) {
             LyricsEmptyNote(fontFamily = lyricsFontFamily, color = AppTheme.colorScheme.secondary)
@@ -1906,6 +1924,23 @@ fun Lyrics(
                 }
             }
         }
+    }
+
+    if (showLinePicker) {
+        LyricsLinePicker(
+            lines = lines.map { it.text },
+            initial = currentLineIndex.coerceAtLeast(0),
+            onDismiss = { showLinePicker = false },
+            onShare = { picked ->
+                shareDialogData = Triple(
+                    picked.joinToString("\n"),
+                    mediaMetadata?.title ?: "",
+                    mediaMetadata?.artists?.joinToString { it.name } ?: "",
+                )
+                showShareDialog = true
+                showLinePicker = false
+            },
+        )
     }
 
     shareDialogData?.takeIf { showShareDialog }?.let { (lyricsText, songTitle, artists) ->
