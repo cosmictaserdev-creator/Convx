@@ -366,6 +366,7 @@ object YTPlayerUtils {
         allowLossless: Boolean = true,
         /** Bypasses lossless providers after repeated playback failures for this track. */
         forceStandardAudio: Boolean = false,
+        requireYouTube: Boolean = false,
         preferAac: Boolean = false,
     ): Result<PlaybackData> {
         if (context != null) {
@@ -373,7 +374,7 @@ object YTPlayerUtils {
             val forceSelectedQuality = context.dataStore.get(EnableSaavnStreamingKey, false) &&
                 context.dataStore.get(ForceSelectedQualityKey, false)
 
-            if (!forceStandardAudio) {
+            if (!forceStandardAudio && !requireYouTube) {
                 Timber.tag(TAG).d("═══ SPINE INTERCEPT START ═══ videoId=$videoId")
                 val enabledModulesJson = context.dataStore.get(EnabledModulesKey, "[]")
                 val moduleSourcesJson = context.dataStore.get(ModuleSourcesKey, "[]")
@@ -442,7 +443,7 @@ object YTPlayerUtils {
             } // !forceStandardAudio
 
             // Try Tidal lossless before Saavn when enabled.
-            if (!forceStandardAudio && !forceSelectedQuality && allowLossless && context.dataStore.get(EnableTidalStreamingKey, false)) {
+            if (!forceStandardAudio && !requireYouTube && !forceSelectedQuality && allowLossless && context.dataStore.get(EnableTidalStreamingKey, false)) {
                 Timber.tag(TAG).d("Lossless enabled — trying TIDAL for videoId=$videoId")
                 val tidalResult = runCatching {
                     val (currentSong, meta) = resolvePlaybackMetadata(videoId, playlistId)
@@ -534,7 +535,7 @@ object YTPlayerUtils {
                 Timber.tag(TAG).d("TIDAL intercept failed or returned null — trying next source")
             }
 
-            val saavnEnabled = context.dataStore.get(EnableSaavnStreamingKey, false)
+            val saavnEnabled = !requireYouTube && context.dataStore.get(EnableSaavnStreamingKey, false)
             if (saavnEnabled && !preferAac) {
                 Timber.tag(TAG).d("JioSaavn streaming enabled — trying Saavn for videoId=$videoId")
                 val saavnResult = runCatching {

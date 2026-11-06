@@ -349,6 +349,67 @@ class MusicService :
     @Inject
     lateinit var widgetManager: ConvxWidgetManager
 
+    @Inject
+    lateinit var roomPlaybackBridge: com.convx.music.listentogether.ListenTogetherPlayerConnectionBridge
+
+    private var jamRetryMediaId: String? = null
+    private val jamRecoveryBudget = com.convx.music.jam.JamRecoveryBudget()
+    private var jamRetryVersion = 0L
+    private var jamStableJob: Job? = null
+
+    /** A new room track or an explicit local retry starts a fresh bounded recovery attempt. */
+    fun resetJamAudioRecovery() {
+        ++jamRetryVersion
+        jamRetryMediaId?.let(jamRecoveryBudget::resetTrack)
+        jamRetryMediaId = null
+        retryJob?.cancel()
+        jamStableJob?.cancel()
+        roomPlaybackBridge.setJamRecovery(com.convx.music.listentogether.JamMediaRecovery.NONE)
+    }
+
+    private fun stopJamAudio() {
+        retryJob?.cancel()
+        roomPlaybackBridge.setJamRecovery(com.convx.music.listentogether.JamMediaRecovery.UNAVAILABLE)
+        player.pause()
+    }
+
+    private fun recoverJamAudio(error: PlaybackException, mediaId: String?) {
+        jamStableJob?.cancel()
+        if (mediaId == null) return stopJamAudio()
+        jamRetryMediaId = mediaId
+        val attempt = jamRecoveryBudget.recordFailure(mediaId, SystemClock.elapsedRealtime()) ?: return stopJamAudio()
+        val generation = ++jamRetryVersion
+        val queueVersion = queueRequestVersion
+        val type = PlaybackErrorClassifier.classify(error, isNetworkConnected.value)
+        val httpCode = PlaybackErrorClassifier.getHttpResponseCode(error)
+        roomPlaybackBridge.setJamRecovery(com.convx.music.listentogether.JamMediaRecovery.RECOVERING)
+        player.pause()
+        retryJob?.cancel()
+        retryJob = scope.launch {
+            val baseDelay = if (httpCode == 429) 15_000L else 1_000L * (1L shl (attempt - 1))
+            delay(kotlin.random.Random.nextLong(baseDelay, baseDelay + baseDelay / 2 + 1))
+            if (generation != jamRetryVersion || queueVersion != queueRequestVersion ||
+                !roomPlaybackBridge.jamActive.value || player.currentMediaItem?.mediaId != mediaId) return@launch
+            // A network outage never invalidates audio already on disk. Wait for it to return.
+            if (type == PlaybackErrorType.Network && !isNetworkConnected.value) {
+                isNetworkConnected.first { it }
+                if (generation != jamRetryVersion || queueVersion != queueRequestVersion ||
+                    !roomPlaybackBridge.jamActive.value || player.currentMediaItem?.mediaId != mediaId) return@launch
+            }
+            if (type == PlaybackErrorType.Parsing || type == PlaybackErrorType.RangeNotSatisfiable) {
+                errorRecovery.performAggressiveCacheClear(mediaId)
+            } else if (type != PlaybackErrorType.Network) {
+                // Refresh only stream resolution; retain all cached audio ranges.
+                songUrlCache.keys.filter { it == mediaId || it.startsWith("$mediaId#") }.forEach(songUrlCache::remove)
+                if (type == PlaybackErrorType.ExpiredUrl || type == PlaybackErrorType.PageReload) {
+                    runCatching { YTPlayerUtils.forceRefreshForVideo(mediaId) }
+                }
+            }
+            Timber.tag(TAG).i("Jam media recovery: id=$mediaId category=$type attempt=$attempt")
+            player.prepare()
+        }
+    }
+
     private lateinit var audioManager: AudioManager
     private var wifiLock: android.net.wifi.WifiManager.WifiLock? = null
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -606,6 +667,7 @@ class MusicService :
 
     /** Per-output EQ: restore the profile last used on whatever is now playing audio. */
     private fun onOutputChanged() {
+        roomPlaybackBridge.invalidateJamTiming()
         val key = currentOutputKey()
         scope.launch { eqProfileRepository.switchOutput(key) }
     }
@@ -672,6 +734,7 @@ class MusicService :
             },
             djEngine = djEngine,
             warmUpcoming = streamResolver::prefetchUpcoming,
+            allowed = { !roomPlaybackBridge.jamActive.value },
         )
         crossfade?.start()
 
@@ -858,17 +921,18 @@ class MusicService :
     }
 
     private fun observeAudioProcessingPreferences() {
-        dataStore.data
-            .map { (it[SkipSilenceKey] ?: false) to (it[SkipSilenceInstantKey] ?: false) }
+        combine(dataStore.data, roomPlaybackBridge.jamActive) { prefs, jam ->
+            Triple(prefs[SkipSilenceKey] ?: false, prefs[SkipSilenceInstantKey] ?: false, jam)
+        }
             .distinctUntilChanged()
-            .collectLatest(scope) { (skipSilence, instantSkip) ->
+            .collectLatest(scope) { (skipSilence, instantSkip, jam) ->
                 cachedSkipSilence = skipSilence
                 cachedSkipSilenceInstant = instantSkip
 
-                player.skipSilenceEnabled = skipSilence
-                sparePlayer?.skipSilenceEnabled = skipSilence
+                player.skipSilenceEnabled = skipSilence && !jam && !cachedBitPerfect
+                sparePlayer?.skipSilenceEnabled = skipSilence && !jam && !cachedBitPerfect
 
-                val enableInstant = skipSilence && instantSkip
+                val enableInstant = skipSilence && instantSkip && !jam
                 instantSilenceSkipEnabled.value = enableInstant
 
                 playerSilenceProcessors.values.forEach { processor ->
@@ -899,8 +963,8 @@ class MusicService :
                     player.skipSilenceEnabled = false
                     sparePlayer?.skipSilenceEnabled = false
                 } else {
-                    player.skipSilenceEnabled = cachedSkipSilence
-                    sparePlayer?.skipSilenceEnabled = cachedSkipSilence
+                    player.skipSilenceEnabled = cachedSkipSilence && !roomPlaybackBridge.jamActive.value
+                    sparePlayer?.skipSilenceEnabled = cachedSkipSilence && !roomPlaybackBridge.jamActive.value
                     BitPerfectAudio.clearBitPerfectMixer(this@MusicService)
                 }
             }
@@ -1387,7 +1451,7 @@ class MusicService :
         val spatialProcessor = SpatialAudioProcessor()
         val vocalSuppressionProcessor = VocalSuppressionAudioProcessor()
         // Use cached preferences; reading DataStore here could stall player creation during crossfade.
-        silenceProcessor.instantModeEnabled = cachedSkipSilence && cachedSkipSilenceInstant
+        silenceProcessor.instantModeEnabled = cachedSkipSilence && cachedSkipSilenceInstant && !roomPlaybackBridge.jamActive.value
         spatialProcessor.enabled = cachedSpatialAudio && !cachedBitPerfect
         vocalSuppressionProcessor.amount = if (cachedBitPerfect) 0f else cachedVocalSuppression
 
@@ -1434,7 +1498,7 @@ class MusicService :
         djEngine.registerPlayer(player, bpmAnalyzer, djFilter, djTail, djDelay, djAmbience)
 
         player.setOffloadEnabled(cachedOffloadEnabled && !analysisOnly)
-        player.skipSilenceEnabled = cachedSkipSilence && !cachedBitPerfect
+        player.skipSilenceEnabled = cachedSkipSilence && !cachedBitPerfect && !roomPlaybackBridge.jamActive.value
         if (!analysisOnly) player.addAnalyticsListener(crashSafe(PlaybackStatsListener(false, this@MusicService)))
 
         if (role == PlayerRole.SESSION) _playerFlow.value = player
@@ -1686,6 +1750,7 @@ class MusicService :
         }
 
         fun skipOnError() {
+            if (roomPlaybackBridge.jamActive.value) return stopJamAudio()
             // Stop retrying after repeated errors and wait for user input.
             consecutivePlaybackErr += 2
             val nextWindowIndex = player.nextMediaItemIndex
@@ -1704,6 +1769,7 @@ class MusicService :
         }
 
         fun stopOnError() {
+            if (roomPlaybackBridge.jamActive.value) return stopJamAudio()
             player.pause()
             // Stop the service so Media3 removes the stale playback notification.
             stopSelf()
@@ -2705,9 +2771,21 @@ class MusicService :
         // checked it (first play with no preload buffer). By STATE_READY the
         // resolver has definitely run for the current item.
         if (playbackState == Player.STATE_READY) {
+            if (roomPlaybackBridge.jamActive.value) {
+                roomPlaybackBridge.setJamRecovery(com.convx.music.listentogether.JamMediaRecovery.NONE)
+                jamStableJob?.cancel()
+                val stableId = player.currentMediaItem?.mediaId
+                jamStableJob = scope.launch {
+                    delay(15_000L)
+                    if (player.currentMediaItem?.mediaId == stableId && player.playbackState == Player.STATE_READY) {
+                        stableId?.let(jamRecoveryBudget::resetTrack)
+                    }
+                }
+            }
             player.currentMediaItem?.mediaId?.let { mediaId ->
                 playerStallWatchdogs[player]?.armed = losslessStreamMediaIds.contains(mediaId)
             }
+            logSeekTiming()
         }
 
         if (playbackState == Player.STATE_ENDED) {
@@ -3052,6 +3130,11 @@ class MusicService :
         Timber.tag(TAG).w(error, "Player error occurred for $mediaId: errorCode=${error.errorCode}, message=${error.message}")
         reportException(error)
 
+        if (roomPlaybackBridge.jamActive.value) {
+            recoverJamAudio(error, mediaId)
+            return
+        }
+
         if (recoverCodecFailure(error, mediaId)) return
 
         if (mediaId != null && errorRecovery.hasExceededRetryLimit(mediaId)) {
@@ -3059,10 +3142,6 @@ class MusicService :
             errorRecovery.markSongAsFailed(mediaId)
             errorRecovery.handleFinalFailure()
             return
-        }
-
-        if (mediaId != null) {
-            errorRecovery.performAggressiveCacheClear(mediaId)
         }
 
         val errorType = PlaybackErrorClassifier.classify(error, isNetworkConnected.value)
@@ -3433,6 +3512,9 @@ class MusicService :
 
         /** Reads DataStore synchronously; call from a loader or IO thread. */
         fun effectiveCacheKey(mediaId: String): String {
+            if (roomPlaybackBridge.requiresJamYouTube) {
+                return "$mediaId#jam-yt" + if (forceAacAudioMediaIds.contains(mediaId)) "#aac" else ""
+            }
             val prefs = runBlocking { dataStore.data.first() }
             val enabledModules = prefs[EnabledModulesKey] ?: "[]"
             val hasModules = runCatching { org.json.JSONArray(enabledModules).length() > 0 }.getOrDefault(false)
@@ -3468,6 +3550,10 @@ class MusicService :
 
         /** Resolves a playback URL and updates format, cache, and database state. */
         private suspend fun fetchResolvedStream(mediaId: String, effKey: String): ResolvedStream {
+            if (roomPlaybackBridge.jamActive.value && jamRecoveryBudget.remainingBackoffMs(SystemClock.elapsedRealtime()) > 0) {
+                throw PlaybackException("Audio source is temporarily unavailable. Retry shortly.", null,
+                    PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED)
+            }
             Timber.tag("MusicService").i("FETCHING STREAM: $mediaId | quality=$audioQuality")
             // Fail immediately offline; stream resolution requires a network connection.
             if (connectivityManager.activeNetwork == null) {
@@ -3485,6 +3571,7 @@ class MusicService :
                     connectivityManager = connectivityManager,
                     context = this@MusicService,
                     forceStandardAudio = mediaId in forceStandardAudioMediaIds || mediaId in videoModeMediaIds,
+                    requireYouTube = roomPlaybackBridge.requiresJamYouTube,
                     preferAac = forceAacAudioMediaIds.contains(mediaId),
                 ).getOrElse { throwable ->
                     throw playbackResolutionException(throwable)
@@ -3577,7 +3664,7 @@ class MusicService :
             scope.launch(Dispatchers.IO) {
                 val effKey = effectiveCacheKey(mediaId)
                 if (playerCache.isCached(effKey, 0, CHUNK_LENGTH)) return@launch
-                if (downloadCache.isCached(downloadKey(mediaId), 0, 1)) return@launch
+                if (!roomPlaybackBridge.requiresJamYouTube && downloadCache.isCached(downloadKey(mediaId), 0, 1)) return@launch
                 if (songUrlCache[effKey]?.takeIf { it.second > System.currentTimeMillis() } != null) return@launch
                 if (!prefetchInFlight.add(effKey)) return@launch
                 try {
@@ -3664,10 +3751,10 @@ class MusicService :
                 // A finished quality upgrade is stored under its own key and wins over the older copy.
                 val owner = downloadKey(mediaId)
                 val upgradeKey = owner + UPGRADE_SUFFIX
-                if (downloadCache.isCachedToEnd(upgradeKey, dataSpec.position)) {
+                if (!roomPlaybackBridge.requiresJamYouTube && downloadCache.isCachedToEnd(upgradeKey, dataSpec.position)) {
                     return@Factory dataSpec.buildUpon().setKey(upgradeKey).build()
                 }
-                if (!bypassCacheForQualityChange.contains(mediaId) &&
+                if (!roomPlaybackBridge.requiresJamYouTube && !bypassCacheForQualityChange.contains(mediaId) &&
                     downloadCache.isCachedToEnd(owner, dataSpec.position)
                 ) {
                     recoverSongOnce(mediaId)
@@ -3683,7 +3770,7 @@ class MusicService :
 
                 if (!shouldBypassCache) {
                     // Downloads use mediaId and are served offline only when the requested range is cached.
-                    if (downloadCache.isCachedToEnd(mediaId, dataSpec.position)) {
+                    if (!roomPlaybackBridge.requiresJamYouTube && downloadCache.isCachedToEnd(mediaId, dataSpec.position)) {
                         recoverSongOnce(mediaId)
                         return@Factory dataSpec
                     }
@@ -3734,7 +3821,7 @@ class MusicService :
                             mediaId.startsWith("/storage/")) return@ResolvingMediaSource progressive.createMediaSource(mediaItem)
                         val key = effectiveCacheKey(mediaId)
                         if (!bypassCacheForQualityChange.contains(mediaId) &&
-                            (downloadCache.isCached(downloadKey(mediaId), 0, 1) || playerCache.isCached(key, 0, CHUNK_LENGTH))) {
+                            ((!roomPlaybackBridge.requiresJamYouTube && downloadCache.isCached(downloadKey(mediaId), 0, 1)) || playerCache.isCached(key, 0, CHUNK_LENGTH))) {
                             return@ResolvingMediaSource progressive.createMediaSource(mediaItem)
                         }
                         val cached = songUrlCache[key]?.takeIf { it.second > System.currentTimeMillis() }
@@ -4206,6 +4293,26 @@ class MusicService :
                 "3=SKIP,4=REMOVE,5=INTERNAL) oldIndex=${oldPosition.mediaItemIndex} " +
                 "oldId=${oldPosition.mediaItem?.mediaId} newIndex=${newPosition.mediaItemIndex} " +
                 "newId=${newPosition.mediaItem?.mediaId}"
+        )
+        if (reason == Player.DISCONTINUITY_REASON_SEEK && oldPosition.mediaItemIndex == newPosition.mediaItemIndex) {
+            seekStartedAt = android.os.SystemClock.elapsedRealtime()
+            seekTarget = newPosition.positionMs
+        }
+    }
+
+    // Debug builds log how long a scrub takes to play again, and from what, to find slow seeks.
+    private var seekStartedAt = 0L
+    private var seekTarget = 0L
+
+    private fun logSeekTiming() {
+        if (!com.convx.music.BuildConfig.DEBUG || seekStartedAt == 0L) return
+        val ms = android.os.SystemClock.elapsedRealtime() - seekStartedAt
+        seekStartedAt = 0L
+        val mediaId = player.currentMediaItem?.mediaId ?: return
+        val format = (player as? androidx.media3.exoplayer.ExoPlayer)?.audioFormat
+        Timber.tag("SeekTiming").i(
+            "seek to ${seekTarget / 1000}s ready in $ms ms: id=$mediaId downloaded=${downloadCache.isCached(downloadKey(mediaId), 0, 1)} " +
+                "container=${format?.containerMimeType} codec=${format?.sampleMimeType} bitrate=${format?.bitrate}",
         )
     }
 

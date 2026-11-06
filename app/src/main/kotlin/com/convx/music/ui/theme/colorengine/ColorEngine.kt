@@ -9,6 +9,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.LruCache
 import androidx.compose.ui.graphics.Color
+import com.convx.music.utils.ArtworkProcessing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -74,18 +75,20 @@ object ColorEngine {
             if (shouldDebug) logCacheHit(cacheKey, visionMode, style)
             return it
         }
-        return withContext(Dispatchers.Default) {
-            diskCache?.load(effectiveKey)?.let { fromDisk ->
-                memoryCache.put(effectiveKey, fromDisk)
-                if (shouldDebug) logCacheHit(cacheKey, visionMode, style)
-                return@withContext fromDisk
+        return ArtworkProcessing.cached("palette|$effectiveKey", { memoryCache.get(effectiveKey) }) {
+            withContext(ArtworkProcessing.dispatcher) {
+                diskCache?.load(effectiveKey)?.let { fromDisk ->
+                    memoryCache.put(effectiveKey, fromDisk)
+                    if (shouldDebug) logCacheHit(cacheKey, visionMode, style)
+                    return@withContext fromDisk
+                }
+                val diagnostics = if (shouldDebug) AnalysisDiagnostics() else null
+                val result = runPipeline(bitmap, style, visionMode, vision, diagnostics) ?: return@withContext null
+                memoryCache.put(effectiveKey, result)
+                diskCache?.store(effectiveKey, result)
+                if (diagnostics != null) logDiagnostics(cacheKey, diagnostics, result)
+                result
             }
-            val diagnostics = if (shouldDebug) AnalysisDiagnostics() else null
-            val result = runPipeline(bitmap, style, visionMode, vision, diagnostics) ?: return@withContext null
-            memoryCache.put(effectiveKey, result)
-            diskCache?.store(effectiveKey, result)
-            if (diagnostics != null) logDiagnostics(cacheKey, diagnostics, result)
-            result
         }
     }
 

@@ -158,17 +158,8 @@ import com.convx.music.utils.listItemShape
 import com.convx.music.utils.makeTimeString
 import com.convx.music.utils.rememberPreference
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.produceState
-import android.content.IntentFilter
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.media.AudioManager
 import android.bluetooth.BluetoothDevice
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import com.convx.music.core.isBluetoothHeadphoneConnected
+import com.convx.music.core.rememberHeadphoneConnected
 import com.convx.music.core.AudioDeviceMenu
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -242,51 +233,7 @@ fun Queue(
     // Keep the active pill translucent so additiveChrome preserves its white glyph.
     val chromePillActive = chromePrimary.copy(alpha = 0.28f)
 
-    val isBluetoothConnected by produceState(initialValue = isBluetoothHeadphoneConnected(context)) {
-        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                value = isBluetoothHeadphoneConnected(context)
-            }
-        }
-
-        val callback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            object : android.media.AudioDeviceCallback() {
-                override fun onAudioDevicesAdded(addedDevices: Array<out android.media.AudioDeviceInfo>?) {
-                    value = isBluetoothHeadphoneConnected(context)
-                }
-                override fun onAudioDevicesRemoved(removedDevices: Array<out android.media.AudioDeviceInfo>?) {
-                    value = isBluetoothHeadphoneConnected(context)
-                }
-            }
-        } else null
-
-        val filter = IntentFilter().apply {
-            addAction(AudioManager.ACTION_HEADSET_PLUG)
-            addAction("android.bluetooth.adapter.action.STATE_CHANGED")
-            addAction("android.bluetooth.device.action.ACL_CONNECTED")
-            addAction("android.bluetooth.device.action.ACL_DISCONNECTED")
-            addAction("android.media.AUDIO_BECOMING_NOISY")
-        }
-        
-        androidx.core.content.ContextCompat.registerReceiver(
-            context,
-            receiver,
-            filter,
-            androidx.core.content.ContextCompat.RECEIVER_EXPORTED,
-        )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && callback != null) {
-            audioManager.registerAudioDeviceCallback(callback, Handler(Looper.getMainLooper()))
-        }
-
-        awaitDispose {
-            context.unregisterReceiver(receiver)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && callback != null) {
-                audioManager.unregisterAudioDeviceCallback(callback)
-            }
-        }
-    }
+    val isBluetoothConnected by rememberHeadphoneConnected()
 
     // Listen Together state (reactive)
     val listenTogetherManager = LocalListenTogetherManager.current

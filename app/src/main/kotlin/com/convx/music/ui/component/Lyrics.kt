@@ -127,6 +127,9 @@ import com.convx.music.constants.LyricsAnimationStyle
 import com.convx.music.constants.LyricsAnimationStyleKey
 import com.convx.music.constants.LyricsClickKey
 import com.convx.music.constants.LyricsGlowEffectKey
+import com.convx.music.constants.FlamingoBrightSingingWordsKey
+import com.convx.music.constants.FlamingoWordSwellKey
+import com.convx.music.constants.FlamingoGlowColorKey
 import com.convx.music.constants.LyricsLineSpacingKey
 import com.convx.music.constants.LyricsRomanizeAsMainKey
 import com.convx.music.constants.LyricsRomanizeBelarusianKey
@@ -452,6 +455,9 @@ fun Lyrics(
     val romanizeHindiLyrics by rememberPreference(LyricsRomanizeHindiKey, true)
     val romanizePunjabiLyrics by rememberPreference(LyricsRomanizePunjabiKey, true)
     val lyricsGlowEffect by rememberPreference(LyricsGlowEffectKey, true)
+    val flamingoBrightSingingWords by rememberPreference(FlamingoBrightSingingWordsKey, true)
+    val flamingoWordSwell by rememberPreference(FlamingoWordSwellKey, true)
+    val flamingoGlowColor by rememberPreference(FlamingoGlowColorKey, 0xFFFFFFFF.toInt())
     val lyricsAnimationStyle by rememberEnumPreference(LyricsAnimationStyleKey, LyricsAnimationStyle.FLAMINGO)
     val lyricsFontSelection by rememberPreference(com.convx.music.constants.LyricsFontKey, "default")
     val lyricsFontFamily = com.convx.music.lyrics.rememberLyricsFont(lyricsFontSelection)
@@ -472,6 +478,7 @@ fun Lyrics(
     val scope = rememberCoroutineScope()
 
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
+    val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val lyricsEntity by playerConnection.currentLyrics.collectAsState(initial = null)
     val currentSong by playerConnection.currentSong.collectAsState(initial = null)
     val lyrics = remember(lyricsEntity) { lyricsEntity?.lyrics?.trim() }
@@ -859,6 +866,10 @@ fun Lyrics(
                 isSynced = isSynced,
                 autoScrollEnabled = scrollLyrics,
                 glow = lyricsGlowEffect,
+                isPlaying = isPlaying,
+                glowColor = Color(flamingoGlowColor),
+                brightSingingWords = flamingoBrightSingingWords,
+                wordSwell = flamingoWordSwell,
                 artistName = mediaMetadata?.artists?.joinToString { it.name },
                 onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
                 modifier = Modifier.fillMaxSize().fadingEdge(vertical = 64.dp),

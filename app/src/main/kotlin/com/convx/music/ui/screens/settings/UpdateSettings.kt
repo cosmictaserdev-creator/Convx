@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavController
@@ -54,6 +55,7 @@ import com.convx.music.core.updater.clearDownloadedApks
 import com.convx.music.core.updater.getBetaUpdatesSetting
 import com.convx.music.core.updater.saveBetaUpdatesSetting
 import com.convx.music.core.updater.autoClearOldApks
+import com.convx.music.viewmodels.UpdateViewModel
 import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.BuildConfig
 
@@ -72,6 +74,7 @@ fun UpdateSettings(
     scrollBehavior: TopAppBarScrollBehavior
 ) {
     val context = LocalContext.current
+    val updateViewModel: UpdateViewModel = hiltViewModel()
     var autoUpdateEnabled by remember { mutableStateOf(getAutoUpdateCheckSetting(context)) }
     var updateNotificationsEnabled by remember { mutableStateOf(getUpdateNotificationsSetting(context)) }
     val alertsPaused = com.convx.music.core.updater.AUTOMATIC_UPDATE_ALERTS_PAUSED
@@ -112,13 +115,7 @@ fun UpdateSettings(
                         }
                     },
                     onClick = {
-                        val isFoss = !BuildConfig.CAST_AVAILABLE
-                        if (isFoss) {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/cosmictaserdev-creator/Convx"))
-                            context.startActivity(intent)
-                        } else {
-                            navController.navigate("update")
-                        }
+                        navController.navigate("update")
                     }
                 ),
                 IosSettingsItem(
@@ -227,6 +224,7 @@ fun UpdateSettings(
                     onClick = {
                         if (apkCount > 0) {
                             if (clearDownloadedApks(context)) {
+                                updateViewModel.clearDownloadedUpdate()
                                 apkCount = 0
                                 Toast.makeText(context, "Deleted successfully", Toast.LENGTH_SHORT).show()
                             } else {

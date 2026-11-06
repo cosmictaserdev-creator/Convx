@@ -208,6 +208,21 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <activity
+            android:name=".core.updater.UpdateInstallActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Convx" />
+
+        <receiver
+            android:name=".core.updater.UpdateInstallReceiver"
+            android:exported="false" />
+
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
         <!-- App-icon variants. Exactly one is enabled; see utils/AppIcon.kt. -->
         <activity-alias
             android:name=".LauncherWhite"

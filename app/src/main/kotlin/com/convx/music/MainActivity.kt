@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.lifecycleScope
 import com.convx.music.constants.AppLanguageKey
 import com.convx.music.constants.DisableScreenshotKey
@@ -195,6 +196,16 @@ class MainActivity : ComponentActivity() {
                     historyDataSource = historyDataSource,
                 )
                 if (showIntro) com.convx.music.ui.component.ConvxIntro(onFinished = { showIntro = false })
+            }
+        }
+        window.decorView.doOnPreDraw {
+            // A frame-clock callback runs before drawing. Post first, then wait for
+            // the queue to become idle so optional startup never competes for that frame.
+            window.decorView.post {
+                android.os.Looper.myQueue().addIdleHandler {
+                    (application as App).initializeAfterFirstDraw()
+                    false
+                }
             }
         }
     }

@@ -14,18 +14,26 @@ import androidx.media3.datasource.DataSpec
 import okhttp3.OkHttpClient
 import okhttp3.Call
 import okhttp3.Request
+import java.io.File
 import java.io.IOException
 import java.io.InterruptedIOException
 import java.net.URI
 
-/** Presents HLS as one cached file for offline playback. FLAC is remuxed; other codecs remain fragmented MP4. */
+/**
+ * Presents HLS as one cached file for offline playback. FLAC is remuxed; other codecs remain
+ * fragmented MP4. Every segment is fetched into [spoolDir] before the first byte goes out, so the
+ * file can start with a seek index (see [JoinedIndex]) that points at all of them.
+ */
 @UnstableApi
 class HlsJoinDataSource(
     private val client: OkHttpClient,
     private val fallback: DataSource,
+    private val spoolDir: File,
 ) : BaseDataSource(true) {
     private var active: DataSource? = null
     private var uri: Uri? = null
+    private var spool: File? = null
+    private var spoolInput: java.io.InputStream? = null
     private var parts: Iterator<() -> ByteArray> = emptyList<() -> ByteArray>().iterator()
     private var chunk = ByteArray(0)
     private var offset = 0
@@ -49,15 +57,40 @@ class HlsJoinDataSource(
         val playlist = mediaPlaylist(requireNotNull(dataSpec.uri.getQueryParameter("u")))
         val init = playlist.init?.let(::fetch)
         val flacHeader = init?.let(::flacHeader)
-        val segments = playlist.segments.map { url ->
-            { fetch(url).let { if (flacHeader != null) mdatPayloads(it) else it } }
+        val timescale = init?.let(JoinedIndex::timescale)
+        val trackId = init?.let(JoinedIndex::trackId)
+        val trexDuration = init?.let(JoinedIndex::defaultDuration)
+
+        val file = File.createTempFile("join", ".part", spoolDir.apply { mkdirs() }).also { spool = it }
+        val index = ArrayList<JoinedIndex.Segment>(playlist.segments.size)
+        var indexable = timescale != null && timescale > 0
+        file.outputStream().buffered().use { out ->
+            for (url in playlist.segments) {
+                val raw = fetch(url)
+                val timing = if (indexable) JoinedIndex.timing(raw, trexDuration) else null
+                if (timing == null) indexable = false
+                val body = when {
+                    flacHeader != null -> mdatPayloads(raw)
+                    init != null -> JoinedIndex.withoutSidx(raw)
+                    else -> raw
+                }
+                out.write(body)
+                if (timing != null) index += JoinedIndex.Segment(body.size.toLong(), timing.first, timing.second)
+            }
         }
-        val head: List<() -> ByteArray> = when {
-            flacHeader != null -> listOf({ flacHeader })
-            init != null -> listOf({ init })
-            else -> emptyList()
+        val head = when {
+            flacHeader != null && indexable -> JoinedIndex.flacWithSeekTable(flacHeader, timescale!!, index)
+            flacHeader != null -> flacHeader
+            init != null && indexable && trackId != null -> init + JoinedIndex.sidx(trackId, timescale!!, index)
+            else -> init ?: ByteArray(0)
         }
-        parts = (head + segments).iterator()
+        val input = file.inputStream().buffered(SPOOL_CHUNK).also { spoolInput = it }
+        val body = generateSequence<() -> ByteArray> {
+            val buffer = ByteArray(SPOOL_CHUNK)
+            val read = input.read(buffer)
+            if (read <= 0) null else ({ if (read == buffer.size) buffer else buffer.copyOf(read) })
+        }
+        parts = (sequenceOf<() -> ByteArray>({ head }) + body).iterator()
         chunk = ByteArray(0)
         offset = 0
         // Joined byte offsets require replaying segments when resuming a download.
@@ -109,6 +142,10 @@ class HlsJoinDataSource(
             active?.close()
         } finally {
             active = null
+            runCatching { spoolInput?.close() }
+            spoolInput = null
+            spool?.delete()
+            spool = null
             parts = emptyList<() -> ByteArray>().iterator()
             chunk = ByteArray(0)
             offset = 0
@@ -154,6 +191,7 @@ class HlsJoinDataSource(
 
     companion object {
         const val SCHEME = "hlsjoin"
+        private const val SPOOL_CHUNK = 256 * 1024
 
         fun uriFor(playlistUrl: String): Uri =
             Uri.Builder().scheme(SCHEME).authority("x").appendQueryParameter("u", playlistUrl).build()

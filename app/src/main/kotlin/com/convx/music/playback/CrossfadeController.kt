@@ -46,6 +46,7 @@ class CrossfadeController(
     private val analysisRunningFor: (MediaItem) -> Boolean = { false },
     private val djEngine: com.convx.music.playback.dj.DjEngine? = null,
     private val warmUpcoming: () -> Unit = {},
+    private val allowed: () -> Boolean = { true },
 ) {
 
     private enum class Phase {
@@ -217,6 +218,11 @@ class CrossfadeController(
     }
 
     private fun tick() {
+        if (!allowed()) {
+            if (phase != Phase.IDLE) finish()
+            endTail()
+            return
+        }
         if (tailPlayer != null && !active().playWhenReady) endTail()
         if (phase == Phase.FADING || phase == Phase.BAILING) {
             outgoing?.playWhenReady = incoming?.playWhenReady ?: true

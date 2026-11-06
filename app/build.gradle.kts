@@ -14,7 +14,7 @@ val versionProps = Properties().apply {
 val appVersionMajor = versionProps.getProperty("VERSION_MAJOR").toInt()
 val appVersionMinor = versionProps.getProperty("VERSION_MINOR").toInt()
 val appVersionPatch = versionProps.getProperty("VERSION_PATCH").toInt()
-// 1.5.1 -> 10501. Room for MINOR/PATCH up to 99 each before a scheme change is needed.
+// The source version uses two decimal digits each for MINOR and PATCH; updater builds reserve four low digits for the channel run.
 val appVersionCode = appVersionMajor * 10_000 + appVersionMinor * 100 + appVersionPatch
 val appVersionName = "$appVersionMajor.$appVersionMinor.$appVersionPatch"
 
@@ -36,8 +36,11 @@ android {
         applicationId = "com.convx.music"
         minSdk = 26
         targetSdk = 36
-        versionCode = appVersionCode
+        val nightlyRunForVersion = (project.findProperty("nightlyRun") as String?)?.toIntOrNull() ?: 0
+        require(nightlyRunForVersion in 0..9_998) { "Nightly run number exceeds the updater version-code range" }
+        versionCode = appVersionCode * 10_000 + if (nightlyRunForVersion == 0) 9_999 else nightlyRunForVersion
         versionName = appVersionName
+        buildConfigField("Boolean", "GITHUB_UPDATER_ENABLED", (project.findProperty("githubUpdater") == "true").toString())
 
         testInstrumentationRunner = providers.gradleProperty("convxTestRunner")
             .orElse("androidx.test.runner.AndroidJUnitRunner").get()
@@ -142,13 +145,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "ARCHITECTURE", "\"release\"")
         }
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            buildConfigField("String", "ARCHITECTURE", "\"debug\"")
         }
     }
 
