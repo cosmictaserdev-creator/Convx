@@ -146,22 +146,15 @@ import com.music.innertube.pages.ExplorePage
 import com.music.innertube.pages.MoodAndGenres
 import com.music.innertube.utils.parseCookieString
 import com.music.innertube.YouTube
-import com.convx.music.constants.InnerTubeCookieKey
 import com.convx.music.constants.HomeSignInCardDismissedKey
 import com.convx.music.ui.ios.foundation.IosTheme
 import com.convx.music.constants.ListThumbnailSize
 import com.convx.music.constants.LocalSongSortDescendingKey
 import com.convx.music.constants.HideHomeFavoriteIconKey
 import com.convx.music.constants.LocalSongSortTypeKey
-import com.convx.music.constants.RandomizeHomeOrderKey
 import com.convx.music.constants.SongSortType
-import com.convx.music.constants.ShowHomeFabKey
 import com.convx.music.ui.component.homeCardRim
 import com.convx.music.ui.component.rememberHomeCardShape
-import com.convx.music.constants.HomeHeroCardEnabledKey
-import com.convx.music.constants.HomeSectionHiddenKey
-import com.convx.music.constants.HomeSectionOrderKey
-import com.convx.music.constants.ShowHomeMoodFiltersKey
 import com.convx.music.constants.ThumbnailCornerRadius
 import com.convx.music.db.MusicDatabase
 import com.convx.music.ui.component.SpotlightCard
@@ -330,8 +323,9 @@ fun HomeScreen(
 
 
     val accountImageUrl = homeState.accountImageUrl
-    val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
-    val (randomizeHomeOrder) = rememberPreference(RandomizeHomeOrderKey, true)
+    val homePrefs = rememberHomePrefs()
+    val innerTubeCookie = homePrefs.innerTubeCookie
+    val randomizeHomeOrder = homePrefs.randomizeOrder
 
     val shouldShowWrappedCard = homeState.showWrappedCard
     val wrappedState by viewModel.wrappedManager.state.collectAsStateWithLifecycle()
@@ -433,10 +427,10 @@ fun HomeScreen(
     val onLocalItemClick = itemHandlers.onLocalItemClick
     val localGridItem = itemHandlers.localGridItem
 
-    val (heroCardEnabled) = rememberPreference(HomeHeroCardEnabledKey, true)
-    val (savedSectionOrder) = rememberPreference(HomeSectionOrderKey, "")
-    val (hiddenSectionIds) = rememberPreference(HomeSectionHiddenKey, "")
-    val (showMoodFilters) = rememberPreference(ShowHomeMoodFiltersKey, true)
+    val heroCardEnabled = homePrefs.heroCard
+    val savedSectionOrder = homePrefs.sectionOrder
+    val hiddenSectionIds = homePrefs.hiddenSections
+    val showMoodFilters = homePrefs.moodFilters
 
     val homeSections = remember(
         heroCardEnabled,
@@ -743,7 +737,7 @@ fun HomeScreen(
                     }
                 }
 
-                val (showHomeFab) = rememberPreference(ShowHomeFabKey, true)
+                val showHomeFab = homePrefs.fab
                 if (showHomeFab) {
                     HideOnScrollFAB(
                         visible = allLocalItems.isNotEmpty() || allYtItems.isNotEmpty(),
