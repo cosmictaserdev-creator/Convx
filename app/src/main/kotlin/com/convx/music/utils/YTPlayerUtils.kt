@@ -236,6 +236,7 @@ object YTPlayerUtils {
      * connection context, proxy, DNS rules, and request pool.
      */
     val httpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(StreamClientHeaders)
         .dns(object : Dns {
             override fun lookup(hostname: String): List<InetAddress> {
                 val addresses = Dns.SYSTEM.lookup(hostname)

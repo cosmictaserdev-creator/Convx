@@ -279,5 +279,23 @@ data class YouTubeClient(
             loginSupported = true,
             useSignatureTimestamp = true
         )
+
+        private val streamClients by lazy {
+            listOf(
+                WEB, WEB_REMIX, WEB_CREATOR, TVHTML5, TVHTML5_SIMPLY_EMBEDDED_PLAYER, IOS, MOBILE, ANDROID_NO_SDK,
+                ANDROID_VR_NO_AUTH, ANDROID_VR_1_61_48, ANDROID_VR_1_65_10, ANDROID_VR_1_43_32, ANDROID_CREATOR,
+                VISIONOS, IPADOS, ANDROID_MUSIC, IOS_MUSIC,
+            )
+        }
+
+        /** The User-Agent of the client that minted a stream URL, which names it in its `c` and `cver` parameters. */
+        fun userAgentForStreamUrl(url: String): String {
+            val params = url.substringAfter('?', "").split('&').mapNotNull { pair ->
+                pair.split('=', limit = 2).takeIf { it.size == 2 }?.let { it[0] to java.net.URLDecoder.decode(it[1], "UTF-8") }
+            }.toMap()
+            val sameClient = streamClients.filter { it.clientName == params["c"] }
+            val client = sameClient.firstOrNull { it.clientVersion == params["cver"] } ?: sameClient.firstOrNull()
+            return client?.userAgent ?: USER_AGENT_WEB
+        }
     }
 }
