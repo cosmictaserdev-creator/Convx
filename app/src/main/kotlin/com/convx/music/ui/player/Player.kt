@@ -2001,6 +2001,14 @@ fun BottomSheetPlayer(
                             .flamingoChrome(additiveChrome)
                             .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                     )
+
+                    PlayerInlineLyrics(
+                        connection = playerConnection,
+                        positionMs = { playerConnection.player.currentPosition },
+                        tint = TextBackgroundColor,
+                        onOpenLyrics = { classicPages.value = PlayerInternalState.LYRICS },
+                        active = isFullScreen,
+                    )
                 }
                 }
                 }

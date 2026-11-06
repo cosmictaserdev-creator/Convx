@@ -782,6 +782,7 @@ val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
 val FisheyeZoomKey = floatPreferencesKey("fisheyeZoom")
 val FisheyeRadiusKey = floatPreferencesKey("fisheyeRadius")
 val FisheyeTextSizeKey = floatPreferencesKey("fisheyeTextSize")
+val PlayerInlineLyricsKey = booleanPreferencesKey("playerInlineLyrics")
 enum class LyricsAnimationStyle {
     FLAMINGO,
     NONE,

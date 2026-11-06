@@ -17,6 +17,7 @@ import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
 import com.convx.music.db.MusicDatabase
+import com.convx.music.lyrics.LyricsUtils
 import com.convx.music.extensions.currentMetadata
 import com.convx.music.extensions.getCurrentQueueIndex
 import com.convx.music.extensions.getQueueWindows
@@ -34,11 +35,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -174,6 +178,16 @@ class PlayerConnection(
         }
     val currentLyrics = mediaMetadata.flatMapLatest { mediaMetadata ->
         database.lyrics(mediaMetadata?.id)
+    }
+    /** Synced lyrics of the current song, for the one-line preview in the player. */
+    val lyricsPreview = mediaMetadata.flatMapLatest { metadata ->
+        database.lyrics(metadata?.id).map { entity ->
+            val synced = entity?.lyrics?.takeIf { it.startsWith("[") }
+            PlayerLyricsPreview(
+                metadata?.id,
+                synced?.let { runCatching { LyricsUtils.parseLyrics(it) }.getOrDefault(emptyList()) }.orEmpty(),
+            )
+        }.flowOn(Dispatchers.Default)
     }
     val currentFormat =
         mediaMetadata.flatMapLatest { mediaMetadata ->

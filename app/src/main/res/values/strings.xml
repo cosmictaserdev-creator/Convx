@@ -376,6 +376,8 @@
     <string name="fisheye_lens_radius_desc">How far the lens bends the rows out from the middle.</string>
     <string name="fisheye_text_size">Text size</string>
     <string name="fisheye_text_size_desc">Scales every word in the stack. Lens effects need Android 13 or newer.</string>
+    <string name="player_inline_lyrics">Lyrics under the title</string>
+    <string name="player_inline_lyrics_desc">Show the line being sung beneath the song and artist in the player. Tap it to open the lyrics.</string>
     <string name="sleep_timer">Sleep timer</string>
     <string name="end_of_song">End of song</string>
     <plurals name="minute">

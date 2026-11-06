@@ -31,6 +31,7 @@ import com.convx.music.constants.AppleMusicLyricsBlurKey
 import com.convx.music.constants.FisheyeRadiusKey
 import com.convx.music.constants.FisheyeTextSizeKey
 import com.convx.music.constants.FisheyeZoomKey
+import com.convx.music.constants.PlayerInlineLyricsKey
 import com.convx.music.constants.LyricsGlowEffectKey
 import com.convx.music.constants.FlamingoBrightSingingWordsKey
 import com.convx.music.constants.FlamingoWordSwellKey
@@ -69,6 +70,7 @@ fun LyricsSettingsScreen(navController: NavController) {
     val credentials = remember(context) { context.getSharedPreferences("lyrics_credentials", android.content.Context.MODE_PRIVATE) }
     var paxKey by remember { mutableStateOf(credentials.getString("paxsenix_api_key", "").orEmpty()) }
     val (glow, onGlowChange) = rememberPreference(LyricsGlowEffectKey, defaultValue = true)
+    val (inlineLyrics, onInlineLyricsChange) = rememberPreference(PlayerInlineLyricsKey, defaultValue = false)
     val (brightSingingWords, onBrightSingingWordsChange) = rememberPreference(FlamingoBrightSingingWordsKey, defaultValue = true)
     val (wordSwell, onWordSwellChange) = rememberPreference(FlamingoWordSwellKey, defaultValue = true)
     val (glowColorInt, onGlowColorChange) = rememberPreference(FlamingoGlowColorKey, defaultValue = Color.White.toArgb())
@@ -162,6 +164,15 @@ fun LyricsSettingsScreen(navController: NavController) {
                 ),
             ))
         }
+        IosSettingsGroup(items = listOf(
+            IosSettingsItem(
+                icon = painterResource(R.drawable.lyrics),
+                title = { Text(stringResource(R.string.player_inline_lyrics)) },
+                description = { Text(stringResource(R.string.player_inline_lyrics_desc)) },
+                trailingContent = { Switch(checked = inlineLyrics, onCheckedChange = onInlineLyricsChange) },
+                onClick = { onInlineLyricsChange(!inlineLyrics) },
+            ),
+        ))
         IosSettingsGroup(title = "Lyrics sources", items = listOf(
             IosSettingsItem(
                 icon = painterResource(R.drawable.lyrics),
