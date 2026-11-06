@@ -72,7 +72,6 @@ import androidx.media3.exoplayer.analytics.PlaybackStatsListener
 import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import androidx.media3.extractor.ExtractorsFactory
 import androidx.media3.extractor.mkv.MatroskaExtractor
 import androidx.media3.extractor.mp4.FragmentedMp4Extractor
@@ -2433,7 +2432,7 @@ class MusicService :
             }
         }
 
-        player.setShuffleOrder(DefaultShuffleOrder(finalOrder, System.currentTimeMillis()))
+        player.setShuffleOrder(HistoryShuffleOrder(finalOrder) { player.currentMediaItemIndex })
     }
 
     fun addToQueue(items: List<MediaItem>) {
@@ -3025,7 +3024,7 @@ class MusicService :
         } else {
             createShuffleOrderWithCurrentFirst(currentIndex, totalCount)
         }
-        player.setShuffleOrder(DefaultShuffleOrder(indices, System.currentTimeMillis()))
+        player.setShuffleOrder(HistoryShuffleOrder(indices) { player.currentMediaItemIndex })
     }
 
     private fun createPlaylistFirstShuffleOrder(currentIndex: Int, totalCount: Int): IntArray {
@@ -3288,6 +3287,7 @@ class MusicService :
                 ChunkedDataSource.Factory(OkHttpDataSource.Factory(
                     OkHttpClient
                         .Builder()
+                        .addInterceptor(com.convx.music.utils.StreamClientHeaders)
                         .dns(object : Dns {
                             override fun lookup(hostname: String): List<InetAddress> {
                                 val addresses = Dns.SYSTEM.lookup(hostname)

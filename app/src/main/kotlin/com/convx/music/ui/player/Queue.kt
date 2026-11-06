@@ -124,7 +124,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
-import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
+import com.convx.music.playback.HistoryShuffleOrder
 import androidx.navigation.NavController
 import com.convx.music.LocalListenTogetherManager
 import com.convx.music.LocalPlayerConnection
@@ -792,13 +792,12 @@ fun Queue(
                         playerConnection.player.moveMediaItem(safeFrom, safeTo)
                     } else {
                         playerConnection.player.setShuffleOrder(
-                            DefaultShuffleOrder(
+                            HistoryShuffleOrder(
                                 queueWindows.map { it.firstPeriodIndex }
                                     .toMutableList()
                                     .move(safeFrom, safeTo)
                                     .toIntArray(),
-                                System.currentTimeMillis()
-                            )
+                            ) { playerConnection.player.currentMediaItemIndex }
                         )
                     }
                 }
