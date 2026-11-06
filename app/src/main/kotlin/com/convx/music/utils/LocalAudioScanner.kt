@@ -158,12 +158,17 @@ object LocalAudioScanner {
                             continue
                         }
                         existingIds.add(songId)
+                        // MediaStore keeps one ARTIST tag; the file itself may name several.
+                        val artistNames = runCatching {
+                            context.contentResolver.openInputStream(ContentUris.withAppendedId(collection, id))
+                                ?.use { LocalArtistTags.read(it) }
+                        }.getOrNull() ?: listOf(artistName)
 
                         val inserted = insertNewSong(
                             database = database,
                             songId = songId,
                             title = title,
-                            artistName = artistName,
+                            artistNames = artistNames,
                             albumName = albumName,
                             albumArtUri = albumArtUri,
                             durationMs = durationMs,
@@ -218,7 +223,7 @@ object LocalAudioScanner {
         database: MusicDatabase,
         songId: String,
         title: String,
-        artistName: String,
+        artistNames: List<String>,
         albumName: String,
         albumArtUri: String?,
         durationMs: Long,
@@ -226,7 +231,6 @@ object LocalAudioScanner {
         dateAdded: Long,
         dateModified: Long,
     ): Boolean {
-        val artistId = "local_artist_${artistName.hashCode()}"
         val albumId = "local_album_${albumName.hashCode()}"
         val durationSeconds = (durationMs / 1000).toInt()
         val song = SongEntity(
@@ -247,8 +251,11 @@ object LocalAudioScanner {
             // Song, artist, and album rows reference each other, so save them atomically.
             database.withTransaction {
                 upsert(song)
-                insert(ArtistEntity(id = artistId, name = artistName, isLocal = true))
-                insert(SongArtistMap(songId = songId, artistId = artistId, position = 0))
+                artistNames.forEachIndexed { position, name ->
+                    val artistId = "local_artist_${name.hashCode()}"
+                    insert(ArtistEntity(id = artistId, name = name, isLocal = true))
+                    insert(SongArtistMap(songId = songId, artistId = artistId, position = position))
+                }
                 if (albumName.isNotBlank()) {
                     insert(
                         AlbumEntity(
