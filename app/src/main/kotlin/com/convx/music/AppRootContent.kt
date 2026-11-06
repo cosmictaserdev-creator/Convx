@@ -687,9 +687,9 @@ internal fun AppRootContent(
                 onDispose { activity.removeOnNewIntentListener(listener) }
             }
 
-            val currentTitleRes = remember(effectiveRoute) {
+            val currentTitleRes = remember(effectiveRoute, localOnlyMode) {
                 when (effectiveRoute) {
-                    Screens.Home.route -> com.convx.music.R.string.home
+                    Screens.Home.route -> if (localOnlyMode) com.convx.music.R.string.home else null
                     Screens.Search.route -> com.convx.music.R.string.search
                     Screens.Library.route -> com.convx.music.R.string.filter_library
                     Screens.Radio.route -> com.convx.music.R.string.radio

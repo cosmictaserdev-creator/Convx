@@ -26,6 +26,9 @@ val ChillaxFontFamily = FontFamily(
     Font(R.font.chillax_bold, FontWeight.Bold),
 )
 
+/** The console face of the CONVX logo. */
+val BdConsoleFontFamily = FontFamily(Font(R.font.bd_console_remix_italic))
+
 /**
  * Chillax while the display-font preference is on, otherwise null so the caller
  * falls through to whatever its text style already specifies. Returning null

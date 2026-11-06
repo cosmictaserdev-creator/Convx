@@ -10,6 +10,9 @@ import androidx.compose.runtime.setValue
 import kotlin.random.Random
 
 private val DEFAULT_HOME_SECTION_ORDER = mapOf(
+    HomeSection.TopPicks to 140,
+    HomeSection.NewReleases to 130,
+    HomeSection.Trending to 120,
     HomeSection.Hero to 110,
     HomeSection.ListenAgain to 100,
     HomeSection.QuickPicks to 90,
@@ -46,6 +49,9 @@ internal fun buildHomeSections(
         .toSet()
     val list = mutableListOf<HomeSection>()
 
+    list.add(HomeSection.TopPicks)
+    list.add(HomeSection.NewReleases)
+    list.add(HomeSection.Trending)
     if (heroCardEnabled && quickPicks?.isNotEmpty() == true) list.add(HomeSection.Hero)
     // Speed Dial: pinned items (long-press menu > Pin), same compact shelf as Top Songs.
     if (homeState.speedDialItems.isNotEmpty()) list.add(HomeSection.SpeedDial)
@@ -91,7 +97,7 @@ internal fun buildHomeSections(
         // Keep unlisted sections after the saved ones, ordered by their default weight.
         list.sortedWith(
             compareBy(
-                { section -> customOrderRank[section.id] ?: Int.MAX_VALUE },
+                { section -> customOrderRank[section.id] ?: if (section.isChartRail()) -1 else Int.MAX_VALUE },
                 { section -> -section.baseWeight },
             ),
         )
@@ -106,12 +112,21 @@ internal fun buildHomeSections(
     }
 }
 
+/** Rails that sat above every other section before they became sections of their own. */
+private fun HomeSection.isChartRail() =
+    this === HomeSection.TopPicks || this === HomeSection.NewReleases || this === HomeSection.Trending
+
 private fun randomizedSectionWeight(section: HomeSection, seed: Long): Int {
     // Seed each section independently so other sections appearing or disappearing won't reshuffle it.
     val sectionRandom = Random(seed + section.id.hashCode())
 
     // Keep main sections close enough to overlap after applying the random modifier.
     val base = when (section) {
+        // The chart rails keep their place above the hero, even with shuffling on.
+        HomeSection.TopPicks -> 20_000
+        HomeSection.NewReleases -> 19_900
+        HomeSection.Trending -> 19_800
+
         // Pinned above everything, even with shuffling on.
         HomeSection.Hero -> 10_000
 

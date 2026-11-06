@@ -76,48 +76,6 @@ import com.music.innertube.models.PlaylistItem
 import com.music.innertube.models.SongItem
 import com.music.innertube.models.YTItem
 
-/** Builds the home feed with its header and music recommendation rails. */
-internal fun LazyListScope.figmaHomeContent(
-    deps: HomeSectionDeps,
-    mediaMetadata: State<MediaMetadata?>,
-    isPlaying: State<Boolean>,
-    topPicks: List<YTItem>,
-    topPicksTitle: String,
-    newReleaseAlbums: List<AlbumItem>,
-    newReleaseTitle: String,
-    trending: List<YTItem>,
-    trendingTitle: String,
-) {
-    figmaRail(
-        deps = deps,
-        mediaMetadata = mediaMetadata,
-        isPlaying = isPlaying,
-        key = "top_picks",
-        title = topPicksTitle,
-        route = "charts_screen",
-        items = topPicks,
-        hero = true,
-    )
-    figmaRail(
-        deps = deps,
-        mediaMetadata = mediaMetadata,
-        isPlaying = isPlaying,
-        key = "new_albums",
-        title = newReleaseTitle,
-        route = "new_release",
-        items = newReleaseAlbums,
-    )
-    figmaRail(
-        deps = deps,
-        mediaMetadata = mediaMetadata,
-        isPlaying = isPlaying,
-        key = "trending",
-        title = trendingTitle,
-        route = "charts_screen",
-        items = trending,
-    )
-}
-
 /** Adds a titled horizontal rail; Top Picks can use the larger hero layout. */
 internal fun LazyListScope.figmaRail(
     deps: HomeSectionDeps,

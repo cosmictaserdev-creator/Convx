@@ -113,6 +113,7 @@ internal fun LazyListScope.homeSectionsContent(
 ) {
     sections.forEach { section ->
         when (section) {
+            HomeSection.TopPicks, HomeSection.NewReleases, HomeSection.Trending -> Unit
             HomeSection.Hero -> heroSection(deps, ui.quickPicks)
             HomeSection.SpeedDial -> speedDialSection(
                 deps = deps,

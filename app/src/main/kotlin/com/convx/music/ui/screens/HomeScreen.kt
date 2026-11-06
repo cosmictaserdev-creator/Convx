@@ -195,6 +195,7 @@ import com.convx.music.ui.component.AlbumGridItem
 import com.convx.music.ui.component.ListItem
 import com.convx.music.ui.component.PlaylistListItem
 import com.convx.music.ui.component.ArtistGridItem
+import com.convx.music.ui.component.ConvxPageHeader
 import com.convx.music.ui.component.HideOnScrollFAB
 import com.convx.music.ui.component.HomeHeroCard
 import com.convx.music.ui.component.HomeImageBackground
@@ -256,6 +257,9 @@ internal const val LocalShelfRows = 2
 internal const val LocalListPreview = 6
 
 sealed class HomeSection(val id: String, val baseWeight: Int) {
+    data object TopPicks : HomeSection("top_picks", 140)
+    data object NewReleases : HomeSection("new_albums", 130)
+    data object Trending : HomeSection("trending", 120)
     /** The "star of the day" card. Always first, never shuffled. */
     data object Hero : HomeSection("hero", 110)
     data object SpeedDial : HomeSection("speed_dial", 100)
@@ -561,12 +565,16 @@ fun HomeScreen(
                         val dir = LocalLayoutDirection.current
                         PaddingValues(
                             start = ins.calculateStartPadding(dir),
-                            top = maxOf(ins.calculateTopPadding(), if (sideInset > 0.dp) 96.dp else 116.dp),
+                            top = maxOf(ins.calculateTopPadding(), if (sideInset > 0.dp) 96.dp else 62.dp),
                             end = ins.calculateRightPadding(dir),
                             bottom = ins.calculateBottomPadding(),
                         )
                     },
                 ) {
+                    item(key = "convx_header", contentType = "convx_header") {
+                        ConvxPageHeader(color = AppTheme.colorScheme.onSurface)
+                    }
+
                     // Apple Music's "Transfer music" card, pointed at our one import path:
                     // signing in to YouTube Music. Gone for good once dismissed or signed in.
                     if (
@@ -662,28 +670,49 @@ fun HomeScreen(
                     } else if (selectedChip != null) {
                         chipFeedContent(deps, homePage)
                     } else {
-                        figmaHomeContent(
-                            deps = deps,
-                            mediaMetadata = mediaMetadataState,
-                            isPlaying = isPlayingState,
-                            topPicks = topPicks.ifEmpty { trending }.ifEmpty { newReleaseAlbums },
-                            topPicksTitle = topPicksTitle,
-                            newReleaseAlbums = if (topPicks.isNotEmpty() || trending.isNotEmpty()) newReleaseAlbums else emptyList(),
-                            newReleaseTitle = newReleaseTitle,
-                            trending = if (topPicks.isNotEmpty()) trending else emptyList(),
-                            trendingTitle = trendingTitle,
-                        )
-                        homeSectionsContent(
-                            sections = homeSections,
-                            deps = deps,
-                            ui = homeState,
-                            mediaMetadata = mediaMetadataState,
-                            isPlaying = isPlayingState,
-                            randomizeJob = randomizeJob,
-                            quickPicksSongMap = quickPicksSongMap,
-                            forgottenFavoritesSongMap = forgottenFavoritesSongMap,
-                            url = url,
-                        )
+                        homeSections.forEach { section ->
+                            when (section) {
+                                HomeSection.TopPicks -> figmaRail(
+                                    deps = deps,
+                                    mediaMetadata = mediaMetadataState,
+                                    isPlaying = isPlayingState,
+                                    key = section.id,
+                                    title = topPicksTitle,
+                                    route = "charts_screen",
+                                    items = topPicks.ifEmpty { trending }.ifEmpty { newReleaseAlbums },
+                                    hero = true,
+                                )
+                                HomeSection.NewReleases -> figmaRail(
+                                    deps = deps,
+                                    mediaMetadata = mediaMetadataState,
+                                    isPlaying = isPlayingState,
+                                    key = section.id,
+                                    title = newReleaseTitle,
+                                    route = "new_release",
+                                    items = if (topPicks.isNotEmpty() || trending.isNotEmpty()) newReleaseAlbums else emptyList(),
+                                )
+                                HomeSection.Trending -> figmaRail(
+                                    deps = deps,
+                                    mediaMetadata = mediaMetadataState,
+                                    isPlaying = isPlayingState,
+                                    key = section.id,
+                                    title = trendingTitle,
+                                    route = "charts_screen",
+                                    items = if (topPicks.isNotEmpty()) trending else emptyList(),
+                                )
+                                else -> homeSectionsContent(
+                                    sections = listOf(section),
+                                    deps = deps,
+                                    ui = homeState,
+                                    mediaMetadata = mediaMetadataState,
+                                    isPlaying = isPlayingState,
+                                    randomizeJob = randomizeJob,
+                                    quickPicksSongMap = quickPicksSongMap,
+                                    forgottenFavoritesSongMap = forgottenFavoritesSongMap,
+                                    url = url,
+                                )
+                            }
+                        }
                     }
                     // Show this infinite shimmer only during a fetch; a continuation can remain available indefinitely.
                     if (isLoading || pendingChip != null) {
