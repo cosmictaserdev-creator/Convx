@@ -688,11 +688,13 @@ fun Lyrics(
     val usesArchiveTuneRenderer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
         lyricsAnimationStyle == LyricsAnimationStyle.ARCHIVE_TUNE &&
         lines.hasKaraokeTimings()
+    val usesFisheyeRenderer = lyricsAnimationStyle == LyricsAnimationStyle.FISHEYE && lines.any { !it.words.isNullOrEmpty() }
     val usesFlamingoRenderer = (lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO ||
             lyricsAnimationStyle == LyricsAnimationStyle.CONVX_1 ||
-            lyricsAnimationStyle == LyricsAnimationStyle.BITCHORD) && lines.isNotEmpty()
+            lyricsAnimationStyle == LyricsAnimationStyle.BITCHORD ||
+            (lyricsAnimationStyle == LyricsAnimationStyle.FISHEYE && !usesFisheyeRenderer)) && lines.isNotEmpty()
     val usesCrawlRenderer = lyricsAnimationStyle == LyricsAnimationStyle.STAR_CRAWL && lines.isNotEmpty()
-    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer && !usesCrawlRenderer
+    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer && !usesCrawlRenderer && !usesFisheyeRenderer
 
     val lazyListState = rememberLazyListState()
     val rubber = rememberLyricRubber(lazyListState)
@@ -795,7 +797,7 @@ fun Lyrics(
         initialScrollDone = false
     }
     LaunchedEffect(currentLineIndex, lastPreviewTime, initialScrollDone, isAutoScrollEnabled, scrollLyrics, isSeeking, hasProviderRow, lines, lazyListState.layoutInfo.totalItemsCount) {
-        if (!isSynced || usesFlamingoRenderer || usesCrawlRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
+        if (!isSynced || usesFlamingoRenderer || usesCrawlRenderer || usesFisheyeRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
         // The playhead-to-line lookup starts asynchronously. Don't interpret its
         // initial -1 as line zero and briefly jump to the start of the lyrics.
         if (currentLineIndex < 0) return@LaunchedEffect
@@ -841,6 +843,16 @@ fun Lyrics(
 
         if (lyrics == LYRICS_NOT_FOUND || (lyrics != null && lines.all { it.text.isBlank() })) {
             LyricsEmptyNote(fontFamily = lyricsFontFamily, color = AppTheme.colorScheme.secondary)
+        } else if (usesFisheyeRenderer) {
+            val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
+            FisheyeLyrics(
+                lines = lines,
+                fontFamily = lyricsFontFamily,
+                positionMs = { (sliderPositionProvider() ?: playerConnection.player.currentPosition) + lyricsOffset },
+                highlight = AppTheme.colorScheme.primary,
+                onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it - lyricsOffset).coerceAtLeast(0)) },
+                modifier = Modifier.fillMaxSize(),
+            )
         } else if (usesCrawlRenderer) {
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
             StarCrawlLyrics(

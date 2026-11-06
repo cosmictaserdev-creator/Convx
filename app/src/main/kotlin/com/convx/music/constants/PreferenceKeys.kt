@@ -779,6 +779,9 @@ val FetchedModulesKey = stringPreferencesKey("fetchedModules")
 
 
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
+val FisheyeZoomKey = floatPreferencesKey("fisheyeZoom")
+val FisheyeRadiusKey = floatPreferencesKey("fisheyeRadius")
+val FisheyeTextSizeKey = floatPreferencesKey("fisheyeTextSize")
 enum class LyricsAnimationStyle {
     FLAMINGO,
     NONE,
@@ -803,6 +806,9 @@ enum class LyricsAnimationStyle {
 
     /** Lines on a tilted plane that recedes into a starfield, like an opening crawl. */
     STAR_CRAWL,
+
+    /** Word-by-word kinetic rows under a convex lens. Needs word timings; without them it falls back to Convx Lyrics. */
+    FISHEYE,
 }
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")

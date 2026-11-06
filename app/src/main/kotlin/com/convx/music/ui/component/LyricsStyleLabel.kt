@@ -21,4 +21,5 @@ fun lyricsStyleLabel(style: LyricsAnimationStyle): String = when (style) {
     LyricsAnimationStyle.METRO_LYRICS -> stringResource(R.string.lyrics_animation_metro)
     LyricsAnimationStyle.ARCHIVE_TUNE -> stringResource(R.string.lyrics_animation_karaoke_apple)
     LyricsAnimationStyle.STAR_CRAWL -> stringResource(R.string.lyrics_animation_star_crawl)
+    LyricsAnimationStyle.FISHEYE -> stringResource(R.string.lyrics_animation_fisheye)
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -27,6 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.convx.music.R
 import com.convx.music.constants.AppleMusicLyricsBlurKey
+import com.convx.music.constants.FisheyeRadiusKey
+import com.convx.music.constants.FisheyeTextSizeKey
+import com.convx.music.constants.FisheyeZoomKey
 import com.convx.music.constants.LyricsGlowEffectKey
 import com.convx.music.constants.FlamingoBrightSingingWordsKey
 import com.convx.music.constants.FlamingoWordSwellKey
@@ -34,6 +38,7 @@ import com.convx.music.constants.FlamingoGlowColorKey
 import com.convx.music.constants.LyricsStandardBlurKey
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.ios.compat.Slider
 import com.convx.music.ui.ios.compat.Switch
 import com.convx.music.ui.ios.compat.Text
 import com.convx.music.utils.rememberPreference
@@ -129,6 +134,31 @@ fun LyricsSettingsScreen(navController: NavController) {
                         )
                     },
                     onClick = { showGlowColorPicker = true },
+                ),
+            ))
+        }
+        if (animationStyle == LyricsAnimationStyle.FISHEYE) {
+            val (lensStrength, onLensStrengthChange) = rememberPreference(FisheyeZoomKey, 0.34f)
+            val (lensRadius, onLensRadiusChange) = rememberPreference(FisheyeRadiusKey, 0.7f)
+            val (fisheyeTextSize, onFisheyeTextSizeChange) = rememberPreference(FisheyeTextSizeKey, 1f)
+            IosSettingsGroup(title = stringResource(R.string.lyrics_animation_fisheye), items = listOf(
+                IosSettingsItem(
+                    icon = painterResource(R.drawable.lyrics),
+                    title = { Text(stringResource(R.string.fisheye_lens_strength)) },
+                    description = { Text(stringResource(R.string.fisheye_lens_strength_desc)) },
+                    trailingContent = { Slider(value = lensStrength, onValueChange = onLensStrengthChange, valueRange = 0f..0.6f, modifier = Modifier.width(140.dp)) },
+                ),
+                IosSettingsItem(
+                    icon = painterResource(R.drawable.lyrics),
+                    title = { Text(stringResource(R.string.fisheye_lens_radius)) },
+                    description = { Text(stringResource(R.string.fisheye_lens_radius_desc)) },
+                    trailingContent = { Slider(value = lensRadius, onValueChange = onLensRadiusChange, valueRange = 0.4f..1.2f, modifier = Modifier.width(140.dp)) },
+                ),
+                IosSettingsItem(
+                    icon = painterResource(R.drawable.lyrics),
+                    title = { Text(stringResource(R.string.fisheye_text_size)) },
+                    description = { Text(stringResource(R.string.fisheye_text_size_desc)) },
+                    trailingContent = { Slider(value = fisheyeTextSize, onValueChange = onFisheyeTextSizeChange, valueRange = 0.6f..1.4f, modifier = Modifier.width(140.dp)) },
                 ),
             ))
         }
