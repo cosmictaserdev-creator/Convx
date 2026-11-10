@@ -307,7 +307,7 @@ fun FloatingMiniPlayer(
             .then(glow.modifier)
             // Edge-flick skip only: center drag stretches (via glow above)
             // but never slides or commits. Snaps hop to the card scope.
-            .pointerInput(swipeEnabled) {
+            .pointerInput(swipeEnabled, swipeDistancePercent) {
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     val pid = down.id
@@ -316,6 +316,7 @@ fun FloatingMiniPlayer(
                     val verticalCapPx = with(density) { 36.dp.toPx() }
                     val isEdgeZone = start.x < edgePx || start.x > size.width - edgePx
                     val allowSwipe = swipeEnabled && isEdgeZone
+                    val pillThreshold = size.width * swipeDistancePercent.coerceIn(10, 100) / 100f
                     dragStartTime = System.currentTimeMillis()
                     totalDragDistance = 0f
                     var lastAdjustedX = 0f
@@ -396,8 +397,8 @@ fun FloatingMiniPlayer(
                     // A quick edge flick or a drag past the threshold skips a track.
                     val shouldChangeSong = allowSwipe &&
                         maxAbsY < verticalCapPx &&
-                        (dragged > autoSwipeThreshold ||
-                            (velocity > 0.55f && dragged > autoSwipeThreshold * 0.25f))
+                        (dragged > pillThreshold ||
+                            (velocity > 0.55f && dragged > pillThreshold * 0.25f))
                     if (shouldChangeSong) {
                         // Use the connection to preserve cast routing and skip callbacks.
                         if (currentOffset > 0 && canSkipPrevious) {
