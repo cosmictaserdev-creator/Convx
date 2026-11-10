@@ -163,9 +163,7 @@ jobs:
       - name: Launch the SwiftUI host
         timeout-minutes: 2
         run: |
-          DIAGNOSTICS_DIR="$RUNNER_TEMP/convx-ios-simulator-diagnostics"
-          mkdir -p "$DIAGNOSTICS_DIR"
-          xcrun simctl launch --stdout="$DIAGNOSTICS_DIR/app.out" --stderr="$DIAGNOSTICS_DIR/app.err" "$SIMULATOR_ID" com.convx.music.client.ioshost
+          xcrun simctl launch "$SIMULATOR_ID" com.convx.music.client.ioshost
       - name: Wait for the Compose UI to appear
         timeout-minutes: 2
         run: sleep 60
