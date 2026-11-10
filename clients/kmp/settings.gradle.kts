@@ -38,7 +38,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "convx-kmp-clients"
-include(":shared", ":androidHost", ":desktopApp")
+include(":shared", ":androidHost")
 include(":network-storage-core")
 project(":network-storage-core").projectDir = file("../../feature/network-storage/domain")
 include(":network-storage-transports")
