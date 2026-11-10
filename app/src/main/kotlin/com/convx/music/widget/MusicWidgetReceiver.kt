@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 open class MusicWidgetReceiver : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,

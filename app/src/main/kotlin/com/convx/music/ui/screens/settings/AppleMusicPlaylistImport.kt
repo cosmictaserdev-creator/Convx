@@ -40,7 +40,7 @@ fun AppleMusicPlaylistImport(
 fun AppleMusicImportDialogHost(
     navController: NavController,
     onCloseSheet: () -> Unit,
-    viewModel: AppleMusicImportViewModel = hiltViewModel(),
+    viewModel: AppleMusicImportViewModel = koinViewModel(),
 ) {
     AppleMusicImportDialogs(navController, viewModel, openOnStart = true, onCloseSheet = onCloseSheet)
 }
