@@ -98,7 +98,7 @@ import com.convx.music.ui.utils.heroPullZoom
 import com.convx.music.ui.utils.listOverscroll
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastSumBy
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -162,7 +162,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun CachePlaylistScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: CachePlaylistViewModel = hiltViewModel(),
+    viewModel: CachePlaylistViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val menuState = LocalMenuState.current

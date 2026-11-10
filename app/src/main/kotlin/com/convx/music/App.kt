@@ -30,12 +30,14 @@ import coil3.request.bitmapConfig
 import coil3.request.crossfade
 import com.convx.music.utils.ArtworkQualityInterceptor
 import com.music.innertube.YouTube
+import com.music.innertube.InnertubeProxySettings
+import com.music.innertube.ProxyType
 import com.music.innertube.models.IpVersion
 import com.music.innertube.models.YouTubeLocale
-import com.music.kugou.KuGou
 import com.music.lastfm.LastFM
 import com.convx.music.constants.*
-import com.convx.music.di.ApplicationScope
+import com.convx.music.di.ValueProvider
+import com.convx.music.di.appModules
 import com.convx.music.extensions.toEnum
 import com.convx.music.extensions.toInetSocketAddress
 import com.convx.music.utils.CrashHandler
@@ -47,7 +49,10 @@ import com.convx.music.utils.migrateSharedPreferencesToMMKV
 import com.convx.music.utils.warmPreferenceMirror
 import com.convx.music.utils.reportException
 import com.tencent.mmkv.MMKV
-import dagger.hilt.android.HiltAndroidApp
+import com.convx.storage.data.NetworkMusicRepository
+import org.koin.core.context.GlobalContext
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -61,20 +66,23 @@ import java.net.Authenticator
 import java.net.PasswordAuthentication
 import java.net.Proxy
 import java.util.Locale
-import javax.inject.Inject
+import java.util.concurrent.atomic.AtomicBoolean
 
-@HiltAndroidApp
 class App : Application(), SingletonImageLoader.Factory {
 
-    @Inject
-    @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
-    @Inject
-    lateinit var networkRepository: dagger.Lazy<com.convx.storage.data.NetworkMusicRepository>
+    private lateinit var networkRepository: ValueProvider<NetworkMusicRepository>
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidContext(this@App)
+            modules(appModules)
+        }
+        val appKoin = GlobalContext.get()
+        applicationScope = appKoin.get()
+        networkRepository = ValueProvider { appKoin.get() }
         com.music.spotify.SpotifyAuth.initialize(this)
         // The recovery activity runs in its own process. Do not reopen the database,
         // preferences, native caches or playback integrations that may have crashed.
@@ -130,13 +138,7 @@ class App : Application(), SingletonImageLoader.Factory {
 
         // Warm the preference mirror off Main so the first composition avoids its blocking read.
         applicationScope.launch(Dispatchers.IO) { dataStore.warmPreferenceMirror() }
-        // Spotify's native engine: report whether it loaded, without ever failing startup over it.
-        applicationScope.launch(Dispatchers.IO) {
-            val loaded = runCatching { com.music.spotify.nativecore.NativeBridge.initContext(this@App) }
-            timber.log.Timber.tag("SpotifyEngine").i(
-                if (loaded.isSuccess) "native engine loaded" else "native engine unavailable: ${loaded.exceptionOrNull()}",
-            )
-        }
+        applicationScope.launch(Dispatchers.IO) { com.convx.music.ai.AiDefaults.keepLegacyProvider(this@App) }
 
         CrashHandler.install(this)
 
@@ -153,9 +155,23 @@ class App : Application(), SingletonImageLoader.Factory {
             cachedCoilCacheSize = dataStore.data.map { it[MaxImageCacheSizeKey] ?: 512 }.first()
         }
 
-        applicationScope.launch {
+        applicationScope.launch(Dispatchers.IO) {
             initializeSettings()
             observeSettingsChanges()
+        }
+    }
+
+    private val deferredInitializationStarted = AtomicBoolean(false)
+
+    /** Optional integrations start only after the activity has drawn and Main is idle. */
+    internal fun initializeAfterFirstDraw() {
+        if (!deferredInitializationStarted.compareAndSet(false, true)) return
+        applicationScope.launch(Dispatchers.IO) {
+            val loaded = runCatching { com.music.spotify.nativecore.NativeBridge.initContext(this@App) }
+            Timber.tag("SpotifyEngine").i(
+                if (loaded.isSuccess) "native engine loaded" else "native engine unavailable: ${loaded.exceptionOrNull()}",
+            )
+            com.convx.music.playback.smart.DemucsModel.autoDownloadIfWanted(this@App)
         }
     }
 
@@ -194,10 +210,6 @@ class App : Application(), SingletonImageLoader.Factory {
                 ?: "en"
         )
 
-        if (languageTag == "zh-TW") {
-            KuGou.useTraditionalChinese = true
-        }
-
         LastFM.initialize(
             apiKey = BuildConfig.LASTFM_API_KEY.takeIf { it.isNotEmpty() } ?: "",
             secret = BuildConfig.LASTFM_SECRET.takeIf { it.isNotEmpty() } ?: ""
@@ -220,7 +232,12 @@ class App : Application(), SingletonImageLoader.Factory {
             }
             try {
                 settings[ProxyUrlKey]?.takeIf { it.isNotBlank() }?.let {
-                    YouTube.proxy = Proxy(type, it.toInetSocketAddress())
+                    val address = it.toInetSocketAddress()
+                    YouTube.proxy = InnertubeProxySettings(
+                        type = if (type == Proxy.Type.SOCKS) ProxyType.SOCKS else ProxyType.HTTP,
+                        host = address.hostString,
+                        port = address.port,
+                    )
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -383,14 +400,14 @@ class App : Application(), SingletonImageLoader.Factory {
             if (cacheSize == 0) {
                 diskCachePolicy(CachePolicy.DISABLED)
             } else {
-                diskCache(
+                diskCache {
                     DiskCache.Builder()
                         // Keep artwork in filesDir: Android can clear cacheDir under storage pressure,
                         // including downloaded thumbnails. Coil still enforces the configured size cap.
                         .directory(filesDir.resolve("coil"))
                         .maxSizeBytes(cacheSize * 1024 * 1024L)
                         .build()
-                )
+                }
             }
         }.build()
     }

@@ -26,6 +26,14 @@ class DashManifestTest {
     }
 
     @Test
+    fun `the highest bandwidth representation is played`() {
+        fun rep(id: String, bandwidth: Int) =
+            """<Representation id="$id" bandwidth="$bandwidth"><SegmentTemplate timescale="1000" duration="1000" media="$id-${'$'}Number${'$'}.mp4"/></Representation>"""
+        val mpd = """<MPD mediaPresentationDuration="PT1S"><Period><AdaptationSet contentType="audio">${rep("lo", 96_996)}${rep("flac", 752_286)}${rep("mid", 321_712)}</AdaptationSet></Period></MPD>"""
+        assertEquals(listOf("https://h/flac-1.mp4"), DashManifest.parse("https://h/m.mpd", mpd).segments)
+    }
+
+    @Test
     fun `an encrypted manifest is refused`() {
         val mpd = """<MPD><Period><AdaptationSet contentType="audio"><ContentProtection schemeIdUri="x"/><Representation id="a"><SegmentTemplate media="s.mp4" duration="1"/></Representation></AdaptationSet></Period></MPD>"""
         assertTrue(runCatching { DashManifest.parse("https://h/m.mpd", mpd) }.isFailure)

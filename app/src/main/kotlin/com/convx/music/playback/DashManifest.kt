@@ -20,9 +20,10 @@ internal object DashManifest {
         val root = document.documentElement
         if (root.getElementsByTagName("ContentProtection").length > 0) throw IOException("Encrypted DASH")
 
-        val representation = root.descendants("Representation").firstOrNull { rep ->
+        val representation = root.descendants("Representation").filter { rep ->
             (rep.parentNode as? Element)?.getAttribute("contentType").let { it.isNullOrEmpty() || it == "audio" }
-        } ?: throw IOException("DASH manifest has no audio representation")
+        }.maxByOrNull { it.getAttribute("bandwidth").toLongOrNull() ?: 0L }
+            ?: throw IOException("DASH manifest has no audio representation")
         val template = representation.child("SegmentTemplate")
             ?: (representation.parentNode as? Element)?.child("SegmentTemplate")
             ?: throw IOException("Unsupported DASH segment addressing")

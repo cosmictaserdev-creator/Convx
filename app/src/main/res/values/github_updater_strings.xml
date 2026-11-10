@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="updater_remind_later">Remind me tomorrow</string>
+    <string name="updater_view_release">View GitHub release</string>
+    <string name="updater_release_details">%1$s · %2$s MB</string>
+    <string name="updater_waiting">Waiting for a connection or retry…</string>
+    <string name="updater_verifying">Verifying update…</string>
+    <string name="updater_installing">Preparing installation…</string>
+    <string name="updater_approval">Confirm installation to finish updating.</string>
+    <string name="updater_installed">Update installed</string>
+    <string name="updater_install_notice">Android will ask you to confirm installation. Installing may interrupt playback.</string>
+    <string name="updater_rate_limit">GitHub is limiting requests. Please try again later.</string>
+    <string name="updater_storage">There is not enough free space. Free some storage and try again.</string>
+    <string name="updater_verification_failed">The update could not be verified. Download it again before installing.</string>
+    <string name="updater_incompatible">This update is not compatible with this installation or device.</string>
+    <string name="updater_blocked">Android blocked installation. Check your device installation settings.</string>
+    <string name="updater_cancelled">Installation was cancelled. Your downloaded update is still available.</string>
+    <string name="updater_install_failed">Installation did not complete. You can try again.</string>
+    <string name="updater_unavailable">This update is no longer available. Check for updates again.</string>
+    <string name="updater_metadata_failed">The release information could not be verified. Please try again later.</string>
+    <string name="updater_channel_disabled">Use your installation source to update this build.</string>
+</resources>

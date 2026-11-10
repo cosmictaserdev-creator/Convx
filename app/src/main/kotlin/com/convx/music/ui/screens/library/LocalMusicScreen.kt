@@ -68,7 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -95,7 +95,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun LocalMusicScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: LocalMusicViewModel = hiltViewModel(),
+    viewModel: LocalMusicViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val playerConnection = LocalPlayerConnection.current ?: return

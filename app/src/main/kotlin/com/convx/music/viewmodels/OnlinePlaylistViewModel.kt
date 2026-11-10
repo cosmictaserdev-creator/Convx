@@ -16,8 +16,6 @@ import com.convx.music.db.MusicDatabase
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +24,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class CachedPlaylistData(
     val playlist: PlaylistItem,
@@ -78,9 +75,8 @@ object PlaylistMemoryCache {
     }
 }
 
-@HiltViewModel
-class OnlinePlaylistViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class OnlinePlaylistViewModel(
+    private val context: Context,
     savedStateHandle: SavedStateHandle,
     database: MusicDatabase
 ) : ViewModel() {

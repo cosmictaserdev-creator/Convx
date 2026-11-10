@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.convx.music.lyrics.rememberLyricsFont
 import com.convx.music.ui.ios.compat.*
 import com.convx.music.viewmodels.LyricsAppearanceViewModel
 
 @Composable
-fun LyricsFontSettings(viewModel: LyricsAppearanceViewModel = hiltViewModel()) {
+fun LyricsFontSettings(viewModel: LyricsAppearanceViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val family = rememberLyricsFont(state.font)
     val import = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(viewModel::importFont) }

@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.convx.music.LocalPlayerAwareWindowInsets
@@ -64,7 +65,7 @@ import com.convx.music.utils.rememberPreference
 @Composable
 fun LocalHomeScreen(
     navController: NavController,
-    viewModel: com.convx.music.viewmodels.LocalHomeViewModel = androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel(),
+    viewModel: com.convx.music.viewmodels.LocalHomeViewModel = koinViewModel(),
 ) {
     val menuState = LocalMenuState.current
     val playerConnection = LocalPlayerConnection.current ?: return

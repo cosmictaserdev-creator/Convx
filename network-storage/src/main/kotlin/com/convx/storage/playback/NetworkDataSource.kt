@@ -31,7 +31,7 @@ class NetworkDataSourceFactory(
             logicalUri = dataSpec.uri
             return when (server) {
                 is NetworkServer.WebDav -> {
-                    val factory = OkHttpDataSource.Factory(webDav.client)
+                    val factory = OkHttpDataSource.Factory(webDav.playbackClient)
                     WebDavFileSource.authorization(server)?.let { factory.setDefaultRequestProperties(mapOf("Authorization" to it)) }
                     active = factory.createDataSource().apply { listeners.forEach(::addTransferListener) }
                     active.open(dataSpec.buildUpon().setUri(WebDavFileSource.resolve(server, location.path).toString()).build())
@@ -76,7 +76,7 @@ private class SmbDataSource(private val server: NetworkServer.Smb, private val p
         val limit = readWindow.readLength(length)
         if (limit == 0) return C.RESULT_END_OF_INPUT
         val count = try { requireNotNull(file).read(readWindow.position, buffer, offset, limit) }
-        catch (error: Exception) { source.invalidate(server.id); throw IOException("Remote read failed", error) }
+        catch (error: Exception) { throw IOException("Remote read failed", error) }
         if (count <= 0) return C.RESULT_END_OF_INPUT
         readWindow.advance(count)
         bytesTransferred(count)

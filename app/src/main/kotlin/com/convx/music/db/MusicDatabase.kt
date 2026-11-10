@@ -52,8 +52,7 @@ import java.time.ZoneOffset
 import java.util.Date
 
 class MusicDatabase(
-    // Not private: the Hilt module hands the same instance back out as
-    // InternalDatabase, so both bindings resolve to the one configured builder.
+    // Koin exposes this configured instance as both MusicDatabase and InternalDatabase.
     val delegate: InternalDatabase,
 ) : DatabaseDao by delegate.dao {
     val speedDialDao: SpeedDialDao
@@ -89,6 +88,8 @@ class MusicDatabase(
     fun close() = delegate.close()
 }
 
+const val INTERNAL_DATABASE_VERSION = 40
+
 @Database(
     entities = [
         SongEntity::class,
@@ -115,7 +116,7 @@ class MusicDatabase(
         SortedSongAlbumMap::class,
         PlaylistSongMapPreview::class,
     ],
-    version = 40,
+    version = INTERNAL_DATABASE_VERSION,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
@@ -131,17 +132,13 @@ class MusicDatabase(
         AutoMigration(from = 12, to = 13, spec = Migration12To13::class),
         AutoMigration(from = 13, to = 14, spec = Migration13To14::class),
         AutoMigration(from = 14, to = 15),
-        AutoMigration(from = 15, to = 16),
-        AutoMigration(from = 16, to = 17, spec = Migration16To17::class),
         AutoMigration(from = 17, to = 18),
         AutoMigration(from = 18, to = 19, spec = Migration18To19::class),
-        AutoMigration(from = 19, to = 20, spec = Migration19To20::class),
         AutoMigration(from = 20, to = 21, spec = Migration20To21::class),
         AutoMigration(from = 21, to = 22, spec = Migration21To22::class),
         AutoMigration(from = 22, to = 23, spec = Migration22To23::class),
         AutoMigration(from = 23, to = 24, spec = Migration23To24::class),
         AutoMigration(from = 24, to = 25),
-        AutoMigration(from = 25, to = 26),
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
         AutoMigration(from = 28, to = 29),
@@ -164,20 +161,32 @@ abstract class InternalDatabase : RoomDatabase() {
     companion object {
         const val DB_NAME = "song.db"
 
-        fun newInstance(context: Context): MusicDatabase =
+        fun newInstance(
+            context: Context,
+            databaseName: String = DB_NAME,
+            allowDestructiveMigrationOnDowngrade: Boolean = true,
+        ): MusicDatabase =
             MusicDatabase(
                 delegate =
                 Room
-                    .databaseBuilder(context, InternalDatabase::class.java, DB_NAME)
+                    .databaseBuilder(context, InternalDatabase::class.java, databaseName)
                     .addMigrations(
                         MIGRATION_1_2,
+                        MIGRATION_15_16,
+                        MIGRATION_16_17,
+                        MIGRATION_19_20,
                         MIGRATION_21_24,
                         MIGRATION_22_24,
                         MIGRATION_24_25,
+                        MIGRATION_25_26,
                         MIGRATION_35_36,
                         MIGRATION_39_40,
                     )
-                    .fallbackToDestructiveMigrationOnDowngrade()
+                    .apply {
+                        if (allowDestructiveMigrationOnDowngrade) {
+                            fallbackToDestructiveMigrationOnDowngrade()
+                        }
+                    }
                     .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
                     .setTransactionExecutor(java.util.concurrent.Executors.newSingleThreadExecutor())
                     .setQueryExecutor(java.util.concurrent.Executors.newFixedThreadPool(4))
@@ -200,6 +209,188 @@ abstract class InternalDatabase : RoomDatabase() {
 }
 
 // Migrations.
+
+private fun ensureColumn(
+    db: SupportSQLiteDatabase,
+    tableName: String,
+    columnName: String,
+    definition: String,
+) {
+    if (columnName !in tableColumnNames(db, tableName)) {
+        db.execSQL("ALTER TABLE `$tableName` ADD COLUMN `$columnName` $definition")
+    }
+}
+
+private fun tableColumnNames(db: SupportSQLiteDatabase, tableName: String): Set<String> = buildSet {
+    db.query("PRAGMA table_info('$tableName')").use { cursor ->
+        val nameIndex = cursor.getColumnIndex("name")
+        while (cursor.moveToNext()) {
+            if (nameIndex >= 0) add(cursor.getString(nameIndex))
+        }
+    }
+}
+
+private fun rebuildTable(
+    db: SupportSQLiteDatabase,
+    sourceTable: String,
+    temporaryTable: String,
+    createTemporaryTableSql: String,
+    targetColumns: List<String>,
+) {
+    db.execSQL("DROP TABLE IF EXISTS `$temporaryTable`")
+    db.execSQL(createTemporaryTableSql)
+
+    val existingColumns = tableColumnNames(db, sourceTable)
+    val columnsToKeep = targetColumns.filter(existingColumns::contains)
+    if (columnsToKeep.isNotEmpty()) {
+        val columnsSql = columnsToKeep.joinToString(",") { "`$it`" }
+        db.execSQL(
+            "INSERT INTO `$temporaryTable` ($columnsSql) SELECT $columnsSql FROM `$sourceTable`",
+        )
+    }
+
+    db.execSQL("DROP TABLE `$sourceTable`")
+    db.execSQL("ALTER TABLE `$temporaryTable` RENAME TO `$sourceTable`")
+}
+
+private fun ensureBooleanColumn(
+    db: SupportSQLiteDatabase,
+    tableName: String,
+    columnName: String,
+    defaultValue: String = "false",
+) = ensureColumn(
+    db,
+    tableName = tableName,
+    columnName = columnName,
+    definition = "INTEGER NOT NULL DEFAULT $defaultValue",
+)
+
+private fun ensurePlaylistThumbnailUrlColumn(db: SupportSQLiteDatabase) =
+    ensureColumn(
+        db,
+        tableName = "playlist",
+        columnName = "thumbnailUrl",
+        definition = "TEXT",
+    )
+
+private fun ensureAlbumIsUploadedColumn(db: SupportSQLiteDatabase) =
+    ensureBooleanColumn(db, tableName = "album", columnName = "isUploaded")
+
+private fun ensureSongColumnsFrom21To24(db: SupportSQLiteDatabase) {
+    ensureColumn(db, tableName = "song", columnName = "libraryAddToken", definition = "TEXT DEFAULT ''")
+    ensureColumn(db, tableName = "song", columnName = "libraryRemoveToken", definition = "TEXT DEFAULT ''")
+    ensureBooleanColumn(
+        db,
+        tableName = "song",
+        columnName = "romanizeLyrics",
+        defaultValue = "1",
+    )
+    ensureBooleanColumn(db, tableName = "song", columnName = "isDownloaded", defaultValue = "0")
+}
+
+val MIGRATION_25_26 =
+    object : Migration(25, 26) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Schema 26 drops defaults that schema 40 retains; add the new flag without rebuilding those tables.
+            ensureBooleanColumn(db, tableName = "song", columnName = "isUploaded")
+        }
+    }
+
+val MIGRATION_15_16 =
+    object : Migration(15, 16) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // The v15 SQL snapshot already has song.isLocal/localPath although its field metadata omits them.
+            ensureBooleanColumn(db, tableName = "song", columnName = "isLocal")
+            ensureColumn(db, tableName = "song", columnName = "localPath", definition = "TEXT")
+            ensureColumn(db, tableName = "artist", columnName = "channelId", definition = "TEXT")
+            ensureColumn(db, tableName = "album", columnName = "playlistId", definition = "TEXT")
+            // The v15 field metadata includes these playlist timestamps although its SQL omits them.
+            ensureColumn(db, tableName = "playlist", columnName = "createdAt", definition = "INTEGER")
+            ensureColumn(db, tableName = "playlist", columnName = "lastUpdateTime", definition = "INTEGER")
+            ensureBooleanColumn(
+                db,
+                tableName = "playlist",
+                columnName = "isEditable",
+                defaultValue = "true",
+            )
+            ensureBooleanColumn(db, tableName = "playlist", columnName = "isLocal")
+            ensureColumn(db, tableName = "playlist", columnName = "bookmarkedAt", definition = "INTEGER")
+            ensureColumn(db, tableName = "playlist_song_map", columnName = "setVideoId", definition = "TEXT")
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `set_video_id` (`videoId` TEXT NOT NULL, `setVideoId` TEXT, PRIMARY KEY(`videoId`))",
+            )
+        }
+    }
+
+val MIGRATION_16_17 =
+    object : Migration(16, 17) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Schema 16 SQL omits nullable columns recorded in its metadata; generated copy SQL assumes they exist.
+            rebuildTable(
+                db = db,
+                sourceTable = "song",
+                temporaryTable = "_new_song",
+                createTemporaryTableSql =
+                    "CREATE TABLE `_new_song` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `duration` INTEGER NOT NULL, `thumbnailUrl` TEXT, `albumId` TEXT, `albumName` TEXT, `year` INTEGER, `date` INTEGER, `dateModified` INTEGER, `liked` INTEGER NOT NULL, `likedDate` INTEGER, `totalPlayTime` INTEGER NOT NULL, `inLibrary` INTEGER, `dateDownload` INTEGER, PRIMARY KEY(`id`))",
+                targetColumns = listOf(
+                    "id",
+                    "title",
+                    "duration",
+                    "thumbnailUrl",
+                    "albumId",
+                    "albumName",
+                    "year",
+                    "date",
+                    "dateModified",
+                    "liked",
+                    "likedDate",
+                    "totalPlayTime",
+                    "inLibrary",
+                    "dateDownload",
+                ),
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_song_albumId` ON `song` (`albumId`)")
+
+            rebuildTable(
+                db = db,
+                sourceTable = "playlist",
+                temporaryTable = "_new_playlist",
+                createTemporaryTableSql =
+                    "CREATE TABLE `_new_playlist` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `browseId` TEXT, `createdAt` INTEGER, `lastUpdateTime` INTEGER, `isEditable` INTEGER NOT NULL DEFAULT true, `bookmarkedAt` INTEGER, `remoteSongCount` INTEGER, `playEndpointParams` TEXT, `shuffleEndpointParams` TEXT, `radioEndpointParams` TEXT, PRIMARY KEY(`id`))",
+                targetColumns = listOf(
+                    "id",
+                    "name",
+                    "browseId",
+                    "createdAt",
+                    "lastUpdateTime",
+                    "isEditable",
+                    "bookmarkedAt",
+                    "remoteSongCount",
+                    "playEndpointParams",
+                    "shuffleEndpointParams",
+                    "radioEndpointParams",
+                ),
+            )
+
+            ensureColumn(db, "album", "likedDate", "INTEGER")
+            ensureColumn(db, "album", "inLibrary", "INTEGER")
+            ensureColumn(db, "format", "playbackUrl", "TEXT")
+
+            db.execSQL("UPDATE playlist SET bookmarkedAt = lastUpdateTime")
+            db.execSQL("UPDATE playlist SET isEditable = 1 WHERE browseId IS NOT NULL")
+        }
+    }
+
+val MIGRATION_19_20 =
+    object : Migration(19, 20) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Schema 19 SQL omits song.explicit even though its metadata and post-migration hook require it.
+            ensureBooleanColumn(db, "song", "explicit", defaultValue = "0")
+            ensureColumn(db, "song", "artistName", "TEXT")
+            ensureBooleanColumn(db, "album", "explicit", defaultValue = "0")
+            db.execSQL("UPDATE song SET explicit = 0 WHERE explicit IS NULL")
+        }
+    }
 
 val MIGRATION_39_40 =
     object : Migration(39, 40) {
@@ -410,68 +601,18 @@ val MIGRATION_1_2 =
 val MIGRATION_21_24 =
     object : Migration(21, 24) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            // Combine all changes from 21→22→23→24
-            
-            // From 21→22: Add columns
-            try {
-                db.execSQL("ALTER TABLE song ADD COLUMN libraryAddToken TEXT DEFAULT ''")
-            } catch (e: Exception) {
-                Timber.tag("Migration").w("Column libraryAddToken may already exist")
-            }
-            try {
-                db.execSQL("ALTER TABLE song ADD COLUMN libraryRemoveToken TEXT DEFAULT ''")
-            } catch (e: Exception) {
-                Timber.tag("Migration").w("Column libraryRemoveToken may already exist")
-            }
-            try {
-                db.execSQL("ALTER TABLE song ADD COLUMN romanizeLyrics INTEGER NOT NULL DEFAULT 1")
-            } catch (e: Exception) {
-                Timber.tag("Migration").w("Column romanizeLyrics may already exist")
-            }
-            try {
-                db.execSQL("ALTER TABLE song ADD COLUMN isDownloaded INTEGER NOT NULL DEFAULT 0")
-            } catch (e: Exception) {
-                Timber.tag("Migration").w("Column isDownloaded may already exist")
-            }
-
-            // From 23→24: Add isUploaded
-            var hasIsUploaded = false
-            db.query("PRAGMA table_info('song')").use { cursor ->
-                val nameIndex = cursor.getColumnIndex("name")
-                while (cursor.moveToNext()) {
-                    val colName = if (nameIndex >= 0) cursor.getString(nameIndex) else null
-                    if (colName == "isUploaded") {
-                        hasIsUploaded = true
-                        break
-                    }
-                }
-            }
-            
-            if (!hasIsUploaded) {
-                db.execSQL("ALTER TABLE `song` ADD COLUMN `isUploaded` INTEGER NOT NULL DEFAULT 0")
-            }
+            ensurePlaylistThumbnailUrlColumn(db)
+            ensureSongColumnsFrom21To24(db)
+            ensureAlbumIsUploadedColumn(db)
         }
     }
 
 val MIGRATION_22_24 =
     object : Migration(22, 24) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            // From 23→24: Add isUploaded
-            var hasIsUploaded = false
-            db.query("PRAGMA table_info('song')").use { cursor ->
-                val nameIndex = cursor.getColumnIndex("name")
-                while (cursor.moveToNext()) {
-                    val colName = if (nameIndex >= 0) cursor.getString(nameIndex) else null
-                    if (colName == "isUploaded") {
-                        hasIsUploaded = true
-                        break
-                    }
-                }
-            }
-            
-            if (!hasIsUploaded) {
-                db.execSQL("ALTER TABLE `song` ADD COLUMN `isUploaded` INTEGER NOT NULL DEFAULT 0")
-            }
+            ensurePlaylistThumbnailUrlColumn(db)
+            ensureSongColumnsFrom21To24(db)
+            ensureAlbumIsUploadedColumn(db)
         }
     }
 
@@ -580,26 +721,7 @@ class Migration13To14 : AutoMigrationSpec {
     }
 }
 
-@DeleteColumn.Entries(
-    DeleteColumn(tableName = "song", columnName = "isLocal"),
-    DeleteColumn(tableName = "song", columnName = "localPath"),
-    DeleteColumn(tableName = "artist", columnName = "isLocal"),
-    DeleteColumn(tableName = "playlist", columnName = "isLocal"),
-)
-class Migration16To17 : AutoMigrationSpec {
-    override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        db.execSQL("UPDATE playlist SET bookmarkedAt = lastUpdateTime")
-        db.execSQL("UPDATE playlist SET isEditable = 1 WHERE browseId IS NOT NULL")
-    }
-}
-
 class Migration18To19 : AutoMigrationSpec {
-    override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        db.execSQL("UPDATE song SET explicit = 0 WHERE explicit IS NULL")
-    }
-}
-
-class Migration19To20 : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.execSQL("UPDATE song SET explicit = 0 WHERE explicit IS NULL")
     }
@@ -646,21 +768,7 @@ class Migration22To23 : AutoMigrationSpec {
 
 class Migration23To24: AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        var hasIsUploaded = false
-        db.query("PRAGMA table_info('song')").use { cursor ->
-            val nameIndex = cursor.getColumnIndex("name")
-            while (cursor.moveToNext()) {
-                val colName = if (nameIndex >= 0) cursor.getString(nameIndex) else null
-                if (colName == "isUploaded") {
-                    hasIsUploaded = true
-                    break
-                }
-            }
-        }
-
-        if (!hasIsUploaded) {
-            db.execSQL("ALTER TABLE `song` ADD COLUMN `isUploaded` INTEGER NOT NULL DEFAULT 0")
-        }
+        ensureAlbumIsUploadedColumn(db)
     }
 }
 

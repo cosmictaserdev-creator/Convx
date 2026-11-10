@@ -31,6 +31,13 @@ See the repository LICENSE for the license text.
 Official music video matching is adapted from Square
 (https://github.com/Lelonio/Square), licensed under GPL-3.0.
 
+## Network storage
+
+SMB transport retry behavior in network-storage is adapted from BitChord
+(https://github.com/kushagrasinghx/BitChord), Copyright its contributors,
+licensed under GPL-3.0. See LICENSE. Convx retains separate saved-server
+sessions and adds connection ownership checks for concurrent readers.
+
 ## Base project
 
 Convx was originally built on an open-source GPL-3.0 music player and has since diverged

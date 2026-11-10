@@ -169,7 +169,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
-import com.convx.music.core.isBluetoothHeadphoneConnected
+import com.convx.music.core.rememberHeadphoneConnected
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Speaker
@@ -259,8 +259,7 @@ private fun NewMiniPlayer(
     }
     val isCasting by castHandler?.isCasting?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-    val isBluetoothConnected = isBluetoothHeadphoneConnected(context)
+    val isBluetoothConnected by rememberHeadphoneConnected()
     var showAudioDeviceBottomSheet by remember { mutableStateOf(false) }
     var showRoutePopover by remember { mutableStateOf(false) }
 
@@ -269,7 +268,7 @@ private fun NewMiniPlayer(
     
     // Disable swipe for Listen Together guests
     val listenTogetherManager = LocalListenTogetherManager.current
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val swipeThumbnail = swipeThumbnailPref && !isListenTogetherGuest
 
     val layoutDirection = LocalLayoutDirection.current
@@ -568,7 +567,7 @@ private fun NewMiniPlayerPlayButton(
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val castIsPlaying by castHandler?.castIsPlaying?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
     val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
 
     
@@ -785,7 +784,7 @@ private fun LegacyMiniPlayer(
     
     // Disable swipe for Listen Together guests
     val listenTogetherManager = LocalListenTogetherManager.current
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val swipeThumbnail = swipeThumbnailPref && !isListenTogetherGuest
 
     val layoutDirection = LocalLayoutDirection.current
@@ -952,7 +951,7 @@ private fun LegacyPlayPauseButton(
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val castIsPlaying by castHandler?.castIsPlaying?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
     val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
-    val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+    val isListenTogetherGuest = listenTogetherManager?.let { it.isGuest } ?: false
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
 
 

@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.convx.music.LocalPlayerAwareWindowInsets
@@ -46,7 +46,7 @@ import com.convx.music.ui.component.ScreenPage
 @Composable
 fun ChannelPickerScreen(navController: NavController) {
     val context = LocalContext.current
-    val accountSettingsViewModel: AccountSettingsViewModel = hiltViewModel()
+    val accountSettingsViewModel: AccountSettingsViewModel = koinViewModel()
     val channels = PendingChannelLogin.channels
 
     ScreenPage(

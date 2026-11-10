@@ -9,13 +9,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.db.MusicDatabase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 
-@HiltViewModel
-class ArtistAlbumsViewModel @Inject constructor(
+class ArtistAlbumsViewModel(
     database: MusicDatabase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

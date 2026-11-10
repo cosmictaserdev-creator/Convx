@@ -631,6 +631,9 @@ val TranslateLanguageKey = stringPreferencesKey("translateLanguage")
 val DeeplApiKey = stringPreferencesKey("deeplApiKey")
 val DeeplFormalityKey = stringPreferencesKey("deeplFormality")
 val LyricsGlowEffectKey = booleanPreferencesKey("lyricsGlowEffect")
+val FlamingoBrightSingingWordsKey = booleanPreferencesKey("flamingoBrightSingingWords")
+val FlamingoWordSwellKey = booleanPreferencesKey("flamingoWordSwell")
+val FlamingoGlowColorKey = intPreferencesKey("flamingoGlowColor")
 val AppleMusicLyricsBlurKey = booleanPreferencesKey("appleMusicLyricsBlur")
 val LyricsStandardBlurKey = booleanPreferencesKey("lyricsStandardBlur")
 
@@ -686,6 +689,7 @@ val DjReverbTypeKey = stringPreferencesKey("djReverbType")
 val DjDelayTypeKey = stringPreferencesKey("djDelayType")
 val StemQualityKey = stringPreferencesKey("stemQuality")
 val DemucsModelUrlKey = stringPreferencesKey("demucsModelUrl")
+val DemucsAutoDownloadKey = booleanPreferencesKey("demucsAutoDownload")
 /** Opens or closes fullscreen lyrics with one tap. Off keeps the two-tap flow. */
 val OneTapFullscreenLyricsKey = booleanPreferencesKey("oneTapFullscreenLyrics")
 /** Controls collapse toward the top by default; false collapses them toward the bottom. */
@@ -796,6 +800,9 @@ enum class LyricsAnimationStyle {
      * the depth-of-field falloff and duet (left/right) alignment all need.
      */
     ARCHIVE_TUNE,
+
+    /** Lines on a tilted plane that recedes into a starfield, like an opening crawl. */
+    STAR_CRAWL,
 }
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
@@ -810,6 +817,42 @@ val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")
 val CanvasThumbnailAnimationKey = booleanPreferencesKey("canvasThumbnailAnimation")
 val CanvasSourceKey = stringPreferencesKey("canvasSource")
+
+// Ambient Mode settings are separate from the main player canvas preferences.
+val AmbientVideoCanvasEnabledKey = booleanPreferencesKey("ambientVideoCanvasEnabled")
+val AmbientCanvasSourceKey = stringPreferencesKey("ambientCanvasSource")
+val AmbientVideoCanvasBlurKey = floatPreferencesKey("ambientVideoCanvasBlur")
+val AmbientVideoCanvasDimKey = floatPreferencesKey("ambientVideoCanvasDim")
+val AmbientProgressRingEnabledKey = booleanPreferencesKey("ambientProgressRingEnabled")
+val AmbientPlaybackFeedbackEnabledKey = booleanPreferencesKey("ambientPlaybackFeedbackEnabled")
+val AmbientSeekTimeEnabledKey = booleanPreferencesKey("ambientSeekTimeEnabled")
+val AmbientSeekHapticsEnabledKey = booleanPreferencesKey("ambientSeekHapticsEnabled")
+val AmbientTrackInfoEnabledKey = booleanPreferencesKey("ambientTrackInfoEnabled")
+val AmbientLyricsTextSizeKey = floatPreferencesKey("ambientLyricsTextSize")
+val AmbientTapToPlayPauseEnabledKey = booleanPreferencesKey("ambientTapToPlayPauseEnabled")
+val AmbientSwipeNavigationEnabledKey = booleanPreferencesKey("ambientSwipeNavigationEnabled")
+val AmbientTrackTransitionsEnabledKey = booleanPreferencesKey("ambientTrackTransitionsEnabled")
+val AmbientAutoHideBackButtonEnabledKey = booleanPreferencesKey("ambientAutoHideBackButtonEnabled")
+val AmbientCanvasSideFitEnabledKey = booleanPreferencesKey("ambientCanvasSideFitEnabled")
+val AmbientCanvasAnchorSideKey = stringPreferencesKey("ambientCanvasAnchorSide")
+val AmbientCanvasFitModeKey = stringPreferencesKey("ambientCanvasFitMode")
+val AmbientCanvasSideWidthKey = floatPreferencesKey("ambientCanvasSideWidth")
+val AmbientCanvasSideGradientKey = floatPreferencesKey("ambientCanvasSideGradient")
+val AmbientCanvasGradientSpreadKey = floatPreferencesKey("ambientCanvasGradientSpread")
+val AmbientCanvasFarVeilKey = floatPreferencesKey("ambientCanvasFarVeil")
+val AmbientCanvasEdgeFeatherKey = floatPreferencesKey("ambientCanvasEdgeFeather")
+
+enum class AmbientCanvasAnchorSide {
+    AUTO,
+    LEFT,
+    RIGHT,
+}
+
+enum class AmbientCanvasFitMode {
+    FIT,
+    ZOOM,
+    STRETCH,
+}
 
 enum class CanvasSource {
     AUTO,

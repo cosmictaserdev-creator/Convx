@@ -66,7 +66,7 @@ import com.convx.music.ui.utils.listOverscroll
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.activity.compose.LocalActivity
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
 import com.music.innertube.utils.parseCookieString
@@ -133,7 +133,7 @@ import kotlinx.coroutines.flow.collect
 @Composable
 fun HistoryScreen(
     navController: NavController,
-    viewModel: HistoryViewModel = hiltViewModel(LocalActivity.current as ViewModelStoreOwner),
+    viewModel: HistoryViewModel = koinViewModel(viewModelStoreOwner = LocalActivity.current as ViewModelStoreOwner),
 ) {
     val context = LocalContext.current
     val menuState = LocalMenuState.current

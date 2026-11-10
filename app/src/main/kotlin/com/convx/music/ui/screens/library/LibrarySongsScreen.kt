@@ -58,7 +58,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.convx.music.LocalPlayerAwareWindowInsets
@@ -106,7 +106,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun LibrarySongsScreen(
     navController: NavController,
     onDeselect: () -> Unit,
-    viewModel: LibrarySongsViewModel = hiltViewModel(),
+    viewModel: LibrarySongsViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val menuState = LocalMenuState.current

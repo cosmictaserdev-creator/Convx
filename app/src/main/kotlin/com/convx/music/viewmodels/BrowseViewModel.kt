@@ -11,17 +11,14 @@ import androidx.lifecycle.viewModelScope
 import com.music.innertube.YouTube
 import com.music.innertube.models.YTItem
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-@HiltViewModel
-class BrowseViewModel @Inject constructor(
+class BrowseViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val browseId: String? = savedStateHandle.get<String>("browseId")

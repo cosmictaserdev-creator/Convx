@@ -5,13 +5,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.ai.AiChatClient
+import com.convx.music.ai.AiDefaults
 import com.convx.music.constants.AiProviderKey
 import com.convx.music.constants.OpenRouterApiKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 data class SongInsightState(
     val title: String = "",
@@ -34,9 +32,8 @@ data class SongInsightState(
     val summary: String? = null,
 )
 
-@HiltViewModel
-class SongInsightViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class SongInsightViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -61,7 +58,8 @@ class SongInsightViewModel @Inject constructor(
 
     fun refreshConfiguration() {
         viewModelScope.launch(Dispatchers.IO) {
-            val configured = context.dataStore.get(AiProviderKey, "OpenRouter") != "Puter" &&
+            val provider = context.dataStore.get(AiProviderKey, AiDefaults.PROVIDER)
+            val configured = provider != "Puter" && provider !in AiDefaults.TRANSLATION_ONLY &&
                 context.dataStore.get(OpenRouterApiKey, "").isNotBlank()
             _state.update { it.copy(configured = configured) }
         }

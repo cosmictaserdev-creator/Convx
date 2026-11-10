@@ -20,11 +20,9 @@ import com.music.innertube.SearchFilter
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
 import com.music.spotify.SpotifyMapper
+import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
-import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -87,10 +85,10 @@ data class AppleMusicImportState(
     val error: Int? = null,
 )
 
-@HiltViewModel
-class AppleMusicImportViewModel @Inject constructor(
+class AppleMusicImportViewModel(
     private val database: MusicDatabase,
-    @ApplicationContext private val context: Context,
+    private val syncUtils: SyncUtils,
+    private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(AppleMusicImportState())
     val state = mutableState.asStateFlow()
@@ -116,7 +114,7 @@ class AppleMusicImportViewModel @Inject constructor(
 
     fun load() {
         if (state.value.busy) return
-        val link = ApplePlaylistLink.parse(state.value.url)
+        val link = ApplePlaylistLink.parse(state.value.url, defaultStorefront = AppleMusicCatalog.storefront)
         if (link == null) {
             mutableState.update { it.copy(error = R.string.apple_music_invalid_link) }
             return
@@ -238,6 +236,7 @@ class AppleMusicImportViewModel @Inject constructor(
                         insert(PlaylistSongMap(playlistId = playlist.id, songId = song.id, position = index))
                     }
                 }
+                syncUtils.uploadPlaylistInBackground(playlist.id, songs.map { it.id })
                 withContext(Dispatchers.Main) {
                     mutableState.update { it.copy(visible = false, choosingDestination = false, busy = false, creatingPlaylist = false, ready = false, error = null) }
                     onCreated(playlist.id)

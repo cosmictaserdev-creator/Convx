@@ -207,7 +207,7 @@ object LyricsTranslationHelper {
         mode: String,
         scope: CoroutineScope,
         context: Context,
-        provider: String = "OpenRouter",
+        provider: String = com.convx.music.ai.AiDefaults.PROVIDER,
         deeplApiKey: String = "",
         deeplFormality: String = "default",
         useStreaming: Boolean = true,

@@ -49,7 +49,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import com.composables.sfsymbols.SfSymbols
 import androidx.compose.ui.res.painterResource
@@ -108,7 +108,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun ArtistItemsScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: ArtistItemsViewModel = hiltViewModel(),
+    viewModel: ArtistItemsViewModel = koinViewModel(),
 ) {
     val menuState = LocalMenuState.current
     val haptic = LocalHapticFeedback.current

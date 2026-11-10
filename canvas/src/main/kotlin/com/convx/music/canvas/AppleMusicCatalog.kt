@@ -39,44 +39,6 @@ import java.util.Base64
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
-/** One Apple Music image plus the colours Apple's servers computed for it (0xRRGGBB, null when absent). */
-@Serializable
-data class AppleArtwork(
-    val url: String,
-    val width: Int = 0,
-    val height: Int = 0,
-    val bgColor: Int? = null,
-    val textColor1: Int? = null,
-    val textColor2: Int? = null,
-    val textColor3: Int? = null,
-    val textColor4: Int? = null,
-) {
-    /**
-     * Concrete URL for a [px]-wide request. Apple scales server-side, capped at the source size.
-     * [png] keeps transparency (logos): the templates hard-code a `bb.jpg` suffix.
-     */
-    fun sized(px: Int, png: Boolean = false): String {
-        val w = if (width > 0) minOf(px, width) else px
-        val h = if (width > 0 && height > 0) w * height / width else w
-        val concrete = url.replace("{w}", w.toString()).replace("{h}", h.toString()).replace("{f}", if (png) "png" else "jpg")
-        return if (png) concrete.replace(Regex("""\.jpg$"""), ".png") else concrete
-    }
-}
-
-@Serializable
-data class AppleArtist(
-    val id: String,
-    val name: String,
-    /** What iOS shows as the artist hero: motion preview frame > vipSquare > profile artwork. */
-    val hero: AppleArtwork?,
-    /** Artist's uploaded wordmark, white variant preferred. Transparent PNG. */
-    val logo: AppleArtwork?,
-    /** Artist's chosen button colour (info/play/favourite); null means white. */
-    val keyColor: Int?,
-    /** Square motion artwork (HLS) that plays in the hero, when the artist has one. */
-    val motionVideoUrl: String?,
-)
-
 /** Looks up Apple artwork and colors by title and artist, with cached results and bounded concurrency. */
 object AppleMusicCatalog {
     private const val AMP = "https://amp-api.music.apple.com"
@@ -238,31 +200,11 @@ object AppleMusicCatalog {
     }
 
     /** Returns Apple's artist button color when a `keyColor` field is present. */
-    internal fun findKeyColor(element: JsonElement?): Int? = when (element) {
-        is JsonObject -> element["keyColor"]?.let { runCatching { it.jsonPrimitive.contentOrNull }.getOrNull() }
-            ?.let(::hexColor)
-            ?: element.values.firstNotNullOfOrNull(::findKeyColor)
-        is JsonArray -> element.firstNotNullOfOrNull(::findKeyColor)
-        else -> null
-    }
+    internal fun findKeyColor(element: JsonElement?): Int? = AppleMusicDataMapper.findKeyColor(element)
 
-    internal fun artwork(element: JsonElement): AppleArtwork? {
-        val o = element as? JsonObject ?: return null
-        val url = o["url"]?.jsonPrimitive?.contentOrNull ?: return null
-        return AppleArtwork(
-            url = url,
-            width = o["width"]?.jsonPrimitive?.intOrNull ?: 0,
-            height = o["height"]?.jsonPrimitive?.intOrNull ?: 0,
-            bgColor = o.str("bgColor").let(::hexColor),
-            textColor1 = o.str("textColor1").let(::hexColor),
-            textColor2 = o.str("textColor2").let(::hexColor),
-            textColor3 = o.str("textColor3").let(::hexColor),
-            textColor4 = o.str("textColor4").let(::hexColor),
-        )
-    }
+    internal fun artwork(element: JsonElement): AppleArtwork? = AppleMusicDataMapper.artwork(element)
 
-    internal fun hexColor(s: String?): Int? =
-        s?.removePrefix("#")?.takeIf { it.length == 6 }?.toIntOrNull(16)
+    internal fun hexColor(s: String?): Int? = AppleMusicDataMapper.hexColor(s)
 
     private suspend fun search(term: String, type: String, priority: Boolean = false): List<JsonObject>? {
         val root = request(

@@ -97,7 +97,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastSumBy
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.LocalPlayerConnection
@@ -170,7 +170,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun AutoPlaylistScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: AutoPlaylistViewModel = hiltViewModel(),
+    viewModel: AutoPlaylistViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val menuState = LocalMenuState.current
