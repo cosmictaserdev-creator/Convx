@@ -168,7 +168,7 @@ fun AppleMiniPlayer(
             .padding(horizontal = 12.dp)
             .let { baseModifier ->
                 if (swipeThumbnail) {
-                    baseModifier.pointerInput(Unit) {
+                    baseModifier.pointerInput(autoSwipeThreshold) {
                         detectHorizontalDragGestures(
                             onDragStart = {
                                 dragStartTime = System.currentTimeMillis()
