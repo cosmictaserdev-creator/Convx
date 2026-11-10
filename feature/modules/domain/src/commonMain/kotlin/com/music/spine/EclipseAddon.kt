@@ -72,7 +72,7 @@ object EclipseAddon {
                 ?: hints.firstNotNullOfOrNull { hint -> options.firstOrNull { it.contains(hint, true) } }
                 ?: options.firstOrNull() ?: quality
         }
-        if (settings["dolbyAtmos"] == "true") result.putIfAbsent("atmos", "auto")
+        if (settings["dolbyAtmos"] == "true" && "atmos" !in result) result["atmos"] = "auto"
         return result
     }
 
