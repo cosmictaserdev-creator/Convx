@@ -102,3 +102,6 @@ project(":design-system").projectDir = file("core/design-system")
 
 include(":playback-data")
 project(":playback-data").projectDir = file("feature/playback/data")
+
+include(":spotify-data")
+project(":spotify-data").projectDir = file("feature/spotify/data")

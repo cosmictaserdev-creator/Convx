@@ -36,6 +36,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
         }
+        val skiaMain by creating { dependsOn(commonMain.get()) }
+        getByName("desktopMain").dependsOn(skiaMain)
+        getByName("iosMain").dependsOn(skiaMain)
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)

@@ -1139,3 +1139,7 @@ val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
 val ReleaseRadarEnabledKey = booleanPreferencesKey("releaseRadarEnabled")
 val OnboardingCompleteKey = booleanPreferencesKey("onboardingComplete")
 val PlayerInlineLyricsKey = booleanPreferencesKey("playerInlineLyrics")
+
+val FisheyeZoomKey = floatPreferencesKey("fisheyeZoom")
+val FisheyeRadiusKey = floatPreferencesKey("fisheyeRadius")
+val FisheyeTextSizeKey = floatPreferencesKey("fisheyeTextSize")
