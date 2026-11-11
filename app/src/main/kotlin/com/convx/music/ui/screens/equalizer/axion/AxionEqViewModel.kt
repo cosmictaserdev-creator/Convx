@@ -11,8 +11,6 @@ import com.convx.music.eq.data.ParametricEQBand
 import com.convx.music.eq.data.SavedEQProfile
 import com.convx.music.eq.data.EQProfileImport
 import com.tencent.mmkv.MMKV
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,11 +22,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Inject
 
-@HiltViewModel
-class AxionEqViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class AxionEqViewModel(
+    private val context: Context,
     private val equalizerService: EqualizerService,
     private val eqProfileRepository: EQProfileRepository,
 ) : ViewModel() {

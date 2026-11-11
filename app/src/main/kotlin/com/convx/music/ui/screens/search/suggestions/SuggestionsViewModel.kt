@@ -16,19 +16,16 @@ import com.music.innertube.models.AlbumItem
 import com.music.innertube.models.ArtistItem
 import com.music.innertube.models.SongItem
 import com.music.innertube.models.WatchEndpoint
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import timber.log.Timber
 import java.util.Locale
 
-@HiltViewModel
-class SuggestionsViewModel @Inject constructor() : ViewModel() {
+class SuggestionsViewModel : ViewModel() {
     private var currentLoadedRegion: String? = null
     
     private val _suggestionTracks = MutableStateFlow<List<SuggestionTrack>?>(null)

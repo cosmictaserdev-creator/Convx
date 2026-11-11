@@ -28,8 +28,8 @@ class ScreensInitializationTest {
             val base = Class.forName(baseName, true, isolated)
             val companion = base.getField("Companion").get(null)
             val mainScreens = companion.javaClass.getMethod("getMainScreens").invoke(companion) as List<*>
-            assertEquals(listOf("home", "search_input", "library"), mainScreens.map { base.getMethod("getRoute").invoke(it) })
-            assertEquals(setOf("home", "search_input", "library", "songs"), companion.javaClass.getMethod("getMainRoutes").invoke(companion))
+            assertEquals(listOf("home", "search_input", "radio", "library"), mainScreens.map { base.getMethod("getRoute").invoke(it) })
+            assertEquals(setOf("home", "search_input", "radio", "library", "songs"), companion.javaClass.getMethod("getMainRoutes").invoke(companion))
         }
     }
 
@@ -39,11 +39,11 @@ class ScreensInitializationTest {
         // Eager companion collections capture Home.INSTANCE before assignment.
         assertEquals("home", Screens.Home.route)
         assertEquals(
-            listOf("home", "search_input", "library"),
+            listOf("home", "search_input", "radio", "library"),
             Screens.MainScreens.map { it.route },
         )
         assertEquals(
-            setOf("home", "search_input", "library", "songs"),
+            setOf("home", "search_input", "radio", "library", "songs"),
             Screens.MainRoutes,
         )
         assertEquals(

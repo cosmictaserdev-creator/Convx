@@ -1,0 +1,5 @@
+package = com.convx.music.client.ios.keychaincompat
+language = Objective-C
+headers = KeychainCompat.h
+compilerOpts = -framework CoreFoundation -framework Foundation -framework Security
+linkerOpts = -framework CoreFoundation -framework Foundation -framework Security

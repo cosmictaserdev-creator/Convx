@@ -1,0 +1,105 @@
+name: KMP client validation
+
+on:
+  pull_request:
+    paths:
+      - 'clients/kmp/**'
+      - 'core/**'
+      - 'feature/**'
+      - 'spine/**'
+      - 'shared/**'
+      - 'androidHost/**'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsSyncLevel.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsEntry.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricTimeline.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/TimedLyricsParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LrcParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricLine.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricGaps.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/SyllableRuns.kt'
+      - 'lyrics/src/test/**'
+      - 'app/src/main/kotlin/com/convx/music/playback/ShuffleOrderPolicy.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackSnapshot.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackController.kt'
+      - 'app/src/test/kotlin/com/convx/music/playback/ShuffleOrderPolicyTest.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/ApplePlaylistLink.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicPlaylistMapper.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/CanvasArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtist.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicDataMapper.kt'
+      - 'gradle/libs.versions.toml'
+      - 'gradle/wrapper/**'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - '.github/workflows/kmp-toolchain-proof.yml'
+  push:
+    branches: ['**']
+    paths:
+      - 'clients/kmp/**'
+      - 'core/**'
+      - 'feature/**'
+      - 'spine/**'
+      - 'shared/**'
+      - 'androidHost/**'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsSyncLevel.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricsEntry.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/LyricTimeline.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/TimedLyricsParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LrcParser.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricLine.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/LyricGaps.kt'
+      - 'lyrics/src/main/kotlin/com/convx/music/lyrics/bitchord/SyllableRuns.kt'
+      - 'lyrics/src/test/**'
+      - 'app/src/main/kotlin/com/convx/music/playback/ShuffleOrderPolicy.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackSnapshot.kt'
+      - 'app/src/main/kotlin/com/convx/music/playback/PlaybackController.kt'
+      - 'app/src/test/kotlin/com/convx/music/playback/ShuffleOrderPolicyTest.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/ApplePlaylistLink.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicPlaylistMapper.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/CanvasArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtwork.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleArtist.kt'
+      - 'canvas/src/main/kotlin/com/convx/music/canvas/AppleMusicDataMapper.kt'
+      - 'gradle/libs.versions.toml'
+      - 'gradle/wrapper/**'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - '.github/workflows/kmp-toolchain-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kmp-toolchain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  common-tests:
+    name: Common tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+      - run: ./gradlew -p clients/kmp :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest :modules-core:desktopTest :modules-runtime:desktopTest :modules-presentation:compileKotlinDesktop :lyrics-core:desktopTest :canvas-core:desktopTest :playback-core:desktopTest :playback-data:desktopTest :playback-presentation:desktopTest :history-core:desktopTest :library-core:desktopTest :library-data:desktopTest :search-core:desktopTest :catalog-core:desktopTest :account-core:desktopTest :account-presentation:desktopTest :catalog-presentation:desktopTest :design-system:desktopTest :listen-together-core:desktopTest :innertube:desktopTest :shared:desktopTest --no-configuration-cache --console=plain
+
+  android-linkage:
+    name: Android shared screen linkage
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+      - run: ./gradlew -p clients/kmp :androidHost:assembleDebug --no-configuration-cache --console=plain

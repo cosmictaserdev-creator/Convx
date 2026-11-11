@@ -53,13 +53,13 @@ import com.convx.music.utils.rememberPreference
 import com.convx.music.viewmodels.HomeViewModel
 import kotlinx.coroutines.flow.map
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingDialoge(
     onDismissRequest: () -> Unit,
     onNavigate: (String) -> Unit,
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = koinViewModel(),
 ) {
     val uriHandler = LocalUriHandler.current
     val (innerTubeCookie, _) = rememberPreference(InnerTubeCookieKey, "")

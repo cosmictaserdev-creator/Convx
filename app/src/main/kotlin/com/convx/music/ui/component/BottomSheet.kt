@@ -46,6 +46,11 @@ import com.convx.music.ui.player.PlayerMorph
 import com.convx.music.ui.player.SCREEN_CORNER_EXPANSION_MILLIS
 import com.convx.music.ui.player.recordPlayerLayer
 import com.convx.music.ui.player.sharedContainerCornerRadius
+import com.convx.music.playback.presentation.PLAYER_MORPH_CONTENT_APPEAR_END
+import com.convx.music.playback.presentation.PLAYER_MORPH_CONTENT_APPEAR_START
+import com.convx.music.playback.presentation.PLAYER_MORPH_LAYER_HANDOFF_PROGRESS
+import com.convx.music.playback.presentation.PLAYER_MORPH_MINI_FADE_END
+import com.convx.music.designsystem.MotionTokens
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.pointerInput
@@ -64,28 +69,28 @@ import kotlinx.coroutines.launch
 import kotlin.math.pow
 
 /** Progress where the mini and full-player layers hand off during the morph. */
-internal const val PLAYER_LAYER_HANDOFF_PROGRESS = 0.2f
+internal const val PLAYER_LAYER_HANDOFF_PROGRESS = PLAYER_MORPH_LAYER_HANDOFF_PROGRESS
 
 /** Progress where mini-player content is fully faded out. */
-internal const val PLAYER_MINI_FADE_END = 0.3f
+internal const val PLAYER_MINI_FADE_END = PLAYER_MORPH_MINI_FADE_END
 
 /** Progress where full-player content starts appearing. */
-internal const val PLAYER_CONTENT_APPEAR_START = 0.1f
+internal const val PLAYER_CONTENT_APPEAR_START = PLAYER_MORPH_CONTENT_APPEAR_START
 
 /** Progress where full-player content is fully visible. */
-internal const val PLAYER_CONTENT_APPEAR_END = 0.6f
+internal const val PLAYER_CONTENT_APPEAR_END = PLAYER_MORPH_CONTENT_APPEAR_END
 
 /** Q3 lock: backdrop sampling stays frozen through the morph, going live here so
  *  the first capture after the glass fades in is warm, not a stale frame. */
 internal const val PLAYER_GLASS_UNFREEZE_PROGRESS = 0.75f
 
 /** Spring stiffness for opening and closing the player sheet. */
-private const val PlayerSheetStiffness = 360f
+private const val PlayerSheetStiffness = MotionTokens.PlayerSheetStiffness
 
 private const val BackdropFreezeSafetyNs = 900_000_000L
 
 /** Close spring damping when the sheet lands into the mini pill with speed. */
-private const val COLLAPSE_LANDING_DAMPING = 0.72f
+private const val COLLAPSE_LANDING_DAMPING = MotionTokens.PlayerSheetLandingDamping
 
 /** How far (of the collapse travel) a full predictive-back swipe previews. */
 private const val PREDICTIVE_BACK_TRAVEL = 0.35f

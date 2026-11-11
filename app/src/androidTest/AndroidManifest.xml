@@ -4,4 +4,8 @@
         android:name="com.convx.music.network.NetworkSecurityInstrumentation"
         android:targetPackage="com.convx.music.debug"
         android:label="Network security regression checks" />
+    <instrumentation
+        android:name="com.convx.music.db.RoomMigrationTestRunner"
+        android:targetPackage="com.convx.music.debug"
+        android:label="Room migration tests" />
 </manifest>

@@ -251,7 +251,9 @@ export class Room {
     // Unauthenticated verbs
     switch (msg.type) {
       case C2S.PING:
-        return this.send(ws, S2C.PONG);
+        // The clock lets a client measure its offset before any playback message
+        // arrives, so a guest joining a playing room lands where the room is.
+        return this.send(ws, S2C.PONG, { server_time: Date.now() });
       case C2S.CREATE_ROOM:
         return this.handleCreate(ws, p.username);
       case C2S.JOIN_ROOM:

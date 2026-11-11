@@ -35,12 +35,11 @@ object PlayerLayoutRegistry {
     fun deserializeOrder(orderString: String): List<PlayerSlot> {
         if (orderString.isBlank()) return getDefaultOrder()
         val parsed = orderString.split(",").mapNotNull { name ->
-            runCatching { PlayerSlot.valueOf(name.trim()) }.getOrNull()
+            com.convx.music.playback.PlayerSection.entries.find { it.name == name.trim() }
         }
         // Any slot missing from a stale/corrupt string still needs to render
         // somewhere — append it rather than silently dropping it.
-        val missing = PlayerSlot.entries.filter { it !in parsed }
-        return parsed + missing
+        return com.convx.music.playback.PlayerCustomization(order = parsed).normalized().order.map { PlayerSlot.valueOf(it.name) }
     }
 
     fun serializeOrder(slots: List<PlayerSlot>): String = slots.joinToString(",") { it.name }

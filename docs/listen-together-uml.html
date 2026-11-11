@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Listen Together UML</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: sticky section rail on the left (top strip on phones), one content column of cards; diagrams fit their card and open full screen to zoom. */
+  :root {
+    --bg: #eef1f4;
+    --panel: #ffffff;
+    --panel-2: #f6f8fa;
+    --ink: #15202b;
+    --ink-2: #3a4754;
+    --muted: #63707d;
+    --rule: #dde3e8;
+    --convx: #17708f;
+    --convx-soft: #e4f1f6;
+    --jam: #a65c0e;
+    --jam-soft: #f8ecdf;
+    --node: #f1f7fa;
+    --node-line: #9ebdcb;
+    --node-2: #e4f1f6;
+    --edge: #7d8c99;
+    --note: #fff7e0;
+    --note-line: #e2c47e;
+    --jam-node: #fbf2e8;
+    --jam-node-line: #d8ab78;
+    --shadow: 0 1px 2px rgba(21, 32, 43, .05), 0 4px 16px rgba(21, 32, 43, .05);
+    --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1216; --panel: #141b21; --panel-2: #10161b; --ink: #e4eaef; --ink-2: #c3ccd4; --muted: #8e9ba7; --rule: #253039;
+      --convx: #5cb6d6; --convx-soft: #11303b; --jam: #e7a95f; --jam-soft: #3a2812;
+      --node: #172630; --node-line: #3f6576; --node-2: #1b3442; --edge: #7a8b98; --note: #2c2614; --note-line: #7a6431;
+      --jam-node: #2a2014; --jam-node-line: #8a6537;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
+  code { font: 12.5px/1.4 var(--font-mono); }
+  a { color: inherit; }
+
+  .shell { max-width: 1320px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 72px max(16px, env(safe-area-inset-left, 0px)); display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+
+  /* Rail */
+  .rail { position: sticky; top: 0; align-self: start; padding-top: 36px; display: grid; gap: 18px; }
+  .brand { font: 700 13px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .rail nav { display: grid; gap: 2px; }
+  .rail .group { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px 10px; }
+  .rail a { text-decoration: none; padding: 7px 10px; border-radius: 6px; font: 500 14px/1.2 var(--font-body); color: var(--ink-2); display: flex; align-items: center; gap: 9px; }
+  .rail a:hover, .rail a:focus-visible { background: var(--panel); color: var(--ink); outline: none; box-shadow: var(--shadow); }
+  .rail a.on { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--muted); }
+  .dot.convx { background: var(--convx); }
+  .dot.jam { background: var(--jam); }
+
+  main { min-width: 0; padding-top: 36px; display: grid; gap: 28px; }
+
+  /* Hero */
+  .hero { display: grid; gap: 14px; padding-bottom: 6px; }
+  h1 { margin: 0; font: 700 clamp(30px, 4.6vw, 46px)/1.02 var(--font-display); letter-spacing: -.015em; text-wrap: balance; }
+  .lede { margin: 0; max-width: 70ch; color: var(--ink-2); font-size: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 4px; }
+  .stat { background: var(--panel); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 2px; border-top: 3px solid var(--muted); }
+  .stat.convx { border-top-color: var(--convx); }
+  .stat.jam { border-top-color: var(--jam); }
+  .stat b { font: 700 24px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 13px; color: var(--muted); }
+
+  /* Sections */
+  section { display: grid; gap: 14px; scroll-margin-top: 20px; }
+  .sec-head { display: grid; gap: 6px; }
+  .eyebrow { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; display: flex; gap: 8px; align-items: center; }
+  .eyebrow.convx { color: var(--convx); }
+  .eyebrow.jam { color: var(--jam); }
+  .eyebrow.both { color: var(--muted); }
+  .eyebrow code { font-size: 11px; color: var(--muted); text-transform: none; letter-spacing: 0; }
+  h2 { margin: 0; font: 700 26px/1.12 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+  .sec-head p { margin: 0; max-width: 72ch; color: var(--ink-2); }
+
+  .card { background: var(--panel); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; }
+  .diagram { display: grid; }
+  .diagram header { display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; border-bottom: 1px solid var(--rule); }
+  .diagram h3 { margin: 0; font: 600 14px/1.3 var(--font-body); flex: 1; min-width: 0; }
+  .diagram h3 small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .btn { appearance: none; border: 1px solid var(--rule); background: var(--panel-2); color: var(--ink-2); font: 500 12.5px/1 var(--font-body); padding: 7px 11px; border-radius: 7px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
+  .btn:hover { color: var(--ink); border-color: var(--edge); }
+  .btn:focus-visible { outline: 2px solid var(--convx); outline-offset: 2px; }
+  .canvas { padding: 18px; overflow-x: auto; display: flex; justify-content: center; }
+  .canvas pre.mermaid { margin: 0; font: 12px/1.45 var(--font-mono); color: var(--muted); white-space: pre; width: 100%; }
+  .canvas pre.mermaid[data-processed] { white-space: normal; display: flex; justify-content: center; }
+  .canvas svg { height: auto; }
+
+  /* Facts */
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .fact { background: var(--panel); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 4px; }
+  .fact b { font: 600 13.5px/1.3 var(--font-body); }
+  .fact span { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+
+  /* Function maps */
+  .fmap { padding: 4px 0; }
+  .fmap summary { list-style: none; cursor: pointer; padding: 12px 18px; display: flex; align-items: center; gap: 10px; font: 600 14px/1.3 var(--font-body); }
+  .fmap summary::-webkit-details-marker { display: none; }
+  .fmap summary::before { content: ""; width: 7px; height: 7px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform .15s; flex: none; }
+  .fmap[open] summary::before { transform: rotate(45deg); }
+  .fmap summary code { color: var(--muted); font-weight: 400; }
+  .fmap summary .count { margin-left: auto; font: 500 12px/1 var(--font-mono); color: var(--muted); }
+  .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0; border-top: 1px solid var(--rule); }
+  .grp { padding: 14px 18px; border-bottom: 1px solid var(--rule); display: grid; gap: 8px; align-content: start; }
+  .grp h4 { margin: 0; font: 600 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { font: 12px/1 var(--font-mono); padding: 5px 7px; border-radius: 5px; background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink-2); }
+  .chip.pub { background: var(--convx-soft); border-color: transparent; color: var(--ink); }
+  .jam-scope .chip.pub { background: var(--jam-soft); }
+  .key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); align-items: center; }
+  .key .chip { font-size: 11px; }
+
+  /* Tables */
+  .table { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font: 600 11px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--panel-2); }
+  td.n { text-align: right; font: 12.5px/1.6 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+  td code { white-space: nowrap; }
+  td.side { white-space: nowrap; }
+  .pill { font: 600 10.5px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; border-radius: 4px; }
+  .pill.convx { background: var(--convx-soft); color: var(--convx); }
+  .pill.jam { background: var(--jam-soft); color: var(--jam); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+  .two > * { min-width: 0; }
+
+  /* Viewer */
+  dialog.viewer { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--panel); color: var(--ink); }
+  dialog.viewer::backdrop { background: rgba(0, 0, 0, .4); }
+  .viewer-bar { position: sticky; top: 0; display: flex; align-items: center; gap: 8px; padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--rule); background: var(--panel); z-index: 1; }
+  .viewer-bar strong { flex: 1; font: 600 14px/1.3 var(--font-body); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .viewer-bar .zoom { font: 500 12px/1 var(--font-mono); color: var(--muted); min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; }
+  .viewer-body { overflow: auto; height: calc(100% - 58px); padding: 24px; }
+  .viewer-body svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
+
+  @media (max-width: 960px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .rail { position: sticky; top: 0; z-index: 5; padding: env(safe-area-inset-top, 0px) 0 0; background: var(--bg); margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
+    .brand, .rail .group { display: none; }
+    .rail nav { display: flex; overflow-x: auto; gap: 4px; padding: 10px max(16px, env(safe-area-inset-left, 0px)); scrollbar-width: none; border-bottom: 1px solid var(--rule); }
+    .rail a { white-space: nowrap; }
+    main { padding-top: 24px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="rail">
+  <div class="brand">Convx · Listen Together</div>
+  <nav aria-label="Sections">
+    <a href="#overview"><i class="dot"></i>Overview</a>
+    <div class="group">Convx Sync</div>
+    <a href="#convx-client"><i class="dot convx"></i>Client</a>
+    <a href="#convx-server"><i class="dot convx"></i>Server</a>
+    <a href="#convx-protocol"><i class="dot convx"></i>Protocol</a>
+    <div class="group">Jam</div>
+    <a href="#jam-client"><i class="dot jam"></i>Client</a>
+    <a href="#jam-server"><i class="dot jam"></i>BitChord server</a>
+    <div class="group">Both</div>
+    <a href="#flows"><i class="dot"></i>Flows</a>
+    <a href="#files"><i class="dot"></i>Files</a>
+  </nav>
+</aside>
+
+<main>
+
+<header class="hero" id="top">
+  <h1>Listen Together UML</h1>
+  <p class="lede">Convx has two group-listening paths that share one player. <strong>Convx Sync</strong> rooms run on a Cloudflare Worker in <code>listen-together-server/</code>. <strong>Jam</strong> parties run on BitChord's Go server. This page maps the classes, functions and flows on both sides.</p>
+  <div class="stats">
+    <div class="stat convx"><b>4,716</b><span>lines · Convx client, 9 files</span></div>
+    <div class="stat convx"><b>1,099</b><span>lines · Convx server, 4 files</span></div>
+    <div class="stat jam"><b>1,289</b><span>lines · Jam client, 4 files</span></div>
+    <div class="stat jam"><b>2,534</b><span>lines · BitChord server, 5 files</span></div>
+  </div>
+</header>
+
+<!-- ============================================================ OVERVIEW -->
+<section id="overview">
+  <div class="sec-head">
+    <div class="eyebrow both">Architecture</div>
+    <h2>How the pieces connect</h2>
+    <p>Each path has a manager that drives the shared <code>PlayerConnection</code> through <code>ListenTogetherPlayerConnectionBridge</code>. Only one path runs at a time: joining a Jam first leaves any Convx room.</p>
+  </div>
+  <div class="card diagram">
+    <header><h3>Components<small>UI → view models → managers → clients → servers</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid">
+flowchart TB
+  subgraph UI["App UI"]
+    direction LR
+    LTS["ListenTogetherScreen"]
+    OV["ListenTogetherOverlay"]
+    JS["JamScreen"]
+    MENU["Player · Queue · song menus"]
+  end
+  subgraph VM["View models"]
+    direction LR
+    LTVM["ListenTogetherViewModel"]
+    JVM["JamViewModel"]
+  end
+  subgraph CONVX["Convx Sync client"]
+    direction LR
+    LTM["ListenTogetherManager"]
+    LTC["ListenTogetherClient"]
+    MC["MessageCodec"]
+    SC["ServerClock"]
+  end
+  subgraph JAM["Jam client"]
+    direction LR
+    JM["JamManager"]
+    JC["JamClient"]
+    JCL["JamClock · JamSync"]
+  end
+  subgraph PLAY["Playback"]
+    direction LR
+    BR["PlayerConnectionBridge"]
+    PC["PlayerConnection"]
+    EXO["ExoPlayer · MusicService"]
+  end
+  subgraph CF["Cloudflare · convx-sync"]
+    direction LR
+    W["Worker"]
+    R["Room DO"]
+    G["Guard DO"]
+  end
+  subgraph BC["BitChord backend · Go"]
+    direction LR
+    API["REST handlers"]
+    WS["Socket handler"]
+    P["Party store"]
+  end
+  LTS --> LTVM --> LTM
+  OV --> LTM
+  JS --> JVM --> JM
+  MENU --> PC
+  LTM --> LTC --> MC
+  LTC --> SC
+  JM --> JC
+  JM --> JCL
+  LTM --> BR
+  JM --> BR
+  BR --> PC --> EXO
+  JM -. leaves room .-> LTM
+  LTC == wss ==> W
+  W --> G
+  W --> R
+  JC == "HTTPS + wss" ==> API
+  JC ==> WS
+  API --> P
+  WS --> P
+  classDef convx fill:var(--convx-soft),stroke:var(--convx),color:var(--ink)
+  classDef jam fill:var(--jam-soft),stroke:var(--jam),color:var(--ink)
+  class LTM,LTC,MC,SC,W,R,G,LTVM,LTS,OV convx
+  class JM,JC,JCL,API,WS,P,JVM,JS jam
+</pre></div>
+  </div>
+</section>
+
+<!-- ============================================================ CONVX CLIENT -->
+<section id="convx-client">
+  <div class="sec-head">
+    <div class="eyebrow convx">Convx Sync · client <code>app/…/listentogether</code></div>
+    <h2>Room client</h2>
+    <p>The client owns the socket and keeps a copy of the room state. The manager turns room events into player actions, and local player events back into room actions. The boxes show state and public API; every private function is listed in the function maps below.</p>
+  </div>
+  <div class="card diagram">
+    <header><h3>Classes<small>Composition ◆ · dependency ⇢</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid">
+classDiagram
+  direction LR
+  class ListenTogetherViewModel {
+    +connect()
+    +createRoom(name)
+    +joinRoom(code, name)
+    +leaveRoom()
+    +approveJoin(id)
+    +kickUser(id)
+  }
+  class ListenTogetherManager {
+    -pendingSyncState
+    -roomPlayback
+    -guestPausedLocally
+    -hostHeldTrackId
+    -bufferingTrackId
+    +initialize()
+    +setPlayerConnection(c)
+    +createRoom(name)
+    +joinRoom(code, name)
+    +leaveRoom()
+    +sendTrackChange(meta)
+    +requestSync()
+    +transferHost(id)
+    +setControlMode(mode)
+    +sendChatMessage(text)
+  }
+  class PlayerListener {
+    &lt;&lt;Player.Listener&gt;&gt;
+    +onPlayWhenReadyChanged()
+    +onMediaItemTransition()
+    +onPositionDiscontinuity()
+  }
+  class ListenTogetherClient {
+    +roomState
+    +role
+    +events
+    +serverClock
+    +connect(code)
+    +sendPlaybackAction(action)
+    +sendBufferReady(trackId)
+    +requestSync()
+    +joinRoom(code, name)
+    +createRoom(name)
+  }
+  class MessageCodec {
+    +encode(type, payload)
+    +decode(bytes)
+    +decodePayload(type, bytes)
+  }
+  class ServerClock {
+    +observe(serverTime, at)
+    +elapsedSince(serverTime, now)
+  }
+  class RoomPermissions {
+    &lt;&lt;object&gt;&gt;
+    +canControlPlayback(host, mode)
+    +canSkipTrack()
+  }
+  class PlayerConnectionBridge {
+    +playerConnection
+    +partyLocked
+    +setPartyLocked(on)
+  }
+  class PlayerConnection {
+    +allowInternalSync
+    +shouldBlockPlaybackChanges
+    +playQueue(q, force)
+    +play()
+    +pause()
+    +seekTo(pos)
+  }
+  class Protocol {
+    &lt;&lt;Protocol.kt&gt;&gt;
+    MessageTypes
+    PlaybackActions
+    RoomState
+    SyncStatePayload
+    PongPayload
+  }
+  ListenTogetherViewModel --> ListenTogetherManager
+  ListenTogetherManager *-- PlayerListener
+  ListenTogetherManager --> ListenTogetherClient
+  ListenTogetherManager --> PlayerConnectionBridge
+  PlayerConnectionBridge --> PlayerConnection
+  ListenTogetherClient *-- MessageCodec
+  ListenTogetherClient *-- ServerClock
+  ListenTogetherClient ..> RoomPermissions
+  ListenTogetherClient ..> Protocol
+</pre></div>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><b>Join mid-song</b><span>Loads straight away and starts at the room's live position on the server clock.</span></div>
+    <div class="fact"><b>New song</b><span>The host holds until every guest reports it loaded, 6 s at most, then everyone starts together.</span></div>
+    <div class="fact"><b>Local pause</b><span>A guest without control, or anyone hit by a call, pauses only their own phone. Play rejoins where the room is.</span></div>
+    <div class="fact"><b>Drift</b><span>Fixed on the 10 s heartbeat beyond 0.4 s paused or 1.5 s playing. A guest on the wrong song asks for the full state.</span></div>
+  </div>
+
+  <div class="key"><span class="chip pub">public</span> called from outside the class <span class="chip">private</span> internal</div>
+
+  <details class="card fmap" open>
+    <summary>ListenTogetherManager <code>ListenTogetherManager.kt</code><span class="count">84 functions</span></summary>
+    <div class="groups">
+      <div class="grp"><h4>Room API</h4><div class="chips">
+        <span class="chip pub">initialize</span><span class="chip pub">setPlayerConnection</span><span class="chip pub">connect</span><span class="chip pub">disconnect</span><span class="chip pub">createRoom</span><span class="chip pub">joinRoom</span><span class="chip pub">leaveRoom</span><span class="chip pub">approveJoin</span><span class="chip pub">rejectJoin</span><span class="chip pub">kickUser</span><span class="chip pub">blockUser</span><span class="chip pub">unblockUser</span><span class="chip pub">transferHost</span><span class="chip pub">requestSync</span><span class="chip pub">setControlMode</span><span class="chip pub">extendSession</span><span class="chip pub">forceReconnect</span><span class="chip pub">sendChatMessage</span><span class="chip pub">suggestTrack</span><span class="chip pub">approveSuggestion</span><span class="chip pub">rejectSuggestion</span><span class="chip pub">sendTrackChange</span>
+      </div></div>
+      <div class="grp"><h4>Room events in</h4><div class="chips">
+        <span class="chip">handleEvent</span><span class="chip">handleRoomCreated</span><span class="chip">handleUserJoined</span><span class="chip">handleReconnected</span><span class="chip">handleHostChanged</span><span class="chip">handlePlaybackSyncEvent</span><span class="chip">noteOwnEcho</span><span class="chip">handleSyncState</span>
+      </div></div>
+      <div class="grp"><h4>Playback actions in</h4><div class="chips">
+        <span class="chip">handlePlaybackSync</span><span class="chip">handlePlayAction</span><span class="chip">handlePauseAction</span><span class="chip">handleSeekAction</span><span class="chip">handleTrackChangeAction</span><span class="chip">resyncIfOnWrongTrack</span>
+      </div></div>
+      <div class="grp"><h4>Queue in</h4><div class="chips">
+        <span class="chip">syncQueue</span><span class="chip">addQueueTrack</span><span class="chip">removeQueueTrack</span><span class="chip">clearQueueAfterCurrentTrack</span>
+      </div></div>
+      <div class="grp"><h4>Loading a song</h4><div class="chips">
+        <span class="chip">applyPlaybackState</span><span class="chip">setSyncedMediaItems</span><span class="chip">applyImmediateSync</span><span class="chip">queueBufferedSync</span><span class="chip">syncToTrack</span><span class="chip">applySyncedQueue</span><span class="chip">stagePendingSync</span><span class="chip">applyPendingSyncIfReady</span><span class="chip">deferSyncUntilTrackReady</span><span class="chip">armBufferCompleteWatchdog</span>
+      </div></div>
+      <div class="grp"><h4>Position and clock</h4><div class="chips">
+        <span class="chip">livePosition</span><span class="chip">noteRoomPlayback</span>
+      </div></div>
+      <div class="grp"><h4>Pause and hold</h4><div class="chips">
+        <span class="chip">onGuestPlayPause</span><span class="chip">holdForGuests</span><span class="chip">releaseHostHold</span><span class="chip">clearHostHold</span>
+      </div></div>
+      <div class="grp"><h4>Local events out</h4><div class="chips">
+        <span class="chip">onPlayWhenReadyChanged</span><span class="chip">onMediaItemTransition</span><span class="chip">onPositionDiscontinuity</span><span class="chip">sendPlayState</span><span class="chip">sendTrackChangeInternal</span><span class="chip">startQueueSyncObservation</span><span class="chip">stopQueueSyncObservation</span><span class="chip">startHeartbeat</span><span class="chip">stopHeartbeat</span>
+      </div></div>
+      <div class="grp"><h4>Volume, mute, teardown</h4><div class="chips">
+        <span class="chip">startVolumeSyncObservation</span><span class="chip">stopVolumeSyncObservation</span><span class="chip">applyHostVolumeIfNeeded</span><span class="chip">saveMuteStateOnJoin</span><span class="chip">restoreGuestMuteState</span><span class="chip">observePreferences</span><span class="chip">cleanup</span><span class="chip">toTrackInfo</span><span class="chip">toMediaMetadata</span>
+      </div></div>
+    </div>
+  </details>
+
+  <details class="card fmap">
+    <summary>ListenTogetherClient <code>ListenTogetherClient.kt</code><span class="count">78 functions</span></summary>
+    <div class="groups">
+      <div class="grp"><h4>Connection</h4><div class="chips">
+        <span class="chip pub">connect</span><span class="chip pub">disconnect</span><span class="chip pub">forceReconnect</span><span class="chip">startPingJob</span><span class="chip">executePendingAction</span><span class="chip">handleDisconnect</span><span class="chip">handleConnectionFailure</span><span class="chip">calculateBackoffDelay</span><span class="chip">observeNetworkChanges</span><span class="chip">getServerUrl</span><span class="chip">httpBase</span>
+      </div></div>
+      <div class="grp"><h4>Room actions out</h4><div class="chips">
+        <span class="chip pub">createRoom</span><span class="chip">allocateRoomCode</span><span class="chip pub">joinRoom</span><span class="chip pub">leaveRoom</span><span class="chip pub">approveJoin</span><span class="chip pub">rejectJoin</span><span class="chip pub">kickUser</span><span class="chip pub">transferHost</span><span class="chip pub">setControlMode</span><span class="chip pub">extendSession</span><span class="chip pub">requestSync</span>
+      </div></div>
+      <div class="grp"><h4>Playback out</h4><div class="chips">
+        <span class="chip pub">sendPlaybackAction</span><span class="chip pub">sendBufferReady</span><span class="chip">sendMessageNoPayload</span>
+      </div></div>
+      <div class="grp"><h4>Social</h4><div class="chips">
+        <span class="chip pub">sendChatMessage</span><span class="chip pub">suggestTrack</span><span class="chip pub">approveSuggestion</span><span class="chip pub">rejectSuggestion</span><span class="chip pub">blockUser</span><span class="chip pub">unblockUser</span><span class="chip pub">isUserBlocked</span>
+      </div></div>
+      <div class="grp"><h4>Messages in</h4><div class="chips">
+        <span class="chip">handleMessage</span><span class="chip">handleRoomCreated</span><span class="chip">handleJoinApproved</span><span class="chip">handleJoinRejected</span><span class="chip">handleJoinRequest</span><span class="chip">handleUserJoined</span><span class="chip">handleUserLeft</span><span class="chip">handleHostChanged</span><span class="chip">handleKicked</span><span class="chip">handlePlaybackSync</span><span class="chip">handleBufferWait</span><span class="chip">handleBufferComplete</span><span class="chip">handleSyncState</span><span class="chip">handleControlModeChanged</span><span class="chip">handleRoomExpiring</span><span class="chip">handleRoomClosed</span><span class="chip">handleServerError</span><span class="chip">handleSuggestionReceived</span><span class="chip">restoreEmbeddedReply</span><span class="chip">updateRoomStateForPlayback</span><span class="chip">adoptRoomSettings</span>
+      </div></div>
+      <div class="grp"><h4>Session and device</h4><div class="chips">
+        <span class="chip">savePersistedSession</span><span class="chip">loadPersistedSession</span><span class="chip">clearPersistedSession</span><span class="chip">loadBlockedUsernames</span><span class="chip">saveBlockedUsernames</span><span class="chip">acquireWakeLock</span><span class="chip">releaseWakeLock</span><span class="chip">ensureNotificationChannel</span><span class="chip">showJoinRequestNotification</span><span class="chip">showSuggestionNotification</span><span class="chip">log</span><span class="chip pub">logExternal</span><span class="chip pub">clearLogs</span><span class="chip pub">getPersistedRoomCode</span><span class="chip pub">getSessionAge</span>
+      </div></div>
+    </div>
+  </details>
+
+  <details class="card fmap">
+    <summary>Helpers <code>MessageCodec · ServerClock · RoomPermissions · Bridge · Servers · ActionReceiver</code><span class="count">32 functions</span></summary>
+    <div class="groups">
+      <div class="grp"><h4>MessageCodec</h4><div class="chips">
+        <span class="chip pub">detectMessageFormat</span><span class="chip pub">encode</span><span class="chip pub">decode</span><span class="chip pub">decodePayload</span><span class="chip">encodeJson</span><span class="chip">decodeJson</span><span class="chip">encodeProtobuf</span><span class="chip">decodeProtobuf</span><span class="chip">compressData</span><span class="chip">decompressData</span><span class="chip">toProtoMessage</span><span class="chip">decodeJsonPayload</span><span class="chip">decodeProtobufPayload</span><span class="chip">trackInfoToProto</span><span class="chip">protoToTrackInfo</span><span class="chip">protoToUserInfo</span><span class="chip">protoToRoomState</span>
+      </div></div>
+      <div class="grp"><h4>ServerClock</h4><div class="chips">
+        <span class="chip pub">observe</span><span class="chip pub">offsetMs</span><span class="chip pub">elapsedSince</span><span class="chip pub">reset</span><span class="chip">trim</span>
+      </div></div>
+      <div class="grp"><h4>RoomPermissions</h4><div class="chips">
+        <span class="chip pub">canControlPlayback</span><span class="chip pub">canSkipTrack</span><span class="chip pub">canRemoveTrack</span><span class="chip pub">skipDeniedReason</span>
+      </div></div>
+      <div class="grp"><h4>Bridge · Servers · Receiver</h4><div class="chips">
+        <span class="chip pub">update</span><span class="chip pub">setPartyLocked</span><span class="chip pub">findByUrl</span><span class="chip pub">onReceive</span>
+      </div></div>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ CONVX SERVER -->
+<section id="convx-server">
+  <div class="sec-head">
+    <div class="eyebrow convx">Convx Sync · server <code>listen-together-server/src</code></div>
+    <h2>Cloudflare room server</h2>
+    <p>One <code>Room</code> Durable Object per room code. It handles one message at a time, so its state is the only version of the room. <code>Guard</code> rate-limits room creation per IP.</p>
+  </div>
+  <div class="card diagram">
+    <header><h3>Classes<small>Worker, Durable Objects, stored state</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid">
+classDiagram
+  direction LR
+  class Worker {
+    &lt;&lt;index.ts&gt;&gt;
+    +fetch(request, env)
+    -throttled(request, limit)
+    -generateCode()
+  }
+  class Room {
+    &lt;&lt;Durable Object&gt;&gt;
+    -room RoomData
+    -members
+    -tokens
+    -buffer BufferWait
+    +fetch(request)
+    +webSocketMessage(ws, raw)
+    +webSocketClose(ws)
+    +alarm()
+  }
+  class Guard {
+    &lt;&lt;Durable Object&gt;&gt;
+    +fetch(request)
+    +alarm()
+  }
+  class RoomData {
+    room_code
+    host_id
+    current_track
+    is_playing
+    position
+    last_update
+    queue
+    control_mode
+    expires_at
+  }
+  class BufferWait {
+    track_id
+    waiting_for
+    deadline
+  }
+  class ProtocolTs {
+    &lt;&lt;protocol.ts&gt;&gt;
+    C2S
+    S2C
+    RoomState
+    +encode(type, payload)
+  }
+  Worker --> Guard : POST /api/rooms
+  Worker --> Room : /room/code socket
+  Room *-- RoomData
+  Room *-- BufferWait
+  Room ..> ProtocolTs
+</pre></div>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><b>Buffer window · 10 s</b><span>After a song change the server waits for every connected member except the one who changed it, then sends <code>buffer_complete</code> to all.</span></div>
+    <div class="fact"><b>Host grace · 90 s</b><span>A disconnected host keeps the room for 90 s. After that, the longest-connected member becomes host.</span></div>
+    <div class="fact"><b>Expiry · 6 h</b><span>The room warns 10 minutes before closing. The host can extend a limited number of times.</span></div>
+    <div class="fact"><b>Clock</b><span><code>sync_playback</code> and <code>pong</code> both carry <code>server_time</code>.</span></div>
+  </div>
+
+  <details class="card fmap">
+    <summary>Room <code>room.ts</code><span class="count">32 functions</span></summary>
+    <div class="groups">
+      <div class="grp"><h4>Entry points</h4><div class="chips">
+        <span class="chip pub">fetch</span><span class="chip pub">webSocketMessage</span><span class="chip pub">webSocketClose</span><span class="chip pub">webSocketError</span><span class="chip pub">alarm</span>
+      </div></div>
+      <div class="grp"><h4>Membership</h4><div class="chips">
+        <span class="chip">handleCreate</span><span class="chip">handleJoin</span><span class="chip">approveJoin</span><span class="chip">rejectJoin</span><span class="chip">handleReconnect</span><span class="chip">kick</span><span class="chip">removeMember</span><span class="chip">promoteHost</span><span class="chip">onSocketGone</span>
+      </div></div>
+      <div class="grp"><h4>Playback</h4><div class="chips">
+        <span class="chip">playback</span><span class="chip">openBufferWindow</span><span class="chip">bufferReady</span><span class="chip">snapshot</span><span class="chip">syncPayload</span>
+      </div></div>
+      <div class="grp"><h4>Suggestions</h4><div class="chips">
+        <span class="chip">suggest</span><span class="chip">resolveSuggestion</span>
+      </div></div>
+      <div class="grp"><h4>Plumbing</h4><div class="chips">
+        <span class="chip">persist</span><span class="chip">send</span><span class="chip">socketsFor</span><span class="chip">broadcast</span><span class="chip">isHost</span><span class="chip">canControl</span><span class="chip">err</span><span class="chip">rescheduleAlarm</span>
+      </div></div>
+      <div class="grp"><h4>index.ts · guard.ts · protocol.ts</h4><div class="chips">
+        <span class="chip pub">fetch</span><span class="chip">throttled</span><span class="chip">generateCode</span><span class="chip">json</span><span class="chip pub">Guard.fetch</span><span class="chip pub">Guard.alarm</span><span class="chip pub">encode</span>
+      </div></div>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ PROTOCOL -->
+<section id="convx-protocol">
+  <div class="sec-head">
+    <div class="eyebrow convx">Convx Sync · wire</div>
+    <h2>Room messages</h2>
+  </div>
+  <div class="two">
+    <div class="card table">
+      <table>
+        <thead><tr><th>Client → server</th><th>Sender</th></tr></thead>
+        <tbody>
+          <tr><td><code>create_room</code> <code>join_room</code> <code>reconnect</code> <code>ping</code></td><td>anyone</td></tr>
+          <tr><td><code>approve_join</code> <code>reject_join</code> <code>kick_user</code> <code>transfer_host</code></td><td>host</td></tr>
+          <tr><td><code>set_control_mode</code> <code>extend_session</code> <code>approve_suggestion</code> <code>reject_suggestion</code></td><td>host</td></tr>
+          <tr><td><code>playback_action</code>: play · pause · seek · change_track · skip_next · skip_prev · queue_add · queue_remove · queue_clear · sync_queue · set_volume</td><td>host, or everyone in "everyone" mode</td></tr>
+          <tr><td><code>buffer_ready</code> <code>request_sync</code> <code>suggest_track</code> <code>chat</code> <code>leave_room</code></td><td>members</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card table">
+      <table>
+        <thead><tr><th>Server → client</th><th>When</th></tr></thead>
+        <tbody>
+          <tr><td><code>room_created</code> <code>join_request</code> <code>join_approved</code> <code>join_rejected</code></td><td>entering a room</td></tr>
+          <tr><td><code>sync_playback</code></td><td>any playback action, to everyone, with <code>server_time</code></td></tr>
+          <tr><td><code>buffer_wait</code> <code>buffer_complete</code></td><td>after a song change</td></tr>
+          <tr><td><code>sync_state</code></td><td>reply to <code>request_sync</code></td></tr>
+          <tr><td><code>user_joined</code> <code>user_left</code> <code>user_reconnected</code> <code>user_disconnected</code> <code>host_changed</code> <code>kicked</code></td><td>membership</td></tr>
+          <tr><td><code>control_mode_changed</code> <code>room_expiring</code> <code>room_closed</code></td><td>room settings</td></tr>
+          <tr><td><code>suggestion_*</code> <code>chat</code> <code>pong</code> <code>error</code></td><td>other</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ JAM CLIENT -->
+<section id="jam-client" class="jam-scope">
+  <div class="sec-head">
+    <div class="eyebrow jam">Jam · client <code>app/…/jam</code></div>
+    <h2>Party client</h2>
+    <p>The server owns the party state and numbers every change. It schedules each start 350 ms ahead and re-sends the state every 5 s. The client keeps its player on that state with a 1 s reconcile tick.</p>
+  </div>
+  <div class="card diagram">
+    <header><h3>Classes<small>Composition ◆ · dependency ⇢</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid" data-tone="jam">
+classDiagram
+  direction LR
+  class JamViewModel {
+    +create(name)
+    +join(code, name)
+    +leave()
+    +setHostOnlyControl(on)
+    +kick(id)
+  }
+  class JamManager {
+    +session
+    +message
+    +serverUrl
+    -lastSeq
+    -intentQuietUntil
+    -detached
+    -locallyPaused
+    +create(name, avatar)
+    +join(code, name, avatar)
+    +leave()
+    +preview(code)
+    +setHostOnlyControl(on)
+    +setAutoplay(on)
+    +setMaxMembers(n)
+    +kick(id)
+    +inviteLink(code)
+  }
+  class JamPlayerListener {
+    &lt;&lt;Player.Listener&gt;&gt;
+    +onPlayWhenReadyChanged()
+    +onPositionDiscontinuity()
+    +onMediaItemTransition()
+    +onTimelineChanged()
+  }
+  class JamClient {
+    +create(base, req)
+    +join(base, code, req)
+    +leave(base, code, token)
+    +open(base, code, token)
+    +send(ws, frame)
+  }
+  class JamClock {
+    +synced
+    +observe(sent, server, got)
+    +serverNow(now)
+  }
+  class JamSync {
+    &lt;&lt;object&gt;&gt;
+    +positionAt(playback, now)
+    +startDelayMs(playback, now)
+  }
+  class JamQueueDiff {
+    &lt;&lt;object&gt;&gt;
+    +between(party, local)
+  }
+  class QueueChange {
+    &lt;&lt;sealed&gt;&gt;
+    None · Clear · Add
+    Remove · Move · Replace
+  }
+  class JamSession {
+    code
+    you
+    members
+    hostOnlyControl
+    playback
+    queue
+    +canControl
+  }
+  class JamModels {
+    &lt;&lt;JamModels.kt&gt;&gt;
+    PartyTrack
+    PartyPlayback
+    PartyQueue
+    PartyMember
+    PartyMembership
+  }
+  JamViewModel --> JamManager
+  JamManager *-- JamPlayerListener
+  JamManager *-- JamClient
+  JamManager *-- JamClock
+  JamManager *-- JamSession
+  JamManager ..> JamSync
+  JamManager ..> JamQueueDiff
+  JamQueueDiff ..> QueueChange
+  JamSession ..> JamModels
+</pre></div>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><b>Your play waits</b><span>Held until the server's echo, so every phone starts on the scheduled instant. Falls back after 1.8 s.</span></div>
+    <div class="fact"><b>Clock first</b><span>Before the first pong a playing party is loaded but not positioned.</span></div>
+    <div class="fact"><b>Reconcile · 1 s</b><span>Loads a missed song and fixes play state. Seeks only for drift over 1.2 s seen twice, then rests 6 s.</span></div>
+    <div class="fact"><b>Only pressed pauses</b><span>A call detaches this phone alone. In a host-only party a guest's pause stays local.</span></div>
+  </div>
+
+  <details class="card fmap" open>
+    <summary>JamManager <code>JamManager.kt</code><span class="count">55 functions</span></summary>
+    <div class="groups">
+      <div class="grp"><h4>Party API</h4><div class="chips">
+        <span class="chip pub">create</span><span class="chip pub">join</span><span class="chip pub">leave</span><span class="chip pub">preview</span><span class="chip pub">stats</span><span class="chip pub">warm</span><span class="chip pub">inviteLink</span><span class="chip pub">offerInvite</span><span class="chip pub">consumeInvite</span><span class="chip pub">dismissMessage</span><span class="chip pub">setHostOnlyControl</span><span class="chip pub">setAutoplay</span><span class="chip pub">setMaxMembers</span><span class="chip pub">kick</span><span class="chip pub">codeFrom</span>
+      </div></div>
+      <div class="grp"><h4>Lifecycle</h4><div class="chips">
+        <span class="chip">enter</span><span class="chip">request</span><span class="chip">normalise</span><span class="chip">teardown</span><span class="chip">dropSession</span><span class="chip">endSession</span>
+      </div></div>
+      <div class="grp"><h4>Socket</h4><div class="chips">
+        <span class="chip">connect</span><span class="chip">lost</span><span class="chip">rejoin</span><span class="chip">reconnect</span><span class="chip">startPing</span><span class="chip">report</span><span class="chip">control</span>
+      </div></div>
+      <div class="grp"><h4>Frames in</h4><div class="chips">
+        <span class="chip">onFrame</span><span class="chip">update</span><span class="chip">onState</span>
+      </div></div>
+      <div class="grp"><h4>Party → player</h4><div class="chips">
+        <span class="chip">applyRemote</span><span class="chip">startTrack</span><span class="chip">startReconcile</span><span class="chip">reconcile</span><span class="chip">applyQueue</span>
+      </div></div>
+      <div class="grp"><h4>Player → party</h4><div class="chips">
+        <span class="chip">onPlayWhenReadyChanged</span><span class="chip">onPositionDiscontinuity</span><span class="chip">onMediaItemTransition</span><span class="chip">onTimelineChanged</span><span class="chip">suppressed</span><span class="chip">refused</span><span class="chip">deferPlay</span><span class="chip">sendQueue</span><span class="chip">canSend</span>
+      </div></div>
+      <div class="grp"><h4>Conversions</h4><div class="chips">
+        <span class="chip">playlistIds</span><span class="chip">toTrack</span><span class="chip">toMediaItem</span>
+      </div></div>
+      <div class="grp"><h4>JamClient · JamSync</h4><div class="chips">
+        <span class="chip pub">warm</span><span class="chip pub">create</span><span class="chip pub">join</span><span class="chip pub">preview</span><span class="chip pub">stats</span><span class="chip pub">leave</span><span class="chip pub">open</span><span class="chip pub">send</span><span class="chip">post</span><span class="chip">describe</span><span class="chip pub">JamClock.observe</span><span class="chip pub">offsetMs</span><span class="chip pub">serverNow</span><span class="chip pub">positionAt</span><span class="chip pub">startDelayMs</span><span class="chip pub">JamQueueDiff.between</span>
+      </div></div>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ BITCHORD SERVER -->
+<section id="jam-server" class="jam-scope">
+  <div class="sec-head">
+    <div class="eyebrow jam">Jam · server <code>BitChord/backend</code></div>
+    <h2>BitChord party server</h2>
+    <p>A Go HTTP server that keeps parties in memory. REST calls create, join and leave a party. The socket carries controls in, and state, queue and member frames out.</p>
+  </div>
+  <div class="card diagram">
+    <header><h3>Packages and types<small>main · party · hub · protocol · clock</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid" data-tone="jam">
+classDiagram
+  direction LR
+  class MainGo {
+    &lt;&lt;main.go&gt;&gt;
+    +main()
+    -handleCreateParty()
+    -handleJoinParty()
+    -handleLeaveParty()
+    -handleWebSocket()
+    -handleSocketFrame()
+    -applyControl()
+    -startHeartbeatTicker()
+  }
+  class PartyStore {
+    +Create()
+    +Get(code)
+    +Drop(code)
+    +Sweep(now)
+  }
+  class Party {
+    +Members
+    +HostOnlyControl
+    +Playback
+    +Join(user, device, name)
+    +Authenticate(token)
+    +Remove(id)
+    +MayControl(member)
+    +ToWire()
+  }
+  class PlaybackState {
+    +Seq
+    +Track
+    +PositionMs
+    +AnchorMs
+    +IsPlaying
+    +Queue
+    +PositionAt(serverMs)
+    +Play() · Pause() · Seek()
+    +SetTrack()
+    +SetQueue()
+    +AddUpcoming() · MoveUpcoming()
+    +Step(delta)
+  }
+  class Member {
+    +MemberId
+    +DisplayName
+    +IsHost
+    +Connected
+  }
+  class Hub {
+    +Attach(code, id, conn)
+    +Detach(code, id)
+    +Send(code, id, payload)
+    +Broadcast(code, payload)
+  }
+  class SafeConn {
+    +WriteJSON(v)
+    +Close()
+  }
+  class JoinRequest {
+    &lt;&lt;protocol.go&gt;&gt;
+    +Validate()
+  }
+  class Clock {
+    &lt;&lt;clock.go&gt;&gt;
+    +NowMs()
+  }
+  MainGo --> PartyStore
+  MainGo --> Hub
+  MainGo ..> JoinRequest
+  PartyStore o-- Party
+  Party *-- PlaybackState
+  Party o-- Member
+  Hub o-- SafeConn
+  PlaybackState ..> Clock
+</pre></div>
+  </div>
+
+  <div class="card table">
+    <table>
+      <thead><tr><th>Socket frame</th><th>Direction</th><th>Carries</th></tr></thead>
+      <tbody>
+        <tr><td><code>sync</code> <code>syncQueue</code></td><td>in</td><td>ask for the full state or the queue</td></tr>
+        <tr><td><code>ping</code> → <code>pong</code></td><td>both</td><td><code>clientMs</code> echoed with <code>serverMs</code> for the clock offset</td></tr>
+        <tr><td><code>control</code></td><td>in</td><td>play · pause · seek · setTrack · next · previous · setQueue · queueAdd · queueRemove · queueMove · queueClear · setHostOnlyControl · setAutoplay · setMaxMembers · kick</td></tr>
+        <tr><td><code>report</code></td><td>in</td><td>this phone's real position, logged for debugging</td></tr>
+        <tr><td><code>welcome</code></td><td>out</td><td>full snapshot and <code>you</code></td></tr>
+        <tr><td><code>state</code></td><td>out</td><td>playback with <code>seq</code> and <code>anchorMs</code> (350 ms ahead on a start), every 5 s</td></tr>
+        <tr><td><code>queue</code> <code>members</code> <code>activity</code></td><td>out</td><td>queue, member list, who did what</td></tr>
+        <tr><td><code>error</code> <code>bye</code></td><td>out</td><td>refusals such as <code>host_only</code>, removal</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details class="card fmap">
+    <summary>Go functions <code>main.go · party.go · hub.go</code><span class="count">96 functions</span></summary>
+    <div class="groups">
+      <div class="grp"><h4>REST handlers</h4><div class="chips">
+        <span class="chip pub">handleCreateParty</span><span class="chip pub">handleJoinParty</span><span class="chip pub">handleGetParty</span><span class="chip pub">handlePreviewParty</span><span class="chip pub">handleLeaveParty</span><span class="chip pub">handleTime</span><span class="chip pub">handlePresence</span><span class="chip pub">handleLiveStats</span><span class="chip pub">handleLiveBadge</span><span class="chip pub">handleInviteLanding</span><span class="chip pub">handleRoot</span><span class="chip pub">handleHealthz</span>
+      </div></div>
+      <div class="grp"><h4>Socket</h4><div class="chips">
+        <span class="chip pub">handleWebSocket</span><span class="chip">handleSocketFrame</span><span class="chip">applyControl</span><span class="chip">stateFrame</span><span class="chip">queueFrame</span><span class="chip">membersFrame</span><span class="chip">activityFrame</span><span class="chip">startHeartbeatTicker</span><span class="chip">startPresenceSweeper</span>
+      </div></div>
+      <div class="grp"><h4>HTTP plumbing</h4><div class="chips">
+        <span class="chip">corsMiddleware</span><span class="chip">newIPRateLimiter</span><span class="chip">Allow</span><span class="chip">clientIP</span><span class="chip">decodeJSONBody</span><span class="chip">jsonResponse</span><span class="chip">jsonError</span><span class="chip">parseBearerToken</span><span class="chip">parseSocketToken</span><span class="chip">requestOrigin</span>
+      </div></div>
+      <div class="grp"><h4>PlaybackState</h4><div class="chips">
+        <span class="chip pub">PositionAt</span><span class="chip pub">Play</span><span class="chip pub">Pause</span><span class="chip pub">Seek</span><span class="chip pub">SetTrack</span><span class="chip pub">SetQueue</span><span class="chip pub">AddUpcoming</span><span class="chip pub">RemoveUpcoming</span><span class="chip pub">ClearUpcoming</span><span class="chip pub">MoveUpcoming</span><span class="chip pub">Step</span><span class="chip pub">SetAutoplay</span><span class="chip pub">ToWire</span><span class="chip pub">QueueToWire</span><span class="chip">touch</span><span class="chip">touchQueue</span>
+      </div></div>
+      <div class="grp"><h4>Party</h4><div class="chips">
+        <span class="chip pub">Join</span><span class="chip pub">Authenticate</span><span class="chip pub">Remove</span><span class="chip pub">Host</span><span class="chip pub">MayControl</span><span class="chip pub">SetMaxMembers</span><span class="chip pub">SetHostOnlyControl</span><span class="chip pub">SpendControlBudget</span><span class="chip pub">SpendFrameBudget</span><span class="chip pub">MarkConnected</span><span class="chip pub">ExpiredMembers</span><span class="chip pub">IsExpired</span><span class="chip pub">ToWire</span><span class="chip">refreshEmptiness</span>
+      </div></div>
+      <div class="grp"><h4>PartyStore · Hub</h4><div class="chips">
+        <span class="chip pub">Create</span><span class="chip pub">CreateWithLimits</span><span class="chip pub">Get</span><span class="chip pub">Find</span><span class="chip pub">Drop</span><span class="chip pub">All</span><span class="chip pub">Sweep</span><span class="chip pub">Attach</span><span class="chip pub">Detach</span><span class="chip pub">Send</span><span class="chip pub">Broadcast</span><span class="chip pub">CloseMember</span><span class="chip pub">DropParty</span><span class="chip pub">MembersOnline</span><span class="chip pub">ActiveCodes</span>
+      </div></div>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ FLOWS -->
+<section id="flows">
+  <div class="sec-head">
+    <div class="eyebrow both">Sequences</div>
+    <h2>Key flows</h2>
+    <p>How a song change, a join, a local pause and a Jam play move through both phones and the server.</p>
+  </div>
+
+  <div class="card diagram">
+    <header><h3>Host picks a new song<small>Convx Sync · everyone starts together</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant HP as Host player
+  participant HM as Host manager
+  participant R as Room
+  participant GM as Guest manager
+  participant GP as Guest player
+  HP->>HM: song changed
+  HM->>R: change_track + queue
+  HM->>HP: holdForGuests: pause
+  R->>GM: sync_playback change_track
+  R->>R: open buffer window
+  GM->>GP: load song, paused at 0
+  GM->>R: buffer_ready
+  R->>HM: buffer_complete
+  R->>GM: buffer_complete
+  HM->>HP: release hold: play
+  HM->>R: play at position
+  R->>GM: sync_playback play + server_time
+  GM->>GP: seek by transit time, play
+  Note over HM,GM: No buffer_complete in 6 s and the host starts anyway
+</pre></div>
+  </div>
+
+  <div class="two">
+    <div class="card diagram">
+      <header><h3>Guest joins mid-song<small>Convx Sync</small></h3><button class="btn" data-expand>Expand</button></header>
+      <div class="canvas"><pre class="mermaid">
+sequenceDiagram
+  participant G as Guest
+  participant R as Room
+  participant H as Host
+  G->>R: ping ×3
+  R-->>G: pong + server_time
+  G->>R: join_room
+  R->>H: join_request
+  H->>R: approve_join
+  R->>G: join_approved + snapshot
+  G->>G: live position on server clock
+  G->>G: load, play at position
+  R->>H: user_joined
+  H->>R: play at position
+  R->>G: sync_playback play
+</pre></div>
+    </div>
+    <div class="card diagram">
+      <header><h3>Guest pauses alone<small>Convx Sync</small></h3><button class="btn" data-expand>Expand</button></header>
+      <div class="canvas"><pre class="mermaid">
+sequenceDiagram
+  participant U as Guest
+  participant M as Guest manager
+  participant R as Room
+  U->>M: pause, or a call
+  M->>M: guestPausedLocally
+  loop every 10 s
+    R->>M: heartbeat play, pos
+    M->>M: note room position
+  end
+  U->>M: play
+  M->>M: seek to room position
+  Note over M: Room paused: stay paused at host's spot
+</pre></div>
+    </div>
+  </div>
+
+  <div class="card diagram">
+    <header><h3>You press play in a Jam<small>Scheduled start and reconcile</small></h3><button class="btn" data-expand>Expand</button></header>
+    <div class="canvas"><pre class="mermaid" data-tone="jam">
+sequenceDiagram
+  autonumber
+  participant P as Your player
+  participant M as JamManager
+  participant S as BitChord
+  participant O as Other phones
+  P->>M: play pressed
+  M->>S: control play
+  M->>P: deferPlay: pause
+  S->>S: anchor = now + 350 ms
+  S->>M: state(seq, anchor)
+  S->>O: state(seq, anchor)
+  M->>P: play at anchor
+  O->>O: play at anchor
+  loop every 1 s
+    M->>M: reconcile drift
+  end
+  loop every 5 s
+    S->>M: state heartbeat
+  end
+</pre></div>
+  </div>
+</section>
+
+<!-- ============================================================ FILES -->
+<section id="files">
+  <div class="sec-head">
+    <div class="eyebrow both">Index</div>
+    <h2>Files</h2>
+  </div>
+  <div class="card table">
+    <table>
+      <thead><tr><th>File</th><th>Side</th><th>Lines</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><code>ListenTogetherManager.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">1,917</td><td>Room events to player and back; hold, local pause, drift, queue</td></tr>
+        <tr><td><code>ListenTogetherClient.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">1,672</td><td>Socket, reconnect, session, room-state copy, notifications</td></tr>
+        <tr><td><code>MessageCodec.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">453</td><td>JSON and protobuf envelopes, gzip</td></tr>
+        <tr><td><code>Protocol.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">409</td><td>Message types, actions, payloads</td></tr>
+        <tr><td><code>RoomPermissions.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">76</td><td>Who may control, skip or remove</td></tr>
+        <tr><td><code>ServerClock.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">59</td><td>Clock offset from server stamps</td></tr>
+        <tr><td><code>ListenTogetherServers.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">53</td><td>Built-in server list</td></tr>
+        <tr><td><code>ListenTogetherActionReceiver.kt</code></td><td class="side"><span class="pill convx">client</span></td><td class="n">46</td><td>Approve or reject from notifications</td></tr>
+        <tr><td><code>ListenTogetherPlayerConnectionBridge.kt</code></td><td class="side"><span class="pill convx">shared</span></td><td class="n">31</td><td>Player handle and party lock, used by both paths</td></tr>
+        <tr><td><code>room.ts</code></td><td class="side"><span class="pill convx">server</span></td><td class="n">783</td><td>Room Durable Object</td></tr>
+        <tr><td><code>index.ts</code></td><td class="side"><span class="pill convx">server</span></td><td class="n">141</td><td>Worker entry, room allocation</td></tr>
+        <tr><td><code>protocol.ts</code></td><td class="side"><span class="pill convx">server</span></td><td class="n">122</td><td>Message names and types</td></tr>
+        <tr><td><code>guard.ts</code></td><td class="side"><span class="pill convx">server</span></td><td class="n">53</td><td>Per-IP rate limit</td></tr>
+        <tr><td><code>JamManager.kt</code></td><td class="side"><span class="pill jam">client</span></td><td class="n">851</td><td>Party lifecycle, socket, reconcile, deferred play, queue</td></tr>
+        <tr><td><code>JamModels.kt</code></td><td class="side"><span class="pill jam">client</span></td><td class="n">201</td><td>Party wire models</td></tr>
+        <tr><td><code>JamClient.kt</code></td><td class="side"><span class="pill jam">client</span></td><td class="n">126</td><td>REST calls, socket open</td></tr>
+        <tr><td><code>JamSync.kt</code></td><td class="side"><span class="pill jam">client</span></td><td class="n">111</td><td>Clock, position at a time, queue diff</td></tr>
+        <tr><td><code>main.go</code></td><td class="side"><span class="pill jam">server</span></td><td class="n">1,317</td><td>HTTP and socket handlers, heartbeat</td></tr>
+        <tr><td><code>party.go</code></td><td class="side"><span class="pill jam">server</span></td><td class="n">925</td><td>Party, playback anchors, store</td></tr>
+        <tr><td><code>hub.go</code></td><td class="side"><span class="pill jam">server</span></td><td class="n">167</td><td>Live sockets, broadcast</td></tr>
+        <tr><td><code>protocol.go</code> · <code>clock.go</code></td><td class="side"><span class="pill jam">server</span></td><td class="n">125</td><td>Join validation, server clock</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</div>
+
+<dialog class="viewer" id="viewer" aria-labelledby="viewer-title">
+  <div class="viewer-bar">
+    <strong id="viewer-title"></strong>
+    <button class="btn" data-zoom="-1" aria-label="Zoom out">−</button>
+    <span class="zoom" id="zoom-label">100%</span>
+    <button class="btn" data-zoom="1" aria-label="Zoom in">+</button>
+    <button class="btn" data-zoom="0">Fit</button>
+    <button class="btn" id="viewer-close">Close</button>
+  </div>
+  <div class="viewer-body" id="viewer-body"></div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+(async () => {
+  if (!window.mermaid) return;
+  const css = getComputedStyle(document.documentElement);
+  const v = (name) => css.getPropertyValue(name).trim();
+  const base = {
+    fontFamily: '"IBM Plex Sans", system-ui, sans-serif', fontSize: '14px',
+    background: v('--panel'), textColor: v('--ink'), lineColor: v('--edge'),
+    primaryColor: v('--node'), primaryBorderColor: v('--node-line'), primaryTextColor: v('--ink'),
+    secondaryColor: v('--node-2'), tertiaryColor: v('--panel-2'), mainBkg: v('--node'), nodeBorder: v('--node-line'),
+    clusterBkg: v('--panel-2'), clusterBorder: v('--rule'), titleColor: v('--muted'), edgeLabelBackground: v('--panel'),
+    actorBkg: v('--node'), actorBorder: v('--node-line'), actorTextColor: v('--ink'), actorLineColor: v('--edge'),
+    signalColor: v('--ink-2'), signalTextColor: v('--ink'), labelBoxBkgColor: v('--node'), labelBoxBorderColor: v('--node-line'),
+    labelTextColor: v('--ink'), loopTextColor: v('--ink'), noteBkgColor: v('--note'), noteBorderColor: v('--note-line'),
+    noteTextColor: v('--ink'), activationBkgColor: v('--node-2'), activationBorderColor: v('--node-line'),
+    sequenceNumberColor: v('--panel'), classText: v('--ink')
+  };
+  const jamTone = { primaryColor: v('--jam-node'), primaryBorderColor: v('--jam-node-line'), mainBkg: v('--jam-node'),
+    nodeBorder: v('--jam-node-line'), actorBkg: v('--jam-node'), actorBorder: v('--jam-node-line'),
+    labelBoxBkgColor: v('--jam-node'), labelBoxBorderColor: v('--jam-node-line'), secondaryColor: v('--jam-soft') };
+
+  // Mermaid cannot read CSS variables, so the flowchart's classDefs get real colours.
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    let src = pre.textContent.replace(/var\((--[\w-]+)\)/g, (_, n) => v(n));
+    if (pre.dataset.tone === 'jam') src = '%%{init: ' + JSON.stringify({ themeVariables: jamTone }) + '}%%\n' + src;
+    pre.textContent = src;
+  });
+
+  mermaid.initialize({
+    startOnLoad: false, theme: 'base', themeVariables: base, maxTextSize: 200000,
+    flowchart: { curve: 'basis', padding: 14, nodeSpacing: 34, rankSpacing: 46 },
+    class: { padding: 10 },
+    sequence: { mirrorActors: false, actorMargin: 46, messageMargin: 32, boxMargin: 8, noteMargin: 10 }
+  });
+  // Boxes are sized from text measured at render time; measured in the fallback face, Plex labels would clip.
+  try { await Promise.all([document.fonts.load('14px "IBM Plex Sans"'), document.fonts.load('600 14px "IBM Plex Sans"')]); } catch (e) {}
+  await document.fonts.ready;
+  try { await mermaid.run({ querySelector: 'pre.mermaid' }); } catch (e) { console.error(e); }
+
+  // Full-screen viewer with zoom.
+  const viewer = document.getElementById('viewer');
+  const body = document.getElementById('viewer-body');
+  const label = document.getElementById('zoom-label');
+  let svg = null, natural = 0, scale = 1;
+  const apply = () => { if (!svg) return; svg.style.width = Math.round(natural * scale) + 'px'; label.textContent = Math.round(scale * 100) + '%'; };
+  const fit = () => { scale = Math.min(2.5, Math.max(0.2, (body.clientWidth - 48) / natural)); apply(); };
+
+  document.querySelectorAll('[data-expand]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.diagram');
+      const src = card.querySelector('svg');
+      if (!src) return;
+      svg = src.cloneNode(true);
+      svg.removeAttribute('height');
+      svg.style.maxWidth = 'none';
+      const box = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+      natural = box[2] || src.getBoundingClientRect().width;
+      body.replaceChildren(svg);
+      document.getElementById('viewer-title').textContent = card.querySelector('h3').firstChild.textContent.trim();
+      viewer.showModal();
+      fit();
+    });
+  });
+  viewer.querySelectorAll('[data-zoom]').forEach((b) => b.addEventListener('click', () => {
+    const step = Number(b.dataset.zoom);
+    if (step === 0) return fit();
+    scale = Math.min(4, Math.max(0.2, scale * (step > 0 ? 1.25 : 0.8)));
+    apply();
+  }));
+  document.getElementById('viewer-close').addEventListener('click', () => viewer.close());
+  viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
+
+  // Highlight the section in view.
+  const links = [...document.querySelectorAll('.rail a')];
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id));
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('main section').forEach((s) => io.observe(s));
+})();
+</script>
+</body>
+</html>

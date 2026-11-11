@@ -1,5 +1,6 @@
 package com.convx.music.eq.data
 
+import com.convx.music.playback.EqualizerProfileParser
 import java.io.InputStream
 
 internal object EQProfileImport {
@@ -18,8 +19,8 @@ internal object EQProfileImport {
             } else count += read
         }
         require(count <= MAX_BYTES) { "EQ file is too large" }
-        val profile = ParametricEQParser.parseText(String(bytes, 0, count, Charsets.UTF_8).removePrefix("\uFEFF"))
-        require(ParametricEQParser.validate(profile).isEmpty()) { "Invalid EQ profile" }
+        val profile = EqualizerProfileParser.parseText(String(bytes, 0, count, Charsets.UTF_8).removePrefix("\uFEFF"))
+        require(EqualizerProfileParser.validate(profile).isEmpty()) { "Invalid EQ profile" }
         return profile
     }
 }

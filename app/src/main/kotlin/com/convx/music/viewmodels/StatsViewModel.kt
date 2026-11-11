@@ -16,8 +16,6 @@ import com.convx.music.db.MusicDatabase
 import com.convx.music.ui.screens.OptionStats
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,18 +28,14 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import javax.inject.Inject
 
 // The UI displays list sizes as counts. A 1,000-item cap covers expected libraries while
 // bounding query results and recomposition cost.
 private const val STATS_LIMIT = 1000
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class StatsViewModel
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+class StatsViewModel(
+    private val context: Context,
     val database: MusicDatabase,
 ) : ViewModel() {
     val selectedOption = MutableStateFlow(OptionStats.CONTINUOUS)

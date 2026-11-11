@@ -30,7 +30,7 @@ package com.convx.music.ui.screens
  import androidx.compose.ui.res.painterResource
  import androidx.compose.ui.res.stringResource
  import androidx.compose.ui.unit.dp
- import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
  import androidx.navigation.NavController
  import com.music.innertube.models.AlbumItem
  import com.music.innertube.models.ArtistItem
@@ -76,7 +76,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
     browseId: String?,
-    viewModel: BrowseViewModel = hiltViewModel(),
+    viewModel: BrowseViewModel = koinViewModel(),
 ) {
      val menuState = LocalMenuState.current
      val playerConnection = LocalPlayerConnection.current ?: return

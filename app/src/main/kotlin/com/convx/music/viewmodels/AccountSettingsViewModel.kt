@@ -23,15 +23,12 @@ import com.convx.music.constants.toJson
 import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
 import com.music.innertube.YouTube
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import androidx.datastore.preferences.core.edit
 
-@HiltViewModel
-class AccountSettingsViewModel @Inject constructor(
+class AccountSettingsViewModel(
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
 

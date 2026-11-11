@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -58,7 +58,6 @@ import com.music.innertube.models.ArtistItem
 import com.music.innertube.models.PlaylistItem
 import com.music.innertube.models.SongItem
 import com.music.innertube.pages.MoodAndGenres
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,7 +65,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import javax.inject.Inject
 
 /**
  * Apple Music's Search landing (iOS 26 reference, `938cf0…png`): two across, every
@@ -75,8 +73,7 @@ import javax.inject.Inject
  * so each tile borrows the lead artwork of its own category page, fetched as the tile
  * scrolls into view and cached for the session.
  */
-@HiltViewModel
-class AppleSearchViewModel @Inject constructor() : ViewModel() {
+class AppleSearchViewModel : ViewModel() {
     private val _categories = MutableStateFlow<List<MoodAndGenres.Item>?>(null)
     val categories = _categories.asStateFlow()
 
@@ -129,7 +126,7 @@ fun AppleSearchBrowse(
     navController: NavController,
     contentPadding: PaddingValues,
     header: @Composable () -> Unit,
-    viewModel: AppleSearchViewModel = hiltViewModel(),
+    viewModel: AppleSearchViewModel = koinViewModel(),
 ) {
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val art by viewModel.art.collectAsStateWithLifecycle()

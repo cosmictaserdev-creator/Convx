@@ -80,6 +80,7 @@ import com.convx.music.ui.screens.Screens
 import com.convx.music.ui.screens.library.apple.SfStyle
 import com.convx.music.ui.theme.LocalAccentColor
 import com.convx.music.ui.utils.fadingEdge
+import com.convx.music.designsystem.ConvxDesignTokens
 
 /** Panel corner. A tall panel, so a rounded rect rather than the phone bar's capsule. */
 private val SideBarShape = ContinuousRoundedRectangle(20.dp)
@@ -88,19 +89,19 @@ private val SideBarShape = ContinuousRoundedRectangle(20.dp)
 private val SideRowShape = ContinuousRoundedRectangle(percent = 50)
 
 /** Width of the whole floating panel. */
-val SideBarWidth: Dp = 320.dp
+val SideBarWidth: Dp = ConvxDesignTokens.Metrics.SidebarWidth
 
 /** Width when collapsed to an icon-only rail: just enough for the icon and padding. */
-val SideBarCollapsedWidth: Dp = 72.dp
+val SideBarCollapsedWidth: Dp = ConvxDesignTokens.Metrics.SidebarCollapsedWidth
 
 /**
  * Container width at or above which the app lays itself out for tab view on its
  * own. Below it the side bar only appears if the Appearance toggle forces it.
  */
-val TabletWidthThreshold: Dp = 840.dp
+val TabletWidthThreshold: Dp = ConvxDesignTokens.Metrics.TabletWidthThreshold
 
 /** Panel inset from the screen edge, and the gap it leaves to the content. */
-val SideBarMargin: Dp = 30.dp
+val SideBarMargin: Dp = ConvxDesignTokens.Metrics.SidebarInset
 private val SideBarDesignHeight: Dp = 600.dp
 
 /** Content padding keeps rows clear of the panel at rest while letting them scroll underneath. */
@@ -110,20 +111,20 @@ val SideBarContentInset: Dp = SideBarWidth + 20.dp
 private const val PuckRestHighlightAlpha = 0.5f
 private const val PuckRestShadowAlpha = 0.35f
 
-private val SideTabHeight = 44.dp
+private val SideTabHeight = ConvxDesignTokens.Metrics.SidebarRowHeight
 private val SideBarContentPadding = PaddingValues(horizontal = 6.dp)
 
 /** Fixed leading slot keeps labels aligned across icons, artwork, and avatars. */
-private val SideRowLeadingSlot = 24.dp
-private val SideRowIconSize = 22.dp
+private val SideRowLeadingSlot = ConvxDesignTokens.Metrics.SidebarLeadingSlot
+private val SideRowIconSize = ConvxDesignTokens.Metrics.SidebarIconSize
 
 /** Width of the floating mini player as a fraction of the available content width. */
-const val FloatingMiniPlayerWidthFraction = 0.8f
+const val FloatingMiniPlayerWidthFraction = ConvxDesignTokens.Metrics.MiniPlayerWidthFraction
 
 /** Height as a share of the pill's own width, clamped to stay a bar. */
 private const val FloatingMiniPlayerAspect = 0.11f
-private val FloatingMiniPlayerMinHeight = 64.dp
-private val FloatingMiniPlayerMaxHeight = 64.dp
+private val FloatingMiniPlayerMinHeight = ConvxDesignTokens.Metrics.MiniPlayerHeight
+private val FloatingMiniPlayerMaxHeight = ConvxDesignTokens.Metrics.MiniPlayerHeight
 
 /** Scopes that let the side panel and the top pill morph into each other as one shared element. */
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -597,7 +598,11 @@ private fun SideTabRow(
             Text(
                 text = stringResource(tab.screen.titleId),
                 color = contentColor,
-                style = SfStyle(17.sp, 22.sp, tracking = (-0.43).sp),
+                style = SfStyle(
+                    ConvxDesignTokens.Type.SidebarLabel,
+                    ConvxDesignTokens.Type.SidebarLabelLineHeight,
+                    tracking = ConvxDesignTokens.Type.SidebarLabelTracking,
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.navMorph(morph, "tab_${tab.screen.route}"),
@@ -647,7 +652,11 @@ private fun SideBarLinkRow(link: SideBarLink, contentColor: Color) {
         Text(
             text = link.label,
             color = contentColor,
-            style = SfStyle(17.sp, 22.sp, tracking = (-0.43).sp),
+            style = SfStyle(
+                ConvxDesignTokens.Type.SidebarLabel,
+                ConvxDesignTokens.Type.SidebarLabelLineHeight,
+                tracking = ConvxDesignTokens.Type.SidebarLabelTracking,
+            ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

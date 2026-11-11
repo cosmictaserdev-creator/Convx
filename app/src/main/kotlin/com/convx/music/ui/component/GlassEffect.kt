@@ -43,6 +43,7 @@ import com.convx.music.ui.component.backdrop.highlight.Highlight
 import com.convx.music.ui.component.backdrop.highlight.HighlightStyle
 import com.convx.music.ui.component.backdrop.shadow.Shadow
 import com.convx.music.ui.utils.outerDarkRim
+import com.convx.music.designsystem.ConvxDesignTokens
 
 /**
  * User-configurable parameters of the liquid glass effect, sourced from DataStore
@@ -52,13 +53,13 @@ import com.convx.music.ui.utils.outerDarkRim
 @Stable
 data class GlassEffectConfig(
     val globalEnabled: Boolean = true,
-    val vibrancy: Float = 2.0f,
+    val vibrancy: Float = ConvxDesignTokens.Glass.MiniPlayerSaturation,
     /** Blur in dp applied to glass pills. Nav spec = 3dp (Q16). */
-    val blurRadius: Float = 3f,
+    val blurRadius: Float = ConvxDesignTokens.Glass.MiniPlayerBlurDp,
     /** 0..1, mapped to 0..[LENS_MAX_DP] dp of lens refraction height. Nav spec .60 (Q16). */
-    val lensHeight: Float = 0.60f,
+    val lensHeight: Float = ConvxDesignTokens.Glass.MiniPlayerLensHeight,
     /** 0..1, mapped to 0..[LENS_MAX_DP] dp of lens refraction amount. Nav spec .69 (Q16). */
-    val lensAmount: Float = 0.69f,
+    val lensAmount: Float = ConvxDesignTokens.Glass.MiniPlayerLensAmount,
     val chromaticAberration: Boolean = false,
     val depthEffect: Boolean = false,
     /** [Color.Unspecified] means adaptive: derived from the theme surface. */
@@ -73,7 +74,7 @@ data class GlassEffectConfig(
      *  to the theme: a dark wash on dark, a light one on light. */
     val puckColor: Color = Color.Unspecified,
     /** Puck wash opacity at rest. It eases toward clear while pressed. */
-    val puckOpacity: Float = 0.8f,
+    val puckOpacity: Float = ConvxDesignTokens.Glass.DarkSelectedPuckOpacity,
     val surfaceOpacity: Float = 0.5f,
     /** [Color.Unspecified] means adaptive monochromatic label (dark over light
      *  content, light over dark) — resolved by [resolvedTextColor]. */
@@ -87,12 +88,12 @@ data class GlassEffectConfig(
      *  which all share [vibrancy]/[blurRadius]/[lensHeight]/[lensAmount]) —
      *  defaults match those shared values so it looks identical until
      *  explicitly customized. */
-    val sidePanelVibrancy: Float = 1.2f,
-    val sidePanelBlurRadius: Float = 2f,
-    val sidePanelLensHeight: Float = 0.4f,
-    val sidePanelLensAmount: Float = 0.6f,
+    val sidePanelVibrancy: Float = ConvxDesignTokens.Glass.SidePanelSaturation,
+    val sidePanelBlurRadius: Float = ConvxDesignTokens.Glass.SidePanelBlurDp,
+    val sidePanelLensHeight: Float = ConvxDesignTokens.Glass.SidePanelLensHeight,
+    val sidePanelLensAmount: Float = ConvxDesignTokens.Glass.SidePanelLensAmount,
     val sidePanelColor: Color = Color.Unspecified,
-    val sidePanelSurfaceOpacity: Float = 0.75f,
+    val sidePanelSurfaceOpacity: Float = ConvxDesignTokens.Glass.SidePanelTintOpacity,
     val sidePanelTextColor: Color = Color.Unspecified,
 ) {
     /** Copies the side panel's effect settings into the shared fields. */
@@ -146,7 +147,7 @@ enum class GlassComponent {
 }
 
 /** Maximum lens height and amount at a preference value of 1. */
-internal const val LENS_MAX_DP = 48f
+internal const val LENS_MAX_DP = ConvxDesignTokens.Glass.MaxLensDp
 
 /** Extra blur applied to the full-screen player's background. */
 internal const val PLAYER_BLUR_MULTIPLIER = 4f

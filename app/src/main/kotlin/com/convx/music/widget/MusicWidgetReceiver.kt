@@ -13,16 +13,12 @@ import android.os.Build
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.convx.music.playback.MusicService
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import org.koin.core.context.GlobalContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 open class MusicWidgetReceiver : AppWidgetProvider() {
-    @Inject lateinit var widgetManager: ConvxWidgetManager
-
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -44,7 +40,7 @@ open class MusicWidgetReceiver : AppWidgetProvider() {
             val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    widgetManager.updateWidgets(
+                    GlobalContext.get().get<ConvxWidgetManager>().updateWidgets(
                         title = context.getString(com.convx.music.R.string.app_name),
                         artist = context.getString(com.convx.music.R.string.widget_open_app),
                         artworkUri = null, isPlaying = false, isLiked = false,

@@ -8,6 +8,7 @@ import android.webkit.WebView
 import androidx.annotation.MainThread
 import androidx.collection.ArrayMap
 import com.music.innertube.YouTube
+import com.convx.music.utils.toJavaProxy
 import com.convx.music.BuildConfig
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -325,7 +326,7 @@ class PoTokenWebView private constructor(
         private const val JS_INTERFACE = "PoTokenWebView"
 
         private val httpClient = OkHttpClient.Builder()
-            .proxy(YouTube.proxy)
+            .proxy(YouTube.proxy.toJavaProxy())
             .build()
 
         suspend fun getNewPoTokenGenerator(context: Context): PoTokenWebView {

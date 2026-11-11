@@ -90,7 +90,7 @@ import com.convx.music.ui.utils.listOverscroll
 import com.convx.music.utils.rememberPreference
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastSumBy
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -163,7 +163,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun TopPlaylistScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: TopPlaylistViewModel = hiltViewModel(),
+    viewModel: TopPlaylistViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val menuState = LocalMenuState.current

@@ -37,13 +37,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.convx.music.LocalDatabase
 import com.convx.music.R
 import com.convx.music.constants.GridCardArtShape
 import com.convx.music.constants.ListRowArtShape
 import com.convx.music.constants.ListThumbnailSize
-import com.convx.music.db.entities.Playlist
 import com.convx.music.db.entities.Song
+import com.convx.music.library.PlaylistCardData
+import com.convx.music.library.LocalPlaylistSongDataSource
 import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.playback.displayDownloadState
 import com.convx.music.ui.ios.compat.Icon
@@ -53,10 +53,7 @@ import com.convx.music.ui.theme.AppleTokens
 import com.convx.music.ui.utils.resize
 import com.convx.music.ui.utils.sharedArtworkSource
 import com.convx.music.ui.utils.sharedTitleSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 
 @Composable
 internal fun getAutoPlaylistIcon(name: String): Int = when {
@@ -70,8 +67,20 @@ internal fun getAutoPlaylistIcon(name: String): Int = when {
 }
 
 @Composable
+private fun playlistSongCountSubtitle(playlist: PlaylistCardData, autoPlaylist: Boolean): String {
+    if (autoPlaylist) return ""
+
+    val remoteSongCount = playlist.remoteSongCount
+    return if (playlist.songCount == 0 && remoteSongCount != null) {
+        pluralStringResource(R.plurals.n_song, remoteSongCount, remoteSongCount)
+    } else {
+        pluralStringResource(R.plurals.n_song, playlist.songCount, playlist.songCount)
+    }
+}
+
+@Composable
 fun PlaylistListItem(
-    playlist: Playlist,
+    playlist: PlaylistCardData,
     modifier: Modifier = Modifier,
     autoPlaylist: Boolean = false,
     sharedArtworkId: String? = null,
@@ -80,12 +89,10 @@ fun PlaylistListItem(
     thumbnailOverrideUrl: String? = null,
     flat: Boolean = false,
     badges: @Composable RowScope.() -> Unit = {
-        val database = LocalDatabase.current.get()
+        val localPlaylistSongDataSource = koinInject<LocalPlaylistSongDataSource>()
 
         val songs by produceState<List<Song>>(initialValue = emptyList(), playlist.id) {
-            withContext(Dispatchers.IO) {
-                value = database.playlistSongs(playlist.id).first().map { it.song }
-            }
+            value = localPlaylistSongDataSource.loadSongs(playlist.id).map { it.song }
         }
 
         val allDownloads = LocalDownloads.current
@@ -102,30 +109,14 @@ fun PlaylistListItem(
     shape: Shape = androidx.compose.ui.graphics.RectangleShape,
     showIconOnly: Boolean = false,
 ) = ListItem(
-    title = playlist.playlist.name,
-    subtitle = if (autoPlaylist) {
-        ""
-    } else {
-        if (playlist.songCount == 0 && playlist.playlist.remoteSongCount != null) {
-            pluralStringResource(
-                R.plurals.n_song,
-                playlist.playlist.remoteSongCount,
-                playlist.playlist.remoteSongCount
-            )
-        } else {
-            pluralStringResource(
-                R.plurals.n_song,
-                playlist.songCount,
-                playlist.songCount
-            )
-        }
-    },
+    title = playlist.name,
+    subtitle = playlistSongCountSubtitle(playlist, autoPlaylist),
     badges = badges,
     thumbnailContent = {
         Box(
             modifier = Modifier.sharedArtworkSource(
                 sharedArtworkId ?: if (autoPlaylist) null else playlist.id,
-                thumbnailOverrideUrl ?: playlist.thumbnails.firstOrNull(),
+                thumbnailOverrideUrl ?: playlist.artworkUrls.firstOrNull(),
             ),
             propagateMinConstraints = true,
         ) {
@@ -150,7 +141,7 @@ fun PlaylistListItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(getAutoPlaylistIcon(playlist.playlist.name)),
+                        painter = painterResource(getAutoPlaylistIcon(playlist.name)),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
                         tint = LocalContentColor.current.copy(alpha = 0.6f)
@@ -158,7 +149,7 @@ fun PlaylistListItem(
                 }
             } else {
                 PlaylistThumbnail(
-                    thumbnails = playlist.thumbnails,
+                    thumbnails = playlist.artworkUrls,
                     size = ListThumbnailSize,
                     placeHolder = {
                         Box(
@@ -168,7 +159,7 @@ fun PlaylistListItem(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                painter = painterResource(getAutoPlaylistIcon(playlist.playlist.name)),
+                                painter = painterResource(getAutoPlaylistIcon(playlist.name)),
                                 contentDescription = null,
                                 tint = LocalContentColor.current.copy(alpha = 0.6f),
                                 modifier = Modifier.size(ListThumbnailSize / 2)
@@ -194,7 +185,7 @@ fun PlaylistListItem(
 
 @Composable
 fun PlaylistGridItem(
-    playlist: Playlist,
+    playlist: PlaylistCardData,
     modifier: Modifier = Modifier,
     autoPlaylist: Boolean = false,
     sharedArtworkId: String? = null,
@@ -202,12 +193,10 @@ fun PlaylistGridItem(
     // first-song artwork URL) instead of the playlist thumbnails / auto icon.
     thumbnailOverrideUrl: String? = null,
     badges: @Composable RowScope.() -> Unit = {
-        val database = LocalDatabase.current.get()
+        val localPlaylistSongDataSource = koinInject<LocalPlaylistSongDataSource>()
 
         val songs by produceState<List<Song>>(initialValue = emptyList(), playlist.id) {
-            withContext(Dispatchers.IO) {
-                value = database.playlistSongs(playlist.id).first().map { it.song }
-            }
+            value = localPlaylistSongDataSource.loadSongs(playlist.id).map { it.song }
         }
 
         val allDownloads = LocalDownloads.current
@@ -225,35 +214,19 @@ fun PlaylistGridItem(
 ) = GridItem(
     title = {
         Text(
-            text = playlist.playlist.name,
+            text = playlist.name,
             style = AppTheme.typography.bodyMedium,
             fontSize = 15.sp,
             fontWeight = FontWeight.Normal,
             letterSpacing = (-0.23).sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.sharedTitleSource(playlist.playlist.name).fillMaxWidth()
+            modifier = Modifier.sharedTitleSource(playlist.name).fillMaxWidth()
         )
     },
     subtitle = {
-        val subtitle = when {
-            autoPlaylist -> ""
-            playlist.songCount == 0 && playlist.playlist.remoteSongCount != null -> {
-                val remoteSongCount = playlist.playlist.remoteSongCount
-                pluralStringResource(
-                    R.plurals.n_song,
-                    remoteSongCount,
-                    remoteSongCount,
-                )
-            }
-            else -> pluralStringResource(
-                R.plurals.n_song,
-                playlist.songCount,
-                playlist.songCount,
-            )
-        }
         Text(
-            text = subtitle,
+            text = playlistSongCountSubtitle(playlist, autoPlaylist),
             style = AppTheme.typography.bodySmall,
             fontSize = 15.sp,
             lineHeight = 20.sp,
@@ -268,7 +241,7 @@ fun PlaylistGridItem(
         Box(
             modifier = Modifier.fillMaxSize().sharedArtworkSource(
                 sharedArtworkId ?: if (autoPlaylist) null else playlist.id,
-                thumbnailOverrideUrl ?: playlist.thumbnails.firstOrNull(),
+                thumbnailOverrideUrl ?: playlist.artworkUrls.firstOrNull(),
             ),
             propagateMinConstraints = true,
         ) {
@@ -290,7 +263,7 @@ fun PlaylistGridItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(getAutoPlaylistIcon(playlist.playlist.name)),
+                        painter = painterResource(getAutoPlaylistIcon(playlist.name)),
                         contentDescription = null,
                         modifier = Modifier.size(width / 3),
                         tint = LocalContentColor.current.copy(alpha = 0.6f)
@@ -298,7 +271,7 @@ fun PlaylistGridItem(
                 }
             } else {
             PlaylistThumbnail(
-                thumbnails = playlist.thumbnails,
+                thumbnails = playlist.artworkUrls,
                 size = width,
                 placeHolder = {
                     Box(
@@ -308,7 +281,7 @@ fun PlaylistGridItem(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(getAutoPlaylistIcon(playlist.playlist.name)),
+                            painter = painterResource(getAutoPlaylistIcon(playlist.name)),
                             contentDescription = null,
                             tint = LocalContentColor.current.copy(alpha = 0.6f),
                             modifier = Modifier.size(width / 3)

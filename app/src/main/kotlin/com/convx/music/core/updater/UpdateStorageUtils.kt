@@ -1,11 +1,10 @@
 package com.convx.music.core.updater
 
 import android.content.Context
-import android.os.Environment
 import java.io.File
 
 fun getDownloadedApksDir(context: Context): File {
-    return File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "convx_updates")
+    return File(context.noBackupFilesDir, "updates")
 }
 
 fun getDownloadedApkCount(context: Context): Int {
@@ -35,6 +34,6 @@ fun autoClearOldApks(context: Context) {
     if (!dir.exists() || !dir.isDirectory) return
     val oneDayAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
     dir.listFiles { file ->
-        file.isFile && file.name.endsWith(".apk", ignoreCase = true) && file.lastModified() < oneDayAgo
+        file.isFile && (file.name.endsWith(".part", ignoreCase = true) || file.name.endsWith(".etag", ignoreCase = true)) && file.lastModified() < oneDayAgo
     }?.forEach { it.delete() }
 }

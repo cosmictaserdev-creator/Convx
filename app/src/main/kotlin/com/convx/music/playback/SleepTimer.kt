@@ -11,53 +11,46 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import com.convx.music.playback.PlaybackSleepTimer
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
 
 class SleepTimer(
     private val scope: CoroutineScope,
     var player: Player,
 ) : Player.Listener {
-    private var sleepTimerJob: Job? = null
+    private val policy = PlaybackSleepTimer(
+        scope = scope,
+        nowMillis = System::currentTimeMillis,
+        pausePlayback = { player.pause() },
+    )
+    val sharedPolicy: PlaybackSleepTimer get() = policy
+
     var triggerTime by mutableLongStateOf(-1L)
         private set
     var pauseWhenSongEnd by mutableStateOf(false)
         private set
     val isActive: Boolean
-        get() = triggerTime != -1L || pauseWhenSongEnd
+        get() = policy.state.value.isActive
 
-    fun start(minute: Int) {
-        sleepTimerJob?.cancel()
-        sleepTimerJob = null
-        if (minute == -1) {
-            pauseWhenSongEnd = true
-            triggerTime = -1L
-        } else {
-            pauseWhenSongEnd = false
-            triggerTime = System.currentTimeMillis() + minute.minutes.inWholeMilliseconds
-            sleepTimerJob =
-                scope.launch {
-                    delay(minute.minutes)
-                    player.pause()
-                    triggerTime = -1L
-                }
+    init {
+        scope.launch {
+            policy.state.collect { state ->
+                triggerTime = state.triggerTimeMs
+                pauseWhenSongEnd = state.pauseWhenTrackEnds
+            }
         }
     }
 
-    /** Also called when crossfade swaps the session player. */
-    fun notifySongTransition() {
-        pauseAtSongEnd()
+    fun start(minute: Int) {
+        policy.start(minute)
     }
 
-    fun clear() {
-        sleepTimerJob?.cancel()
-        sleepTimerJob = null
-        pauseWhenSongEnd = false
-        triggerTime = -1L
-    }
+    /** Also called when crossfade swaps the session player. */
+    fun notifySongTransition() = pauseAtSongEnd()
+
+    fun clear() = policy.clear()
 
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
@@ -73,8 +66,6 @@ class SleepTimer(
     }
 
     private fun pauseAtSongEnd() {
-        if (!pauseWhenSongEnd) return
-        pauseWhenSongEnd = false
-        player.pause()
+        policy.onTrackEnded()
     }
 }

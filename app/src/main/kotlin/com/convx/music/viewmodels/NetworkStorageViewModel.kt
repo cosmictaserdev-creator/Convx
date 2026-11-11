@@ -17,17 +17,13 @@ import com.convx.storage.domain.NetworkServer
 import com.convx.storage.domain.SourceCredentials
 import com.convx.storage.domain.StorageError
 import com.convx.storage.domain.StorageException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-@HiltViewModel
-class NetworkStorageViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class NetworkStorageViewModel(
+    private val context: Context,
     private val repository: NetworkMusicRepository,
     private val database: MusicDatabase,
 ) : ViewModel() {
