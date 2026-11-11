@@ -18,7 +18,7 @@ kotlin {
         commonMain.dependencies {
             api(libs.kotlinx.coroutines.core)
             implementation("io.ktor:ktor-http:${libs.versions.ktor.get()}")
-            api("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
+            api("org.jetbrains.kotlinx:kotlinx-io-core:0.9.2")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
