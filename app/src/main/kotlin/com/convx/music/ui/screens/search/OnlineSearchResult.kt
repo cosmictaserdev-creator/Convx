@@ -418,6 +418,25 @@ fun OnlineSearchResult(
                             }
                         }
 
+                        // JioSaavn results, shown only when the Saavn switch is on in
+                        // settings and only where a song list makes sense.
+                        val saavnItems = viewModel.saavnSongs.orEmpty()
+                        if (
+                            saavnItems.isNotEmpty() &&
+                            (searchFilter == null || searchFilter == FILTER_SONG)
+                        ) {
+                            item(key = "saavn_header") {
+                                NavigationTitle(title = "JioSaavn")
+                            }
+                            itemsIndexed(
+                                items = saavnItems,
+                                key = { _, item -> "saavn/${item.id}" },
+                                contentType = { _, _ -> "yt_item_row" },
+                            ) { index, item ->
+                                ytItemContent(item, index, saavnItems)
+                            }
+                        }
+
                         if (isLoadingResults) {
                             item {
                                 ShimmerHost {

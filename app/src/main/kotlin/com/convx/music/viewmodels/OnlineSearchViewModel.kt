@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Convx Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -23,11 +23,16 @@ import com.convx.music.constants.HideExplicitKey
 import com.convx.music.constants.HideVideoSongsKey
 import com.convx.music.constants.DataSaverEnabledKey
 import com.convx.music.constants.HideYoutubeShortsKey
+import com.convx.music.constants.EnableSaavnStreamingKey
+import com.music.innertube.models.SongItem
+import com.convx.music.api.SaavnCatalogue
 import com.convx.music.models.ItemsPage
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import com.convx.music.utils.PageCaches
@@ -45,11 +50,21 @@ class OnlineSearchViewModel(
     var summaryPage by mutableStateOf<SearchSummaryPage?>(null)
     val viewStateMap = mutableStateMapOf<String, ItemsPage?>()
 
+    /** JioSaavn matches for this query; stays null unless the Saavn switch is on. */
+    var saavnSongs by mutableStateOf<List<SongItem>?>(null)
+        private set
+
     init {
         viewModelScope.launch {
             // Only fetches what isn't cached yet — switching filters back and forth
             // must not re-hit the network. refresh() drops the cache entry first.
             filter.collect { load(it) }
+        }
+        viewModelScope.launch {
+            // Same switch that enables Saavn playback (Settings > JioSaavn).
+            if (context.dataStore.get(EnableSaavnStreamingKey, false)) {
+                saavnSongs = withContext(Dispatchers.IO) { SaavnCatalogue.searchSongs(query) }
+            }
         }
     }
 
