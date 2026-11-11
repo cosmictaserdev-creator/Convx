@@ -22,6 +22,7 @@ val IsFirstRunKey = booleanPreferencesKey("isFirstRun")
 val FirstLaunchTimestampKey = longPreferencesKey("firstLaunchTimestamp")
 val DonationPromptLastShownKey = longPreferencesKey("donationPromptLastShown")
 val DonationPromptDismissedKey = booleanPreferencesKey("donationPromptDismissed")
+val HideStatusBarKey = booleanPreferencesKey("hideStatusBar")
 val AppIconKey = stringPreferencesKey("appIcon")
 
 /**
@@ -127,6 +128,8 @@ val SeekExtraSeconds = booleanPreferencesKey("seekExtraSeconds")
 val PauseOnMute = booleanPreferencesKey("pauseOnMute")
 val ResumeOnBluetoothConnectKey = booleanPreferencesKey("resumeOnBluetoothConnect")
 val KeepScreenOn = booleanPreferencesKey("keepScreenOn")
+/** "Add to queue" plays after the current song and earlier queued songs, ahead of the rest of the playlist. */
+val QueueBeforeContextKey = booleanPreferencesKey("queueBeforeContext")
 val DeveloperModeKey = booleanPreferencesKey("developerMode")
 val EnableSettingsPopupKey = booleanPreferencesKey("enableSettingsPopup")
 

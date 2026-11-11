@@ -179,7 +179,7 @@ interface DatabaseDao {
     fun likedSongsCount(): Flow<Int>
 
     @Transaction
-    @Query("SELECT song.* FROM song JOIN song_album_map ON song.id = song_album_map.songId WHERE song_album_map.albumId = :albumId")
+    @Query("SELECT song.* FROM song JOIN song_album_map ON song.id = song_album_map.songId WHERE song_album_map.albumId = :albumId ORDER BY song_album_map.`index`, song.title COLLATE NOCASE")
     fun albumSongs(albumId: String): Flow<List<Song>>
 
     @Transaction
@@ -1967,6 +1967,9 @@ interface DatabaseDao {
 
     @Query("DELETE FROM song_album_map WHERE songId = :songId")
     fun clearSongAlbums(songId: String)
+
+    @Query("UPDATE song_album_map SET `index` = :index WHERE songId = :songId AND `index` != :index")
+    fun setSongAlbumIndex(songId: String, index: Int)
 
     @Query("UPDATE album SET thumbnailUrl = :thumbnailUrl WHERE id = :albumId AND (thumbnailUrl IS NULL OR thumbnailUrl != :thumbnailUrl)")
     fun setAlbumThumbnail(albumId: String, thumbnailUrl: String)

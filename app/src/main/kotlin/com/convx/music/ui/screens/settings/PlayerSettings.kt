@@ -118,6 +118,10 @@ fun PlayerSettings(
         KeepScreenOn,
         defaultValue = false
     )
+    val (queueBeforeContext, onQueueBeforeContextChange) = rememberPreference(
+        com.convx.music.constants.QueueBeforeContextKey,
+        defaultValue = true
+    )
     var showAudioQualityDialog by remember {
         mutableStateOf(false)
     }
@@ -377,6 +381,18 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onResumeOnBluetoothConnectChange(!resumeOnBluetoothConnect) }
+                        ),
+                        IosSettingsItem(
+                            icon = painterResource(R.drawable.queue_music),
+                            title = { Text(stringResource(R.string.queue_before_context)) },
+                            description = { Text(stringResource(R.string.queue_before_context_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = queueBeforeContext,
+                                    onCheckedChange = onQueueBeforeContextChange
+                                )
+                            },
+                            onClick = { onQueueBeforeContextChange(!queueBeforeContext) }
                         ),
                         IosSettingsItem(
                             icon = painterResource(R.drawable.screenshot),

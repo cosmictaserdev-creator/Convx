@@ -163,6 +163,7 @@ import com.convx.music.constants.ScrobbleMinSongDurationKey
 import com.convx.music.constants.ShuffleModeKey
 import com.convx.music.constants.ShufflePlaylistFirstKey
 import com.convx.music.constants.PreventDuplicateTracksInQueueKey
+import com.convx.music.constants.QueueBeforeContextKey
 import com.convx.music.constants.SimilarContent
 import com.convx.music.constants.SkipSilenceInstantKey
 import com.convx.music.constants.BitPerfectKey
@@ -2416,12 +2417,30 @@ class MusicService :
     fun addToQueue(items: List<MediaItem>) {
         removeDuplicateQueueItems(items)
 
+        val playing = player.mediaItemCount > 0 && player.playbackState != STATE_IDLE
+        if (playing && !player.shuffleModeEnabled && dataStore.get(QueueBeforeContextKey, true)) {
+            // Like Spotify's queue: songs added here play right after the current one, in the order they were
+            // added, and before the rest of the album or playlist rather than after all of it.
+            var insertIndex = player.currentMediaItemIndex + 1
+            while (insertIndex < player.mediaItemCount && player.getMediaItemAt(insertIndex).isUserQueued()) insertIndex++
+            player.addMediaItems(insertIndex, items.map { it.asUserQueued() })
+            player.prepare()
+            return
+        }
+
         player.addMediaItems(items)
         if (player.shuffleModeEnabled) {
             val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
             applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
         }
         player.prepare()
+    }
+
+    private fun MediaItem.isUserQueued(): Boolean = mediaMetadata.extras?.getBoolean(USER_QUEUED_EXTRA) == true
+
+    private fun MediaItem.asUserQueued(): MediaItem {
+        val extras = android.os.Bundle(mediaMetadata.extras ?: android.os.Bundle.EMPTY).apply { putBoolean(USER_QUEUED_EXTRA, true) }
+        return buildUpon().setMediaMetadata(mediaMetadata.buildUpon().setExtras(extras).build()).build()
     }
 
     private fun removeDuplicateQueueItems(items: List<MediaItem>) {
@@ -4419,6 +4438,7 @@ class MusicService :
     private val scrobbleCoordinator = ScrobbleCoordinator()
 
     companion object {
+        private const val USER_QUEUED_EXTRA = "convx_user_queued"
         /** Widget progress repaint cadence while playing with the screen on. */
         private const val WIDGET_PROGRESS_INTERVAL_MS = 1000L
         private const val WIDGET_LYRICS_INTERVAL_MS = 200L

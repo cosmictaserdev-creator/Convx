@@ -50,6 +50,7 @@ import com.convx.music.models.toMediaMetadata
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -355,6 +356,10 @@ class MediaLibrarySessionCallback(
     ): ListenableFuture<MediaItemsWithStartPosition> =
         scope.future(Dispatchers.IO) {
             val defaultResult = MediaItemsWithStartPosition(emptyList(), startIndex, startPositionMs)
+            // "Hey Google, play X on Convx" arrives as an item with a search query and no media id of ours.
+            mediaItems.firstOrNull()?.requestMetadata?.searchQuery?.let { spoken ->
+                return@future resolveVoiceRequest(spoken.trim(), defaultResult)
+            }
             val path = mediaItems.firstOrNull()?.mediaId?.split("/")
                 ?: return@future defaultResult
 
@@ -444,6 +449,27 @@ class MediaLibrarySessionCallback(
         songs.indexOfFirst { it.id == songId }.coerceAtLeast(0),
         startPositionMs,
     )
+
+    /** An empty request ("play some music") shuffles the library; anything else plays the best search matches. */
+    private suspend fun resolveVoiceRequest(
+        spoken: String,
+        defaultResult: MediaItemsWithStartPosition,
+    ): MediaItemsWithStartPosition {
+        val items = try {
+            if (spoken.isEmpty()) {
+                database.allSongs().first().shuffled().take(MAX_VOICE_QUEUE).map { it.toMediaItem() }
+            } else {
+                val localSongs = findLocalSearchSongs(spoken)
+                (localSongs + findOnlineSearchSongs(spoken, localSongs)).map { it.toMediaItem() }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            reportException(e)
+            return defaultResult
+        }
+        return if (items.isEmpty()) defaultResult else MediaItemsWithStartPosition(items, 0, C.TIME_UNSET)
+    }
 
     private suspend fun resolveSearchItems(
         path: List<String>,
@@ -900,3 +926,5 @@ class MediaLibrarySessionCallback(
         return subList(fromIndex.toInt(), minOf(fromIndex.toInt() + pageSize, size))
     }
 }
+
+private const val MAX_VOICE_QUEUE = 100
