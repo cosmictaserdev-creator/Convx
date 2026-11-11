@@ -164,7 +164,6 @@ import com.convx.music.constants.ShuffleModeKey
 import com.convx.music.constants.ShufflePlaylistFirstKey
 import com.convx.music.constants.PreventDuplicateTracksInQueueKey
 import com.convx.music.constants.QueueBeforeContextKey
-import com.convx.music.constants.UsbBitPerfectKey
 import com.convx.music.constants.SimilarContent
 import com.convx.music.constants.SkipSilenceInstantKey
 import com.convx.music.constants.BitPerfectKey
@@ -646,7 +645,6 @@ class MusicService :
 
     /** Per-output EQ: restore the profile last used on whatever is now playing audio. */
     private fun onOutputChanged() {
-        UsbBitPerfectAudio.apply(audioManager, dataStore.get(UsbBitPerfectKey, false))
         roomPlaybackBridge.invalidateJamTiming()
         val key = currentOutputKey()
         scope.launch { eqProfileRepository.switchOutput(key) }
@@ -749,11 +747,6 @@ class MusicService :
 
         audioManager.registerAudioDeviceCallback(audioDeviceCallback, null)
         onOutputChanged()
-        scope.launch {
-            // Turning the setting on or off takes effect right away, without replugging the DAC.
-            dataStore.data.map { it[UsbBitPerfectKey] ?: false }.distinctUntilChanged()
-                .collect { UsbBitPerfectAudio.apply(audioManager, it) }
-        }
 
         audioQuality = dataStore.get(AudioQualityKey).toEnum(com.convx.music.constants.AudioQuality.AUTO)
         ipVersion = dataStore.get(IpVersionKey).toEnum(IpVersion.AUTO)
