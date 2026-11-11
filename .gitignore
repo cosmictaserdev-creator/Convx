@@ -99,8 +99,7 @@ output-metadata.json
 .vscode/
 
 # Binary files and core dumps
-# (a bare "/core" rule used to be here; it also ignored the core/ module folder, so new files there never
-# showed up in git status. Only dump files named core.<pid> are ignored now.)
+/core
 /core.*
 *.so
 *.bin
