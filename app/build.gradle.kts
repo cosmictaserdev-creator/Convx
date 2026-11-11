@@ -270,6 +270,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.guava)
+    // Writes ID3, Vorbis/FLAC, MP4 and Ogg tags for the built-in tag editor.
+    implementation(libs.jaudiotagger)
     implementation(libs.coroutines.guava)
     implementation(libs.concurrent.futures)
 

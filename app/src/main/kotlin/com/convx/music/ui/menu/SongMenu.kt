@@ -869,7 +869,24 @@ fun SongMenu(
                     if (song.song.isLocal) {
                         add(
                             IosMenuItemData(
-                                title = { Text(text = stringResource(R.string.edit_tags)) },
+                                title = { Text(text = stringResource(R.string.tag_editor_title)) },
+                                description = {
+                                    Text(text = stringResource(R.string.tag_editor_desc))
+                                },
+                                icon = {
+                                    SymbolIcon(symbol = sf("square.and.pencil"), contentDescription = null)
+                                },
+                                onClick = {
+                                    onDismiss()
+                                    bottomSheetPageState.showFloating {
+                                        EditTagsPanel(song)
+                                    }
+                                }
+                            )
+                        )
+                        add(
+                            IosMenuItemData(
+                                title = { Text(text = stringResource(R.string.edit_tags_external)) },
                                 description = {
                                     Text(text = stringResource(R.string.edit_tags_desc))
                                 },

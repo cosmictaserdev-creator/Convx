@@ -1981,6 +1981,13 @@ interface DatabaseDao {
     @Query("DELETE FROM artist WHERE isLocal = 1 AND id LIKE 'network_artist_%' AND id NOT IN (SELECT artistId FROM song_artist_map)")
     fun pruneEmptyNetworkArtists()
 
+    /** After a tag edit moves a song, the album or artist it left may be empty. */
+    @Query("DELETE FROM album WHERE isLocal = 1 AND id LIKE 'local_album_%' AND id NOT IN (SELECT albumId FROM song_album_map)")
+    fun pruneEmptyLocalAlbums()
+
+    @Query("DELETE FROM artist WHERE isLocal = 1 AND id LIKE 'local_artist_%' AND id NOT IN (SELECT artistId FROM song_artist_map)")
+    fun pruneEmptyLocalArtists()
+
     @Delete
     fun delete(playlist: PlaylistEntity)
 
