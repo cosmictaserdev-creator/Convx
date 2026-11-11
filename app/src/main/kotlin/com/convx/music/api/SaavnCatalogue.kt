@@ -32,7 +32,7 @@ object SaavnCatalogue {
     }
 }
 
-private fun RawSongItem.toSongItem(): SongItem? {
+internal fun RawSongItem.toSongItem(): SongItem? {
     if (id.isBlank() || title.isBlank()) return null
     val primaryArtists = moreInfo.artistMap.primaryArtists.mapNotNull { artist ->
         artist.name.takeIf { it.isNotBlank() }?.let { Artist(name = saavnUnescape(it), id = null) }
@@ -42,7 +42,7 @@ private fun RawSongItem.toSongItem(): SongItem? {
         title = saavnUnescape(title),
         artists = primaryArtists,
         album = moreInfo.album.takeIf { it.isNotBlank() }?.let {
-            Album(name = saavnUnescape(it), id = moreInfo.albumId)
+            Album(name = saavnUnescape(it), id = moreInfo.album_id)
         },
         duration = moreInfo.duration.trim().toIntOrNull(),
         thumbnail = saavnThumbnail(image),
