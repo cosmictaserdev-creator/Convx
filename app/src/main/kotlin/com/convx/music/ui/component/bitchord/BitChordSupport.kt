@@ -10,6 +10,12 @@ package com.convx.music.ui.component.bitchord
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -86,3 +92,27 @@ internal fun Modifier.bleedHorizontally(gutter: Dp): Modifier = layout { measura
         placeable.place(-(placeable.width - width) / 2, 0)
     }
 }
+
+/** Softens the list where it meets the header and the scrubber. */
+internal fun Modifier.fadingEdges(): Modifier = this
+    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    .drawWithContent {
+        drawContent()
+        val fade = 28.dp.toPx()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Transparent, Color.Black),
+                startY = 0f,
+                endY = fade,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Black, Color.Transparent),
+                startY = size.height - fade,
+                endY = size.height,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+    }
