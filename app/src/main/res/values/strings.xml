@@ -75,6 +75,7 @@
     <string name="recently_added">Recently Added</string>
     <string name="home_section_hero">Featured card</string>
     <string name="home_section_community">From the community</string>
+    <string name="home_section_more">More for you (everything else)</string>
     <string name="home_section_daily_discover">Daily discover</string>
     <string name="home_section_account_playlists">Your playlists</string>
     <string name="home_section_forgotten_favorites">Forgotten favourites</string>

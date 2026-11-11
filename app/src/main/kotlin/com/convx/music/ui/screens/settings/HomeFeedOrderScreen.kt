@@ -77,6 +77,8 @@ private val ArrangeableRows = listOf(
     HomeFeedRow("daily_discover", R.string.home_section_daily_discover),
     HomeFeedRow("account_playlists", R.string.home_section_account_playlists),
     HomeFeedRow("forgotten_favorites", R.string.home_section_forgotten_favorites),
+    // Everything the user cannot place one by one; see HOME_MORE_SECTIONS_ID.
+    HomeFeedRow("more_sections", R.string.home_section_more),
     HomeFeedRow("mood_and_genres", R.string.mood_and_genres),
 )
 
