@@ -42,10 +42,8 @@ class LyricsLookupSession internal constructor(
 
 class LyricsLookupSessionFactory(
     private val scope: CoroutineScope,
-    private val identify: suspend (LyricsQuery) -> BiniLyrics.Hit? = {
-        BiniLyrics.identify(it.title, it.artist, it.durationMs, it.album)
-    },
-    private val download: suspend (String) -> String? = ::lyricsGet,
+    private val identify: (suspend (LyricsQuery) -> BiniLyrics.Hit?)? = null,
+    private val download: (suspend (String) -> String?)? = null,
 ) {
     private val mutex = Mutex()
     private val recordings = linkedMapOf<LyricsQuery, BiniLyrics.Hit>()
@@ -55,7 +53,7 @@ class LyricsLookupSessionFactory(
         val remembered = mutex.withLock { recordings.remove(cleaned)?.also { recordings[cleaned] = it } }
         val hit = remembered ?: if ("BiniLyrics" in enabledProviders) {
             withTimeoutOrNull(2_500) {
-                try { identify(cleaned) }
+                try { if (identify == null) BiniLyrics.identify(cleaned.title, cleaned.artist, cleaned.durationMs, cleaned.album) else identify(cleaned) }
                 catch (cancelled: CancellationException) { throw cancelled }
                 catch (_: Exception) { null }
             }?.also { found ->
@@ -67,6 +65,8 @@ class LyricsLookupSessionFactory(
                 }
             }
         } else null
-        return LyricsLookupSession(cleaned, hit?.isrc, hit, scope, download)
+        return LyricsLookupSession(cleaned, hit?.isrc, hit, scope) { url ->
+            if (download == null) lyricsGet(url) else download(url)
+        }
     }
 }

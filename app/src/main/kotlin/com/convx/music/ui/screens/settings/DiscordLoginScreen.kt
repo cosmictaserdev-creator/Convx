@@ -110,9 +110,10 @@ fun DiscordLoginScreen(navController: NavController) {
 
                     // Motorola WebView needs the Samsung user agent to complete Discord login.
                     // See: https://github.com/dead8309/Kizzy/issues/345#issuecomment-2699729072
-                    if (Build.MANUFACTURER.equals(MOTOROLA, ignoreCase = true)) {
-                        settings.userAgentString = SAMSUNG_USER_AGENT
-                    }
+                    settings.userAgentString = discordBrowserUserAgent(
+                        if (Build.MANUFACTURER.equals(MOTOROLA, ignoreCase = true)) SAMSUNG_USER_AGENT
+                        else settings.userAgentString,
+                    )
 
                     webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView, url: String?) {
@@ -167,3 +168,9 @@ fun DiscordLoginScreen(navController: NavController) {
         webView?.goBack()
     }
 }
+
+internal fun discordBrowserUserAgent(agent: String?): String =
+    (agent?.takeIf(String::isNotBlank) ?: SAMSUNG_USER_AGENT)
+        .replace("; wv", "")
+        .replace(Regex("\\s*Version/\\d+(?:\\.\\d+)*"), "")
+        .trim()

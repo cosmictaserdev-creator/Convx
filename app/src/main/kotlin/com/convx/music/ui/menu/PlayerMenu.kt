@@ -632,11 +632,11 @@ fun TempoPitchDialog(onDismiss: () -> Unit) {
         mutableFloatStateOf(playerConnection.player.playbackParameters.speed)
     }
     var transposeValue by remember {
-        mutableIntStateOf(round(12 * log2(playerConnection.player.playbackParameters.pitch)).toInt())
+        mutableIntStateOf(com.convx.music.data.settings.pitchToSemitones(playerConnection.player.playbackParameters.pitch))
     }
     val updatePlaybackParameters = {
         playerConnection.player.playbackParameters =
-            PlaybackParameters(tempo, 2f.pow(transposeValue.toFloat() / 12))
+            PlaybackParameters(tempo, com.convx.music.data.settings.semitonesToPitch(transposeValue))
     }
     val listenTogetherManager = com.convx.music.LocalListenTogetherManager.current
     val isInRoom = listenTogetherManager?.isInRoom ?: false
