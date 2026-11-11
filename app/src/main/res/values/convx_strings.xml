@@ -1412,6 +1412,9 @@
     <string name="keep_downloads_in_app_desc">Turn off to keep downloads only in Download/Convx. They then play from Local, and the app\'s own copy is removed to save space.</string>
     <string name="show_downloads_in_local">Show downloads in Local</string>
     <string name="show_downloads_in_local_desc">List the files saved in Download/Convx under Local music as well as under Downloaded.</string>
+    <string name="usb_bit_perfect">USB DAC bit-perfect mode</string>
+    <string name="usb_bit_perfect_desc">Send music to a connected USB DAC untouched, with no resampling or mixing by Android. Only takes effect while a DAC that supports it is plugged in.</string>
+    <string name="usb_bit_perfect_unsupported">Needs Android 14 or newer.</string>
     <string name="hide_status_bar">Hide status bar</string>
     <string name="hide_status_bar_desc">Hide the clock and battery icons for a cleaner, more immersive screen. Swipe down from the top to peek at them.</string>
     <string name="network_storage_reading_tags">Reading tags… %1$d of %2$d</string>

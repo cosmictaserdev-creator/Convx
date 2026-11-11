@@ -19,6 +19,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import okhttp3.Call
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
@@ -57,7 +58,7 @@ object AiChatClient {
         }
 
         if (apiKey.isEmpty()) {
-            onLog("API Key is missing. Please set it in Settings.")
+            onLog("No API key is set for $provider. Open Settings → AI, paste your key (a free Groq key works) and try again.")
             return@withContext null
         }
 
@@ -67,7 +68,8 @@ object AiChatClient {
                 val responseString = response.body.string()
                 if (!response.isSuccessful) {
                     // The provider's own message says what to fix: a wrong model, a bad key, a rate limit.
-                    onLog("AI request failed: ${AiRequests.errorMessage(responseString, response.code, response.message)}")
+                    val host = baseUrl.toHttpUrlOrNull()?.host ?: baseUrl
+                    onLog("AI request to $host failed: ${AiRequests.errorMessage(responseString, response.code, response.message)}. Check the address and key in Settings → AI.")
                     return@withContext null
                 }
                 currentCoroutineContext().ensureActive()

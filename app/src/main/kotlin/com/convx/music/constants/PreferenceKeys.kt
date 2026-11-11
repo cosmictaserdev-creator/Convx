@@ -23,6 +23,8 @@ val FirstLaunchTimestampKey = longPreferencesKey("firstLaunchTimestamp")
 val DonationPromptLastShownKey = longPreferencesKey("donationPromptLastShown")
 val DonationPromptDismissedKey = booleanPreferencesKey("donationPromptDismissed")
 val HideStatusBarKey = booleanPreferencesKey("hideStatusBar")
+/** Bit-perfect output to a connected USB DAC (Android 14+). */
+val UsbBitPerfectKey = booleanPreferencesKey("usbBitPerfect")
 val AppIconKey = stringPreferencesKey("appIcon")
 
 /**

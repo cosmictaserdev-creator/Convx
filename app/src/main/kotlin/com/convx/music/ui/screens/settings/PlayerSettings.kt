@@ -126,6 +126,10 @@ fun PlayerSettings(
         KeepScreenOn,
         defaultValue = false
     )
+    val (usbBitPerfect, onUsbBitPerfectChange) = rememberPreference(
+        com.convx.music.constants.UsbBitPerfectKey,
+        defaultValue = false
+    )
     val (queueBeforeContext, onQueueBeforeContextChange) = rememberPreference(
         com.convx.music.constants.QueueBeforeContextKey,
         defaultValue = true
@@ -414,6 +418,28 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onResumeOnBluetoothConnectChange(!resumeOnBluetoothConnect) }
+                        ),
+                        IosSettingsItem(
+                            icon = painterResource(R.drawable.equalizer),
+                            title = { Text(stringResource(R.string.usb_bit_perfect)) },
+                            description = {
+                                Text(
+                                    stringResource(
+                                        if (com.convx.music.playback.UsbBitPerfectAudio.isSupported) R.string.usb_bit_perfect_desc
+                                        else R.string.usb_bit_perfect_unsupported
+                                    )
+                                )
+                            },
+                            trailingContent = {
+                                Switch(
+                                    checked = usbBitPerfect && com.convx.music.playback.UsbBitPerfectAudio.isSupported,
+                                    enabled = com.convx.music.playback.UsbBitPerfectAudio.isSupported,
+                                    onCheckedChange = onUsbBitPerfectChange
+                                )
+                            },
+                            onClick = {
+                                if (com.convx.music.playback.UsbBitPerfectAudio.isSupported) onUsbBitPerfectChange(!usbBitPerfect)
+                            }
                         ),
                         IosSettingsItem(
                             icon = painterResource(R.drawable.queue_music),
