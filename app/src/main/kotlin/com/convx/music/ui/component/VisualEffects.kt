@@ -30,3 +30,9 @@ data class VisualEffects(
             )
         }
 }
+
+@androidx.compose.runtime.Composable
+fun rememberReduceEffects(): Boolean {
+    val preference = com.convx.music.utils.rememberPreference(com.convx.music.constants.ReduceDynamicBlurKey, false)
+    return preference.value || !android.animation.ValueAnimator.areAnimatorsEnabled()
+}

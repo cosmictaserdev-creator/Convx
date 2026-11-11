@@ -3,7 +3,6 @@ package com.convx.music.playback
 import kotlinx.serialization.Serializable
 
 @Serializable
-@kotlinx.serialization.Serializable
 enum class LyricsAnimationStyle {
     FLAMINGO,
     NONE,

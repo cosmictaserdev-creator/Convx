@@ -150,34 +150,13 @@ class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        val isFirstRun = dataStore.get(IsFirstRunKey, true)
-        val forceShow = intent.getBooleanExtra("FORCE_SHOW", false)
-
-        if (!isFirstRun && !forceShow) {
-            finishOnboarding()
-            return
-        }
-
-        enableEdgeToEdge()
-        setContent {
-            ConvxTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = AppTheme.colorScheme.background
-                ) {
-                    WelcomePagerScreen(onFinished = {
-                        lifecycleScope.launch {
-                            dataStore.edit { it[IsFirstRunKey] = false }
-                            if (forceShow) {
-                                finish()
-                            } else {
-                                finishOnboarding()
-                            }
-                        }
-                    })
-                }
+        if (intent.getBooleanExtra("FORCE_SHOW", false)) {
+            lifecycleScope.launch {
+                dataStore.edit { it[com.convx.music.constants.OnboardingCompleteKey] = false }
+                finishOnboarding()
             }
+        } else {
+            finishOnboarding()
         }
     }
 

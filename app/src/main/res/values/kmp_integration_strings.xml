@@ -1,0 +1,34 @@
+<resources>
+    <string name="new_releases_channel">New releases</string>
+    <string name="new_releases_channel_desc">New music from your saved artists</string>
+    <string name="onboarding_tagline">Your music, your way.</string>
+    <string name="onboarding_feature_lyrics_title">Follow every word</string>
+    <string name="onboarding_feature_lyrics_body">Synced lyrics that move with your music.</string>
+    <string name="onboarding_feature_glass_title">Make it yours</string>
+    <string name="onboarding_feature_glass_body">Choose the look and feel of your player.</string>
+    <string name="onboarding_feature_offline_title">Listen offline</string>
+    <string name="onboarding_feature_offline_body">Keep your favorite music available wherever you go.</string>
+    <string name="onboarding_feature_together_title">Listen together</string>
+    <string name="onboarding_feature_together_body">Share a listening session with friends.</string>
+    <string name="onboarding_feature_sound_title">Find your sound</string>
+    <string name="onboarding_feature_sound_body">Tune playback to the way you like to listen.</string>
+    <string name="onboarding_title">Welcome to Convx</string>
+    <string name="onboarding_name_prompt">What should we call you?</string>
+    <string name="onboarding_name_hint">Your name</string>
+    <string name="onboarding_name_footer">You can change this later in Settings.</string>
+    <string name="onboarding_next">Continue</string>
+    <string name="onboarding_connect_title">Connect your music</string>
+    <string name="onboarding_connect_body">Sign in to access your YouTube Music library.</string>
+    <string name="onboarding_sign_in_google">Sign in with Google</string>
+    <string name="onboarding_skip_sign_in">Skip for now</string>
+    <string name="onboarding_mode_title">How do you listen?</string>
+    <string name="onboarding_mode_body">Choose your starting mode. You can switch later in Settings.</string>
+    <string name="onboarding_mode_online">Online and local music</string>
+    <string name="onboarding_mode_local">Local music only</string>
+    <string name="onboarding_notifications_title">Stay in the loop</string>
+    <string name="onboarding_notifications_body">Allow notifications for playback and new releases.</string>
+    <string name="onboarding_notifications_allow">Allow notifications</string>
+    <string name="onboarding_notifications_skip">Not now</string>
+    <string name="home_artist_list">Artists for you</string>
+    <string name="home_all_time_hits">All-time hits</string>
+</resources>

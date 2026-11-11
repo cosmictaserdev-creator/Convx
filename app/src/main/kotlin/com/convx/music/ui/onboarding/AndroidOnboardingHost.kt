@@ -66,7 +66,7 @@ private val PageSeeds = intArrayOf(
 fun AndroidOnboardingHost(navController: NavController, onYouTubeLoginRequest: () -> Unit) {
     val context = LocalContext.current
     val dataStore = context.dataStore
-    val shown = remember { MutableTransitionState(dataStore[OnboardingCompleteKey] != true) }
+    val shown = remember { MutableTransitionState(!(dataStore[OnboardingCompleteKey] ?: (dataStore[com.convx.music.constants.IsFirstRunKey] == false))) }
     if (!shown.currentState && !shown.targetState) return
 
     val scope = rememberCoroutineScope()
@@ -134,7 +134,7 @@ fun AndroidOnboardingHost(navController: NavController, onYouTubeLoginRequest: (
             },
             onFinish = {
                 shown.targetState = false
-                scope.launch { dataStore.edit { it[OnboardingCompleteKey] = true } }
+                scope.launch { dataStore.edit { it[OnboardingCompleteKey] = true; it[com.convx.music.constants.IsFirstRunKey] = false } }
             },
             modifier = Modifier.iosSheetPresentation(rememberSheetPresentation(loginOpen)),
             background = { page ->
@@ -146,7 +146,7 @@ fun AndroidOnboardingHost(navController: NavController, onYouTubeLoginRequest: (
                 )
             },
             wordmarkFont = com.convx.music.ui.theme.ChillaxFontFamily,
-            logoFont = com.convx.music.ui.theme.BdConsoleFontFamily,
+            logoFont = com.convx.music.designsystem.convxLogoFontFamily(),
             imeVisible = { WindowInsets.isImeVisible },
             backHandler = { enabled, onBack -> BackHandler(enabled = enabled && !loginOpen, onBack = onBack) },
         )
