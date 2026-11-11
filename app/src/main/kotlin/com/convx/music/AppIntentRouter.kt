@@ -8,6 +8,7 @@ package com.convx.music
 import com.convx.music.utils.openSearchResults
 
 import ai.onnxruntime.BuildConfig
+import android.app.SearchManager
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
@@ -24,7 +25,9 @@ import com.convx.music.di.ValueProvider
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
+import com.music.innertube.SearchFilter
 import com.music.innertube.YouTube
+import com.music.innertube.models.SongItem
 import com.music.innertube.models.WatchEndpoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,6 +60,13 @@ internal class AppIntentRouter(
             return
         }
         if (handleDebugIntent(intent, navController)) return
+
+        if (intent.action == android.provider.MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) {
+            // "Hey Google, play X on Convx" while the app is closed: the assistant launches us with the query.
+            intent.action = null
+            playFromVoiceSearch(intent.getStringExtra(SearchManager.QUERY).orEmpty().trim())
+            return
+        }
 
         val uri = intent.data ?: intent.extras?.getString(Intent.EXTRA_TEXT)?.toUri() ?: return
         intent.data = null
@@ -181,6 +191,25 @@ internal class AppIntentRouter(
             }
         }
         return true
+    }
+
+    private fun playFromVoiceSearch(query: String) {
+        if (query.isBlank()) return
+        activity.lifecycle.coroutineScope.launch(Dispatchers.IO) {
+            YouTube.search(query, SearchFilter.FILTER_SONG)
+                .onSuccess { result ->
+                    val song = result.items.filterIsInstance<SongItem>().firstOrNull() ?: return@onSuccess
+                    withContext(Dispatchers.Main) {
+                        currentPlayerConnection()?.playQueue(
+                            YouTubeQueue(
+                                endpoint = WatchEndpoint(videoId = song.id),
+                                preloadItem = song.toMediaMetadata(),
+                            ),
+                        )
+                    }
+                }
+                .onFailure(::reportException)
+        }
     }
 
     private fun playFromYouTubeLink(

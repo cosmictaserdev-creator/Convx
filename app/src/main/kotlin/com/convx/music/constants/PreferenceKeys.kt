@@ -22,6 +22,7 @@ val IsFirstRunKey = booleanPreferencesKey("isFirstRun")
 val FirstLaunchTimestampKey = longPreferencesKey("firstLaunchTimestamp")
 val DonationPromptLastShownKey = longPreferencesKey("donationPromptLastShown")
 val DonationPromptDismissedKey = booleanPreferencesKey("donationPromptDismissed")
+val HideStatusBarKey = booleanPreferencesKey("hideStatusBar")
 val AppIconKey = stringPreferencesKey("appIcon")
 
 /**
@@ -127,6 +128,8 @@ val SeekExtraSeconds = booleanPreferencesKey("seekExtraSeconds")
 val PauseOnMute = booleanPreferencesKey("pauseOnMute")
 val ResumeOnBluetoothConnectKey = booleanPreferencesKey("resumeOnBluetoothConnect")
 val KeepScreenOn = booleanPreferencesKey("keepScreenOn")
+/** "Add to queue" plays after the current song and earlier queued songs, ahead of the rest of the playlist. */
+val QueueBeforeContextKey = booleanPreferencesKey("queueBeforeContext")
 val DeveloperModeKey = booleanPreferencesKey("developerMode")
 val EnableSettingsPopupKey = booleanPreferencesKey("enableSettingsPopup")
 
@@ -262,6 +265,10 @@ val DisableLoadMoreWhenRepeatAllKey = booleanPreferencesKey("disableLoadMoreWhen
 val AutoDownloadOnLikeKey = booleanPreferencesKey("autoDownloadOnLike")
 /** Copy finished downloads into Music/Convx as real .m4a files (Android 10+). */
 val SaveDownloadsToMusicFolderKey = booleanPreferencesKey("saveDownloadsToMusicFolder")
+/** Keep the in-app copy of a download after it is saved to the device. Off leaves the file only in Download/Convx. */
+val KeepDownloadsInAppKey = booleanPreferencesKey("keepDownloadsInApp")
+/** List the saved Download/Convx files in the Local library too, not only the in-app Downloaded list. */
+val ShowDownloadsInLocalKey = booleanPreferencesKey("showDownloadsInLocal")
 val SimilarContent = booleanPreferencesKey("similarContent")
 val AutoSkipNextOnErrorKey = booleanPreferencesKey("autoSkipNextOnError")
 val StopMusicOnTaskClearKey = booleanPreferencesKey("stopMusicOnTaskClear")

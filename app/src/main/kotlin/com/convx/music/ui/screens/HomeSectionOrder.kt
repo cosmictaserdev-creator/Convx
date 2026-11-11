@@ -21,6 +21,18 @@ private val DEFAULT_HOME_SECTION_ORDER = mapOf(
     HomeSection.MoodAndGenres to 10,
 )
 
+/**
+ * Stands in the arrangement for every section the user cannot place one by one (Top Songs, the "similar to"
+ * shelves and the shelves YouTube Music supplies). Dragging it moves all of them together, so a section can be
+ * put below them instead of always sorting above.
+ */
+internal const val HOME_MORE_SECTIONS_ID = "more_sections"
+
+private val ARRANGEABLE_SECTION_IDS = setOf(
+    "hero", "keep_listening", "quick_picks", "speed_dial", "from_the_community",
+    "daily_discover", "account_playlists", "forgotten_favorites", "mood_and_genres",
+)
+
 /** Builds Home's ordered section list: default weights, a saved custom order, or a seeded shuffle. */
 internal fun buildHomeSections(
     homeState: com.convx.music.viewmodels.HomeUiState,
@@ -73,6 +85,8 @@ internal fun buildHomeSections(
 
     // Apply hidden-section filtering once after building the available sections.
     list.retainAll { it.id !in hidden }
+    // Switching off "More for you" hides every shelf that is not individually arrangeable.
+    if (HOME_MORE_SECTIONS_ID in hidden) list.retainAll { it.id in ARRANGEABLE_SECTION_IDS }
 
     val customOrder = savedSectionOrder.lineSequence()
         .map(String::trim)
@@ -88,10 +102,12 @@ internal fun buildHomeSections(
             .withIndex()
             .associate { (index, id) -> id to index }
 
-        // Keep unlisted sections after the saved ones, ordered by their default weight.
+        // A section the user cannot place takes the place of the "More for you" marker when it was arranged;
+        // without a marker (an older saved order) it keeps going after the saved ones, by default weight.
+        val moreRank = customOrderRank[HOME_MORE_SECTIONS_ID]
         list.sortedWith(
             compareBy(
-                { section -> customOrderRank[section.id] ?: Int.MAX_VALUE },
+                { section -> customOrderRank[section.id] ?: moreRank ?: Int.MAX_VALUE },
                 { section -> -section.baseWeight },
             ),
         )

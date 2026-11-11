@@ -41,6 +41,7 @@ import com.convx.music.constants.SkipSilenceKey
 import com.convx.music.ui.component.EnumDialog
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.component.IosSettingsSymbolTile
 import com.convx.music.ui.ios.compat.Switch
 import com.convx.music.ui.ios.compat.Text
 import com.convx.music.utils.rememberEnumPreference
@@ -90,6 +91,14 @@ fun PlayerSettings(
         com.convx.music.constants.SaveDownloadsToMusicFolderKey,
         defaultValue = true
     )
+    val (keepDownloadsInApp, onKeepDownloadsInAppChange) = rememberPreference(
+        com.convx.music.constants.KeepDownloadsInAppKey,
+        defaultValue = true
+    )
+    val (showDownloadsInLocal, onShowDownloadsInLocalChange) = rememberPreference(
+        com.convx.music.constants.ShowDownloadsInLocalKey,
+        defaultValue = false
+    )
     val (similarContentEnabled, similarContentEnabledChange) = rememberPreference(
         key = SimilarContent,
         defaultValue = true
@@ -117,6 +126,10 @@ fun PlayerSettings(
     val (keepScreenOn, onKeepScreenOnChange) = rememberPreference(
         KeepScreenOn,
         defaultValue = false
+    )
+    val (queueBeforeContext, onQueueBeforeContextChange) = rememberPreference(
+        com.convx.music.constants.QueueBeforeContextKey,
+        defaultValue = true
     )
     var showAudioQualityDialog by remember {
         mutableStateOf(false)
@@ -333,6 +346,31 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onSaveDownloadsToMusicChange(!saveDownloadsToMusic) }
+                        ),
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("arrow.down.circle") },
+                            title = { Text(stringResource(R.string.keep_downloads_in_app)) },
+                            description = { Text(stringResource(R.string.keep_downloads_in_app_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = keepDownloadsInApp || !saveDownloadsToMusic,
+                                    enabled = saveDownloadsToMusic,
+                                    onCheckedChange = onKeepDownloadsInAppChange
+                                )
+                            },
+                            onClick = { if (saveDownloadsToMusic) onKeepDownloadsInAppChange(!keepDownloadsInApp) }
+                        ),
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("folder.fill") },
+                            title = { Text(stringResource(R.string.show_downloads_in_local)) },
+                            description = { Text(stringResource(R.string.show_downloads_in_local_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = showDownloadsInLocal,
+                                    onCheckedChange = onShowDownloadsInLocalChange
+                                )
+                            },
+                            onClick = { onShowDownloadsInLocalChange(!showDownloadsInLocal) }
                         )
                     )
                 )
@@ -377,6 +415,18 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onResumeOnBluetoothConnectChange(!resumeOnBluetoothConnect) }
+                        ),
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("text.badge.plus") },
+                            title = { Text(stringResource(R.string.queue_before_context)) },
+                            description = { Text(stringResource(R.string.queue_before_context_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = queueBeforeContext,
+                                    onCheckedChange = onQueueBeforeContextChange
+                                )
+                            },
+                            onClick = { onQueueBeforeContextChange(!queueBeforeContext) }
                         ),
                         IosSettingsItem(
                             icon = painterResource(R.drawable.screenshot),

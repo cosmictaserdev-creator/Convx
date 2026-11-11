@@ -222,10 +222,7 @@ class ConvxWidgetManager(
         val views = RemoteViews(context.packageName, R.layout.widget_music_player)
         val ink = onCardColorFor(defaultCardConfig, albumArt)
 
-        views.setImageViewBitmap(
-            R.id.widget_player_bg,
-            createCardBackground(defaultCardConfig, albumArt, card),
-        )
+        applyCardBackground(views, R.id.widget_player_bg, defaultCardConfig, albumArt, card)
 
         views.setTextViewText(R.id.widget_song_title, title)
         views.setTextViewText(R.id.widget_artist_name, artist)
@@ -380,10 +377,7 @@ class ConvxWidgetManager(
     ): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_compact_square)
 
-        views.setImageViewBitmap(
-            R.id.widget_compact_bg,
-            createCardBackground(defaultCardConfig, albumArt, card),
-        )
+        applyCardBackground(views, R.id.widget_compact_bg, defaultCardConfig, albumArt, card)
 
         if (albumArt != null) {
             val roundedAlbumArt = getRoundedCornerBitmap(albumArt)
@@ -423,10 +417,7 @@ class ConvxWidgetManager(
         val views = RemoteViews(context.packageName, R.layout.widget_compact_wide)
         val ink = onCardColorFor(defaultCardConfig, albumArt)
 
-        views.setImageViewBitmap(
-            R.id.widget_wide_bg,
-            createCardBackground(defaultCardConfig, albumArt, card),
-        )
+        applyCardBackground(views, R.id.widget_wide_bg, defaultCardConfig, albumArt, card)
 
         views.setTextViewText(R.id.widget_wide_song_title, title)
         views.setTextViewText(R.id.widget_wide_artist_name, artist)
@@ -514,7 +505,36 @@ class ConvxWidgetManager(
             // IMAGE draws the user's picture instead; this only shows through if
             // the image is missing or unreadable.
             WidgetBackground.IMAGE -> tintColorFor(albumArt)
+            // The real tint is drawn by the launcher; this picks the readable ink and the fallback colour.
+            WidgetBackground.BLUR ->
+                if (!OneUiBlur.isSupported) tintColorFor(albumArt) else if (isNightMode()) Color.BLACK else Color.WHITE
         }
+
+    private fun isNightMode(): Boolean =
+        (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    /**
+     * Paints the card behind a widget. On a One UI launcher with frosted glass selected the bitmap is dropped and
+     * the root view gets a translucent tint instead, because an opaque card would hide the blur the launcher
+     * draws under it.
+     */
+    private fun applyCardBackground(
+        views: RemoteViews,
+        backgroundViewId: Int,
+        config: WidgetConfig,
+        albumArt: Bitmap?,
+        card: CardSize,
+        configured: Bitmap? = null,
+    ) {
+        if (config.background == WidgetBackground.BLUR && OneUiBlur.isSupported) {
+            views.setViewVisibility(backgroundViewId, android.view.View.GONE)
+            views.setInt(android.R.id.background, "setBackgroundColor", OneUiBlur.tint(isNightMode()))
+            // The hidden card used to take the tap that opens the app; the translucent root takes it now.
+            views.setOnClickPendingIntent(android.R.id.background, getOpenAppIntent())
+        } else {
+            views.setImageViewBitmap(backgroundViewId, configured ?: createCardBackground(config, albumArt, card))
+        }
+    }
 
     /**
      * The user's chosen background image, centre-cropped into the card and rounded
@@ -783,11 +803,7 @@ class ConvxWidgetManager(
             NowPlayingForm.WIDE -> R.id.widget_np_wide_play_pause
         }
 
-        views.setImageViewBitmap(
-            bgId,
-            loadConfiguredBackground(config, card)
-                ?: createCardBackground(config, albumArt, card),
-        )
+        applyCardBackground(views, bgId, config, albumArt, card, loadConfiguredBackground(config, card))
 
         if (config.showArtwork) {
             views.setViewVisibility(artId, android.view.View.VISIBLE)
@@ -975,11 +991,7 @@ class ConvxWidgetManager(
         val views = RemoteViews(context.packageName, R.layout.widget_lyrics)
         val card = cardSizeFor(options)
 
-        views.setImageViewBitmap(
-            R.id.widget_lyr_bg,
-            loadConfiguredBackground(config, card)
-                ?: createCardBackground(config, albumArt, card),
-        )
+        applyCardBackground(views, R.id.widget_lyr_bg, config, albumArt, card, loadConfiguredBackground(config, card))
 
         views.setTextViewText(R.id.widget_lyr_title, title)
         views.setTextViewText(R.id.widget_lyr_artist, artist)

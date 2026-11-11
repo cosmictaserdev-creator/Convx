@@ -10,7 +10,10 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import com.convx.music.constants.KeepDownloadsInAppKey
 import com.convx.music.constants.LocalExcludedFoldersKey
+import com.convx.music.constants.SaveDownloadsToMusicFolderKey
+import com.convx.music.constants.ShowDownloadsInLocalKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.AlbumEntity
 import com.convx.music.db.entities.ArtistEntity
@@ -64,6 +67,7 @@ object LocalAudioScanner {
                 MediaStore.Audio.Media.DATE_ADDED,
                 MediaStore.Audio.Media.DATE_MODIFIED,
                 MediaStore.Audio.Media.YEAR,
+                MediaStore.Audio.Media.TRACK,
                 LocalFolderIndex.pathColumn,
             )
 
@@ -71,7 +75,12 @@ object LocalAudioScanner {
             // for FLAC/OGG/OPUS from downloads) — accept anything with an
             // audio/* mime type too. Duration floor still filters ringtones.
             // Exported downloads are already stored as online songs in the library.
-            val downloadExclusion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Unless the user asked to see them here, or the in-app copy is gone so this file is the only one.
+            val settings = context.dataStore.data.first()
+            val savedToDevice = settings[SaveDownloadsToMusicFolderKey] ?: true
+            val keptInApp = settings[KeepDownloadsInAppKey] ?: true
+            val showDownloadsHere = (settings[ShowDownloadsInLocalKey] ?: false) || (savedToDevice && !keptInApp)
+            val downloadExclusion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !showDownloadsHere) {
                 " AND (${MediaStore.MediaColumns.RELATIVE_PATH} IS NULL OR (" +
                     "${MediaStore.MediaColumns.RELATIVE_PATH} NOT LIKE '${DownloadExporter.FOLDER}/%'" +
                     " AND ${MediaStore.MediaColumns.RELATIVE_PATH} NOT LIKE 'Music/Convx/%'))"
@@ -116,6 +125,7 @@ object LocalAudioScanner {
                     val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
                     val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
                     val yearColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
+                    val trackColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
                     val pathColumnIndex = cursor.getColumnIndexOrThrow(LocalFolderIndex.pathColumn)
 
                     while (cursor.moveToNext()) {
@@ -129,6 +139,8 @@ object LocalAudioScanner {
                         val dateAdded = cursor.getLong(dateAddedColumn)
                         val dateModified = cursor.getLong(dateModifiedColumn)
                         val year = cursor.getInt(yearColumn)
+                        // MediaStore packs disc and track as disc * 1000 + track, which still sorts correctly.
+                        val trackNumber = cursor.getInt(trackColumn).coerceAtLeast(0)
                         val folderPath = cursor.getString(pathColumnIndex)
                             ?.let { LocalFolderIndex.folderPathOf(it) }
                             ?: ""
@@ -154,6 +166,8 @@ object LocalAudioScanner {
 
                         if (songId in existingIds) {
                             backfillExistingSongDates(database, songId, dateAdded, dateModified)
+                            // Songs scanned before track numbers were read still sit at index 0.
+                            if (trackNumber > 0) runCatching { database.setSongAlbumIndex(songId, trackNumber) }
                             skippedExisting++
                             continue
                         }
@@ -168,6 +182,7 @@ object LocalAudioScanner {
                             albumArtUri = albumArtUri,
                             durationMs = durationMs,
                             year = year,
+                            trackNumber = trackNumber,
                             dateAdded = dateAdded,
                             dateModified = dateModified,
                         )
@@ -223,6 +238,7 @@ object LocalAudioScanner {
         albumArtUri: String?,
         durationMs: Long,
         year: Int,
+        trackNumber: Int,
         dateAdded: Long,
         dateModified: Long,
     ): Boolean {
@@ -262,7 +278,7 @@ object LocalAudioScanner {
                             inLibrary = LocalDateTime.now(),
                         ),
                     )
-                    insert(SongAlbumMap(songId = songId, albumId = albumId, index = 0))
+                    insert(SongAlbumMap(songId = songId, albumId = albumId, index = trackNumber))
                 }
             }
             true
