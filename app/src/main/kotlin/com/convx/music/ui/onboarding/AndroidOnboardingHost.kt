@@ -149,7 +149,7 @@ fun AndroidOnboardingHost(navController: NavController, onYouTubeLoginRequest: (
                 ArtworkMeshBackground(
                     imageUrl = null,
                     appearance = rememberPlaylistAppearance(null, PageSeeds[page % PageSeeds.size]),
-                    animated = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
+                    paused = { Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || loginOpen },
                 )
             },
             wordmarkFont = com.convx.music.ui.theme.ChillaxFontFamily,

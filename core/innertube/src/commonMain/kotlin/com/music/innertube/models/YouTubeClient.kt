@@ -49,8 +49,8 @@ data class YouTubeClient(
                 value.length <= 80 && value.all { it.isLetterOrDigit() || it in "._-" }
             }
             val clients = listOf(WEB, WEB_REMIX, WEB_CREATOR, TVHTML5, TVHTML5_SIMPLY_EMBEDDED_PLAYER,
-                IOS, MOBILE, ANDROID_NO_SDK, ANDROID_VR_NO_AUTH, ANDROID_VR_1_61_48, ANDROID_VR_1_65_10,
-                ANDROID_VR_1_43_32, ANDROID_CREATOR, VISIONOS, IPADOS, ANDROID_MUSIC, IOS_MUSIC)
+                IOS, MOBILE, ANDROID_NO_SDK, ANDROID_VR_1_61_48, ANDROID_VR_1_65_10,
+                ANDROID_VR_1_43_32, ANDROID_VR_NO_AUTH, ANDROID_CREATOR, VISIONOS, IPADOS, ANDROID_MUSIC, IOS_MUSIC)
             val client = clients.firstOrNull { it.clientName == name && it.clientVersion == version }
                 ?: clients.firstOrNull { it.clientName == name } ?: return USER_AGENT_WEB
             return if (version == null) client.userAgent else client.userAgent.replace(client.clientVersion, version)
