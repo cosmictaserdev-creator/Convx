@@ -265,6 +265,10 @@ val DisableLoadMoreWhenRepeatAllKey = booleanPreferencesKey("disableLoadMoreWhen
 val AutoDownloadOnLikeKey = booleanPreferencesKey("autoDownloadOnLike")
 /** Copy finished downloads into Music/Convx as real .m4a files (Android 10+). */
 val SaveDownloadsToMusicFolderKey = booleanPreferencesKey("saveDownloadsToMusicFolder")
+/** Keep the in-app copy of a download after it is saved to the device. Off leaves the file only in Download/Convx. */
+val KeepDownloadsInAppKey = booleanPreferencesKey("keepDownloadsInApp")
+/** List the saved Download/Convx files in the Local library too, not only the in-app Downloaded list. */
+val ShowDownloadsInLocalKey = booleanPreferencesKey("showDownloadsInLocal")
 val SimilarContent = booleanPreferencesKey("similarContent")
 val AutoSkipNextOnErrorKey = booleanPreferencesKey("autoSkipNextOnError")
 val StopMusicOnTaskClearKey = booleanPreferencesKey("stopMusicOnTaskClear")

@@ -90,6 +90,14 @@ fun PlayerSettings(
         com.convx.music.constants.SaveDownloadsToMusicFolderKey,
         defaultValue = true
     )
+    val (keepDownloadsInApp, onKeepDownloadsInAppChange) = rememberPreference(
+        com.convx.music.constants.KeepDownloadsInAppKey,
+        defaultValue = true
+    )
+    val (showDownloadsInLocal, onShowDownloadsInLocalChange) = rememberPreference(
+        com.convx.music.constants.ShowDownloadsInLocalKey,
+        defaultValue = false
+    )
     val (similarContentEnabled, similarContentEnabledChange) = rememberPreference(
         key = SimilarContent,
         defaultValue = true
@@ -337,6 +345,31 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onSaveDownloadsToMusicChange(!saveDownloadsToMusic) }
+                        ),
+                        IosSettingsItem(
+                            icon = painterResource(R.drawable.download),
+                            title = { Text(stringResource(R.string.keep_downloads_in_app)) },
+                            description = { Text(stringResource(R.string.keep_downloads_in_app_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = keepDownloadsInApp || !saveDownloadsToMusic,
+                                    enabled = saveDownloadsToMusic,
+                                    onCheckedChange = onKeepDownloadsInAppChange
+                                )
+                            },
+                            onClick = { if (saveDownloadsToMusic) onKeepDownloadsInAppChange(!keepDownloadsInApp) }
+                        ),
+                        IosSettingsItem(
+                            icon = painterResource(R.drawable.download),
+                            title = { Text(stringResource(R.string.show_downloads_in_local)) },
+                            description = { Text(stringResource(R.string.show_downloads_in_local_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = showDownloadsInLocal,
+                                    onCheckedChange = onShowDownloadsInLocalChange
+                                )
+                            },
+                            onClick = { onShowDownloadsInLocalChange(!showDownloadsInLocal) }
                         )
                     )
                 )

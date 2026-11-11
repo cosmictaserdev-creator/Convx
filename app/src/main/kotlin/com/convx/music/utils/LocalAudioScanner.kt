@@ -10,7 +10,10 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import com.convx.music.constants.KeepDownloadsInAppKey
 import com.convx.music.constants.LocalExcludedFoldersKey
+import com.convx.music.constants.SaveDownloadsToMusicFolderKey
+import com.convx.music.constants.ShowDownloadsInLocalKey
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.AlbumEntity
 import com.convx.music.db.entities.ArtistEntity
@@ -72,7 +75,12 @@ object LocalAudioScanner {
             // for FLAC/OGG/OPUS from downloads) — accept anything with an
             // audio/* mime type too. Duration floor still filters ringtones.
             // Exported downloads are already stored as online songs in the library.
-            val downloadExclusion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Unless the user asked to see them here, or the in-app copy is gone so this file is the only one.
+            val settings = context.dataStore.data.first()
+            val savedToDevice = settings[SaveDownloadsToMusicFolderKey] ?: true
+            val keptInApp = settings[KeepDownloadsInAppKey] ?: true
+            val showDownloadsHere = (settings[ShowDownloadsInLocalKey] ?: false) || (savedToDevice && !keptInApp)
+            val downloadExclusion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !showDownloadsHere) {
                 " AND (${MediaStore.MediaColumns.RELATIVE_PATH} IS NULL OR (" +
                     "${MediaStore.MediaColumns.RELATIVE_PATH} NOT LIKE '${DownloadExporter.FOLDER}/%'" +
                     " AND ${MediaStore.MediaColumns.RELATIVE_PATH} NOT LIKE 'Music/Convx/%'))"

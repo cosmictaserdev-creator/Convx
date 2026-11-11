@@ -39,6 +39,7 @@ import com.convx.music.db.entities.FormatEntity
 import com.convx.music.db.entities.SongEntity
 import com.convx.music.ui.utils.resize
 import com.convx.music.constants.AutoDownloadOnLikeKey
+import com.convx.music.constants.KeepDownloadsInAppKey
 import com.convx.music.constants.SaveDownloadsToMusicFolderKey
 import com.convx.music.utils.YTPlayerUtils
 import com.convx.music.utils.enumPreference
@@ -398,7 +399,13 @@ class DownloadUtil(
                                 }
                                 registerDuplicate(download.request.id)
                                 if (appContext.dataStore.get(SaveDownloadsToMusicFolderKey, true)) {
-                                    exportToMusicFolder(download.request.id)
+                                    val exported = exportToMusicFolder(download.request.id)
+                                    if (exported && !appContext.dataStore.get(KeepDownloadsInAppKey, true)) {
+                                        // The file now lives in Download/Convx. Drop the in-app copy, then let the
+                                        // Local library pick the file up so the song is still playable and listed.
+                                        downloadManager.removeDownload(download.request.id)
+                                        runCatching { com.convx.music.utils.LocalAudioScanner.scanAndInsert(appContext, database) }
+                                    }
                                 }
                             }
                             Download.STATE_FAILED,
@@ -488,14 +495,15 @@ class DownloadUtil(
         if (appContext.dataStore.get(SaveDownloadsToMusicFolderKey, true)) exportToMusicFolder(songId, key)
     }
 
-    private suspend fun exportToMusicFolder(songId: String, cacheKey: String = songId) {
-        val song = database.song(songId).first() ?: return
+    /** True when the file was written to shared storage. */
+    private suspend fun exportToMusicFolder(songId: String, cacheKey: String = songId): Boolean {
+        val song = database.song(songId).first() ?: return false
         val format = database.format(songId).first()
         val lyrics = database.lyrics(songId).first()?.lyrics
             ?: optionalSidecar { lyricsHelper.getLyrics(song.toMediaMetadata()).lyrics }
         val video = if (song.song.isLocal) null else optionalSidecar { YTPlayerUtils.videoStream(songId) }
         currentCoroutineContext().ensureActive()
-        DownloadExporter.export(
+        return DownloadExporter.export(
             context = appContext,
             cache = downloadCache,
             pkg = DownloadExporter.Package(
@@ -508,7 +516,7 @@ class DownloadUtil(
                 coverUrl = song.song.thumbnailUrl,
                 video = video,
             ),
-        )
+        ) != null
     }
 
     private suspend fun <T> optionalSidecar(fetch: suspend () -> T): T? = try {
