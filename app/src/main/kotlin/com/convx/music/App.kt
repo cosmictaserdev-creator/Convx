@@ -395,6 +395,7 @@ class App : Application(), SingletonImageLoader.Factory {
                 add(ArtworkQualityInterceptor())
                 // Cover art that lives on an SMB or WebDAV source.
                 add(com.convx.music.utils.NetworkArtworkFetcher.Factory { networkRepository.get() })
+                add(com.convx.music.utils.NetworkEmbeddedArtworkFetcher.Factory { networkRepository.get() })
             }
             // Reuse decoded images while scrolling.
             memoryCache {

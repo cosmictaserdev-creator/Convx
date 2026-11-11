@@ -35,11 +35,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.convx.music.R
 
-data class LinkSegment(
-    val text: String,
-    val url: String? = null,
-)
-
 @Composable
 fun ExpandableText(
     text: String = "",
@@ -96,7 +91,7 @@ fun ExpandableText(
                 }
             }
         )
-        
+
         if (hasOverflow) {
             Box(
                 modifier = Modifier
