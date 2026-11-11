@@ -87,7 +87,7 @@ object BiniLyrics {
      */
     suspend fun lyricsFor(
         hit: Hit,
-        get: suspend (String) -> String? = { lyricsGet(it) },
+        get: suspend (String) -> String? = ::lyricsGet,
     ): Match? = withContext(Dispatchers.IO) {
         val document = hit.lyricsUrl?.takeIf { it.isNotBlank() } ?: return@withContext null
         val ttml = get(document) ?: return@withContext null
@@ -101,7 +101,7 @@ object BiniLyrics {
         durationMs: Long,
         album: String? = null,
         isrc: String? = null,
-        get: suspend (String) -> String? = { lyricsGet(it) },
+        get: suspend (String) -> String? = ::lyricsGet,
     ): Match? = identify(title, artist, durationMs, album, isrc)?.let { lyricsFor(it, get) }
 
     @Serializable

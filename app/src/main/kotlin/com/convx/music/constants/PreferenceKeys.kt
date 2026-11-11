@@ -1134,3 +1134,8 @@ val SuggestionRegionSlugToName =
         "ae" to "United Arab Emirates",
         "il" to "Israel"
     )
+
+val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
+val ReleaseRadarEnabledKey = booleanPreferencesKey("releaseRadarEnabled")
+val OnboardingCompleteKey = booleanPreferencesKey("onboardingComplete")
+val PlayerInlineLyricsKey = booleanPreferencesKey("playerInlineLyrics")

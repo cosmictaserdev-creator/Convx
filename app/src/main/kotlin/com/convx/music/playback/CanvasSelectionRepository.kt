@@ -104,6 +104,13 @@ internal object CanvasSelectionRepository {
         }
     }
 
+    internal suspend fun invalidate(context: Context, mediaId: String) {
+        coordinator.invalidateWhere { it.mediaId == mediaId }
+        withContext(Dispatchers.IO) {
+            context.getSharedPreferences("canvas_decisions", Context.MODE_PRIVATE).edit().remove(mediaId).apply()
+        }
+    }
+
     /** Explicit selection is scoped to one song; remembering it never changes global provider order. */
     suspend fun selectManually(context: Context, mediaId: String, source: CanvasSource, artwork: CanvasArtwork, remember: Boolean) {
         require(mediaId.isNotBlank() && source != CanvasSource.AUTO && !artwork.preferredAnimationUrl.isNullOrBlank())

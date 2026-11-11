@@ -99,3 +99,6 @@ project(":design-system").projectDir = file("core/design-system")
 //        substitute(module("com.github.teamnewpipe:NewPipeExtractor")).using(project(":extractor"))
 //    }
 //}
+
+include(":playback-data")
+project(":playback-data").projectDir = file("feature/playback/data")

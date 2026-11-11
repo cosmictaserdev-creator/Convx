@@ -53,4 +53,21 @@ class CanvasLookupCoordinatorTest {
         now = 11
         assertNull(resolver.findCached { _, _ -> true })
     }
+    @Test
+    fun invalidatingASongPreservesOtherCachedSongs() = runTest {
+        var calls = 0
+        val resolver = CanvasLookupCoordinator(backgroundScope, { 0L }, 1000, 1000) { key: String ->
+            calls++
+            "result:$key"
+        }
+        resolver.resolve("track:a")
+        resolver.resolve("track:b")
+        resolver.resolve("other")
+        resolver.invalidateWhere { it.startsWith("track:") }
+        assertEquals("result:other", resolver.resolve("other"))
+        assertEquals(3, calls)
+        resolver.resolve("track:a")
+        resolver.resolve("track:b")
+        assertEquals(5, calls)
+    }
 }

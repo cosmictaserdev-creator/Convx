@@ -79,6 +79,13 @@ class CanvasLookupCoordinator<K, V : Any>(
         }
     }
 
+    suspend fun invalidateWhere(matches: (K) -> Boolean) {
+        mutex.withLock {
+            entries.keys.removeAll(matches)
+            inFlight.keys.filter(matches).forEach { key -> inFlight.remove(key)?.cancel() }
+        }
+    }
+
     suspend fun invalidate(key: K) {
         mutex.withLock {
             entries.remove(key)

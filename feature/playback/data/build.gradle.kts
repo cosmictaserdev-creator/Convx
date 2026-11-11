@@ -22,12 +22,19 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":playback-core"))
+            implementation(project(":innertube"))
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
         }
+        val jvmSharedMain by creating {
+            dependsOn(commonMain.get())
+            dependencies { implementation("com.squareup.okhttp3:okhttp:4.12.0") }
+        }
+        androidMain.get().dependsOn(jvmSharedMain)
+        getByName("desktopMain").dependsOn(jvmSharedMain)
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
