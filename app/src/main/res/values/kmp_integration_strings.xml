@@ -31,4 +31,5 @@
     <string name="onboarding_notifications_skip">Not now</string>
     <string name="home_artist_list">Artists for you</string>
     <string name="home_all_time_hits">All-time hits</string>
+    <string name="lyrics_animation_fisheye">Fisheye</string>
 </resources>

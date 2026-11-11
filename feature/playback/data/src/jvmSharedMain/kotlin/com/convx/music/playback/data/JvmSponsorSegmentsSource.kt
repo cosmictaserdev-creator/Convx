@@ -68,9 +68,10 @@ class JvmSponsorSegmentsSource(
     }
 
     private fun readBoundedBody(response: Response): String? {
-        if (response.body.contentLength() > MAX_RESPONSE_BYTES) return null
+        val body = response.body ?: return null
+        if (body.contentLength() > MAX_RESPONSE_BYTES) return null
         val bytes = ByteArrayOutputStream()
-        response.body.byteStream().use { stream ->
+        body.byteStream().use { stream ->
             val buffer = ByteArray(8_192)
             while (true) {
                 val count = stream.read(buffer)

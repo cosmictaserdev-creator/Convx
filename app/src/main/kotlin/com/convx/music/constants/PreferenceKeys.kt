@@ -783,31 +783,7 @@ val FetchedModulesKey = stringPreferencesKey("fetchedModules")
 
 
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
-enum class LyricsAnimationStyle {
-    FLAMINGO,
-    NONE,
-    FADE,
-    GLOW,
-    SLIDE,
-    KARAOKE,
-    APPLE,
-    APPLE_V2,
-    BITCHORD,
-    CONVX_1,
-    LYRICS_V2,
-    METRO_LYRICS,
-
-    /**
-     * the reference app's treatment: Apple Music's karaoke view, rendered by
-     * `com.mocharealm.accompanist:lyrics-ui`. The only style that animates the whole
-     * column rather than one line at a time, which is what the smooth catch-up scroll,
-     * the depth-of-field falloff and duet (left/right) alignment all need.
-     */
-    ARCHIVE_TUNE,
-
-    /** Lines on a tilted plane that recedes into a starfield, like an opening crawl. */
-    STAR_CRAWL,
-}
+typealias LyricsAnimationStyle = com.convx.music.playback.LyricsAnimationStyle
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
 val LyricsFontKey = stringPreferencesKey("lyricsFont")

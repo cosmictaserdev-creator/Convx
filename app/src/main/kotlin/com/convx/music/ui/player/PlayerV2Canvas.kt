@@ -195,6 +195,11 @@ class CanvasVideoController internal constructor(
     internal var renderedFrame by mutableIntStateOf(0)
         private set
 
+    internal val loopKey: String?
+        get() = exoPlayer.currentMediaItem?.let { "${it.mediaId}:${it.localConfiguration?.uri}" }
+    internal val loopPositionMs: Long get() = exoPlayer.currentPosition.coerceAtLeast(0L)
+    internal val loopDurationMs: Long get() = exoPlayer.duration.coerceAtLeast(0L)
+
     private var loadingMediaId: String? = null
     private var loadingUrl: String? = null
     private var primary: String? = null

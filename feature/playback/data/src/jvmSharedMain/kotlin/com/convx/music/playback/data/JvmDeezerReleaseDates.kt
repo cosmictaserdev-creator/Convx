@@ -46,8 +46,8 @@ class JvmDeezerReleaseDates(
             override fun onResponse(call: Call, response: Response) {
                 val body = response.use {
                     when {
-                        !it.isSuccessful || it.body.contentLength() > MAX_BODY_BYTES -> null
-                        else -> try { it.body.string().takeIf { text -> text.length <= MAX_BODY_BYTES } } catch (_: IOException) { null }
+                        !it.isSuccessful || it.body == null || (it.body?.contentLength() ?: 0L) > MAX_BODY_BYTES -> null
+                        else -> try { it.body?.string()?.takeIf { text -> text.length <= MAX_BODY_BYTES } } catch (_: IOException) { null }
                     }
                 }
                 continuation.resumeWith(Result.success(body))

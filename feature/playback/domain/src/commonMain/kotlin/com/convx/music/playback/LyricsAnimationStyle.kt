@@ -30,4 +30,5 @@ enum class LyricsAnimationStyle {
      * in the middle, earlier words stacked above. Only when the lyrics have word timings.
      */
     FISHEYE,
+    STAR_CRAWL,
 }
