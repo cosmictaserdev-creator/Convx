@@ -54,36 +54,32 @@ class NetworkTagReader(
     }
 
     private suspend fun readInternal(uri: String): NetworkTags? {
-        val retriever = MetadataRetriever.Builder(context, MediaItem.fromUri(uri))
-            .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
-            .build()
-        retriever.use { source ->
-            val groups = source.retrieveTrackGroups().awaitResult()
-            val durationUs = runCatching { source.retrieveDurationUs().awaitResult() }.getOrNull()
-            val builder = MediaMetadata.Builder()
-            for (group in 0 until groups.length) {
-                val trackGroup = groups[group]
-                for (track in 0 until trackGroup.length) {
-                    val metadata = trackGroup.getFormat(track).metadata ?: continue
-                    for (entry in 0 until metadata.length()) metadata[entry].populateMediaMetadata(builder)
-                }
+        // The static call is the one available in Media3 1.7; it parses only the file header through our source.
+        val groups = MetadataRetriever.retrieveMetadata(
+            DefaultMediaSourceFactory(dataSourceFactory),
+            MediaItem.fromUri(uri),
+        ).awaitResult()
+        val builder = MediaMetadata.Builder()
+        for (group in 0 until groups.length) {
+            val trackGroup = groups[group]
+            for (track in 0 until trackGroup.length) {
+                val metadata = trackGroup.getFormat(track).metadata ?: continue
+                for (entry in 0 until metadata.length()) metadata[entry].populateMediaMetadata(builder)
             }
-            val tags = builder.build()
-            val duration = durationUs?.takeIf { it > 0 && it != androidx.media3.common.C.TIME_UNSET }
-                ?.let { (it / 1_000_000L).toInt() }
-            val result = NetworkTags(
-                title = tags.title?.toString()?.trim()?.takeIf(String::isNotEmpty),
-                artist = tags.artist?.toString()?.trim()?.takeIf(String::isNotEmpty),
-                albumArtist = tags.albumArtist?.toString()?.trim()?.takeIf(String::isNotEmpty),
-                album = tags.albumTitle?.toString()?.trim()?.takeIf(String::isNotEmpty),
-                trackNumber = tags.trackNumber?.takeIf { it > 0 },
-                durationSeconds = duration,
-                artwork = tags.artworkData?.takeIf { it.isNotEmpty() },
-            )
-            val empty = result.title == null && result.artist == null && result.album == null &&
-                result.albumArtist == null && result.artwork == null && result.trackNumber == null && duration == null
-            return if (empty) null else result
         }
+        val tags = builder.build()
+        val result = NetworkTags(
+            title = tags.title?.toString()?.trim()?.takeIf(String::isNotEmpty),
+            artist = tags.artist?.toString()?.trim()?.takeIf(String::isNotEmpty),
+            albumArtist = tags.albumArtist?.toString()?.trim()?.takeIf(String::isNotEmpty),
+            album = tags.albumTitle?.toString()?.trim()?.takeIf(String::isNotEmpty),
+            trackNumber = tags.trackNumber?.takeIf { it > 0 },
+            durationSeconds = null,
+            artwork = tags.artworkData?.takeIf { it.isNotEmpty() },
+        )
+        val empty = result.title == null && result.artist == null && result.album == null &&
+            result.albumArtist == null && result.artwork == null && result.trackNumber == null
+        return if (empty) null else result
     }
 }
 
