@@ -262,3 +262,22 @@ object SaavnService {
         Log.e(TAG, "getContentLength failed for url=$url", it)
     }.getOrNull()
 }
+
+/**
+ * JioSaavn catalogue ids ride inside Convx media ids behind this prefix, so a
+ * Saavn search result can travel through the same queue and player path as a
+ * YouTube one while still resolving to a Saavn stream rather than a video.
+ */
+const val SAAVN_SONG_ID_PREFIX = "saavn:"
+
+fun isSaavnSongId(id: String): Boolean = id.startsWith(SAAVN_SONG_ID_PREFIX)
+
+fun saavnRawSongId(id: String): String = id.removePrefix(SAAVN_SONG_ID_PREFIX)
+
+/** The search API hands out the 50x50 cover; the CDN serves the same art at 500x500. */
+fun saavnThumbnail(url: String): String = when {
+    url.isBlank() -> ""
+    url.contains("50x50") -> url.replace("50x50", "500x500")
+    url.contains("150x150") -> url.replace("150x150", "500x500")
+    else -> url
+}

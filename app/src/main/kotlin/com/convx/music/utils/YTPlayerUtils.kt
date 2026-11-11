@@ -57,6 +57,8 @@ import com.convx.music.utils.PlaybackLogManager
 import com.music.innertube.models.IpVersion
 import com.music.innertube.models.WatchEndpoint
 import com.music.jiosaavn.SaavnService
+import com.music.jiosaavn.isSaavnSongId
+import com.music.jiosaavn.saavnRawSongId
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import timber.log.Timber
@@ -370,6 +372,64 @@ object YTPlayerUtils {
         requireYouTube: Boolean = false,
         preferAac: Boolean = false,
     ): Result<PlaybackData> {
+        // A Saavn catalogue id has no YouTube video behind it: resolve the stream
+        // straight from JioSaavn instead of trying to match a video first.
+        if (isSaavnSongId(videoId)) {
+            val rawSaavnId = saavnRawSongId(videoId)
+            val stream = SaavnService.getStreamUrl(rawSaavnId)
+                ?: return Result.failure(
+                    IllegalStateException("JioSaavn stream unavailable for $rawSaavnId"),
+                )
+            if (stream.url.isBlank()) {
+                return Result.failure(
+                    IllegalStateException("JioSaavn returned an empty stream for $rawSaavnId"),
+                )
+            }
+            val kbps = stream.kbps ?: 320
+            val (itag, qualityLabel) = when {
+                kbps >= 320 -> 141 to "320kbps"
+                kbps >= 160 -> 140 to "160kbps"
+                else -> 139 to "96kbps"
+            }
+            val saavnMime = if (stream.url.endsWith(".mp3", ignoreCase = true)) {
+                "audio/mpeg; codecs=\"mp3\""
+            } else {
+                "audio/mp4; codecs=\"mp4a.40.2\""
+            }
+            Timber.tag(TAG).i("Saavn: streaming catalogue id $rawSaavnId (${kbps}kbps)")
+            return Result.success(
+                PlaybackData(
+                    audioConfig = null,
+                    videoDetails = null,
+                    playbackTracking = null,
+                    format = PlayerResponse.StreamingData.Format(
+                        itag = itag,
+                        url = stream.url,
+                        mimeType = saavnMime,
+                        bitrate = kbps * 1_000,
+                        width = null,
+                        height = null,
+                        contentLength = null,
+                        quality = qualityLabel,
+                        fps = null,
+                        qualityLabel = null,
+                        averageBitrate = null,
+                        audioQuality = qualityLabel,
+                        approxDurationMs = null,
+                        audioSampleRate = null,
+                        audioChannels = null,
+                        loudnessDb = null,
+                        lastModified = null,
+                        signatureCipher = null,
+                        cipher = null,
+                        audioTrack = null,
+                    ),
+                    streamUrl = stream.url,
+                    streamExpiresInSeconds = 3600,
+                    isSaavnStream = true,
+                ),
+            )
+        }
         if (context != null) {
             // Honor selected quality only when Saavn is enabled.
             val forceSelectedQuality = context.dataStore.get(EnableSaavnStreamingKey, false) &&
