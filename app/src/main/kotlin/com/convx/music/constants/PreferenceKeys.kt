@@ -274,6 +274,10 @@ val CrossfadeGaplessKey = booleanPreferencesKey("crossfadeGapless")
 
 val MaxImageCacheSizeKey = intPreferencesKey("maxImageCacheSize")
 val MaxSongCacheSizeKey = intPreferencesKey("maxSongCacheSize")
+val UpcomingCacheEnabledKey = booleanPreferencesKey("upcomingCacheEnabled")
+val UpcomingCacheMobileDataKey = booleanPreferencesKey("upcomingCacheMobileData")
+val CacheEvictWhenFullKey = booleanPreferencesKey("cacheEvictWhenFull")
+val CachePlaybackReservePercentKey = intPreferencesKey("cachePlaybackReservePercent")
 
 val PauseListenHistoryKey = booleanPreferencesKey("pauseListenHistory")
 val PauseSearchHistoryKey = booleanPreferencesKey("pauseSearchHistory")
@@ -779,31 +783,7 @@ val FetchedModulesKey = stringPreferencesKey("fetchedModules")
 
 
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
-enum class LyricsAnimationStyle {
-    FLAMINGO,
-    NONE,
-    FADE,
-    GLOW,
-    SLIDE,
-    KARAOKE,
-    APPLE,
-    APPLE_V2,
-    BITCHORD,
-    CONVX_1,
-    LYRICS_V2,
-    METRO_LYRICS,
-
-    /**
-     * the reference app's treatment: Apple Music's karaoke view, rendered by
-     * `com.mocharealm.accompanist:lyrics-ui`. The only style that animates the whole
-     * column rather than one line at a time, which is what the smooth catch-up scroll,
-     * the depth-of-field falloff and duet (left/right) alignment all need.
-     */
-    ARCHIVE_TUNE,
-
-    /** Lines on a tilted plane that recedes into a starfield, like an opening crawl. */
-    STAR_CRAWL,
-}
+typealias LyricsAnimationStyle = com.convx.music.playback.LyricsAnimationStyle
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
 val LyricsFontKey = stringPreferencesKey("lyricsFont")
@@ -816,7 +796,13 @@ val RepeatModeKey = intPreferencesKey("repeatMode")
 val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")
 val CanvasThumbnailAnimationKey = booleanPreferencesKey("canvasThumbnailAnimation")
+val CanvasMiniPlayerEnabledKey = booleanPreferencesKey("canvasMiniPlayerEnabled")
+val CanvasBlurQualityKey = stringPreferencesKey("canvasBlurQuality")
 val CanvasSourceKey = stringPreferencesKey("canvasSource")
+val CanvasProviderOrderKey = stringPreferencesKey("canvasProviderOrder")
+val CanvasDisabledProvidersKey = stringPreferencesKey("canvasDisabledProviders")
+val CanvasFirstAvailableKey = booleanPreferencesKey("canvasFirstAvailable")
+val CanvasPriorityWaitSecondsKey = intPreferencesKey("canvasPriorityWaitSeconds")
 
 // Ambient Mode settings are separate from the main player canvas preferences.
 val AmbientVideoCanvasEnabledKey = booleanPreferencesKey("ambientVideoCanvasEnabled")
@@ -1124,3 +1110,12 @@ val SuggestionRegionSlugToName =
         "ae" to "United Arab Emirates",
         "il" to "Israel"
     )
+
+val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
+val ReleaseRadarEnabledKey = booleanPreferencesKey("releaseRadarEnabled")
+val OnboardingCompleteKey = booleanPreferencesKey("onboardingComplete")
+val PlayerInlineLyricsKey = booleanPreferencesKey("playerInlineLyrics")
+
+val FisheyeZoomKey = floatPreferencesKey("fisheyeZoom")
+val FisheyeRadiusKey = floatPreferencesKey("fisheyeRadius")
+val FisheyeTextSizeKey = floatPreferencesKey("fisheyeTextSize")

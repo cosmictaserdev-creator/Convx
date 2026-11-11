@@ -88,7 +88,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
-      - run: ./gradlew -p clients/kmp :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest :modules-core:desktopTest :modules-runtime:desktopTest :modules-presentation:compileKotlinDesktop :lyrics-core:desktopTest :canvas-core:desktopTest :playback-core:desktopTest :playback-data:desktopTest :playback-presentation:desktopTest :history-core:desktopTest :library-core:desktopTest :library-data:desktopTest :search-core:desktopTest :catalog-core:desktopTest :account-core:desktopTest :account-presentation:desktopTest :catalog-presentation:desktopTest :design-system:desktopTest :listen-together-core:desktopTest :innertube:desktopTest :shared:desktopTest --no-configuration-cache --console=plain
+      - run: ./gradlew -p clients/kmp :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest :modules-core:desktopTest :modules-runtime:desktopTest :modules-presentation:compileKotlinDesktop :lyrics-core:desktopTest :canvas-core:desktopTest :spotify-data:test :playback-core:desktopTest :playback-data:desktopTest :playback-presentation:desktopTest :history-core:desktopTest :library-core:desktopTest :library-data:desktopTest :search-core:desktopTest :catalog-core:desktopTest :account-core:desktopTest :account-presentation:desktopTest :catalog-presentation:desktopTest :design-system:desktopTest :listen-together-core:desktopTest :innertube:desktopTest :shared:desktopTest --no-configuration-cache --console=plain
 
   android-linkage:
     name: Android shared screen linkage

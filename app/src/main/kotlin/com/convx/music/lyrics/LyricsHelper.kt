@@ -68,8 +68,6 @@ class LyricsHelper(
         initialLyrics: LyricsWithProvider? = null,
         onUpgrade: suspend (LyricsWithProvider) -> Unit = {},
     ): LyricsWithProvider {
-        currentLyricsJob?.cancel()
-
         if (!hasNetworkConnection()) {
             return LyricsWithProvider(LYRICS_NOT_FOUND, "Unknown")
         }

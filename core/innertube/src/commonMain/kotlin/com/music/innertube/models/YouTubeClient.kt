@@ -42,6 +42,20 @@ data class YouTubeClient(
     )
 
     companion object {
+        fun userAgentForStreamUrl(url: String): String {
+            val parameters = runCatching { io.ktor.http.Url(url).parameters }.getOrNull() ?: return USER_AGENT_WEB
+            val name = parameters["c"] ?: return USER_AGENT_WEB
+            val version = parameters["cver"]?.takeIf { value ->
+                value.length <= 80 && value.all { it.isLetterOrDigit() || it in "._-" }
+            }
+            val clients = listOf(WEB, WEB_REMIX, WEB_CREATOR, TVHTML5, TVHTML5_SIMPLY_EMBEDDED_PLAYER,
+                IOS, MOBILE, ANDROID_NO_SDK, ANDROID_VR_1_61_48, ANDROID_VR_1_65_10,
+                ANDROID_VR_1_43_32, ANDROID_VR_NO_AUTH, ANDROID_CREATOR, VISIONOS, IPADOS, ANDROID_MUSIC, IOS_MUSIC)
+            val client = clients.firstOrNull { it.clientName == name && it.clientVersion == version }
+                ?: clients.firstOrNull { it.clientName == name } ?: return USER_AGENT_WEB
+            return if (version == null) client.userAgent else client.userAgent.replace(client.clientVersion, version)
+        }
+
         const val USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
 
         const val ORIGIN_YOUTUBE_MUSIC = "https://music.youtube.com"

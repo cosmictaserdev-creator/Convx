@@ -22,6 +22,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":catalog-core"))
+            api(project(":innertube"))
+            implementation(project(":hig"))
             api(project(":library-core"))
             api(project(":playback-core"))
             implementation(project(":playback-presentation"))

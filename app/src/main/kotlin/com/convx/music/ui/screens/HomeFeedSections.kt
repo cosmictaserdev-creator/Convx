@@ -5,6 +5,8 @@
 
 package com.convx.music.ui.screens
 
+import com.convx.music.catalog.HomeSection
+
 import com.convx.music.ui.component.sf
 import com.convx.music.ui.component.SymbolIcon
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -140,6 +142,9 @@ internal fun LazyListScope.homeSectionsContent(
             )
             is HomeSection.HomePageSection -> homePageSection(section, deps, ui.homePage)
             HomeSection.MoodAndGenres -> moodAndGenresSection(deps, ui.explorePage)
+            HomeSection.ArtistList -> homeArtistListSection(deps, ui.similarRecommendations.orEmpty())
+            HomeSection.AllTimeHits -> homeHitsSection(deps, ui.allYtItems)
+            else -> Unit
         }
     }
 }

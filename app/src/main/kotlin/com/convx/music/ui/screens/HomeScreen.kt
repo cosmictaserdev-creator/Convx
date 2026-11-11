@@ -5,6 +5,8 @@
 
 package com.convx.music.ui.screens
 
+import com.convx.music.catalog.HomeSection
+
 import com.convx.music.ui.ios.component.AppleContextMenu
 import com.convx.music.ui.ios.component.IosGlyph
 import com.convx.music.ui.ios.component.IosMenuItem
@@ -262,22 +264,6 @@ internal const val LocalShelfRows = 2
 /** Playlist and folder rows on Home. The rest are one tap away in Library. */
 internal const val LocalListPreview = 6
 
-sealed class HomeSection(val id: String, val baseWeight: Int) {
-    /** The "star of the day" card. Always first, never shuffled. */
-    data object Hero : HomeSection("hero", 110)
-    data object SpeedDial : HomeSection("speed_dial", 100)
-    data object QuickPicks : HomeSection("quick_picks", 90)
-    data object DailyDiscover : HomeSection("daily_discover", 80)
-    data object ListenAgain : HomeSection("keep_listening", 50)
-    data object TopSongs : HomeSection("top_songs", 55)
-    data object AccountPlaylists : HomeSection("account_playlists", 40)
-    data object ForgottenFavorites : HomeSection("forgotten_favorites", 30)
-    data object FromTheCommunity : HomeSection("from_the_community", 20)
-    data class SimilarRecommendation(val index: Int) : HomeSection("similar_recommendation_$index", 10)
-    data class HomePageSection(val index: Int) : HomeSection("home_page_section_$index", 10)
-    data object MoodAndGenres : HomeSection("mood_and_genres", 5)
-}
-
 /** Picks the Home for the current mode before either view model exists, so local mode never builds the online feed. */
 @Composable
 fun HomeRoute(navController: NavController, snackbarHostState: SnackbarHostState) {
@@ -489,267 +475,34 @@ fun HomeScreen(
     val newReleaseTitle = stringResource(R.string.new_release_albums)
     val trendingTitle = stringResource(R.string.trending)
 
-    PullToRefreshBox(
-        state = pullRefreshState,
-        isRefreshing = isRefreshing,
-        onRefresh = { viewModel.refresh() },
-        indicator = {
-            // Compose the animated indicator only while it is visible to avoid idle redraws.
-            if (isRefreshing || pullRefreshState.distanceFraction > 0f) {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(LocalPlayerAwareWindowInsets.current.asPaddingValues()),
-                )
-            }
-        }
-    ) {
-        // The shared top bar renders the title and avatar; this screen starts below it.
-        Box(Modifier.fillMaxSize()) {
-        CompositionLocalProvider(
-            LocalPageMetrics provides AppPage.Metrics,
-            LocalMetadataColor provides AppTheme.colorScheme.onSurfaceVariant,
-        ) {
-            BoxWithConstraints(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopStart
-            ) {
-                val pageBackground = rememberAppBackgroundColor(AppTheme.colorScheme.surface)
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(pageBackground)
-                )
-                HomeImageBackground(contentLoaded = homePage != null)
-                if (!hasCustomHomeBackground()) {
-                    HomeChipBackdrop(
-                        url = homePage?.background?.takeIf { selectedChip != null && pendingChip == null },
-                        fadeTo = pageBackground,
-                        scrolledPx = {
-                            val atTop = lazylistState.firstVisibleItemIndex == 0 && lazylistState.firstVisibleItemScrollOffset == 0
-                            if (atTop) 0f else feedScroll.floatValue
-                        },
-                    )
-                }
-
-                // Space the floating side bar occupies. The vertical list keeps it as
-                // content padding so rows stay clear of the panel; the carousels below
-                // give it back with bleedStart so their cards run underneath the glass
-                // instead of stopping at its edge.
-                val sideInset = LocalPlayerAwareWindowInsets.current
-                    .asPaddingValues()
-                    .calculateStartPadding(LocalLayoutDirection.current)
-
-                val deps = HomeSectionDeps(
-                    context = LocalContext.current,
-                    randomItem = viewModel::getRandomItem,
-                    navController = navController,
-                    playerConnection = playerConnection,
-                    menuState = menuState,
-                    haptic = haptic,
-                    scope = scope,
-                    sideInset = sideInset,
-                    localGridItem = localGridItem,
-                    onLocalItemClick = onLocalItemClick,
-                    isScrolling = remember(lazylistState) { { lazylistState.isScrollInProgress } },
-                )
-
-                LazyColumn(
-                    state = lazylistState,
-                    modifier = Modifier.nestedScroll(feedScrollTracker),
-                    // Sections had nothing but NavigationTitle's own 12dp padding
-                    // between them — ran into each other, felt cramped.
-                    verticalArrangement = Arrangement.spacedBy(AppPage.ItemSpacing),
-                    contentPadding = run {
-                        val ins = LocalPlayerAwareWindowInsets.current.asPaddingValues()
-                        val dir = LocalLayoutDirection.current
-                        PaddingValues(
-                            start = ins.calculateStartPadding(dir),
-                            top = maxOf(ins.calculateTopPadding(), if (sideInset > 0.dp) 96.dp else 116.dp),
-                            end = ins.calculateRightPadding(dir),
-                            bottom = ins.calculateBottomPadding(),
-                        )
-                    },
-                ) {
-                    // Apple Music's "Transfer music" card, pointed at our one import path:
-                    // signing in to YouTube Music. Gone for good once dismissed or signed in.
-                    if (
-                        selectedChip == null && !isLoggedIn && !signInCardDismissed
-                    ) {
-                        item(key = "sign_in_card", contentType = "sign_in_card") {
-                            HomeSignInCard(
-                                onGetStarted = { navController.navigate("login") },
-                                onDismiss = { setSignInCardDismissed(true) },
-                                modifier = Modifier.animateItem(),
-                            )
-                        }
-                    }
-
-                    item(key = "home_feed_filters", contentType = "home_feed_filters") {
-                        HomeFeedFilterRow(
-                            moodChips = if (showMoodFilters) homePage?.chips.orEmpty().filter { it.endpoint?.browseId?.isNotBlank() == true } else emptyList(),
-                            selectedChip = shownChip,
-                            onSelected = viewModel::toggleChip,
-                            scrollState = filterScrollState,
-                            sideInset = sideInset,
-                            modifier = Modifier.animateItem(),
-                        )
-                    }
-
-                    if (selectedChip == null) {
-                        item(key = "wrapped_card", contentType = "wrapped_card") {
-                            AnimatedVisibility(visible = shouldShowWrappedCard) {
-                                val wrappedCardShape = rememberHomeCardShape()
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                        .homeCardRim(wrappedCardShape),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = LocalContentColor.current.copy(alpha = 0.1f),
-                                    ),
-                                    shape = wrappedCardShape
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        if (isWrappedDataReady) {
-                                            val bbhFont = try {
-                                                FontFamily(Font(R.font.bbh_bartle_regular))
-                                            } catch (e: Exception) {
-                                                FontFamily.Default
-                                            }
-                                            Column(
-                                                modifier = Modifier.padding(16.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                            ) {
-                                                Text(
-                                                    text = stringResource(R.string.wrapped_ready_title),
-                                                    style = AppTheme.typography.headlineLarge.copy(
-                                                        fontFamily = bbhFont,
-                                                        textAlign = TextAlign.Center
-                                                    )
-                                                )
-                                                Spacer(modifier = Modifier.height(8.dp))
-                                                Text(
-                                                    text = stringResource(R.string.wrapped_ready_subtitle),
-                                                    style = AppTheme.typography.bodyLarge.copy(
-                                                        textAlign = TextAlign.Center
-                                                    )
-                                                )
-                                                Spacer(modifier = Modifier.height(16.dp))
-                                                Button(onClick = {
-                                                    navController.navigate("wrapped")
-                                                }) {
-                                                    Text(stringResource(R.string.open))
-                                                }
-                                            }
-                                        } else {
-                                            com.convx.music.ui.component.ShimmerBox(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(16.dp)
-                                                    .height(160.dp),
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (pendingChip != null) {
-                        // The shimmer below stands in for the chip's feed until it arrives.
-                    } else if (selectedChip != null) {
-                        chipFeedContent(deps, homePage)
-                    } else {
-                        figmaHomeContent(
-                            deps = deps,
-                            mediaMetadata = mediaMetadataState,
-                            isPlaying = isPlayingState,
-                            topPicks = topPicks.ifEmpty { trending }.ifEmpty { newReleaseAlbums },
-                            topPicksTitle = topPicksTitle,
-                            newReleaseAlbums = if (topPicks.isNotEmpty() || trending.isNotEmpty()) newReleaseAlbums else emptyList(),
-                            newReleaseTitle = newReleaseTitle,
-                            trending = if (topPicks.isNotEmpty()) trending else emptyList(),
-                            trendingTitle = trendingTitle,
-                        )
-                        homeSectionsContent(
-                            sections = homeSections,
-                            deps = deps,
-                            ui = homeState,
-                            mediaMetadata = mediaMetadataState,
-                            isPlaying = isPlayingState,
-                            randomizeJob = randomizeJob,
-                            quickPicksSongMap = quickPicksSongMap,
-                            forgottenFavoritesSongMap = forgottenFavoritesSongMap,
-                            url = url,
-                        )
-                    }
-                    // Show this infinite shimmer only during a fetch; a continuation can remain available indefinitely.
-                    if (isLoading || pendingChip != null) {
-                        item(key = "loading_shimmer", contentType = "shimmer") {
-                            ShimmerHost(
-                                modifier = Modifier.animateItem()
-                            ) {
-                                repeat(2) {
-                                    TextPlaceholder(
-                                        height = 36.dp,
-                                        modifier = Modifier
-                                            .padding(AppPage.Gutter)
-                                            .width(250.dp),
-                                    )
-                                    LazyRow(
-                                        modifier = Modifier.bleedStart(sideInset),
-                                        contentPadding = PaddingValues(horizontal = AppleTokens.ItemGap / 2)
-                                            .plusStart(sideInset),
-                                    ) {
-                                        items(4) {
-                                            GridItemPlaceHolder()
-                                        }
-                                    }
-                                }
-
-                                TextPlaceholder(
-                                    height = 36.dp,
-                                    modifier = Modifier
-                                        .padding(AppPage.Gutter)
-                                        .width(250.dp),
-                                )
-                                repeat(4) {
-                                    Row {
-                                        repeat(2) {
-                                            TextPlaceholder(
-                                                height = MoodAndGenresButtonHeight,
-                                                shape = RoundedCornerShape(AppleTokens.Control),
-                                                modifier = Modifier
-                                                    .padding(AppleTokens.ItemGap / 2)
-                                                    .width(200.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    item(key = "bottom_spacer", contentType = "spacer") {
-                        Spacer(modifier = Modifier.height(30.dp))
-                    }
-                }
-
-                val (showHomeFab) = rememberPreference(ShowHomeFabKey, true)
-                if (showHomeFab) {
-                    HideOnScrollFAB(
-                        visible = allLocalItems.isNotEmpty() || allYtItems.isNotEmpty(),
-                        lazyListState = lazylistState,
-                        icon = R.drawable.shuffle,
-                        onClick = {
+    val homePrefs = rememberHomePrefs()
+    val sideInset = LocalPlayerAwareWindowInsets.current.asPaddingValues()
+        .calculateStartPadding(LocalLayoutDirection.current)
+    val deps = HomeSectionDeps(
+        context = LocalContext.current,
+        randomItem = viewModel::getRandomItem,
+        navController = navController,
+        playerConnection = playerConnection,
+        menuState = menuState,
+        haptic = haptic,
+        scope = scope,
+        sideInset = sideInset,
+        localGridItem = localGridItem,
+        onLocalItemClick = onLocalItemClick,
+        isScrolling = remember(lazylistState) { { lazylistState.isScrollInProgress } },
+    )
+    HomeContent(
+        state = HomeContentState(homeState, shownChip, pendingChip, homeSections, topPicks, trending,
+            newReleaseAlbums.orEmpty(), quickPicksSongMap, forgottenFavoritesSongMap, isLoggedIn,
+            signInCardDismissed, isWrappedDataReady, url, homePrefs),
+        actions = HomeActions(
+            onRefresh = viewModel::refresh,
+            onToggleChip = viewModel::toggleChip,
+            onSignIn = { navController.navigate("login") },
+            onDismissSignIn = { setSignInCardDismissed(true) },
+            onOpenWrapped = { navController.navigate("wrapped") },
+            onOpenRecognition = { navController.navigate("recognition") },
+            onLuckyPlay = {
                             val local = when {
                                 allLocalItems.isNotEmpty() && allYtItems.isNotEmpty() -> Random.nextFloat() < 0.5
                                 allLocalItems.isNotEmpty() -> true
@@ -783,14 +536,12 @@ fun HomeScreen(
                                     }
                                 }
                             }
-                        },
-                        onRecognitionClick = {
-                            navController.navigate("recognition")
-                        }
-                    )
-                }
-            }
-        }
-        }
-    }
+                                    },
+        ),
+        deps = deps,
+        lazylistState = lazylistState,
+        mediaMetadataState = mediaMetadataState,
+        isPlayingState = isPlayingState,
+        randomizeJob = randomizeJob,
+    )
 }

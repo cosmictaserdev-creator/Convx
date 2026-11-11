@@ -28,9 +28,9 @@ import com.convx.music.utils.rememberPreference
  * every Home card through here instead.
  */
 @Composable
-fun rememberHomeCardShape(): Shape {
+fun rememberHomeCardShape(defaultCorner: androidx.compose.ui.unit.Dp = AppleTokens.CardCornerLarge): Shape {
     val (cornerOverride) = rememberPreference(HomeCardCornerRadiusOverrideKey, 0)
-    val corner = if (cornerOverride > 0) cornerOverride.dp else AppleTokens.CardCornerLarge
+    val corner = if (cornerOverride > 0) cornerOverride.dp else defaultCorner
     return remember(corner) { ContinuousRoundedRectangle(corner) }
 }
 

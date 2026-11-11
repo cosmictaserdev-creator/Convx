@@ -203,6 +203,7 @@ fun Queue(
     handleBack: Boolean = true,
     /** Disable when the host already applies the top system inset. */
     applyTopSystemInset: Boolean = true,
+    embedded: Boolean = false,
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -325,6 +326,7 @@ fun Queue(
 
     BottomSheet(
         state = state,
+        embedded = embedded,
         modifier = modifier,
         isExpandable = sheetDraggable,
         handleBack = handleBack,

@@ -25,6 +25,7 @@ ksp = "2.3.6"
 macosUi = "1.1.0"
 
 [libraries]
+smoothCorner = { module = "com.github.racra:smooth-corner-rect-android-compose", version = "v1.0.0" }
 nucleus-macos-ui = { module = "dev.nucleusframework:compose-macos-ui", version.ref = "macosUi" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }

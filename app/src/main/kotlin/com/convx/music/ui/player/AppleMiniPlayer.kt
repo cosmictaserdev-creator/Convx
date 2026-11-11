@@ -79,7 +79,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun AppleMiniPlayer(
     progressState: ProgressState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    canvasVideo: CanvasVideoController? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     
@@ -273,6 +274,9 @@ fun AppleMiniPlayer(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
+                    }
+                    if (canvasVideo != null) {
+                        CanvasVideoSurface(controller = canvasVideo, modifier = Modifier.fillMaxSize())
                     }
                 }
 

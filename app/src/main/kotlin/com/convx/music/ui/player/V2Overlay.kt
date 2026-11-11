@@ -49,13 +49,15 @@ import kotlinx.coroutines.launch
  * player -- artwork included. A `Popup` is a separate window, and sampling a layer from
  * there came out empty, which is why the menus showed a flat black panel.
  */
-internal val LocalV2Overlay = compositionLocalOf<MutableState<(@Composable () -> Unit)?>?> { null }
+internal class V2OverlayEntry(val content: @Composable () -> Unit, val dismiss: () -> Unit)
+
+internal val LocalV2Overlay = compositionLocalOf<MutableState<V2OverlayEntry?>?> { null }
 
 /** Renders the slot; place after the content [backdrop] records. */
 @Composable
-internal fun V2OverlayHost(slot: MutableState<(@Composable () -> Unit)?>, backdrop: Backdrop) {
+internal fun V2OverlayHost(slot: MutableState<V2OverlayEntry?>, backdrop: Backdrop) {
     val content = slot.value ?: return
-    CompositionLocalProvider(LocalIosBackdrop provides backdrop) { content() }
+    CompositionLocalProvider(LocalIosBackdrop provides backdrop) { content.content() }
 }
 
 /** Places a panel of [panel] size in a host of [host] size, given the opening touch (host px). */
@@ -103,9 +105,10 @@ internal fun V2Floating(
     val latestDismiss by rememberUpdatedState(onDismiss)
     val latestContent by rememberUpdatedState(content)
     DisposableEffect(slot) {
-        val entry: @Composable () -> Unit = {
-            FloatingLayer(touch, { latestDismiss() }, dimAlpha, placement) { latestContent() }
-        }
+        val entry = V2OverlayEntry(
+            content = { FloatingLayer(touch, { latestDismiss() }, dimAlpha, placement) { latestContent() } },
+            dismiss = { latestDismiss() },
+        )
         slot.value = entry
         onDispose { if (slot.value === entry) slot.value = null }
     }

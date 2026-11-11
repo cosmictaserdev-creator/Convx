@@ -125,6 +125,7 @@ import com.convx.music.ui.component.CastButton
 import com.convx.music.utils.rememberEnumPreference
 import com.convx.music.constants.CanvasSource
 import com.convx.music.constants.CanvasSourceKey
+import com.convx.music.playback.CanvasSelectionRepository
 import com.convx.music.constants.CanvasThumbnailAnimationKey
 import com.convx.music.constants.DataSaverEnabledKey
 import com.convx.music.canvas.TidalCanvasProvider
@@ -746,130 +747,20 @@ private fun ThumbnailItem(
 
             if (canvasThumbnailAnimation && item.mediaId == currentMediaId && !rotatingThumbnail && playerBackground != PlayerBackgroundStyle.APPLE_MUSIC) {
                 val (canvasSource) = rememberEnumPreference(CanvasSourceKey, defaultValue = CanvasSource.AUTO)
+                val disabledCanvasProviders by rememberPreference(com.convx.music.constants.CanvasDisabledProvidersKey, defaultValue = "")
+                val manualCanvasRevision by CanvasSelectionRepository.selectionRevision.collectAsState()
                 var canvasArtwork by remember(item.mediaId) { mutableStateOf<CanvasArtwork?>(null) }
-                var canvasFetchInFlight by remember(item.mediaId) { mutableStateOf(false) }
-                val storefront = remember {
-                    val country = Locale.getDefault().country
-                    if (country.length == 2) country.lowercase(Locale.ROOT) else "us"
-                }
-
-                LaunchedEffect(item.mediaId, canvasSource) {
-                    val cacheKey = "${item.mediaId}:${canvasSource.name}"
-                    CanvasArtworkPlaybackCache.get(cacheKey)?.let { cached ->
-                        canvasArtwork = cached
-                        return@LaunchedEffect
-                    }
-
-                    if (canvasFetchInFlight) return@LaunchedEffect
-                    canvasFetchInFlight = true
-
-                    val fetched = withContext(Dispatchers.IO) {
-                        val metadata = item.metadata
-                        val albumName = (metadata?.album?.title ?: item.mediaMetadata.albumTitle)?.toString()
-                        val duration = metadata?.duration
-                        
-                        val songTitleRaw = item.mediaMetadata.title?.toString() ?: ""
-                        val artistNameRaw = item.mediaMetadata.artist?.toString() ?: ""
-                        
-                        val searchTasks = listOf(
-                            songTitleRaw to artistNameRaw
-                        ).filter { (s, a) -> s.isNotBlank() && a.isNotBlank() }
-
-                        when (canvasSource) {
-                            CanvasSource.AUTO -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    SpotifyCanvasLookup.getBySongArtist(context, s, a)
-                                        ?: AppleMusicCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a,
-                                        album = albumName,
-                                        storefront = storefront
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                        ?: ConvxCanvasProvider.getBySongArtist(
-                                            song = s,
-                                            artist = a
-                                        )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                        ?: TidalCanvasProvider.getBySongArtist(
-                                            song = s,
-                                            artist = a,
-                                            album = albumName
-                                        )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.APPLE_MUSIC -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    AppleMusicCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a,
-                                        album = albumName,
-                                        storefront = storefront
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.CONVX -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    ConvxCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.TIDAL -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    TidalCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a,
-                                        album = albumName
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.SPOTIFY -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    SpotifyCanvasLookup.getBySongArtist(context, s, a)
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Client-side safety check: ensure the fetched canvas matches the requested song
-                    // This prevents "wrong canvas" if a provider returned a generic or incorrect match
-                    val requestedArtist = item.mediaMetadata.artist?.toString() ?: ""
-                    val requestedTitle = item.mediaMetadata.title?.toString() ?: ""
-                    
-                    val validated = fetched?.let { artwork ->
-                        val resultArtist = artwork.artist
-                        val resultName = artwork.name
-                        
-                        val artistMatches = if (resultArtist != null && requestedArtist.isNotBlank()) {
-                            val requestedList = splitAndNormalizeArtists(requestedArtist)
-                            val resultList = splitAndNormalizeArtists(resultArtist)
-                            requestedList.any { req -> resultList.any { res -> res.contains(req) || req.contains(res) } }
-                        } else true
-
-                        val songMatches = if (resultName != null && requestedTitle.isNotBlank()) {
-                            resultName.trim().equals(requestedTitle.trim(), ignoreCase = true)
-                        } else true
-                        val requestedAlbum = item.mediaMetadata.albumTitle?.toString() ?: ""
-                        val canvasAlbumName = artwork.albumName
-
-                        val albumMatches = if (canvasAlbumName != null && requestedAlbum.isNotBlank()) {
-                            canvasAlbumName.trim().equals(requestedAlbum.trim(), ignoreCase = true)
-                        } else false
-
-                        val titleMatches = songMatches && albumMatches
-
-                        if (artistMatches && titleMatches) {
-                            artwork
-                        } else {
-                            null
-                        }
-                    }
-                    
-                    canvasArtwork = validated
-                    if (validated != null) {
-                        CanvasArtworkPlaybackCache.put("${item.mediaId}:${canvasSource.name}", validated)
-                    }
-                    canvasFetchInFlight = false
+                LaunchedEffect(item.mediaId, canvasSource, disabledCanvasProviders, manualCanvasRevision) {
+                    val metadata = item.metadata
+                    canvasArtwork = CanvasSelectionRepository.resolve(
+                        context = context,
+                        mediaId = item.mediaId,
+                        title = metadata?.title ?: item.mediaMetadata.title?.toString().orEmpty(),
+                        artist = metadata?.artists?.firstOrNull()?.name
+                            ?: item.mediaMetadata.artist?.toString().orEmpty(),
+                        album = metadata?.album?.title ?: item.mediaMetadata.albumTitle?.toString(),
+                        source = canvasSource,
+                    )
                 }
 
                 canvasArtwork?.let { artwork ->

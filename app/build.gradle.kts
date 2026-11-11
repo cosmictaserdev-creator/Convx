@@ -332,6 +332,8 @@ dependencies {
     implementation(libs.nextlib.media3ext)
 
     // Google Cast - only included in GMS flavor (not available in F-Droid/FOSS builds)
+    "gmsImplementation"("com.google.android.gms:play-services-wearable:19.0.0")
+    "gmsImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
     "gmsImplementation"(libs.media3.cast)
     "gmsImplementation"(libs.mediarouter)
     "gmsImplementation"(libs.cast.framework)
@@ -358,7 +360,9 @@ dependencies {
     implementation(project(":artwork"))
     implementation(project(":network-storage"))
     implementation(project(":canvas"))
+    implementation(project(":account-presentation"))
     implementation(project(":playback-core"))
+    implementation(project(":playback-data"))
     implementation(project(":playback-presentation"))
     implementation(project(":history-core"))
     implementation(project(":listen-together-core"))
