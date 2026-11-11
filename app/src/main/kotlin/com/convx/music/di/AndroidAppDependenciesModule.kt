@@ -3,10 +3,8 @@ package com.convx.music.di
 import android.content.Context
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
-import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
-import com.convx.music.constants.MaxSongCacheSizeKey
 import com.convx.music.db.DatabaseDao
 import com.convx.music.db.InternalDatabase
 import com.convx.music.db.MusicDatabase
@@ -43,6 +41,8 @@ import com.convx.music.lyrics.LyricsProviderRepository
 import com.convx.music.playback.DownloadUtil
 import com.convx.music.playback.MediaLibrarySessionCallback
 import com.convx.music.playback.PlaybackServiceConnector
+import com.convx.music.playback.PolicyCacheEvictor
+import com.convx.music.playback.PlayerCacheBudgetRegistry
 import com.convx.music.utils.NetworkConnectivityObserver
 import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
@@ -72,12 +72,12 @@ val androidAppDependenciesModule = module {
     single<DatabaseProvider> { StandaloneDatabaseProvider(androidContext()) }
     single<SimpleCache>(named("playerCache")) {
         val context: Context = androidContext()
-        val cacheSize = context.dataStore[MaxSongCacheSizeKey] ?: 1024
+        val evictor = PolicyCacheEvictor({ com.convx.music.playback.cachePolicy(context) })
         SimpleCache(
             context.filesDir.resolve("exoplayer"),
-            if (cacheSize == -1) NoOpCacheEvictor() else LeastRecentlyUsedCacheEvictor(cacheSize * 1024 * 1024L),
+            evictor,
             get(),
-        )
+        ).also { PlayerCacheBudgetRegistry.register(context, it, evictor) }
     }
     single<SimpleCache>(named("downloadCache")) {
         val context: Context = androidContext()

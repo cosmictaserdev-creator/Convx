@@ -612,6 +612,17 @@ fun PlaylistMenu(
                             )
                         )
                     }
+                    if (songs.any { downloads[it.id]?.state == Download.STATE_COMPLETED }) {
+                        add(IosMenuItemData(
+                            title = { Text(stringResource(R.string.check_upgrade_playlist_downloads)) },
+                            description = { Text(stringResource(R.string.check_upgrade_playlist_downloads_desc)) },
+                            icon = { SymbolIcon(symbol = sf("arrow.up.circle"), contentDescription = null) },
+                            onClick = {
+                                downloadUtil.checkAndUpgradeDownloads(songs.map { it.id })
+                                onDismiss()
+                            },
+                        ))
+                    }
                     if (downloadPlaylist != true) {
                         add(
                             when (downloadState) {

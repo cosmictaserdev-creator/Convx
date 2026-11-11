@@ -45,11 +45,11 @@ object AudioCache {
     fun renditionsOf(uri: Uri): List<Rendition> {
         if (!::cache.isInitialized) return emptyList()
         val videoId = uri.getQueryParameter("v") ?: return emptyList()
-        val siblingPrefix = "$videoId#"
         return buildList {
             for ((source, fromDownload) in listOfNotNull(cache to false, downloadCache?.let { it to true })) {
                 for (key in source.keys) {
-                    if (key != videoId && !key.startsWith(siblingPrefix)) continue
+                    // Canvas and other sidecars share a song prefix but are not audio.
+                    if (!isAnalysisAudioCacheKey(key, videoId)) continue
                     val contentLength = ContentMetadata.getContentLength(source.getContentMetadata(key))
                     val prefix = source.getCachedLength(key, 0, Long.MAX_VALUE).coerceAtLeast(0L)
                     add(
@@ -71,9 +71,13 @@ object AudioCache {
 
     /** [fetchUri] must be the playable URL; all fills retain the rendition's cache key. */
     fun renditionDataSource(uri: Uri, rendition: Rendition, fetchUri: Uri? = null): MediaDataSource {
+        val selectedCache = if (rendition.fromDownload) downloadCache ?: cache else cache
         val factory = CacheDataSource.Factory()
-            .setCache(if (rendition.fromDownload) downloadCache ?: cache else cache)
+            .setCache(selectedCache)
             .setCacheKeyFactory(keyFactory)
+            .setCacheWriteDataSinkFactory(
+                if (rendition.fromDownload) null else PlayerCacheBudgetRegistry.sinkFactory(selectedCache, prefetch = true)
+            )
         if (fetchUri != null) {
             factory.setUpstreamDataSourceFactory(analyzerUpstream)
         }

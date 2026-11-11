@@ -312,6 +312,7 @@ import com.convx.music.canvas.TidalCanvasProvider
 import com.convx.music.constants.CanvasSource
 import com.convx.music.constants.CanvasSourceKey
 import com.convx.music.constants.CanvasThumbnailAnimationKey
+import com.convx.music.constants.CanvasMiniPlayerEnabledKey
 import com.convx.music.constants.DataSaverEnabledKey
 import com.convx.music.extensions.metadata
 import com.convx.music.ui.player.CanvasArtworkPlaybackCache
@@ -536,6 +537,27 @@ fun BottomSheetPlayer(
     val trackChoreography = rememberTrackChoreography(mediaMetadata)
     val ambientMetadata = trackChoreography.ambient.value
     val videoLook = CanvasVideoLooks.forMedia(ambientMetadata?.id)
+    val miniCanvasEnabled by rememberPreference(CanvasMiniPlayerEnabledKey, true)
+    val fullscreenVideo = LocalFullscreenVideo.current
+    val miniCanvasVisible by remember(state) {
+        derivedStateOf { state.progress < 0.25f }
+    }
+    // The V2 cover, its auxiliary pages and the mini bar all attach to this one player.
+    val sharedCanvasVideo = if (useAppleMusicPlayer && !isPreviewOnly) {
+        val videoLookup by playerConnection.videoStreamLookup.collectAsStateWithLifecycle()
+        val selectedVideo = fullscreenVideo?.selectedVideoId == mediaMetadata?.id && mediaMetadata != null
+        val stream = (videoLookup as? com.convx.music.playback.VideoStreamLookup.Ready)
+            ?.stream?.takeIf { selectedVideo && it.mediaId == ambientMetadata?.id }
+        rememberCanvasVideoController(
+            mediaMetadata = ambientMetadata.takeIf { enableCanvas || stream != null },
+            isPlaying = effectiveIsPlaying,
+            isVisible = fullscreenVideo?.visible == true ||
+                (!state.isCollapsed || miniCanvasEnabled),
+            trackFadeMillis = bgFadeMs,
+            videoStream = stream,
+            videoStartPositionMs = playerConnection.player.currentPosition,
+        )
+    } else null
 
     suspend fun extractGradientColors(source: Any, style: PlayerBackgroundStyle): List<Color>? =
         withContext(Dispatchers.IO) {
@@ -881,6 +903,7 @@ fun BottomSheetPlayer(
 
     // PlayerV2 reports its page so the sticker overlay can hide on Lyrics and Queue.
     var v17ShowingCover by remember { mutableStateOf(true) }
+    val v2MenuOverlay = remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
 
     PlayerMorphHostEffects(state, isPreviewOnly)
 
@@ -941,6 +964,8 @@ fun BottomSheetPlayer(
                     )
                 }
             }
+            // V2's floating panels must draw and receive input above the sticker band.
+            if (useAppleMusicPlayer && !state.isCollapsed) v2MenuOverlay.value?.invoke()
         },
         background = {
             val glassConfig = LocalGlassEffectConfig.current
@@ -1576,7 +1601,10 @@ fun BottomSheetPlayer(
                 AppleMiniPlayer(
                     progressState = remember(positionState, durationState) {
                         ProgressState(positionState, durationState)
-                    }
+                    },
+                    canvasVideo = sharedCanvasVideo.takeIf {
+                        miniCanvasEnabled && miniCanvasVisible && fullscreenVideo?.visible != true
+                    },
                 )
             } else {
                 MiniPlayer(
@@ -1603,6 +1631,10 @@ fun BottomSheetPlayer(
                 isPreviewOnly = isPreviewOnly,
                 diyRootCoordinates = diyRootCoordinates,
                 onCoverShowingChange = { v17ShowingCover = it },
+                sharedCanvasVideo = sharedCanvasVideo,
+                sharedTrackChoreography = trackChoreography,
+                miniCanvasEnabled = miniCanvasEnabled,
+                overlayHost = v2MenuOverlay,
             )
             }
             return@BottomSheet
@@ -3617,7 +3649,6 @@ private fun BackgroundVideoView(
     onFrame: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
-    val downloadUtil = LocalDownloadUtil.current.get()
     var isVideoReady by remember(videoUrl) { mutableStateOf(false) }
     // The reused player listener must see the latest callbacks and media ID.
     val currentOnError by rememberUpdatedState(onError)
@@ -3631,22 +3662,13 @@ private fun BackgroundVideoView(
     val trackSelector = remember {
         DefaultTrackSelector(context).apply {
             parameters = buildUponParameters()
-                .setMaxVideoSize(4096, 4096)
-                .setForceHighestSupportedBitrate(true)
+                .setMaxVideoSize(1080, 1920)
+                .setMaxVideoBitrate(2_500_000)
                 .build()
         }
     }
 
-    val mediaSourceFactory = remember<DefaultMediaSourceFactory>(downloadUtil) {
-        DefaultMediaSourceFactory(
-            CacheDataSource.Factory()
-                .setCache(downloadUtil.downloadCache)
-                .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context))
-                .setCacheWriteDataSinkFactory(null)
-                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
-            androidx.media3.extractor.DefaultExtractorsFactory()
-        )
-    }
+    val mediaSourceFactory = rememberCanvasMediaSourceFactory()
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context)
@@ -3706,8 +3728,9 @@ private fun BackgroundVideoView(
     LaunchedEffect(videoUrl, mediaId) {
         isVideoReady = false
         val mediaItem = MediaItem.Builder()
+            .setMediaId(mediaId)
             .setUri(videoUrl)
-            .setCustomCacheKey("$mediaId#canvas")
+            .setCustomCacheKey(com.convx.music.canvas.canvasCacheKey(mediaId, videoUrl))
             .setMimeType(if (videoUrl.contains("m3u8")) MimeTypes.APPLICATION_M3U8 else MimeTypes.VIDEO_MP4)
             .build()
         exoPlayer.setMediaItem(mediaItem)

@@ -155,6 +155,12 @@ class App : Application(), SingletonImageLoader.Factory {
             cachedCoilCacheSize = dataStore.data.map { it[MaxImageCacheSizeKey] ?: 512 }.first()
         }
 
+        // Resolve the playback cache early so PlayerCacheBudgetRegistry.register() runs before
+        // the first artwork admission probe; canAdmitArtwork() fails closed while unregistered.
+        applicationScope.launch(Dispatchers.IO) {
+            appKoin.get<SimpleCache>(qualifier = named("playerCache"))
+        }
+
         applicationScope.launch(Dispatchers.IO) {
             initializeSettings()
             observeSettingsChanges()
@@ -406,7 +412,8 @@ class App : Application(), SingletonImageLoader.Factory {
                         // including downloaded thumbnails. Coil still enforces the configured size cap.
                         .directory(filesDir.resolve("coil"))
                         .maxSizeBytes(cacheSize * 1024 * 1024L)
-                        .build()
+                        .build().let { com.convx.music.playback.AdmissionDiskCache(it) }
+                        .also { com.convx.music.playback.AutomaticCacheAccounting.registerImageCache(it) }
                 }
             }
         }.build()
