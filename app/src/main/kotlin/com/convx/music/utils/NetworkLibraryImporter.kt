@@ -21,7 +21,9 @@ import java.time.LocalDateTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import timber.log.Timber
 
@@ -39,6 +41,9 @@ object NetworkLibraryImporter {
 
     /** Enough parallel header reads to keep a LAN busy without starving playback on the shared connection. */
     private const val TAG_READ_PARALLELISM = 3
+
+    /** Songs written per database transaction. */
+    private const val WRITE_CHUNK = 100
     private const val UNKNOWN_ARTIST = "Unknown Artist"
 
     @UnstableApi
@@ -53,28 +58,46 @@ object NetworkLibraryImporter {
         val library = repository.scan(serverId)
         var added = 0
         var skipped = 0
-        library.tracks.forEach { track ->
-            if (insert(database, track, refreshExisting = true)) added++ else skipped++
+        // One transaction per chunk, not per song: every commit makes each open library screen re-run its query,
+        // and thousands of them in a row is what made a large share freeze or crash the app.
+        library.tracks.chunked(WRITE_CHUNK).forEach { chunk ->
+            database.withTransaction {
+                chunk.forEach { track -> if (insert(database, track, refreshExisting = true)) added++ else skipped++ }
+            }
         }
         var tagged = 0
         if (tagReader != null && library.tracks.isNotEmpty()) {
             val permits = Semaphore(TAG_READ_PARALLELISM)
             val lock = Any()
+            val writer = Mutex()
+            val pending = mutableListOf<Pair<NetworkTrack, NetworkTags>>()
             var done = 0
+
+            suspend fun flush(batch: List<Pair<NetworkTrack, NetworkTags>>) {
+                if (batch.isEmpty()) return
+                writer.withLock {
+                    database.withTransaction {
+                        batch.forEach { (track, tags) -> if (applyTags(database, track, tags, artworkDir)) tagged++ }
+                    }
+                }
+            }
+
             onProgress(0, library.tracks.size)
             coroutineScope {
                 library.tracks.map { track ->
                     async {
                         val tags = permits.withPermit { tagReader.read(track.id) }
-                        val updated = tags != null && applyTags(database, track, tags, artworkDir)
-                        synchronized(lock) {
-                            if (updated) tagged++
+                        val ready = synchronized(lock) {
+                            if (tags != null) pending += track to tags
                             done++
                             onProgress(done, library.tracks.size)
+                            if (pending.size >= WRITE_CHUNK) pending.toList().also { pending.clear() } else null
                         }
+                        if (ready != null) flush(ready)
                     }
                 }.forEach { it.await() }
             }
+            flush(synchronized(lock) { pending.toList().also { pending.clear() } })
         }
         database.withTransaction {
             pruneEmptyNetworkAlbums()

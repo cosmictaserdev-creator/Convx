@@ -38,8 +38,12 @@ class SmbFileSource internal constructor(private val connect: (NetworkServer.Smb
         withSession(source) { connection, _ -> connection.list(fullPath(source, relative)) }.mapNotNull { entry ->
             coroutineContext.ensureActive()
             if (entry.name == "." || entry.name == "..") null
-            else entry.copy(path = RemotePath.child(relative, entry.name))
-        }.sortedWith(compareBy<NetworkEntry> { !it.directory }.thenBy { it.name.lowercase() })
+            // One file with a name we cannot address must not abort the whole folder listing.
+            else runCatching { entry.copy(path = RemotePath.child(relative, entry.name)) }.getOrNull()
+        }
+            // Some NAS firmware repeats entries when a large directory spans several SMB responses.
+            .distinctBy { it.path }
+            .sortedWith(compareBy<NetworkEntry> { !it.directory }.thenBy { it.name.lowercase() })
     }
 
     override fun open(server: NetworkServer, path: String): RemoteFile {

@@ -33,6 +33,23 @@ class SmbPlaybackTest {
         }
     }
 
+    @Test fun aFolderListingNeverRepeatsAnEntry() = runBlocking {
+        val session = FakeSession().apply {
+            // A NAS that re-sends the start of a large directory when it spans several SMB responses.
+            entries = listOf(
+                NetworkEntry("Album", "Album", true),
+                NetworkEntry("song.flac", "song.flac", false, 10),
+                NetworkEntry("Album", "Album", true),
+                NetworkEntry("song.flac", "song.flac", false, 10),
+                NetworkEntry(".", ".", true),
+            )
+        }
+        SmbFileSource { session }.use { source ->
+            val listing = source.list(server, "")
+            assertEquals(listOf("Album", "song.flac"), listing.map { it.path })
+        }
+    }
+
     @Test fun reconnectsForBrowsingAndRetainsTheConfiguredBaseFolder() = runBlocking {
         var connections = 0
         val first = FakeSession().apply { listFailure = IOException("Stale tree connection") }
@@ -132,11 +149,12 @@ class SmbPlaybackTest {
         var listFailure: Exception? = null
         val opened = mutableListOf<String>()
         val listed = mutableListOf<String>()
+        var entries: List<NetworkEntry> = listOf(NetworkEntry("song.flac", "song.flac", false, 10))
         override val connected get() = !closed
         override fun list(path: String): List<NetworkEntry> {
             listFailure?.let { throw it }
             listed += path
-            return listOf(NetworkEntry("song.flac", "song.flac", false, 10))
+            return entries
         }
         override fun open(path: String): RemoteFile {
             openFailure?.let { throw it }
