@@ -42,3 +42,9 @@ sessions and adds connection ownership checks for concurrent readers.
 
 Convx was originally built on an open-source GPL-3.0 music player and has since diverged
 completely. It remains licensed under the GNU General Public License v3.0 (see LICENSE).
+
+blur-widget-demo (MIT License)
+  Source: https://github.com/thatjoshguy67/blur-widget-demo
+  Used for: the approach of opting widgets into Samsung One UI's native wallpaper blur (the two provider attributes
+  plus a translucent @android:id/background root). Implemented in
+  app/src/main/kotlin/com/convx/music/widget/OneUiBlur.kt and ConvxWidgetManager.kt.

@@ -10,6 +10,7 @@
   is handled inside the launcher without waking the app.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:minWidth="180dp"
     android:minHeight="40dp"
     android:minResizeWidth="110dp"
@@ -25,4 +26,6 @@
     android:initialLayout="@layout/widget_now_playing_wide"
     android:description="@string/widget_now_playing_description"
     android:widgetCategory="home_screen"
-    android:resizeMode="horizontal|vertical" />
+    android:resizeMode="horizontal|vertical"
+    app:widgetStyle="colorful"
+    app:widgetSize="small|wideSmall|medium|large|extraLarge|extraLargeLong" />

@@ -41,6 +41,7 @@ import com.convx.music.constants.SkipSilenceKey
 import com.convx.music.ui.component.EnumDialog
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.component.IosSettingsSymbolTile
 import com.convx.music.ui.ios.compat.Switch
 import com.convx.music.ui.ios.compat.Text
 import com.convx.music.utils.rememberEnumPreference
@@ -351,7 +352,7 @@ fun PlayerSettings(
                             onClick = { onSaveDownloadsToMusicChange(!saveDownloadsToMusic) }
                         ),
                         IosSettingsItem(
-                            icon = painterResource(R.drawable.download),
+                            leadingContent = { IosSettingsSymbolTile("arrow.down.circle") },
                             title = { Text(stringResource(R.string.keep_downloads_in_app)) },
                             description = { Text(stringResource(R.string.keep_downloads_in_app_desc)) },
                             trailingContent = {
@@ -364,7 +365,7 @@ fun PlayerSettings(
                             onClick = { if (saveDownloadsToMusic) onKeepDownloadsInAppChange(!keepDownloadsInApp) }
                         ),
                         IosSettingsItem(
-                            icon = painterResource(R.drawable.download),
+                            leadingContent = { IosSettingsSymbolTile("folder.fill") },
                             title = { Text(stringResource(R.string.show_downloads_in_local)) },
                             description = { Text(stringResource(R.string.show_downloads_in_local_desc)) },
                             trailingContent = {
@@ -420,7 +421,7 @@ fun PlayerSettings(
                             onClick = { onResumeOnBluetoothConnectChange(!resumeOnBluetoothConnect) }
                         ),
                         IosSettingsItem(
-                            icon = painterResource(R.drawable.equalizer),
+                            leadingContent = { IosSettingsSymbolTile("hifispeaker.fill") },
                             title = { Text(stringResource(R.string.usb_bit_perfect)) },
                             description = {
                                 Text(
@@ -442,7 +443,7 @@ fun PlayerSettings(
                             }
                         ),
                         IosSettingsItem(
-                            icon = painterResource(R.drawable.queue_music),
+                            leadingContent = { IosSettingsSymbolTile("text.badge.plus") },
                             title = { Text(stringResource(R.string.queue_before_context)) },
                             description = { Text(stringResource(R.string.queue_before_context_desc)) },
                             trailingContent = {

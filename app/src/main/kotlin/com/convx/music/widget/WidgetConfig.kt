@@ -16,6 +16,14 @@ enum class WidgetBackground {
     LIGHT,
     /** A still image the user picked in the widget's config screen. */
     IMAGE,
+
+    /** Samsung One UI's native wallpaper blur behind a translucent tint. Only offered where it works. */
+    BLUR;
+
+    companion object {
+        /** Frosted glass where the launcher supports it, otherwise the artwork colour. */
+        fun defaultForDevice(): WidgetBackground = if (OneUiBlur.isSupported) BLUR else ALBUM_TINT
+    }
 }
 
 /**
@@ -27,7 +35,7 @@ enum class WidgetBackground {
  * synchronous access with mmap-backed writes (migrated from SharedPreferences).
  */
 data class WidgetConfig(
-    val background: WidgetBackground = WidgetBackground.ALBUM_TINT,
+    val background: WidgetBackground = WidgetBackground.defaultForDevice(),
     /** content:// uri of the user's chosen background, when [background] is IMAGE. */
     val imageUri: String? = null,
     val showArtwork: Boolean = true,

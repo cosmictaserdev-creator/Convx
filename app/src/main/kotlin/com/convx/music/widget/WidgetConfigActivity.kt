@@ -134,7 +134,7 @@ private fun WidgetConfigScreen(
     ) {
         PreferenceGroupTitle(title = stringResource(R.string.widget_cfg_background))
 
-        WidgetBackground.entries.forEach { option ->
+        WidgetBackground.entries.filter { it != WidgetBackground.BLUR || OneUiBlur.isSupported }.forEach { option ->
             PreferenceEntry(
                 title = { Text(stringResource(option.labelRes())) },
                 trailingContent = {
@@ -195,4 +195,5 @@ private fun WidgetBackground.labelRes(): Int = when (this) {
     WidgetBackground.DARK -> R.string.widget_cfg_bg_dark
     WidgetBackground.LIGHT -> R.string.widget_cfg_bg_light
     WidgetBackground.IMAGE -> R.string.widget_cfg_bg_image
+    WidgetBackground.BLUR -> R.string.widget_cfg_bg_blur
 }

@@ -94,6 +94,7 @@ import com.convx.music.ui.component.EnumDialog
 import com.convx.music.ui.component.IconButton
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.component.IosSettingsSymbolTile
 import com.convx.music.ui.component.MenuSheetCornerRadius
 import com.convx.music.ui.component.SheetCornerRadiusModal
 import com.convx.music.ui.component.ThumbnailCornerRadiusModal
@@ -446,7 +447,7 @@ fun AppearanceAdvancedSettings(
                     title = "Layout & behaviour",
                     items = listOf(
                         IosSettingsItem(
-                            icon = painterResource(R.drawable.tune),
+                            leadingContent = { IosSettingsSymbolTile("arrow.up.left.and.arrow.down.right") },
                             title = { Text(stringResource(R.string.hide_status_bar)) },
                             description = { Text(stringResource(R.string.hide_status_bar_desc)) },
                             trailingContent = {
