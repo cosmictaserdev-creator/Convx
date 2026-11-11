@@ -360,6 +360,7 @@ dependencies {
     implementation(project(":artwork"))
     implementation(project(":network-storage"))
     implementation(project(":canvas"))
+    implementation(project(":account-presentation"))
     implementation(project(":playback-core"))
     implementation(project(":playback-data"))
     implementation(project(":playback-presentation"))

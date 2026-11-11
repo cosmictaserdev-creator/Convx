@@ -5,6 +5,8 @@
 
 package com.convx.music.ui.screens
 
+import com.convx.music.catalog.HomeSection
+
 import com.convx.music.ui.ios.component.AppleContextMenu
 import com.convx.music.ui.ios.component.IosGlyph
 import com.convx.music.ui.ios.component.IosMenuItem
@@ -261,22 +263,6 @@ internal const val LocalShelfRows = 2
 
 /** Playlist and folder rows on Home. The rest are one tap away in Library. */
 internal const val LocalListPreview = 6
-
-sealed class HomeSection(val id: String, val baseWeight: Int) {
-    /** The "star of the day" card. Always first, never shuffled. */
-    data object Hero : HomeSection("hero", 110)
-    data object SpeedDial : HomeSection("speed_dial", 100)
-    data object QuickPicks : HomeSection("quick_picks", 90)
-    data object DailyDiscover : HomeSection("daily_discover", 80)
-    data object ListenAgain : HomeSection("keep_listening", 50)
-    data object TopSongs : HomeSection("top_songs", 55)
-    data object AccountPlaylists : HomeSection("account_playlists", 40)
-    data object ForgottenFavorites : HomeSection("forgotten_favorites", 30)
-    data object FromTheCommunity : HomeSection("from_the_community", 20)
-    data class SimilarRecommendation(val index: Int) : HomeSection("similar_recommendation_$index", 10)
-    data class HomePageSection(val index: Int) : HomeSection("home_page_section_$index", 10)
-    data object MoodAndGenres : HomeSection("mood_and_genres", 5)
-}
 
 /** Picks the Home for the current mode before either view model exists, so local mode never builds the online feed. */
 @Composable

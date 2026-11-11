@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.convx.music.R
 import com.convx.music.account.presentation.onboarding.OnboardingFeature
 import com.convx.music.account.presentation.onboarding.OnboardingScreen
@@ -111,7 +112,8 @@ fun AndroidOnboardingHost(navController: NavController, onYouTubeLoginRequest: (
         notificationsAllow = stringResource(R.string.onboarding_notifications_allow),
         notificationsSkip = stringResource(R.string.onboarding_notifications_skip),
     )
-    val loginOpen = com.convx.music.ui.component.WebLoginSheets.youtube
+    val loginEntry by navController.currentBackStackEntryAsState()
+    val loginOpen = loginEntry?.destination?.route in setOf("login", "channel_picker")
 
     AnimatedVisibility(
         visibleState = shown,
@@ -136,7 +138,12 @@ fun AndroidOnboardingHost(navController: NavController, onYouTubeLoginRequest: (
                 shown.targetState = false
                 scope.launch { dataStore.edit { it[OnboardingCompleteKey] = true; it[com.convx.music.constants.IsFirstRunKey] = false } }
             },
-            modifier = Modifier.iosSheetPresentation(rememberSheetPresentation(loginOpen)),
+            modifier = Modifier.layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    if (!loginOpen) placeable.place(0, 0)
+                }
+            }.iosSheetPresentation(rememberSheetPresentation(loginOpen)),
             background = { page ->
                 // Still below Android 13: the mesh renders once instead of drifting.
                 ArtworkMeshBackground(

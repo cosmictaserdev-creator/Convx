@@ -5,6 +5,8 @@
 
 package com.convx.music.ui.screens
 
+import com.convx.music.catalog.HomeSection
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import kotlin.random.Random

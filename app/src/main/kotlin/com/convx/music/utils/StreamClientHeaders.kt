@@ -12,7 +12,7 @@ import okhttp3.Response
 object StreamClientHeaders : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        if (!request.url.host.endsWith("googlevideo.com") || request.url.queryParameter("c") == null) {
+        if (!(request.url.host == "googlevideo.com" || request.url.host.endsWith(".googlevideo.com")) || request.url.queryParameter("c") == null) {
             return chain.proceed(request)
         }
         return chain.proceed(

@@ -414,7 +414,7 @@ internal fun HomeContent(
                     },
                 ) {
                     item(key = "convx_header", contentType = "convx_header") {
-                        ConvxPageHeader(fontFamily = com.convx.music.ui.theme.BdConsoleFontFamily, color = AppTheme.colorScheme.onSurface)
+                        ConvxPageHeader(fontFamily = com.convx.music.designsystem.convxLogoFontFamily(), color = AppTheme.colorScheme.onSurface)
                     }
 
                     // Apple Music's "Transfer music" card, pointed at our one import path:

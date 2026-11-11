@@ -54,8 +54,9 @@ fun ExpandableText(
         } else {
             buildAnnotatedString {
                 runs.forEach { segment ->
-                    if (segment.url != null) {
-                        pushStringAnnotation(tag = "URL", annotation = segment.url)
+                    val url = segment.url
+                    if (url != null) {
+                        pushStringAnnotation(tag = "URL", annotation = url)
                         withStyle(SpanStyle(color = linkColor)) {
                             append(segment.text)
                         }

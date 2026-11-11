@@ -1,5 +1,7 @@
 package com.convx.music.ui.screens
 
+import com.convx.music.catalog.HomeSection
+
 import com.convx.music.viewmodels.HomeUiState
 import com.music.innertube.pages.HomePage
 import org.junit.Assert.assertEquals
