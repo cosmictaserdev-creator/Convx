@@ -66,7 +66,7 @@ class NetworkStorageViewModel(
 
     fun scan(server: NetworkServer) = run(server) {
         _status.value = context.getString(R.string.network_storage_scanning, server.name)
-        val result = NetworkLibraryImporter.import(database, repository, server.id)
+        val result = NetworkLibraryImporter.import(database, repository, server.id, context)
         context.getString(R.string.network_storage_scanned, result.added, result.skipped) +
             if (result.truncated) context.getString(R.string.network_storage_truncated) else ""
     }

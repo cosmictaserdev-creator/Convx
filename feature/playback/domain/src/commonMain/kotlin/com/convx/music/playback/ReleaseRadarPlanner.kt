@@ -114,9 +114,9 @@ object DeezerDates {
         val dates = HashMap<String, String>()
         for ((title, date) in albums) {
             if (ReleaseRadarRules.epochDayOf(date) == null) continue
-            dates.merge("=" + exact(title), date) { old, new -> minOf(old, new) }
+            dates["=" + exact(title)] = dates["=" + exact(title)]?.let { minOf(it, date) } ?: date
             val loose = ReleaseRadarRules.normalize(title)
-            if (loose.isNotEmpty()) dates.merge(loose, date) { old, new -> minOf(old, new) }
+            if (loose.isNotEmpty()) dates[loose] = dates[loose]?.let { minOf(it, date) } ?: date
         }
         return dates
     }

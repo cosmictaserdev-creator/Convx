@@ -422,6 +422,7 @@ class MusicService :
     private var sparePlayer: ExoPlayer? = null
     // Keep sibling service tasks alive if one coroutine fails.
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var wearBridge: AutoCloseable? = null
 
     // Serialize persistence writes and keep file I/O off the main thread.
     private val persistenceScope =
@@ -820,6 +821,12 @@ class MusicService :
         observePlaybackUiAndLyrics()
 
         observeAudioProcessingPreferences()
+        val sponsorPlayback = SponsorBlockPlayback({ player }, { sleepTimer.pauseWhenSongEnd })
+        dataStore.data.map { it[com.convx.music.constants.SponsorBlockEnabledKey] ?: false }
+            .distinctUntilChanged().collectLatest(scope) { enabled ->
+                if (enabled) sponsorPlayback.run(DefaultSponsorCategories)
+            }
+        wearBridge = com.convx.music.wear.startWearBridge(this, database)
 
         observeDiscordPreferences()
 
@@ -4276,6 +4283,8 @@ class MusicService :
 
     override fun onDestroy() {
         isRunning = false
+        wearBridge?.close()
+        wearBridge = null
 
         try {
             unregisterReceiver(screenStateReceiver)

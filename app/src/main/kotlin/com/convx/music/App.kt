@@ -180,6 +180,7 @@ class App : Application(), SingletonImageLoader.Factory {
                 if (loaded.isSuccess) "native engine loaded" else "native engine unavailable: ${loaded.exceptionOrNull()}",
             )
             com.convx.music.playback.smart.DemucsModel.autoDownloadIfWanted(this@App)
+            com.convx.music.releases.ReleaseRadarWorker.schedule(this@App)
         }
     }
 

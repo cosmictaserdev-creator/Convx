@@ -61,7 +61,7 @@ object MadeForYou {
         val weights = LinkedHashMap<String, Double>()
         for (play in usablePlays(plays)) {
             val name = names.getOrPut(key(play.artist)) { play.artist.trim() }
-            weights.merge(name, playWeight(play, nowEpochMs), Double::plus)
+            weights[name] = (weights[name] ?: 0.0) + playWeight(play, nowEpochMs)
         }
         return weights
     }
@@ -132,8 +132,8 @@ object MadeForYou {
         val spelling = HashMap<String, String>()
         for (genre in known) {
             val genreKey = genre.lowercase()
-            spelling.putIfAbsent(genreKey, genre)
-            counts.merge(genreKey, 1, Int::plus)
+            spelling.getOrPut(genreKey) { genre }
+            counts[genreKey] = (counts[genreKey] ?: 0) + 1
         }
         val (topKey, count) = counts.maxByOrNull { it.value } ?: return null
         return spelling.getValue(topKey).takeIf { count * 2 > known.size }
@@ -242,7 +242,7 @@ object MadeForYou {
     private fun <T> separateRepeats(items: MutableList<T>, artistOf: (T) -> String) {
         val remaining = items.toMutableList()
         val counts = HashMap<String, Int>()
-        for (item in remaining) counts.merge(key(artistOf(item)), 1, Int::plus)
+        for (item in remaining) counts[key(artistOf(item))] = (counts[key(artistOf(item))] ?: 0) + 1
         items.clear()
         var previous: String? = null
         while (remaining.isNotEmpty()) {
@@ -255,7 +255,7 @@ object MadeForYou {
             if (index < 0) index = 0
             val picked = remaining.removeAt(index)
             val pickedKey = key(artistOf(picked))
-            counts.merge(pickedKey, -1, Int::plus)
+            counts[pickedKey] = (counts[pickedKey] ?: 0) - 1
             previous = pickedKey
             items += picked
         }

@@ -67,6 +67,20 @@ val androidAppDependenciesModule = module {
     single<DatabaseDao> { get<InternalDatabase>().dao }
     // Must be the signed-in global client; a new instance has no session.
     single<InnertubeRepository> { YouTube }
+    single<com.convx.music.playback.PlaybackSettingsRepository> {
+        com.convx.music.data.settings.DataStorePlaybackSettingsRepository(androidContext().dataStore)
+    }
+    single<com.convx.music.playback.ReleaseStore> {
+        com.convx.music.playback.data.JsonFileReleaseStore(androidContext().filesDir.resolve("release_radar.json"))
+    }
+    single {
+        val watched = com.convx.music.releases.WatchedArtistsFromLibrary(get())
+        com.convx.music.playback.ReleaseRadarSync(
+            com.convx.music.playback.data.InnertubeReleaseArtistSource(get()) { watched(it) },
+            com.convx.music.playback.data.JvmDeezerReleaseDates(), get(),
+            com.convx.music.releases.ReleaseRadarNotifier(androidContext()),
+        )
+    }
     single<MusicLibraryRemoteDataSource> { InnertubeMusicLibraryDataSource(get()) }
     single<MusicPlaylistRemoteDataSource> { InnertubeMusicPlaylistDataSource(get()) }
     single<DatabaseProvider> { StandaloneDatabaseProvider(androidContext()) }
