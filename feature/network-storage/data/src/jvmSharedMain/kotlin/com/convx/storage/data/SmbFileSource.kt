@@ -51,7 +51,9 @@ class SmbFileSource internal constructor(private val connect: (NetworkServer.Smb
                 override fun read(position: Long, buffer: ByteArray, offset: Int, length: Int): Int = try {
                     file.read(position, buffer, offset, length)
                 } catch (failure: Exception) {
-                    invalidate(source.id, owner)
+                    // Only a broken transport poisons the shared connection. A refused or vanished single file
+                    // must not cut every other open handle (the player's read-ahead, cover art) off mid-song.
+                    if (failure is IOException || !owner.share.connected) invalidate(source.id, owner)
                     throw failure
                 }
                 override fun close() { file.close() }

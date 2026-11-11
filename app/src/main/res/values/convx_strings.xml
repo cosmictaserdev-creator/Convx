@@ -1406,7 +1406,8 @@
     <string name="network_storage_saved">Saved %1$s</string>
     <string name="network_storage_ok">%1$s is reachable</string>
     <string name="network_storage_scanning">Scanning %1$s…</string>
-    <string name="network_storage_scanned">Added %1$d songs, %2$d already in the library.</string>
+    <string name="network_storage_reading_tags">Reading tags… %1$d of %2$d</string>
+    <string name="network_storage_scanned">Added %1$d songs, updated %2$d already in the library.</string>
     <string name="network_storage_truncated"> The scan stopped at its limit.</string>
     <string name="network_storage_remove_title">Remove %1$s?</string>
     <string name="network_storage_remove_text">The server is removed from Convx. Songs already added stay in the library.</string>

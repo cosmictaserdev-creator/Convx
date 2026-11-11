@@ -1961,6 +1961,23 @@ interface DatabaseDao {
     @Delete
     fun delete(albumArtistMap: AlbumArtistMap)
 
+    /** A re-scan replaces a network song's artist and album links instead of stacking new ones. */
+    @Query("DELETE FROM song_artist_map WHERE songId = :songId")
+    fun clearSongArtists(songId: String)
+
+    @Query("DELETE FROM song_album_map WHERE songId = :songId")
+    fun clearSongAlbums(songId: String)
+
+    @Query("UPDATE album SET thumbnailUrl = :thumbnailUrl WHERE id = :albumId AND (thumbnailUrl IS NULL OR thumbnailUrl != :thumbnailUrl)")
+    fun setAlbumThumbnail(albumId: String, thumbnailUrl: String)
+
+    /** Drops network albums and artists left with no songs once their songs were re-filed. */
+    @Query("DELETE FROM album WHERE isLocal = 1 AND id LIKE 'network_album_%' AND id NOT IN (SELECT albumId FROM song_album_map)")
+    fun pruneEmptyNetworkAlbums()
+
+    @Query("DELETE FROM artist WHERE isLocal = 1 AND id LIKE 'network_artist_%' AND id NOT IN (SELECT artistId FROM song_artist_map)")
+    fun pruneEmptyNetworkArtists()
+
     @Delete
     fun delete(playlist: PlaylistEntity)
 
