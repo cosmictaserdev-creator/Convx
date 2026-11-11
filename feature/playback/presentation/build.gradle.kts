@@ -19,6 +19,8 @@ kotlin {
     iosSimulatorArm64()
     jvm("desktop")
 
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         commonMain.dependencies {
             api(project(":playback-core"))

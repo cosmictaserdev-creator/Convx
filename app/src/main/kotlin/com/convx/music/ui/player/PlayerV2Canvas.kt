@@ -200,7 +200,8 @@ class CanvasVideoController internal constructor(
     private var primary: String? = null
     private var fallback: String? = null
     private var loadingVideoStream: com.convx.music.utils.YTPlayerUtils.VideoStream? = null
-    private var frameMediaId: String? = null
+    internal var frameMediaId: String? = null
+        private set
     private var boundTexture: TextureView? = null
     internal var hasSurface by mutableStateOf(false)
         private set
