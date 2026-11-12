@@ -6,14 +6,11 @@
 package com.convx.music.viewmodels
 
 import android.content.Context
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.R
 import com.convx.music.db.MusicDatabase
 import com.convx.music.utils.NetworkLibraryImporter
-import com.convx.music.utils.NetworkTagReader
 import com.convx.storage.data.NetworkMusicRepository
 import com.convx.storage.domain.NetworkProtocol
 import com.convx.storage.domain.NetworkServer
@@ -24,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 
 class NetworkStorageViewModel(
     private val context: Context,
@@ -68,20 +64,9 @@ class NetworkStorageViewModel(
         context.getString(R.string.network_storage_ok, server.name)
     }
 
-    @OptIn(UnstableApi::class)
     fun scan(server: NetworkServer) = run(server) {
         _status.value = context.getString(R.string.network_storage_scanning, server.name)
-        val tagReader = NetworkTagReader(context, repository.dataSourceFactory(DefaultDataSource.Factory(context)))
-        val result = NetworkLibraryImporter.import(
-            database = database,
-            repository = repository,
-            serverId = server.id,
-            tagReader = tagReader,
-            artworkDir = File(context.filesDir, "network_art"),
-            onProgress = { done, total ->
-                _status.value = context.getString(R.string.network_storage_reading_tags, done, total)
-            },
-        )
+        val result = NetworkLibraryImporter.import(database, repository, server.id, context)
         context.getString(R.string.network_storage_scanned, result.added, result.skipped) +
             if (result.truncated) context.getString(R.string.network_storage_truncated) else ""
     }

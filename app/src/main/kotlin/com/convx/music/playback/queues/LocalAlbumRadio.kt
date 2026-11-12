@@ -21,6 +21,7 @@ class LocalAlbumRadio(
     @Volatile private var continuation: String? = null,
     @Volatile private var firstTimeLoaded: Boolean = false,
     private var restoredStatus: Queue.Status? = null,
+    private val initialSongs: List<com.convx.music.db.entities.Song>? = null,
 ) : Queue {
     override val preloadItem: MediaMetadata? = null
 
@@ -38,13 +39,13 @@ class LocalAlbumRadio(
         return withContext(IO) {
             Queue.Status(
                 title = albumWithSongs.album.title,
-                items = albumWithSongs.songs.map { it.toMediaItem() },
+                items = (initialSongs ?: albumWithSongs.songs).map { it.toMediaItem() },
                 mediaItemIndex = startIndex
             )
         }
     }
 
-    override fun hasNextPage(): Boolean = !firstTimeLoaded || continuation != null
+    override fun hasNextPage(): Boolean = !albumWithSongs.album.isLocal && (!firstTimeLoaded || continuation != null)
 
     fun persistenceData() = QueueState(
         albumId = albumWithSongs.album.id,
@@ -55,6 +56,7 @@ class LocalAlbumRadio(
     )
 
     override suspend fun nextPage(): List<MediaItem> = withContext(IO) {
+        if (albumWithSongs.album.isLocal) return@withContext emptyList()
         if (!firstTimeLoaded) {
             playlistId = playlistId ?: YouTube.album(albumWithSongs.album.id).getOrThrow().album.playlistId
             val nextResult = YouTube.next(endpoint, continuation).getOrThrow()

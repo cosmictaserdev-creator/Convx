@@ -5,93 +5,69 @@
 
 package com.convx.music.utils
 
-import android.content.Context
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DataSource
-import androidx.media3.exoplayer.MetadataRetriever
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import com.google.common.util.concurrent.ListenableFuture
-import java.util.concurrent.Executor
-import kotlinx.coroutines.suspendCancellableCoroutine
+import android.media.MediaDataSource
+import android.media.MediaMetadataRetriever
+import com.convx.storage.domain.NetworkTagReader
+import com.convx.storage.domain.NetworkTags
+import com.convx.storage.domain.RemoteFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
-/** What a file says about itself, read from its embedded tags rather than guessed from its name. */
-data class NetworkTags(
-    val title: String?,
-    val artist: String?,
-    val albumArtist: String?,
-    val album: String?,
-    val trackNumber: Int?,
-    val durationSeconds: Int?,
-    val artwork: ByteArray?,
-)
+/** Reads tags and the embedded picture through the platform retriever, straight off the share. */
+class AndroidNetworkTagReader : NetworkTagReader {
 
-/**
- * Reads ID3, Vorbis/FLAC and MP4 tags (and the embedded cover) from an SMB or WebDAV file.
- *
- * It goes through [dataSourceFactory], the same network-aware factory playback uses, so a
- * `convx-network://` URI resolves exactly as it does when the song is played. ExoPlayer's
- * extractors only fetch the header bytes they need, so this does not download whole files.
- */
-@UnstableApi
-class NetworkTagReader(
-    private val context: Context,
-    private val dataSourceFactory: DataSource.Factory,
-) {
-    /** Null when the file has no readable tags, cannot be reached, or takes longer than [timeoutMs]. */
-    suspend fun read(uri: String, timeoutMs: Long = 20_000): NetworkTags? = withTimeoutOrNull(timeoutMs) {
-        try {
-            readInternal(uri)
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+    // A stalled share blocks the retriever on a thread nothing can interrupt, so the wait is abandoned
+    // after a while and that one file goes untagged instead of freezing the whole import.
+    private val reads = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    override suspend fun read(file: RemoteFile, size: Long): NetworkTags? {
+        val pending = reads.async { readBlocking(file, size) }
+        return withTimeoutOrNull(ReadTimeoutMs) { pending.await() }.also { if (it == null) pending.cancel() }
+    }
+
+    private fun readBlocking(file: RemoteFile, size: Long): NetworkTags? {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            // WebDAV listings need not provide getcontentlength. The first ranged
+            // read lets the response supply it; MediaDataSource also accepts -1.
+            if (size <= 0 && file.length <= 0) file.read(0, ByteArray(1), 0, 1)
+            val length = size.takeIf { it > 0 } ?: file.length.takeIf { it > 0 } ?: -1L
+            retriever.setDataSource(RemoteMediaDataSource(file, length))
+            fun text(key: Int) = retriever.extractMetadata(key)?.trim()?.takeIf(String::isNotEmpty)
+            // "3/12" and "1/2" are the usual shape for both.
+            fun number(key: Int) = text(key)?.substringBefore('/')?.trim()?.toIntOrNull()
+            NetworkTags(
+                title = text(MediaMetadataRetriever.METADATA_KEY_TITLE),
+                artist = text(MediaMetadataRetriever.METADATA_KEY_ARTIST),
+                albumArtist = text(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST),
+                album = text(MediaMetadataRetriever.METADATA_KEY_ALBUM),
+                trackNumber = number(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER),
+                discNumber = number(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER),
+                year = text(MediaMetadataRetriever.METADATA_KEY_YEAR)?.take(4)?.toIntOrNull(),
+                durationSeconds = text(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()?.let { (it / 1000).toInt() },
+                picture = retriever.embeddedPicture,
+            )
         } catch (_: Exception) {
             null
+        } finally {
+            runCatching { retriever.release() }
         }
     }
 
-    private suspend fun readInternal(uri: String): NetworkTags? {
-        // The static call is the one available in Media3 1.7; it parses only the file header through our source.
-        val groups = MetadataRetriever.retrieveMetadata(
-            DefaultMediaSourceFactory(dataSourceFactory),
-            MediaItem.fromUri(uri),
-        ).awaitResult()
-        val builder = MediaMetadata.Builder()
-        for (group in 0 until groups.length) {
-            val trackGroup = groups[group]
-            for (track in 0 until trackGroup.length) {
-                val metadata = trackGroup.getFormat(track).metadata ?: continue
-                for (entry in 0 until metadata.length()) metadata[entry].populateMediaMetadata(builder)
-            }
-        }
-        val tags = builder.build()
-        val result = NetworkTags(
-            title = tags.title?.toString()?.trim()?.takeIf(String::isNotEmpty),
-            artist = tags.artist?.toString()?.trim()?.takeIf(String::isNotEmpty),
-            albumArtist = tags.albumArtist?.toString()?.trim()?.takeIf(String::isNotEmpty),
-            album = tags.albumTitle?.toString()?.trim()?.takeIf(String::isNotEmpty),
-            trackNumber = tags.trackNumber?.takeIf { it > 0 },
-            durationSeconds = null,
-            artwork = tags.artworkData?.takeIf { it.isNotEmpty() },
-        )
-        val empty = result.title == null && result.artist == null && result.album == null &&
-            result.albumArtist == null && result.artwork == null && result.trackNumber == null
-        return if (empty) null else result
+    private companion object {
+        const val ReadTimeoutMs = 20_000L
     }
-}
 
-private val DirectExecutor = Executor { it.run() }
+    private class RemoteMediaDataSource(private val file: RemoteFile, private val total: Long) : MediaDataSource() {
+        override fun readAt(position: Long, buffer: ByteArray, offset: Int, size: Int): Int =
+            if (total >= 0 && position >= total) -1 else file.read(position, buffer, offset, size)
 
-private suspend fun <T> ListenableFuture<T>.awaitResult(): T = suspendCancellableCoroutine { continuation ->
-    addListener({
-        try {
-            continuation.resume(get())
-        } catch (failure: Exception) {
-            continuation.resumeWithException(failure.cause ?: failure)
-        }
-    }, DirectExecutor)
-    continuation.invokeOnCancellation { cancel(true) }
+        override fun getSize(): Long = total
+
+        // The importer owns the file and closes it.
+        override fun close() = Unit
+    }
 }

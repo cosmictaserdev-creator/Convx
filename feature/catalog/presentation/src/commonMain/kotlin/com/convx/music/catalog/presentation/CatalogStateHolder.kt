@@ -312,7 +312,7 @@ class CatalogStateHolder(
                     }
                     continuationPageIndex = pageIndex
                     mutableState.value = mutableState.value.copy(
-                        sections = mutableState.value.sections + appendedSections,
+                        sections = mutableState.value.sections.withContinuation(appendedSections),
                         isLoadingMore = false,
                         continuationToken = result.value.continuationToken,
                         continuationError = null,

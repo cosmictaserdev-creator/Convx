@@ -50,8 +50,11 @@ data class NetworkTrack(
     val album: String?,
     val artwork: String?,
     val size: Long,
-    /** Folder the file lives in, relative to the source root; identifies the album across same-named folders. */
-    val folder: String = "",
+    val albumArtist: String? = null,
+    val trackNumber: Int? = null,
+    val discNumber: Int? = null,
+    val year: Int? = null,
+    val durationSeconds: Int = 0,
 )
 
 object NetworkMedia {
@@ -60,12 +63,12 @@ object NetworkMedia {
     fun isAudio(name: String): Boolean = name.substringAfterLast('.', "").lowercase() in audioExtensions
     fun isImage(name: String): Boolean = name.substringAfterLast('.', "").lowercase() in imageExtensions
 
-    /** Track numbers such as "01", "1-01" or "2.03" are not artists. */
-    private val trackNumberLike = Regex("^\\d+([-._]\\d+)*[.)]?$")
+    /** "01 - Title", "1-01 - Title", "05. Title", "01 Title": digits, then a separator. */
+    private val numberPrefixRegex = Regex("^(?:(\\d{1,2})[-.])?(\\d{1,3})(\\s*[-. ]\\s*)")
 
     /**
-     * The part after " - " in "Song Name - Remastered 2011" is a version note, not a title, so the whole name is
-     * the title and no artist can be inferred. Only genuine suffix phrases count: "Queen - Radio Ga Ga",
+     * The part after " - " in "Song Name - Remastered 2011" is a version note, not a title, so the whole name is the
+     * title and no artist can be inferred. Only genuine suffix phrases count: "Queen - Radio Ga Ga",
      * "Oasis - Live Forever" and "Prince - 1999" are still artist - title.
      */
     private val titleQualifier = Regex(
@@ -76,30 +79,39 @@ object NetworkMedia {
         RegexOption.IGNORE_CASE,
     )
 
-    internal fun looksLikeTitleQualifier(part: String): Boolean = titleQualifier.containsMatchIn(part.trim())
-
-    /** Only the names people actually use for album art. Anything else in a folder is not assumed to be a cover. */
+    /** Only the names people actually use for album art; anything else in a folder is not assumed to be a cover. */
     private val coverNames = listOf("cover", "folder", "front", "albumart", "albumartsmall", "album", "artwork", "thumb")
+
+    /**
+     * A leading number is a track number when it is zero-padded ("01 Title") or followed by a dash or dot
+     * ("1 - Title", "5. Title"). Digits then only a space are usually part of the artist: "50 Cent - In da Club",
+     * "21 Savage", "3 Doors Down", "5 Seconds of Summer" are not tracks 50, 21, 3 and 5.
+     */
+    private fun trackPrefix(stem: String): MatchResult? {
+        val match = numberPrefixRegex.find(stem) ?: return null
+        val digits = match.groupValues[2]
+        val separator = match.groupValues[3]
+        val spaceOnly = separator.none { it == '-' || it == '.' }
+        return match.takeUnless { spaceOnly && !digits.startsWith("0") && match.groupValues[1].isEmpty() }
+    }
 
     fun track(serverId: String, entry: NetworkEntry, images: List<NetworkEntry>): NetworkTrack {
         val stem = entry.name.substringBeforeLast('.').trim()
-        val parts = stem.split(" - ", limit = 2)
+        val numberPrefix = trackPrefix(stem)
+        val trackNumber = numberPrefix?.groupValues?.get(2)?.toIntOrNull()
+        val stripped = numberPrefix?.let { stem.substring(it.range.last + 1).trim() } ?: stem
+        val parts = stripped.split(" - ", limit = 2)
         val first = parts.first().trim()
-        val second = parts.getOrNull(1)?.trim().orEmpty()
-        val splittable = parts.size == 2 && first.isNotBlank() && second.isNotBlank()
-        val numbered = splittable && trackNumberLike.matches(first)
-        val qualifier = splittable && looksLikeTitleQualifier(second)
-        val hasLetter = first.any(Char::isLetter)
-        val artist = first.takeIf { splittable && !numbered && !qualifier && hasLetter }
-        val title = when {
-            !splittable -> stem
-            numbered -> second
-            artist != null -> second
-            else -> stem
-        }
+        val splittable = numberPrefix == null && parts.size == 2 && first.isNotBlank() && first.any(Char::isLetter) &&
+            first.toIntOrNull() == null && !titleQualifier.containsMatchIn(parts[1].trim())
+        val artist = first.takeIf { splittable }
+        val title = if (artist != null) parts[1].trim().ifBlank { stripped } else stripped
         val parent = RemotePath.parent(entry.path)
+        val discFolder = Regex("(?i)(?:cd|disc|disk)\\s*([0-9]+)").matchEntire(RemotePath.name(parent))
+        val discNumber = numberPrefix?.groupValues?.get(1)?.toIntOrNull() ?: discFolder?.groupValues?.get(1)?.toIntOrNull()
+        val albumFolder = if (discFolder == null) parent else RemotePath.parent(parent)
         val sameFolder = images.filter { RemotePath.parent(it.path) == parent }
-        val ranked = sameFolder.mapNotNull { image ->
+        val cover = sameFolder.mapNotNull { image ->
             val name = image.name.substringBeforeLast('.').lowercase()
             val rank = when {
                 name == stem.lowercase() -> 0
@@ -112,18 +124,9 @@ object NetworkMedia {
             }
             rank?.let { it to image }
         }.minByOrNull { it.first }?.second
-        // A lone image is almost certainly the cover; with several unrelated images guessing would give every
-        // song in a flat folder the same wrong art, so leave it to the tags.
-        val artworkEntry = ranked ?: sameFolder.singleOrNull()
-        val artwork = artworkEntry?.let { NetworkMediaUri.create(serverId, it.path) }
-        return NetworkTrack(
-            NetworkMediaUri.create(serverId, entry.path),
-            title,
-            artist,
-            parent.substringAfterLast('/').takeIf(String::isNotBlank),
-            artwork,
-            entry.size,
-            parent,
-        )
+        // A lone image is almost certainly the cover; with several unrelated images guessing would give every song in
+        // a flat folder the same wrong art, so leave it to the embedded picture.
+        val artwork = (cover ?: sameFolder.singleOrNull())?.let { NetworkMediaUri.create(serverId, it.path) }
+        return NetworkTrack(NetworkMediaUri.create(serverId, entry.path), title, artist, albumFolder.substringAfterLast('/').takeIf(String::isNotBlank), artwork, entry.size, trackNumber = trackNumber, discNumber = discNumber)
     }
 }

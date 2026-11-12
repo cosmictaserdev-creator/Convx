@@ -126,7 +126,7 @@ internal fun YouTubeVideoPane(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
-            CanvasVideoSurface(videoController, Modifier.fillMaxSize().graphicsLayer { alpha = paneVideoAlpha }, crop = cropVideo)
+            CanvasVideoSurface(videoController, Modifier.fillMaxSize().graphicsLayer { alpha = paneVideoAlpha }, crop = cropVideo, priority = if (fullscreenOnly) 3 else 0)
             if (visible && failed) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.video_unavailable), color = Color.White)

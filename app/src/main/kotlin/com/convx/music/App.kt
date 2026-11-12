@@ -12,6 +12,7 @@ import android.content.Context
 import android.os.Build
 import android.os.StrictMode
 import android.widget.Toast
+import androidx.media3.datasource.cache.SimpleCache
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import coil3.ImageLoader
@@ -50,6 +51,7 @@ import com.convx.music.utils.warmPreferenceMirror
 import com.convx.music.utils.reportException
 import com.tencent.mmkv.MMKV
 import com.convx.storage.data.NetworkMusicRepository
+import org.koin.core.qualifier.named
 import org.koin.core.context.GlobalContext
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -155,6 +157,12 @@ class App : Application(), SingletonImageLoader.Factory {
             cachedCoilCacheSize = dataStore.data.map { it[MaxImageCacheSizeKey] ?: 512 }.first()
         }
 
+        // Resolve the playback cache early so PlayerCacheBudgetRegistry.register() runs before
+        // the first artwork admission probe; canAdmitArtwork() fails closed while unregistered.
+        applicationScope.launch(Dispatchers.IO) {
+            appKoin.get<SimpleCache>(qualifier = named("playerCache"))
+        }
+
         applicationScope.launch(Dispatchers.IO) {
             initializeSettings()
             observeSettingsChanges()
@@ -172,6 +180,7 @@ class App : Application(), SingletonImageLoader.Factory {
                 if (loaded.isSuccess) "native engine loaded" else "native engine unavailable: ${loaded.exceptionOrNull()}",
             )
             com.convx.music.playback.smart.DemucsModel.autoDownloadIfWanted(this@App)
+            com.convx.music.releases.ReleaseRadarWorker.schedule(this@App)
         }
     }
 
@@ -387,6 +396,7 @@ class App : Application(), SingletonImageLoader.Factory {
                 add(ArtworkQualityInterceptor())
                 // Cover art that lives on an SMB or WebDAV source.
                 add(com.convx.music.utils.NetworkArtworkFetcher.Factory { networkRepository.get() })
+                add(com.convx.music.utils.NetworkEmbeddedArtworkFetcher.Factory { networkRepository.get() })
             }
             // Reuse decoded images while scrolling.
             memoryCache {
@@ -406,7 +416,8 @@ class App : Application(), SingletonImageLoader.Factory {
                         // including downloaded thumbnails. Coil still enforces the configured size cap.
                         .directory(filesDir.resolve("coil"))
                         .maxSizeBytes(cacheSize * 1024 * 1024L)
-                        .build()
+                        .build().let { com.convx.music.playback.AdmissionDiskCache(it) }
+                        .also { com.convx.music.playback.AutomaticCacheAccounting.registerImageCache(it) }
                 }
             }
         }.build()

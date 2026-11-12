@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,6 +39,7 @@ import com.convx.music.ui.ios.compat.IconButton
 import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.ui.ios.compat.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -98,6 +100,8 @@ import com.convx.music.R
 import com.convx.music.ui.player.customize.PlayerGlyph
 import com.convx.music.ui.player.customize.PlayerIconSlot
 import com.convx.music.constants.MiniBarTabStyleKey
+import com.convx.music.constants.CanvasMiniPlayerEnabledKey
+import com.convx.music.constants.UseAppleMusicPlayerKey
 import com.convx.music.constants.MiniPlayerWaveformKey
 import com.convx.music.constants.SwipeSensitivityKey
 import com.convx.music.constants.SwipeThumbnailKey
@@ -136,6 +140,36 @@ private fun Modifier.scaledWidth(width: Dp, fade: Boolean = false, fraction: () 
     val placeable = measurable.measure(constraints.copy(minWidth = w, maxWidth = w))
     layout(w, placeable.height) {
         if (fade) placeable.placeWithLayer(0, 0) { alpha = f } else placeable.place(0, 0)
+    }
+}
+
+@Composable
+private fun FloatingMiniArtwork(
+    thumbnailUrl: String?,
+    artSize: Dp,
+    cornerRadius: Dp,
+    canvasVideo: CanvasVideoController?,
+) {
+    val context = LocalContext.current
+    val density = LocalDensity.current
+    Box(
+        Modifier.size(artSize)
+            .miniArtworkMorphSource(with(density) { cornerRadius.toPx() })
+            .clip(RoundedCornerShape(cornerRadius)),
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(thumbnailUrl?.resize(1200, 1200))
+                .size(CoilSize.ORIGINAL)
+                .placeholderMemoryCacheKey(thumbnailUrl?.resize(1200, 1200))
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            placeholder = rememberNoArtworkPainter(),
+            error = rememberNoArtworkPainter(),
+            modifier = Modifier.fillMaxSize(),
+        )
+        if (canvasVideo != null) CanvasVideoSurface(canvasVideo, Modifier.fillMaxSize())
     }
 }
 
@@ -202,6 +236,13 @@ fun FloatingMiniPlayer(
     )
     val context = LocalContext.current
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
+    val miniCanvasEnabled by rememberPreference(CanvasMiniPlayerEnabledKey, true)
+    val useV2 by rememberPreference(UseAppleMusicPlayerKey, true)
+    val miniCanvasVisible by remember { derivedStateOf { PlayerMorph.progress < 0.25f } }
+    val fullscreenVideo = LocalFullscreenVideo.current
+    val miniCanvas = CanvasPosterSource.controller.takeIf {
+        useV2 && miniCanvasEnabled && miniCanvasVisible && fullscreenVideo?.visible != true
+    }
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val playbackSnapshot by playerConnection.playbackSnapshot.collectAsStateWithLifecycle()
     val shuffleModeEnabled = playbackSnapshot.shuffleEnabled
@@ -474,27 +515,11 @@ fun FloatingMiniPlayer(
                             onClick = tryOpenPlayer,
                         ),
                 ) {
-                    AsyncImage(
-                        // Same URL AND decode size as PlayerArtworkMorphOverlay and the
-                        // full player's own artwork -- one shared Coil cache entry for
-                        // all three, so the pill, the flying cover, and the handoff
-                        // target are pixel-identical (no re-decode pop between them).
-                        model = ImageRequest.Builder(context)
-                            .data(mediaMetadata?.thumbnailUrl?.resize(1200, 1200))
-                            .size(CoilSize.ORIGINAL)
-                            // A fresh AsyncImage mounts on every bar state change (inline and
-                            // expanded are separate trees); without this its first frame can be
-                            // the empty placeholder -- the thumbnail "vanishing" mid-transition.
-                            .placeholderMemoryCacheKey(mediaMetadata?.thumbnailUrl?.resize(1200, 1200))
-                            .build(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        placeholder = rememberNoArtworkPainter(),
-                        error = rememberNoArtworkPainter(),
-                        modifier = Modifier
-                            .size(artSize)
-                            .miniArtworkMorphSource(with(density) { artCornerRadius.toPx() })
-                            .clip(RoundedCornerShape(artCornerRadius)),
+                    FloatingMiniArtwork(
+                        thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                        artSize = artSize,
+                        cornerRadius = artCornerRadius,
+                        canvasVideo = miniCanvas,
                     )
 
                     Spacer(Modifier.width(10.dp))
@@ -654,27 +679,11 @@ fun FloatingMiniPlayer(
                             onClick = tryOpenPlayer,
                         ),
                 ) {
-                    AsyncImage(
-                        // Same URL AND decode size as PlayerArtworkMorphOverlay and the
-                        // full player's own artwork -- one shared Coil cache entry for
-                        // all three, so the pill, the flying cover, and the handoff
-                        // target are pixel-identical (no re-decode pop between them).
-                        model = ImageRequest.Builder(context)
-                            .data(mediaMetadata?.thumbnailUrl?.resize(1200, 1200))
-                            .size(CoilSize.ORIGINAL)
-                            // A fresh AsyncImage mounts on every bar state change (inline and
-                            // expanded are separate trees); without this its first frame can be
-                            // the empty placeholder -- the thumbnail "vanishing" mid-transition.
-                            .placeholderMemoryCacheKey(mediaMetadata?.thumbnailUrl?.resize(1200, 1200))
-                            .build(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        placeholder = rememberNoArtworkPainter(),
-                        error = rememberNoArtworkPainter(),
-                        modifier = Modifier
-                            .size(artSize)
-                            .miniArtworkMorphSource(with(density) { artCornerRadius.toPx() })
-                            .clip(RoundedCornerShape(artCornerRadius)),
+                    FloatingMiniArtwork(
+                        thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                        artSize = artSize,
+                        cornerRadius = artCornerRadius,
+                        canvasVideo = miniCanvas,
                     )
 
                     Spacer(Modifier.width(12.dp))

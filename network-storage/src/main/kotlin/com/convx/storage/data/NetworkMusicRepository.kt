@@ -9,7 +9,8 @@ class NetworkMusicRepository(
     private val store: NetworkServerStore,
     private val webDav: WebDavFileSource = WebDavFileSource(),
     private val smb: SmbFileSource = SmbFileSource(),
-) : NetworkLibraryRepository by RemoteNetworkLibraryRepository(store, webDav, smb, Dispatchers.IO) {
+    private val remote: RemoteNetworkLibraryRepository = RemoteNetworkLibraryRepository(store, webDav, smb, Dispatchers.IO),
+) : NetworkLibraryRepository by remote, NetworkMediaAccess by remote {
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun dataSourceFactory(downstream: DataSource.Factory): DataSource.Factory = NetworkDataSourceFactory(downstream, store, webDav, smb)
 

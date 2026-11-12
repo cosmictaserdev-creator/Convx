@@ -58,6 +58,24 @@ jobs:
           ./gradlew :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest --no-configuration-cache --console=plain
           ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
 
+      - name: Test restored Android integration
+        run: >-
+          ./gradlew :app:testUniversalFossDebugUnitTest
+          --tests 'com.convx.music.data.settings.*'
+          --tests com.convx.music.NetworkEmbeddedArtTest
+          --tests com.convx.music.playback.ChunkedDataSourceRetryTest
+          --tests com.convx.music.playback.CacheWriteBudgetTest
+          --tests com.convx.music.playback.HistoryShuffleOrderTest
+          --tests com.convx.music.playback.PlayerLyricsPreviewTest
+          --tests com.convx.music.ui.component.PlaylistCoverFileTest
+          --tests com.convx.music.ui.component.VisualEffectsTest
+          --tests com.convx.music.ui.screens.HomePrefsTest
+          --tests com.convx.music.utils.VideoFormatCandidatesTest
+          --tests com.convx.music.utils.LocalArtistTagsTest
+          --tests com.convx.music.playback.queues.LocalAlbumRadioTest
+          --tests com.convx.music.ui.screens.settings.DiscordBrowserUserAgentTest
+          --no-configuration-cache --console=plain
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

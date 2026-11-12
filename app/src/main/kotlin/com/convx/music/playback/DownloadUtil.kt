@@ -9,6 +9,9 @@ import timber.log.Timber
 import coil3.SingletonImageLoader
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import com.convx.music.db.entities.LyricsEntity
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -22,7 +25,6 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.CacheWriter
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.offline.DefaultDownloadIndex
@@ -89,6 +91,8 @@ class DownloadUtil(
     private val audioQuality by enumPreference(context, AudioQualityKey, AudioQuality.AUTO)
     private val songUrlCache = java.util.concurrent.ConcurrentHashMap<String, Pair<String, Long>>()
     private val autoDownloadRequests = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+    private val canvasDownloadJobs = java.util.concurrent.ConcurrentHashMap<String, kotlinx.coroutines.Job>()
+    private val upgradeRequests = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
     private val appContext: Context = context
     private val pendingUpgrades = java.util.concurrent.ConcurrentHashMap<String, FormatEntity>()
 
@@ -166,6 +170,9 @@ class DownloadUtil(
             CacheDataSource
                 .Factory()
                 .setCache(playerCache)
+                // DownloadManager writes the explicit download to its own cache.
+                // The player cache is only a possible read source here.
+                .setCacheWriteDataSinkFactory(null)
                 .setUpstreamDataSourceFactory(
                     DataSource.Factory {
                         HlsJoinDataSource(
@@ -255,7 +262,6 @@ class DownloadUtil(
 
             upsert(updatedSong)
             prefetchThumbnail(updatedSong.thumbnailUrl)
-            cacheCanvas(mediaId, playbackData)
         }
     }
 
@@ -273,47 +279,80 @@ class DownloadUtil(
         SingletonImageLoader.get(appContext).enqueue(request)
     }
 
-    private fun cacheCanvas(mediaId: String, playbackData: YTPlayerUtils.PlaybackData) {
+    private val bundleSidecarMutex = Mutex()
+
+    /** Save downloaded-song lyrics independently of filesystem export; preserve manual edits. */
+    private suspend fun ensureCachedLyrics(songId: String): String? = bundleSidecarMutex.withLock {
+        database.lyrics(songId).first()?.let { return@withLock it.lyrics }
+        if (_downloads.value[songId]?.state != Download.STATE_COMPLETED) return@withLock null
+        val song = database.song(songId).first() ?: return@withLock null
+        val found = optionalSidecar { lyricsHelper.getLyrics(song.toMediaMetadata()) } ?: return@withLock null
+        if (found.lyrics == LyricsEntity.LYRICS_NOT_FOUND) return@withLock null
+        database.withTransaction {
+            if (_downloads.value[songId]?.state == Download.STATE_COMPLETED && lyrics(songId).first() == null)
+                upsert(LyricsEntity(songId, found.lyrics, found.provider))
+        }
+        database.lyrics(songId).first()?.lyrics
+    }
+
+    private fun cacheCanvas(mediaId: String) {
         scope.launch {
+            val job = currentCoroutineContext()[kotlinx.coroutines.Job] ?: return@launch
+            if (canvasDownloadJobs.putIfAbsent(mediaId, job) != null) return@launch
+            try {
+            bundleSidecarMutex.withLock {
+            if (_downloads.value[mediaId]?.state != Download.STATE_COMPLETED) return@launch
             val sourceName = appContext.dataStore.data
                 .map { it[CanvasSourceKey] ?: CanvasSource.AUTO.name }
                 .first()
             val canvasSource = CanvasSource.entries.firstOrNull { it.name == sourceName } ?: CanvasSource.AUTO
 
-            val storefront = Locale.getDefault().country.lowercase(Locale.ROOT).takeIf { it.length == 2 } ?: "us"
-            val requestedTitle = playbackData.videoDetails?.title.orEmpty()
-            val requestedArtist = playbackData.videoDetails?.author.orEmpty()
-            val title = normalizeCanvasSongTitle(requestedTitle)
-            val artist = normalizeCanvasArtistName(requestedArtist)
+            val song = database.song(mediaId).first()
+            val title = song?.song?.title.orEmpty()
+            val artist = song?.artists?.firstOrNull()?.name.orEmpty()
+            val artwork = CanvasSelectionRepository.resolve(
+                context = appContext,
+                mediaId = mediaId,
+                title = title,
+                artist = artist,
+                album = song?.album?.title,
+                source = canvasSource,
+            ) ?: return@launch
+            val canvasUrl = artwork.preferredAnimationUrl ?: return@launch
 
-            val canvasUrl = when (canvasSource) {
-                CanvasSource.AUTO ->
-                    SpotifyCanvasLookup.getBySongArtist(appContext, requestedTitle, requestedArtist)?.preferredAnimationUrl
-                        ?: AppleMusicCanvasProvider.getBySongArtist(title, artist, "", storefront)?.preferredAnimationUrl
-                        ?: ConvxCanvasProvider.getBySongArtist(title, artist)?.preferredAnimationUrl
-                        ?: TidalCanvasProvider.getBySongArtist(title, artist, "")?.preferredAnimationUrl
-                CanvasSource.APPLE_MUSIC ->
-                    AppleMusicCanvasProvider.getBySongArtist(title, artist, "", storefront)?.preferredAnimationUrl
-                CanvasSource.CONVX -> ConvxCanvasProvider.getBySongArtist(title, artist)?.preferredAnimationUrl
-                CanvasSource.TIDAL -> TidalCanvasProvider.getBySongArtist(title, artist, "")?.preferredAnimationUrl
-                CanvasSource.SPOTIFY ->
-                    SpotifyCanvasLookup.getBySongArtist(appContext, requestedTitle, requestedArtist)?.preferredAnimationUrl
-            } ?: return@launch
+            if (!canvasUrl.substringBefore('?').endsWith(".mp4", ignoreCase = true)) {
+                val factory = CacheDataSource.Factory()
+                    .setCache(downloadCache)
+                    .setCacheKeyFactory(canvasSegmentKeyFactory(mediaId))
+                    .setUpstreamDataSourceFactory(DefaultDataSource.Factory(appContext))
+                val finished = HlsAudioPrefetcher(mediaId, downloadCache, factory,
+                    keyForUrl = { com.convx.music.canvas.canvasCacheKey(mediaId, it) }, canvasVideo = true)
+                    .fill(canvasUrl, denominator = 1, preferLow = false) {
+                        _downloads.value[mediaId]?.state == Download.STATE_COMPLETED
+                    }
+                if (finished && HlsCanvasCache.completedSelection(mediaId, canvasUrl, downloadCache) != null) {
+                    CanvasSelectionRepository.markHlsDownloaded(appContext, mediaId, canvasUrl, downloadCache)
+                }
+                return@launch
+            }
 
-            val dataSpec = DataSpec.Builder()
-                .setUri(canvasUrl.toUri())
-                .setKey("$mediaId#canvas")
-                .setFlags(DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION)
-                .build()
-            val dataSource = CacheDataSource.Factory()
+            if (!canvasUrl.substringBefore('?').endsWith(".mp4", ignoreCase = true)) return@launch
+
+            val factory = CacheDataSource.Factory()
                 .setCache(downloadCache)
                 .setUpstreamDataSourceFactory(DefaultDataSource.Factory(appContext))
-                .createDataSource()
-
-            currentCoroutineContext().ensureActive()
-            runCatching { CacheWriter(dataSource, dataSpec, null, null).cache() }
-                .onSuccess { Timber.tag("CanvasDownload").d("Successfully cached canvas for $mediaId") }
-                .onFailure { Timber.tag("CanvasDownload").e(it, "Failed to cache canvas for $mediaId") }
+            val finished = CanvasPrefetcher(downloadCache, downloadCache, factory).fill(mediaId, canvasUrl) {
+                _downloads.value[mediaId]?.state == Download.STATE_COMPLETED
+            }
+            if (finished) Timber.tag("CanvasDownload").d("Successfully cached canvas for $mediaId")
+            }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                Timber.tag("CanvasDownload").w(error, "Canvas download failed for %s", mediaId)
+            } finally {
+                canvasDownloadJobs.remove(mediaId, job)
+            }
         }
     }
 
@@ -349,7 +388,7 @@ class DownloadUtil(
                 downloadIndex,
             ),
         ).apply {
-            maxParallelDownloads = 3
+            maxParallelDownloads = 1
             addListener(
                 ExoDownloadService.TerminalStateNotificationHelper(
                     context,
@@ -382,6 +421,7 @@ class DownloadUtil(
                         // An upgrade copy never touches the song's own downloaded flag.
                         if (download.request.id.endsWith(UPGRADE_SUFFIX)) {
                             val base = download.request.id.removeSuffix(UPGRADE_SUFFIX)
+                            upgradeRequests.remove(base)
                             when (download.state) {
                                 Download.STATE_COMPLETED -> scope.launch { finishUpgrade(base) }
                                 Download.STATE_FAILED -> pendingUpgrades.remove(base)
@@ -393,6 +433,8 @@ class DownloadUtil(
                         when (download.state) {
                             Download.STATE_COMPLETED -> scope.launch {
                                 database.updateDownloadedInfo(download.request.id, true, LocalDateTime.now())
+                                scope.launch { ensureCachedLyrics(download.request.id) }
+                                cacheCanvas(download.request.id)
                                 if (shared) {
                                     shareFormat(download.request.id, download.request.storageKey())
                                     return@launch
@@ -421,6 +463,15 @@ class DownloadUtil(
                         DownloadDuplicates.unregister(download.request.id)
                         autoDownloadRequests.remove(download.request.id)
                         publishDownload(download.request.id, null)
+                        if (!download.request.id.endsWith(UPGRADE_SUFFIX)) {
+                            val canvasJob = canvasDownloadJobs.remove(download.request.id)
+                            scope.launch(Dispatchers.IO) {
+                                canvasJob?.let { it.cancel(); it.join() }
+                                val prefix = "${download.request.id}#canvas-v2:"
+                                downloadCache.keys.filter { it.startsWith(prefix) }.forEach(downloadCache::removeResource)
+                                CanvasSelectionRepository.clearDownloadedHls(appContext, download.request.id)
+                            }
+                        }
                     }
                 }
             )
@@ -469,16 +520,47 @@ class DownloadUtil(
 
     fun getDownload(songId: String): Flow<Download?> = downloads.map { it[songId] }.distinctUntilChanged()
 
+    /** User-requested bundle check also repairs missing offline sidecars. */
+    fun checkAndUpgradeDownload(songId: String) {
+        upgradeQuality(songId)
+        cacheCanvas(songId)
+        scope.launch(Dispatchers.IO) {
+            database.song(songId).first()?.let { prefetchThumbnail(it.song.thumbnailUrl) }
+            ensureCachedLyrics(songId)
+        }
+    }
+
+    fun checkAndUpgradeDownloads(songIds: List<String>) {
+        songIds.distinct().filter { _downloads.value[it]?.state == Download.STATE_COMPLETED }
+            .forEach(::checkAndUpgradeDownload)
+    }
+
     /** Queues a best-quality copy of a downloaded song; the current copy stays until it is complete. */
     fun upgradeQuality(songId: String) {
-        val title = runBlocking(Dispatchers.IO) { database.songTitle(songId).orEmpty() }
-        val key = songId + UPGRADE_SUFFIX
-        DownloadService.sendAddDownload(
-            appContext,
-            ExoDownloadService::class.java,
-            DownloadRequest.Builder(key, key.toUri()).setCustomCacheKey(key).setData(title.toByteArray()).build(),
-            false,
-        )
+        if (!upgradeRequests.add(songId)) return
+        scope.launch(Dispatchers.IO) {
+            try {
+            val key = songId + UPGRADE_SUFFIX
+            val existing = _downloads.value[key]
+            if (existing != null && existing.state in setOf(Download.STATE_QUEUED, Download.STATE_DOWNLOADING, Download.STATE_RESTARTING)) {
+                upgradeRequests.remove(songId)
+                return@launch
+            }
+            val title = database.songTitle(songId).orEmpty()
+            DownloadService.sendAddDownload(
+                appContext,
+                ExoDownloadService::class.java,
+                DownloadRequest.Builder(key, key.toUri()).setCustomCacheKey(key).setData(title.toByteArray()).build(),
+                false,
+            )
+            } catch (cancelled: CancellationException) {
+                upgradeRequests.remove(songId)
+                throw cancelled
+            } catch (error: Exception) {
+                upgradeRequests.remove(songId)
+                Timber.tag("DownloadUpgrade").w(error, "Unable to enqueue upgrade for %s", songId)
+            }
+        }
     }
 
     /** Swaps the finished upgrade in only when it is better than what is stored; otherwise drops it. */
@@ -490,7 +572,7 @@ class DownloadUtil(
             DownloadService.sendRemoveDownload(appContext, ExoDownloadService::class.java, key, false)
             return
         }
-        database.query { upsert(better) }
+        database.withTransaction { upsert(better) }
         downloadCache.removeResource(songId)
         if (appContext.dataStore.get(SaveDownloadsToMusicFolderKey, true)) exportToMusicFolder(songId, key)
     }
@@ -499,8 +581,7 @@ class DownloadUtil(
     private suspend fun exportToMusicFolder(songId: String, cacheKey: String = songId): Boolean {
         val song = database.song(songId).first() ?: return false
         val format = database.format(songId).first()
-        val lyrics = database.lyrics(songId).first()?.lyrics
-            ?: optionalSidecar { lyricsHelper.getLyrics(song.toMediaMetadata()).lyrics }
+        val lyrics = ensureCachedLyrics(songId)
         val video = if (song.song.isLocal) null else optionalSidecar { YTPlayerUtils.videoStream(songId) }
         currentCoroutineContext().ensureActive()
         return DownloadExporter.export(

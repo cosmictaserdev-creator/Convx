@@ -402,29 +402,37 @@ internal fun Modifier.heroLiveBlur(
     sideFromHeight: Float = 0f,
     pageColor: Color? = null,
     videoFrame: () -> Int = { 0 },
+    downsample: Int = HeroBlurDown,
 ): Modifier =
     if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this then HeroBlurElement(progress, sideFromHeight, pageColor, videoFrame)
+        this then HeroBlurElement(progress, sideFromHeight, pageColor, videoFrame, downsample)
     } else {
         this
     }
 
 /** Applies progressive blur to a full artwork box without adding a mirrored tail. */
-fun Modifier.heroFootLiveBlur(boxExtent: Float, videoFrame: () -> Int = { 0 }): Modifier =
-    heroLiveBlur(enabled = true, progress = { 0f }, sideFromHeight = boxExtent, videoFrame = videoFrame)
+@Composable
+fun Modifier.heroFootLiveBlur(boxExtent: Float, videoFrame: () -> Int = { 0 }, rapidChanges: Boolean = false): Modifier {
+    val (quality) = com.convx.music.utils.rememberEnumPreference(
+        com.convx.music.constants.CanvasBlurQualityKey, com.convx.music.canvas.CanvasBlurQuality.HIGH)
+    return heroLiveBlur(enabled = true, progress = { 0f }, sideFromHeight = boxExtent,
+        videoFrame = videoFrame, downsample = if (rapidChanges) com.convx.music.canvas.CanvasBlurQuality.LOW.downsample else quality.downsample)
+}
 
 internal data class HeroBlurElement(
     val progress: () -> Float,
     val sideFromHeight: Float,
     val pageColor: Color?,
     val videoFrame: () -> Int,
+    val downsample: Int,
 ) : androidx.compose.ui.node.ModifierNodeElement<HeroBlurNode>() {
-    override fun create(): HeroBlurNode = HeroBlurNode(progress, sideFromHeight, pageColor, videoFrame)
+    override fun create(): HeroBlurNode = HeroBlurNode(progress, sideFromHeight, pageColor, videoFrame, downsample)
     override fun update(node: HeroBlurNode) {
         node.progress = progress
         node.sideFromHeight = sideFromHeight
         node.pageColor = pageColor
         node.videoFrame = videoFrame
+        node.downsample = downsample
     }
 }
 
@@ -435,6 +443,7 @@ internal class HeroBlurNode(
     var sideFromHeight: Float,
     var pageColor: Color?,
     var videoFrame: () -> Int,
+    var downsample: Int,
 ) : Modifier.Node(), androidx.compose.ui.node.DrawModifierNode {
     private var sharp: androidx.compose.ui.graphics.layer.GraphicsLayer? = null
     private var small: androidx.compose.ui.graphics.layer.GraphicsLayer? = null
@@ -477,8 +486,9 @@ internal class HeroBlurNode(
             drawContent()
             return
         }
-        val sw = (size.width + HeroBlurDown - 1) / HeroBlurDown
-        val sh = (size.height + HeroBlurDown - 1) / HeroBlurDown
+        val factor = downsample.coerceIn(2, 4)
+        val sw = (size.width + factor - 1) / factor
+        val sh = (size.height + factor - 1) / factor
         val sx = sw / size.width.toFloat()
         val sy = sh / size.height.toFloat()
         // Re-recorded every draw: both are display lists (cheap), and this node only draws when
@@ -597,25 +607,39 @@ half4 main(float2 c) {
  * the blur; older devices keep the sharp art and the outer fade.
  */
 @Composable
-fun Modifier.heroSideLiveBlur(): Modifier {
+fun Modifier.heroSideLiveBlur(videoFrame: () -> Int = { 0 }, rapidChanges: Boolean = false): Modifier {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return this
+    val (quality) = com.convx.music.utils.rememberEnumPreference(
+        com.convx.music.constants.CanvasBlurQualityKey, com.convx.music.canvas.CanvasBlurQuality.HIGH)
+    val factor = if (rapidChanges) com.convx.music.canvas.CanvasBlurQuality.LOW.downsample else quality.downsample
     val base = androidx.compose.ui.graphics.rememberGraphicsLayer()
     val blurred = androidx.compose.ui.graphics.rememberGraphicsLayer()
     val sharp = androidx.compose.ui.graphics.rememberGraphicsLayer()
-    val radiusPx = with(androidx.compose.ui.platform.LocalDensity.current) { 40.dp.toPx() }
+    val radiusPx = with(androidx.compose.ui.platform.LocalDensity.current) { 40.dp.toPx() } / factor
+    val blurEffect = remember(radiusPx) {
+        androidx.compose.ui.graphics.BlurEffect(radiusPx, radiusPx, androidx.compose.ui.graphics.TileMode.Clamp)
+    }
     val mask = remember {
         Brush.horizontalGradient(colorStops = heroFadeOutStops(0.42f, 0.86f).toTypedArray())
     }
     return drawWithContent {
+        videoFrame()
         base.record { this@drawWithContent.drawContent() }
-        blurred.renderEffect = androidx.compose.ui.graphics.BlurEffect(radiusPx, radiusPx, androidx.compose.ui.graphics.TileMode.Clamp)
-        blurred.record { drawLayer(base) }
+        blurred.renderEffect = blurEffect
+        val full = size.toIntSize()
+        if (full.width <= 0 || full.height <= 0) return@drawWithContent
+        val reduced = androidx.compose.ui.unit.IntSize((full.width + factor - 1) / factor, (full.height + factor - 1) / factor)
+        val sx = reduced.width / size.width
+        val sy = reduced.height / size.height
+        blurred.record(size = reduced) {
+            scale(sx, sy, pivot = androidx.compose.ui.geometry.Offset.Zero) { drawLayer(base) }
+        }
         sharp.compositingStrategy = androidx.compose.ui.graphics.layer.CompositingStrategy.Offscreen
         sharp.record {
             drawLayer(base)
             drawRect(mask, blendMode = androidx.compose.ui.graphics.BlendMode.DstIn)
         }
-        drawLayer(blurred)
+        scale(1f / sx, 1f / sy, pivot = androidx.compose.ui.geometry.Offset.Zero) { drawLayer(blurred) }
         drawLayer(sharp)
     }
 }

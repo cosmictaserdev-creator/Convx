@@ -27,6 +27,7 @@ class ChunkedDataSource(private val upstream: DataSource) : DataSource {
     private var remaining = C.LENGTH_UNSET.toLong()
     private var pieceLeft = 0L
     private var opened = false
+    private var requestNumber = 0
 
     override fun addTransferListener(transferListener: TransferListener) =
         upstream.addTransferListener(transferListener)
@@ -57,7 +58,14 @@ class ChunkedDataSource(private val upstream: DataSource) : DataSource {
         val wanted = if (remaining == C.LENGTH_UNSET.toLong()) CHUNK_BYTES else minOf(CHUNK_BYTES, remaining)
         val piece = requireNotNull(spec).buildUpon().setPosition(position).setLength(wanted).build()
         opened = true
-        val length = upstream.open(piece)
+        val length = retryOnce(
+            retryable = { error -> error is HttpDataSource.InvalidResponseCodeException &&
+                error.responseCode in setOf(403, 429, 500, 502, 503, 504) },
+            pause = Thread::sleep,
+        ) { attempt ->
+            if (attempt > 0) upstream.close()
+            upstream.open(piece.buildUpon().setUri(piece.uri.toString().withRequestNumber(requestNumber++)).build())
+        }
         pieceLeft = if (length == C.LENGTH_UNSET.toLong()) wanted else length
         return pieceLeft
     }

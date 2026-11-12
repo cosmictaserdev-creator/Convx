@@ -59,12 +59,24 @@ class NetworkMediaMappingTest {
         assertEquals(NetworkMediaUri.create("nas", "Album/Folder.jpg"), NetworkMedia.track("nas", song("Album/A.flac"), images).artwork)
     }
 
-    @Test fun sameNamedFoldersKeepTheirOwnPathSoAlbumsCanBeToldApart() {
-        val queen = NetworkMedia.track("nas", song("Queen/Greatest Hits/01 Track.mp3"), emptyList())
-        val abba = NetworkMedia.track("nas", song("ABBA/Greatest Hits/01 Track.mp3"), emptyList())
-        assertEquals("Greatest Hits", queen.album)
-        assertEquals(queen.album, abba.album)
-        assertEquals("Queen/Greatest Hits", queen.folder)
-        assertEquals("ABBA/Greatest Hits", abba.folder)
+    @Test fun artistsThatStartWithADigitAreNotTrackNumbers() {
+        for ((file, artist, title) in listOf(
+            Triple("Flat/50 Cent - In da Club.mp3", "50 Cent", "In da Club"),
+            Triple("Flat/21 Savage - a lot.mp3", "21 Savage", "a lot"),
+            Triple("Flat/3 Doors Down - Kryptonite.mp3", "3 Doors Down", "Kryptonite"),
+            Triple("Flat/5 Seconds of Summer - Youngblood.mp3", "5 Seconds of Summer", "Youngblood"),
+        )) {
+            val track = NetworkMedia.track("nas", song(file), emptyList())
+            assertEquals(artist, track.artist, file)
+            assertEquals(title, track.title, file)
+            assertNull(track.trackNumber, file)
+        }
+    }
+
+    @Test fun zeroPaddedAndDashedNumbersAreStillTrackNumbers() {
+        assertEquals(1, NetworkMedia.track("nas", song("Album/01 Intro.flac"), emptyList()).trackNumber)
+        assertEquals("Intro", NetworkMedia.track("nas", song("Album/01 Intro.flac"), emptyList()).title)
+        assertEquals(5, NetworkMedia.track("nas", song("Album/5. Song.flac"), emptyList()).trackNumber)
+        assertEquals(12, NetworkMedia.track("nas", song("Album/12 - Song.flac"), emptyList()).trackNumber)
     }
 }

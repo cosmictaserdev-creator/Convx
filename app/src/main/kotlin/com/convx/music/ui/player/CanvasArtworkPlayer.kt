@@ -52,10 +52,7 @@ fun CanvasArtworkPlayer(
     fallbackUrl: String?,
     isPlaying: Boolean,
     modifier: Modifier = Modifier,
-    // Matches the "$mediaId#canvas" key DownloadUtil.kt pre-caches the canvas
-    // video under. Without it, this player has no way to hit that cache entry
-    // even when one exists — it always re-fetches over the network, which
-    // fails outright offline and can flicker/drop the overlay on a hiccup.
+    // Shared with canvas downloads and the other player surfaces.
     mediaId: String? = null,
     onExhausted: () -> Unit = {},
     onReady: () -> Unit = {},
@@ -99,7 +96,6 @@ fun CanvasArtworkPlayer(
                 .apply {
                 trackSelectionParameters = trackSelectionParameters
                     .buildUpon()
-                    .setMaxVideoFrameRate(30)
                     .setMaxVideoBitrate(2_500_000)
                     .build()
                 setAudioAttributes(
@@ -162,13 +158,11 @@ fun CanvasArtworkPlayer(
 
         val mediaItem =
             MediaItem.Builder()
+                .setMediaId(mediaId.orEmpty())
                 .setUri(normalized)
                 .setMimeType(mimeType)
                 .apply {
-                    // Same key DownloadUtil.kt pre-caches this canvas video
-                    // under — without it CacheDataSource has no way to find
-                    // an already-downloaded copy and always hits the network.
-                    if (!mediaId.isNullOrBlank()) setCustomCacheKey("$mediaId#canvas")
+                    if (!mediaId.isNullOrBlank()) setCustomCacheKey(com.convx.music.canvas.canvasCacheKey(mediaId, normalized))
                 }
                 .build()
 
@@ -222,7 +216,7 @@ internal fun VideoSize.toAspectRatio(): Float {
 
 /** Canvas loops are served by several CDNs; YouTube-hosted ones need the client UA. */
 @Composable
-internal fun rememberCanvasMediaSourceFactory(): DefaultMediaSourceFactory {
+internal fun rememberCanvasMediaSourceFactory(): androidx.media3.exoplayer.source.MediaSource.Factory {
     val context = LocalContext.current
     val downloadUtil = LocalDownloadUtil.current.get()
     val okHttpClient =
@@ -273,19 +267,27 @@ internal fun rememberCanvasMediaSourceFactory(): DefaultMediaSourceFactory {
                 .build()
         }
     return remember(okHttpClient, downloadUtil) {
-            DefaultMediaSourceFactory(
-                CacheDataSource.Factory()
-                    .setCache(downloadUtil.downloadCache)
-                    .setUpstreamDataSourceFactory(
-                        DefaultDataSource.Factory(
-                            context,
-                            OkHttpDataSource.Factory(okHttpClient),
-                        ),
-                    )
-                    .setCacheWriteDataSinkFactory(null)
-                    .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
-            )
+        val upstream = DefaultDataSource.Factory(context, OkHttpDataSource.Factory(okHttpClient))
+        val fallback = DefaultMediaSourceFactory(
+            com.convx.music.playback.canvasCacheDataSourceFactory(downloadUtil.downloadCache, downloadUtil.playerCache, upstream),
+        )
+        object : androidx.media3.exoplayer.source.MediaSource.Factory by fallback {
+            override fun createMediaSource(mediaItem: MediaItem): androidx.media3.exoplayer.source.MediaSource {
+                if (mediaItem.mediaId.isBlank()) return fallback.createMediaSource(mediaItem)
+                val source = com.convx.music.playback.canvasCacheDataSourceFactory(
+                    downloadUtil.downloadCache,
+                    downloadUtil.playerCache,
+                    upstream,
+                    com.convx.music.playback.canvasSegmentKeyFactory(mediaItem.mediaId),
+                )
+                val cachedKeys = mediaItem.localConfiguration?.uri?.toString()?.let { url ->
+                    com.convx.music.playback.HlsCanvasCache.preparedSelection(mediaItem.mediaId, url)
+                }
+                val playable = if (!cachedKeys.isNullOrEmpty()) mediaItem.buildUpon().setStreamKeys(cachedKeys).build() else mediaItem
+                return DefaultMediaSourceFactory(source).createMediaSource(playable)
+            }
         }
+    }
 }
 
 /** HLS vs MP4 for a canvas URL; unknown extensions on the primary default to HLS (Apple). */

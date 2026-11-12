@@ -56,10 +56,10 @@ object LyricsTranslationHelper {
     private var translationJob: Job? = null
     private var isCompositionActive = true
 
-    private val translationCache = mutableMapOf<String, List<String>>()
+    private val translationCache = mutableMapOf<LyricsTranslationKey, List<String>>()
 
-    private fun getCacheKey(lyricsText: String, mode: String, language: String): String =
-        "${lyricsText.hashCode()}_${mode}_$language"
+    private fun getCacheKey(lyricsText: String, mode: String, language: String): LyricsTranslationKey =
+        LyricsTranslationKey(lyricsText, mode, language)
 
     /** Reads complete string values from a partially received JSON array. */
     private fun parsePartialTranslations(content: String, maxCount: Int): List<String> {
@@ -185,6 +185,11 @@ object LyricsTranslationHelper {
             if (entry.text.isNotBlank()) index to entry else null
         }
 
+        if (translatedLines.size < nonEmptyEntries.size) {
+            _hasActiveTranslations.value = false
+            return
+        }
+
         nonEmptyEntries.forEachIndexed { idx, (originalIndex, _) ->
             if (idx < translatedLines.size) {
                 lyrics[originalIndex].translatedTextFlow.value = translatedLines[idx]
@@ -222,10 +227,6 @@ object LyricsTranslationHelper {
         translationJob = scope.launch(Dispatchers.IO) {
             try {
                 val effectiveApiKey = if (provider == "DeepL") deeplApiKey else apiKey
-                if (effectiveApiKey.isBlank()) {
-                    _status.value = TranslationStatus.Error(context.getString(com.convx.music.R.string.ai_error_api_key_required))
-                    return@launch
-                }
 
                 if (lyrics.isEmpty()) {
                     _status.value = TranslationStatus.Error(context.getString(com.convx.music.R.string.ai_error_no_lyrics))
@@ -261,12 +262,19 @@ object LyricsTranslationHelper {
                     return@launch
                 }
 
+                // Reusing a saved result does not need a configured remote provider.
+                if (effectiveApiKey.isBlank()) {
+                    _status.value = TranslationStatus.Error(context.getString(com.convx.music.R.string.ai_error_api_key_required))
+                    return@launch
+                }
+
                 val fullLanguageName = LanguageCodeToName[targetLanguage]
                     ?: try {
                         Locale.forLanguageTag(targetLanguage).displayLanguage.takeIf { it.isNotBlank() && it != targetLanguage }
                     } catch (e: Exception) { null }
                     ?: targetLanguage
 
+                val sourceLyrics = if (songId.isNotBlank() && database != null) database.lyrics(songId).first()?.lyrics else null
                 val result = translateWithProvider(
                     text = fullText,
                     targetLanguage = targetLanguage,
@@ -300,9 +308,10 @@ object LyricsTranslationHelper {
                     if (songId.isNotBlank() && database != null) {
                         scope.launch(Dispatchers.IO) {
                             try {
-                                val currentLyrics = database.lyrics(songId).first()
-                                if (currentLyrics != null) {
-                                    database.query {
+                                var saved = false
+                                database.withTransaction {
+                                    val currentLyrics = database.lyrics(songId).first()
+                                    if (currentLyrics != null && currentLyrics.lyrics == sourceLyrics) {
                                         upsert(
                                             currentLyrics.copy(
                                                 translatedLyrics = translatedLines.joinToString("\n"),
@@ -310,9 +319,10 @@ object LyricsTranslationHelper {
                                                 translationMode = mode,
                                             ),
                                         )
+                                        saved = true
                                     }
-                                    _translationSaved.tryEmit(Unit)
                                 }
+                                if (saved) _translationSaved.tryEmit(Unit)
                             } catch (e: Exception) {
                                 timber.log.Timber.e(e, "Failed to save translated lyrics to database")
                             }

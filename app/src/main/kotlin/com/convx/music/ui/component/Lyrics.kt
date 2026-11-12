@@ -841,6 +841,19 @@ fun Lyrics(
 
         if (lyrics == LYRICS_NOT_FOUND || (lyrics != null && lines.all { it.text.isBlank() })) {
             LyricsEmptyNote(fontFamily = lyricsFontFamily, color = AppTheme.colorScheme.secondary)
+        } else if (lyricsAnimationStyle == LyricsAnimationStyle.FISHEYE &&
+            lines.any { !it.words.isNullOrEmpty() } && !isSelectionModeActive) {
+            val offset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
+            FisheyeLyrics(
+                lines = lines,
+                fontFamily = lyricsFontFamily,
+                positionMs = { (sliderPositionProvider() ?: playerConnection.player.currentPosition) + offset },
+                highlight = textColor,
+                onSeek = if (isSynced && changeLyrics && !isGuest) {
+                    { time -> playerConnection.seekTo((time - offset).coerceAtLeast(0)) }
+                } else null,
+                modifier = Modifier.fillMaxSize(),
+            )
         } else if (usesCrawlRenderer) {
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
             StarCrawlLyrics(

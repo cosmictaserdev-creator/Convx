@@ -122,7 +122,6 @@ interface DatabaseDao {
     @Query("SELECT * FROM song WHERE inLibrary IS NOT NULL ORDER BY totalPlayTime")
     fun songsByPlayTimeAsc(): Flow<List<Song>>
 
-
     fun songs(
         sortType: SongSortType,
         descending: Boolean,
@@ -585,10 +584,15 @@ interface DatabaseDao {
     @Query("SELECT * FROM song WHERE id IN (:songIds)")
     fun songsByIds(songIds: List<String>): Flow<List<Song>>
 
-
     @Transaction
     @Query("SELECT * FROM song_artist_map WHERE songId = :songId")
     fun songArtistMap(songId: String): List<SongArtistMap>
+
+    @Query("SELECT * FROM song_album_map WHERE songId = :songId")
+    fun songAlbumMaps(songId: String): List<SongAlbumMap>
+
+    @Delete
+    fun delete(songAlbumMap: SongAlbumMap)
 
     @Transaction
     @Query("SELECT * FROM song")
@@ -1970,16 +1974,6 @@ interface DatabaseDao {
 
     @Query("UPDATE song_album_map SET `index` = :index WHERE songId = :songId AND `index` != :index")
     fun setSongAlbumIndex(songId: String, index: Int)
-
-    @Query("UPDATE album SET thumbnailUrl = :thumbnailUrl WHERE id = :albumId AND (thumbnailUrl IS NULL OR thumbnailUrl != :thumbnailUrl)")
-    fun setAlbumThumbnail(albumId: String, thumbnailUrl: String)
-
-    /** Drops network albums and artists left with no songs once their songs were re-filed. */
-    @Query("DELETE FROM album WHERE isLocal = 1 AND id LIKE 'network_album_%' AND id NOT IN (SELECT albumId FROM song_album_map)")
-    fun pruneEmptyNetworkAlbums()
-
-    @Query("DELETE FROM artist WHERE isLocal = 1 AND id LIKE 'network_artist_%' AND id NOT IN (SELECT artistId FROM song_artist_map)")
-    fun pruneEmptyNetworkArtists()
 
     /** After a tag edit moves a song, the album or artist it left may be empty. */
     @Query("DELETE FROM album WHERE isLocal = 1 AND id LIKE 'local_album_%' AND id NOT IN (SELECT albumId FROM song_album_map)")

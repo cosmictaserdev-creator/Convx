@@ -437,12 +437,12 @@ fun AlbumScreen(
                         if (filteredSongs.any { it.id == mediaMetadata?.id }) playerConnection.togglePlayPause()
                         else {
                             playerConnection.service.getAutomix(playlistId)
-                            playerConnection.playQueue(LocalAlbumRadio(albumWithSongs))
+                            playerConnection.playQueue(LocalAlbumRadio(albumWithSongs, initialSongs = filteredSongs))
                         }
                     },
                     onShuffle = {
                         playerConnection.service.getAutomix(playlistId)
-                        playerConnection.playQueue(LocalAlbumRadio(albumWithSongs.copy(songs = albumWithSongs.songs.shuffled())))
+                        playerConnection.playQueue(LocalAlbumRadio(albumWithSongs, initialSongs = filteredSongs.shuffled()))
                     },
                     rightSymbol = if (downloadState == Download.STATE_COMPLETED) "checkmark" else "arrow.down",
                     onRightAction = {
@@ -539,7 +539,7 @@ fun AlbumScreen(
                                     } else {
                                         playerConnection.service.getAutomix(playlistId)
                                         playerConnection.playQueue(
-                                            LocalAlbumRadio(albumWithSongs, startIndex = index),
+                                            LocalAlbumRadio(albumWithSongs, startIndex = index, initialSongs = filteredSongs),
                                         )
                                     }
                                 },

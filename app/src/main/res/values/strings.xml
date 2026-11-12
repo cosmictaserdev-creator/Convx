@@ -7,6 +7,23 @@
 <!-- Translators: Do not modify this file for translations, use the reference app's Weblate instead. -->
 
 <resources>
+    <string name="canvas_provider_priority">Provider priority</string>
+    <string name="canvas_provider_priority_desc">When Automatic is selected, providers are searched in this order. Drag to reorder; disabled providers are skipped.</string>
+    <string name="canvas_first_available">First available</string>
+    <string name="canvas_first_available_desc">Use the first provider that finds a canvas instead of waiting for higher-priority providers.</string>
+    <string name="canvas_priority_wait">Priority wait: %1$d seconds</string>
+    <string name="canvas_reorder_provider">Drag to reorder %1$s</string>
+    <string name="canvas_provider_spotify">Spotify</string>
+    <string name="canvas_provider_apple">Apple Music</string>
+    <string name="canvas_provider_tidal">TIDAL</string>
+    <string name="canvas_provider_convx">Convx</string>
+    <string name="canvas_mini_player">Play canvas in mini player</string>
+    <string name="canvas_mini_player_desc">Keep the current video moving in the mini player. Turn off to save power.</string>
+    <string name="cache_replace_old">Remove old cached songs when full</string>
+    <string name="cache_replace_old_desc">When off, keep existing cached songs and stop adding new media once the limit is reached.</string>
+    <string name="cache_upcoming">Cache upcoming songs</string>
+    <string name="cache_upcoming_desc">Once the current song is cached, prepare up to three upcoming songs when playback and the device are idle.</string>
+    <string name="cache_upcoming_mobile">Allow upcoming cache on mobile data</string>
     <string name="song_insight_title">Track insights</string>
     <string name="song_insight_disclosure">Uses track metadata sent to your configured AI provider. Suggestions may be inaccurate. Audio is not uploaded or measured.</string>
     <string name="song_insight_error">Could not create an overview. Check your connection, provider settings and selected track, then try again.</string>
@@ -231,8 +248,21 @@
     <string name="edit_lyrics">Edit lyrics</string>
     <string name="search_lyrics">Search lyrics</string>
     <string name="search_cover">Find cover</string>
-    <string name="upgrade_download_quality">Upgrade download quality</string>
-    <string name="upgrade_download_quality_desc">Downloads the best version, then replaces the current file and its metadata only when it is complete and better.</string>
+    <string name="upgrade_download_quality">Check and upgrade download</string>
+    <string name="search_canvas">Search canvas</string>
+    <string name="canvas_blur_quality">Live artwork blur quality</string>
+    <string name="canvas_blur_quality_desc">Keeps the blur moving with the video. Quality temporarily reduces during rapid song changes, then returns to your selection. Blur strength stays the same.</string>
+    <string name="canvas_blur_high">High</string>
+    <string name="canvas_blur_balanced">Balanced</string>
+    <string name="canvas_blur_low">Low</string>
+    <string name="canvas_use_automatic">Use automatic canvas for this song</string>
+    <string name="remember_canvas_for_song">Remember for this song</string>
+    <string name="canvas_search_working">Searching…</string>
+    <string name="canvas_search_no_result">No canvas found. Try another title, artist or provider.</string>
+    <string name="canvas_search_apply_hint">Canvas found. Press OK to use it for this song.</string>
+    <string name="check_upgrade_playlist_downloads">Check and upgrade downloads</string>
+    <string name="check_upgrade_playlist_downloads_desc">Checks downloaded songs in this playlist for better audio and missing artwork, canvas and lyrics.</string>
+    <string name="upgrade_download_quality_desc">Checks for better audio and fills missing artwork, canvas and lyrics. Replaces audio only when a better version is complete.</string>
     <string name="analyze_library">Analyze device and downloaded songs for AutoMix</string>
     <string name="analyze_library_desc">Stores beats, key and energy once, so AutoMix uses no CPU to analyze those songs while playing. Tap again while running to stop.</string>
     <string name="analyze_library_progress">Analyzing %1$d of %2$d…</string>
