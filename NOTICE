@@ -6,6 +6,14 @@ The provider clients and lyric parsers in lyrics/.../lyrics/bitchord are
 adapted from BitChord (https://github.com/kushagrasinghx/BitChord),
 Copyright its contributors, licensed under GPL-3.0. See LICENSE.
 
+## BitChord lyrics panel
+
+The lyrics renderer and supporting clock, focus, gesture, fading, language
+and playback helpers in app/.../ui/component/bitchord are adapted from
+BitChord (https://github.com/kushagrasinghx/BitChord), Copyright its
+contributors, licensed under GPL-3.0. See LICENSE. Convx supplies Android
+platform adapters and maps its lyrics and playback state into the panel.
+
 ## Flamingo lyrics and player controls
 
 The renderer in app/.../ui/component/flamingo and player chrome values
