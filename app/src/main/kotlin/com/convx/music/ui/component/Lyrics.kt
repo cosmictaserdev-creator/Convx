@@ -1904,8 +1904,9 @@ fun Lyrics(
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     type = "text/plain"
-                    val songLink = com.convx.music.utils.ShareUtils.songUrl(mediaMetadata?.id ?: "")
-                    putExtra(Intent.EXTRA_TEXT, "\"$lyricsText\"\n\n$songTitle - $artists\n$songLink")
+                    val songLink = mediaMetadata?.id?.takeIf { it.isNotBlank() }
+                        ?.let { com.convx.music.utils.ShareUtils.songUrl(it) }
+                    putExtra(Intent.EXTRA_TEXT, "\"$lyricsText\"\n\n$songTitle - $artists" + (songLink?.let { "\n$it" } ?: ""))
                 }
                 context.startActivity(
                     Intent.createChooser(shareIntent, context.getString(R.string.share_lyrics))
