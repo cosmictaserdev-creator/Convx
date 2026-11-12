@@ -57,4 +57,14 @@ class YouTubeUrlParserTest {
         assertNull(YouTubeUrlParser.parse("https://youtube.com/playlist?list=PLabcdefgh"))
         assertTrue(YouTubeUrlParser.isYouTubeUrl("https://youtu.be/abcdefghijk"))
     }
+
+    @Test
+    fun lookalikeHostsAreNotTreatedAsConvxLinks() {
+        assertNull(YouTubeUrlParser.parse("https://evilconvx.aryavl.com/watch?v=abcdefghijk"))
+        assertNull(YouTubeUrlParser.parse("https://evilconvx.aryavl.com/channel/UCabcdefghijk"))
+        assertEquals(
+            YouTubeUrlParser.ParsedUrl.Video("abcdefghijk"),
+            YouTubeUrlParser.parse("https://www.convx.aryavl.com/watch?v=abcdefghijk"),
+        )
+    }
 }
