@@ -55,7 +55,7 @@ jobs:
 
       - name: Test network storage and playback routing
         run: |
-          ./gradlew :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest --no-configuration-cache --console=plain
+          ./gradlew :network-storage-core:testDebugUnitTest :network-storage-transports:testDebugUnitTest :network-storage-presentation:testDebugUnitTest --no-configuration-cache --console=plain
           ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
 
       - name: Upload APK

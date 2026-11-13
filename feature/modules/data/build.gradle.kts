@@ -1,30 +1,25 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.kmp.library)
+    alias(libs.plugins.android.library)
 }
-group = "com.convx.shared.data"
-version = "0.1.0"
-kotlin {
-    android {
-        namespace = "com.convx.music.modules.runtime"
-        compileSdk = 37
-        minSdk = 26
+
+android {
+    namespace = "com.convx.music.modules.runtime"
+    compileSdk = 37
+    defaultConfig { minSdk = 26 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    iosArm64()
-    iosSimulatorArm64()
-    jvm("desktop")
-    sourceSets {
-        commonMain.dependencies {
-            api(project(":modules-core"))
-            implementation("io.github.dokar3:quickjs-kt:1.0.15")
-            implementation(libs.kotlinx.atomicfu)
-        }
-        androidMain.dependencies { implementation(libs.ktor.client.okhttp) }
-        iosMain.dependencies { implementation(libs.ktor.client.darwin) }
-        getByName("desktopMain").dependencies { implementation(libs.ktor.client.okhttp) }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.kotlinx.coroutines.test)
-        }
-    }
+}
+
+kotlin { jvmToolchain(21) }
+
+dependencies {
+    api(project(":modules-core"))
+    implementation("io.github.dokar3:quickjs-kt:1.0.15")
+    implementation(libs.kotlinx.atomicfu)
+    implementation(libs.ktor.client.okhttp)
+    testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.test)
 }

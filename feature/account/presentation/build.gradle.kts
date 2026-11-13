@@ -1,31 +1,24 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.kmp.library)
+    alias(libs.plugins.android.library)
 }
 
-group = "com.convx.shared.presentation"
-version = "0.1.0"
-
-kotlin {
-    android {
-        namespace = "com.convx.music.account.presentation"
-        compileSdk = 37
-        minSdk = 26
+android {
+    namespace = "com.convx.music.account.presentation"
+    compileSdk = 37
+    defaultConfig { minSdk = 26 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
+}
 
-    iosArm64()
-    iosSimulatorArm64()
-    jvm("desktop")
+kotlin { jvmToolchain(21) }
 
-    sourceSets {
-        commonMain.dependencies {
-            api(project(":account-core"))
-            api(libs.kotlinx.coroutines.core)
-            implementation(libs.koin.core)
-        }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.kotlinx.coroutines.test)
-        }
-    }
+dependencies {
+    api(project(":account-core"))
+    api(libs.kotlinx.coroutines.core)
+    implementation(libs.koin.core)
+    testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.test)
 }

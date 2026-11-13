@@ -1,43 +1,29 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.kmp.library)
-    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.convx.shared"
-version = "0.1.0"
-
-kotlin {
-    androidLibrary {
-        namespace = "com.convx.music.hig"
-        compileSdk = 37
-        minSdk = 26
+android {
+    namespace = "com.convx.music.hig"
+    compileSdk = 37
+    defaultConfig { minSdk = 26 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
+}
 
-    iosArm64()
-    iosSimulatorArm64()
-    jvm("desktop")
+kotlin { jvmToolchain(21) }
 
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
-        binaries.framework {
-            baseName = "ConvxHig"
-            isStatic = true
-        }
-    }
-
-    sourceSets {
-        commonMain.dependencies {
-            implementation(project(":design-system"))
-            api(compose.runtime)
-            api(compose.foundation)
-            api(compose.ui)
-            api(libs.hig.backdrop)
-            api(libs.hig.capsule)
-            implementation(compose.uiUtil)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.atomicfu)
-        }
-    }
+dependencies {
+    implementation(project(":design-system"))
+    api(libs.compose.runtime)
+    api(libs.compose.foundation)
+    api(libs.compose.ui)
+    api(libs.hig.backdrop)
+    api(libs.hig.capsule)
+    implementation(libs.compose.ui.util)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.atomicfu)
 }
