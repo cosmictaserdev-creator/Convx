@@ -1,12 +1,19 @@
 plugins {
-    id("java-library")
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.jvm)
 }
 
-kotlin {
-    jvmToolchain(21)
+android {
+    namespace = "com.convx.music.canvas"
+    compileSdk = 37
+    defaultConfig { minSdk = 26 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 }
+
+kotlin { jvmToolchain(21) }
 
 dependencies {
     api(project(":canvas-core"))
