@@ -31,6 +31,6 @@ dependencies {
     implementation(libs.coil.network.ktor3)
     implementation(libs.koin.compose)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }

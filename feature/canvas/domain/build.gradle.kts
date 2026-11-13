@@ -18,6 +18,6 @@ kotlin { jvmToolchain(21) }
 dependencies {
     api(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }

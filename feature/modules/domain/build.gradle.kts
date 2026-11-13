@@ -21,6 +21,6 @@ dependencies {
     api(libs.kotlinx.serialization.json)
     api(libs.ktor.client.core)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -30,6 +30,6 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     implementation(libs.newpipeextractor)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.junit)
 }

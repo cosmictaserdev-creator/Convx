@@ -19,6 +19,6 @@ dependencies {
     implementation("io.ktor:ktor-http:${libs.versions.ktor.get()}")
     api("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -23,6 +23,6 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.ui)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -25,5 +25,5 @@ dependencies {
     implementation(libs.ksoup)
     implementation(libs.ktor.client.okhttp)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
 }

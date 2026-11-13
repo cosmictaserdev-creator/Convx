@@ -22,5 +22,5 @@ dependencies {
     api(libs.compose.multiplatform.animation)
     implementation(libs.coil.compose)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
 }

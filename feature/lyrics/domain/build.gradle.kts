@@ -17,5 +17,5 @@ kotlin { jvmToolchain(21) }
 dependencies {
     api(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
 }

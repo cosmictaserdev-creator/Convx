@@ -25,7 +25,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     ksp(libs.room.compiler)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }
 

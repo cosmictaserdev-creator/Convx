@@ -20,6 +20,6 @@ dependencies {
     implementation(libs.kotlinx.atomicfu)
     implementation(libs.ktor.client.okhttp)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }

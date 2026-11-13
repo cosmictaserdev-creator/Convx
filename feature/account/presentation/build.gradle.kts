@@ -19,6 +19,6 @@ dependencies {
     api(libs.kotlinx.coroutines.core)
     implementation(libs.koin.core)
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
     testImplementation(libs.kotlinx.coroutines.test)
 }
