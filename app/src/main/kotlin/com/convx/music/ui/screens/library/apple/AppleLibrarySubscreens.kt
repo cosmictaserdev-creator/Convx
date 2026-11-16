@@ -201,7 +201,9 @@ internal fun AppleSubpage(
                     text = title,
                     style = SfStyle(34.sp, 41.sp, FontWeight.Bold, (-0.6).sp),
                     color = colors.label,
-                    maxLines = 1,
+                    // A long title ("Listas de reproducción") wraps; one line would silently drop the rest.
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(start = titleGutter, end = 16.dp, top = 10.dp, bottom = 10.dp),
                 )
             }
