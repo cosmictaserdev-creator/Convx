@@ -31,8 +31,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.media3.exoplayer.offline.Download
 import coil3.compose.AsyncImage
 import com.convx.music.R
+import com.convx.music.ui.ios.compat.CircularProgressIndicator
 import com.convx.music.ui.ios.compat.LocalContentColor
 import com.convx.music.ui.ios.compat.Text
 import com.convx.music.ui.screens.library.apple.SfStyle
@@ -56,6 +58,8 @@ fun CollectionDetailHeader(
     descriptionRuns: List<LinkSegment>? = null,
     rightSymbol: String = "ellipsis",
     onRightAction: (() -> Unit)? = null,
+    onDownload: (() -> Unit)? = null,
+    downloadState: Int = Download.STATE_STOPPED,
     onEditCover: (() -> Unit)? = null,
     onSearch: (() -> Unit)? = null,
     searchValue: TextFieldValue? = null,
@@ -175,6 +179,23 @@ fun CollectionDetailHeader(
                         Spacer(Modifier.width(7.dp))
                         Text(stringResource(if (playing) R.string.pause else R.string.play),
                             style = SfStyle(19.sp, 23.sp, FontWeight.Bold), color = inverse)
+                    }
+                    if (onDownload != null) {
+                        // Filled once everything is saved, so "done" reads differently from "not yet".
+                        val downloaded = downloadState == Download.STATE_COMPLETED
+                        val inProgress = downloadState == Download.STATE_QUEUED ||
+                            downloadState == Download.STATE_DOWNLOADING
+                        ContrastCircleButton(foreground, onDownload, size = 54.dp, filled = downloaded, enabled = enabled) {
+                            if (inProgress) {
+                                CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
+                            } else {
+                                SymbolIcon(
+                                    sf("arrow.down.circle"),
+                                    stringResource(if (downloaded) R.string.remove_download else R.string.action_download),
+                                    size = 26.dp,
+                                )
+                            }
+                        }
                     }
                     if (onRightAction != null) {
                         ContrastCircleButton(foreground, onRightAction, size = 54.dp) {

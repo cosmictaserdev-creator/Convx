@@ -1011,6 +1011,29 @@ fun LocalPlaylistHeader(
     val appearance = com.convx.music.ui.component.rememberPlaylistAppearance(artwork)
     val duration = remember(songs) { songs.fastSumBy { it.song.song.duration } }
     val count = if (detail.songCount == 0) detail.remoteSongCount ?: 0 else detail.songCount
+    val toggleDownload: () -> Unit = {
+        when (downloadState) {
+            Download.STATE_COMPLETED -> onShowRemoveDownloadDialog()
+            Download.STATE_DOWNLOADING -> cancelDownloads(
+                context,
+                songs.map { it.song.id },
+                downloads,
+            )
+
+            else -> downloadSongs(
+                context,
+                songs.map {
+                    DownloadTarget(
+                        it.song.id,
+                        it.song.song.title,
+                        it.song.artists.firstOrNull()?.name,
+                        it.song.song.duration,
+                    )
+                },
+                downloads,
+            )
+        }
+    }
     com.convx.music.ui.component.CollectionDetailHeader(
         title = detail.name,
         artwork = artwork,
@@ -1030,6 +1053,8 @@ fun LocalPlaylistHeader(
         onSearchValueChange = onSearchValueChange,
         onSearchImeAction = onSearchImeAction,
         searchFocusRequester = searchFocusRequester,
+        onDownload = toggleDownload,
+        downloadState = downloadState,
         onRightAction = {
                         menuState.show {
                             LocalPlaylistMenu(
@@ -1047,29 +1072,7 @@ fun LocalPlaylistHeader(
                                     }
                                 },
                                 onDelete = onshowDeletePlaylistDialog,
-                                onDownload = {
-                                    when (downloadState) {
-                                        Download.STATE_COMPLETED -> onShowRemoveDownloadDialog()
-                                        Download.STATE_DOWNLOADING -> cancelDownloads(
-                                            context,
-                                            songs.map { it.song.id },
-                                            downloads,
-                                        )
-
-                                        else -> downloadSongs(
-                                            context,
-                                            songs.map {
-                                                DownloadTarget(
-                                                    it.song.id,
-                                                    it.song.song.title,
-                                                    it.song.artists.firstOrNull()?.name,
-                                                    it.song.song.duration,
-                                                )
-                                            },
-                                            downloads,
-                                        )
-                                    }
-                                },
+                                onDownload = toggleDownload,
                                 onQueue = {
                                     playerConnection.addToQueue(
                                         items = songs.map { it.song.toMediaItem() }
