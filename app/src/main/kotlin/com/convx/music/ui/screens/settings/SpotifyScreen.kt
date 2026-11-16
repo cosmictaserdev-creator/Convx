@@ -266,7 +266,9 @@ fun SpotifyScreen(
                         onClick = { viewModel.dismissImportProgress() },
                         shape = CircleShape
                     ) {
-                        Text(stringResource(android.R.string.ok))
+                        // DefaultDialog hands its buttons the accent as content colour, which is also
+                        // this filled button's fill, so the label has to name its own colour.
+                        Text(stringResource(android.R.string.ok), color = AppTheme.colorScheme.onPrimary)
                     }
                 } else {
                     TextButton(onClick = { viewModel.cancelImport() }) {
