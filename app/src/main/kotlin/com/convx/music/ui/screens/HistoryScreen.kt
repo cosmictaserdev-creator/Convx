@@ -264,8 +264,8 @@ fun HistoryScreen(
                 state = lazyListState,
                 overscrollEffect = heroZoom.listOverscroll(),
                 modifier = Modifier.heroPullZoom(heroZoom).hazeSource(hazeState),
-                contentPadding = LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-                    .asPaddingValues(),
+                // Top included, as in Stats, so the large title starts below the floating back button.
+                contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
             ) {
                 item(key = "history_header") {
                     LargeScreenTitle(

@@ -61,6 +61,10 @@ internal object AppRoutePolicy {
         "switch_channel",
         "listen_together_from_topbar",
         Screens.ListenTogether.route,
+        // These draw their own top blur and buttons; the shell's fallback haze sits above the
+        // page and would blur those buttons.
+        "stats",
+        "history",
     )
 
     fun isTabRoot(route: String?) = route != null && route in tabRootRoutes
