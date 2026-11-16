@@ -190,7 +190,7 @@ fun CollectionDetailHeader(
                                 CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
                             } else {
                                 SymbolIcon(
-                                    sf("arrow.down.circle"),
+                                    sf(if (downloaded) "checkmark" else "arrow.down.circle"),
                                     stringResource(if (downloaded) R.string.remove_download else R.string.action_download),
                                     size = 26.dp,
                                 )
