@@ -296,6 +296,10 @@ internal fun FoldingTabGroup(
                             if (isLightTheme) Color.Black.copy(0.1f) else Color.White.copy(0.1f),
                             alpha = 1f - progress,
                         )
+                        // The pill is glass over whatever scrolls under the bar, so a busy or warm
+                        // image (an orange cover under a red label) can swallow the accent ink.
+                        // A dark veil keeps the backdrop calm enough for the label to read.
+                        if (!isLightTheme) drawRect(Color.Black.copy(alpha = 0.34f * (1f - progress)))
                         drawRect(Color.Black.copy(alpha = 0.03f * progress))
                     },
                 )
