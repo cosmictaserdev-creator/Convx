@@ -366,6 +366,7 @@ internal class SwipeableV2State<T>(
     ) {
         val targetOffset = anchors[targetValue]
         if (targetOffset != null) {
+            var completed = false
             try {
                 swipe {
                     animationTarget = targetValue
@@ -381,6 +382,7 @@ internal class SwipeableV2State<T>(
                     }
                     lastVelocity = 0f
                 }
+                completed = true
             } finally {
                 animationTarget = null
                 val endOffset = requireOffset()
@@ -389,7 +391,15 @@ internal class SwipeableV2State<T>(
                         .entries
                         .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
                         ?.key
-                this.currentValue = endState ?: currentValue
+                if (endState == null && completed) {
+                    // The anchors moved while the animation was running (a sheet's anchor can
+                    // depend on insets that only arrive mid-flight), so the offset we ended on
+                    // matches none of them. The animation did reach its target, so settle on
+                    // that value's current anchor instead of leaving currentValue behind.
+                    snap(targetValue)
+                } else {
+                    this.currentValue = endState ?: currentValue
+                }
             }
         } else {
             currentValue = targetValue
