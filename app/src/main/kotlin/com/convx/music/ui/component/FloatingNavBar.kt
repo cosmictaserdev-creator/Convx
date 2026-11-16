@@ -228,7 +228,16 @@ private fun AppFloatingNavBarChrome(
     val isDark = AppTheme.colorScheme.surface.luminance() <= 0.5f
     val ambientColor = Color.Unspecified // plain: no artwork-driven tinting
     // The Library screens' accent, so the selected tab matches the icons on those screens.
-    val selectedIconColor = IosTheme.tint
+    val accentColor = IosTheme.tint
+    // A screen tinted by its artwork (History, Stats) can land close to the accent; the selection
+    // wash is the accent, so accent ink on it vanishes. Switch the active ink to white there.
+    val pageTint = com.convx.music.LocalAmbientBackgroundColor.current.value
+    val accentLosesToPage = pageTint.isSpecified && run {
+        val a = accentColor.luminance() + 0.05f
+        val b = pageTint.luminance() + 0.05f
+        (if (a > b) a / b else b / a) < 3f
+    }
+    val selectedIconColor = if (accentLosesToPage) Color.White else accentColor
     val selectedLabelColor = selectedIconColor
     // Keep every tab readable, including after restoring an older theme backup.
     val unselectedIconColor = AppTheme.colorScheme.onSurface.copy(alpha = 0.82f)
@@ -337,7 +346,7 @@ private fun AppFloatingNavBarChrome(
                 backdrop = if (useGlass) appBackdrop else surfaceBackdrop,
                 surfaceBackdrop = surfaceBackdrop,
                 tabsCount = tabs.size,
-                accentColor = selectedIconColor,
+                accentColor = accentColor,
                 containerColor = Color.Transparent,
                 height = NavBarRowHeight,
                 indicatorVisible = tabs.any { it.key == selectedTabKey },
