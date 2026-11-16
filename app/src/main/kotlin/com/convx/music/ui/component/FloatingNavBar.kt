@@ -346,7 +346,8 @@ private fun AppFloatingNavBarChrome(
                 backdrop = if (useGlass) appBackdrop else surfaceBackdrop,
                 surfaceBackdrop = surfaceBackdrop,
                 tabsCount = tabs.size,
-                accentColor = accentColor,
+                // The selected tab is shown through a copy of the tabs tinted with this colour.
+                accentColor = selectedIconColor,
                 containerColor = Color.Transparent,
                 height = NavBarRowHeight,
                 indicatorVisible = tabs.any { it.key == selectedTabKey },
