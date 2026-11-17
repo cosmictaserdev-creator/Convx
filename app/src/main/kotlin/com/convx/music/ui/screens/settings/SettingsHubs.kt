@@ -364,14 +364,9 @@ fun SettingsLinkRow(link: SettingsLink, trailing: String?, selected: Boolean, on
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            Modifier
-                .size(30.dp)
-                .clip(ContinuousRoundedRectangle(7.dp))
-                .background(link.tint(IosTheme.colors)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(painterResource(link.icon), null, tint = Color.White, modifier = Modifier.size(18.dp))
+        // A single-colour glyph on the row, no filled box. The label colour follows light and dark.
+        Box(Modifier.size(30.dp), contentAlignment = Alignment.Center) {
+            Icon(painterResource(link.icon), null, tint = IosTheme.colors.label, modifier = Modifier.size(22.dp))
         }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {

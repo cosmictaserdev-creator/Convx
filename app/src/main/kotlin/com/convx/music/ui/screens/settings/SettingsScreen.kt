@@ -279,11 +279,8 @@ private fun LocalOnlyRow() {
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            Modifier.size(30.dp).clip(ContinuousRoundedRectangle(7.dp)).background(IosTheme.colors.systemOrange),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(painterResource(R.drawable.music_note), null, tint = Color.White, modifier = Modifier.size(18.dp))
+        Box(Modifier.size(30.dp), contentAlignment = Alignment.Center) {
+            Icon(painterResource(R.drawable.music_note), null, tint = IosTheme.colors.label, modifier = Modifier.size(22.dp))
         }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
