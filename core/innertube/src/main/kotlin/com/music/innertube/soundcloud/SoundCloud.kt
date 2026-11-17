@@ -21,6 +21,9 @@ data class SoundCloudStream(
     val mimeType: String?,
     val bitrateKbps: Int?,
     val durationSeconds: Long,
+    val title: String? = null,
+    val uploader: String? = null,
+    val thumbnailUrl: String? = null,
 )
 
 // Uses the web API through NewPipeExtractor; client-id rotation can break it, so failure is normal.
@@ -39,20 +42,7 @@ object SoundCloud {
 
     suspend fun resolveStream(id: String): Result<SoundCloudStream> = request {
         val url = requireNotNull(SoundCloudIds.toUrl(id)) { "Invalid SoundCloud track id" }
-        val info = StreamInfo.getInfo(ServiceList.SoundCloud, url)
-        require(info.contentAvailability !in unavailable) { "SoundCloud track is not freely available" }
-        val streams = info.audioStreams.filter { it.isUrl && it.content.startsWith("https://") }
-        val progressive = streams.filter { it.deliveryMethod == DeliveryMethod.PROGRESSIVE_HTTP }
-        val hls = streams.filter { it.deliveryMethod == DeliveryMethod.HLS }
-        val stream = (progressive.ifEmpty { hls }).maxByOrNull { it.averageBitrate }
-            ?: error("No playable SoundCloud audio stream")
-        SoundCloudStream(
-            url = stream.content,
-            isHls = stream.deliveryMethod == DeliveryMethod.HLS,
-            mimeType = stream.format?.mimeType,
-            bitrateKbps = stream.averageBitrate.takeIf { it > 0 },
-            durationSeconds = info.duration,
-        )
+        StreamInfo.getInfo(ServiceList.SoundCloud, url).toSoundCloudStream()
     }
 
     private suspend fun <T> request(block: () -> T): Result<T> = withContext(Dispatchers.IO) {
@@ -64,6 +54,25 @@ object SoundCloud {
 }
 
 private val unavailable = setOf(ContentAvailability.PAID, ContentAvailability.MEMBERSHIP, ContentAvailability.UPCOMING)
+
+internal fun StreamInfo.toSoundCloudStream(): SoundCloudStream {
+    require(contentAvailability !in unavailable) { "SoundCloud track is not freely available" }
+    val streams = audioStreams.filter { it.isUrl && it.content.startsWith("https://") }
+    val progressive = streams.filter { it.deliveryMethod == DeliveryMethod.PROGRESSIVE_HTTP }
+    val hls = streams.filter { it.deliveryMethod == DeliveryMethod.HLS }
+    val stream = progressive.ifEmpty { hls }.maxByOrNull { it.averageBitrate }
+        ?: error("No playable SoundCloud audio stream")
+    return SoundCloudStream(
+        url = stream.content,
+        isHls = stream.deliveryMethod == DeliveryMethod.HLS,
+        mimeType = stream.format?.mimeType,
+        bitrateKbps = stream.averageBitrate.takeIf { it > 0 },
+        durationSeconds = duration,
+        title = name?.takeIf { it.isNotBlank() },
+        uploader = uploaderName?.takeIf { it.isNotBlank() },
+        thumbnailUrl = thumbnails.maxByOrNull { it.width.toLong() * it.height }?.url,
+    )
+}
 
 internal fun StreamInfoItem.toSongItem(): SongItem? {
     if (contentAvailability in unavailable) return null
