@@ -17,6 +17,11 @@ import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.ui.ios.compat.Icon
 import com.convx.music.ui.ios.compat.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.convx.music.constants.SoundCloudEnabledKey
+import com.convx.music.utils.rememberPreference
+import com.convx.music.ui.ios.compat.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -39,6 +44,8 @@ fun IntegrationScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
+    var soundCloudEnabled by rememberPreference(SoundCloudEnabledKey, false)
+
     SettingsPage(
         navController = navController,
         title = stringResource(R.string.integrations),
@@ -48,6 +55,15 @@ fun IntegrationScreen(
         IntegrationCard(
             title = "Services",
             items = listOf(
+                IntegrationCardItem(
+                    icon = painterResource(R.drawable.music_note),
+                    title = { Text(stringResource(R.string.soundcloud_title)) },
+                    description = { Text(stringResource(R.string.soundcloud_notice)) },
+                    trailingContent = {
+                        Switch(checked = soundCloudEnabled, onCheckedChange = { soundCloudEnabled = it })
+                    },
+                    onClick = { soundCloudEnabled = !soundCloudEnabled },
+                ),
                 IntegrationCardItem(
                     icon = painterResource(R.drawable.discord),
                     title = { Text(stringResource(R.string.discord_integration)) },
