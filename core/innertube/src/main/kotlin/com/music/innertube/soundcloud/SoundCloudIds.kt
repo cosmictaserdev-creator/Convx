@@ -3,6 +3,8 @@ package com.music.innertube.soundcloud
 import java.net.URI
 
 object SoundCloudIds {
+    private val permalinkSegment = Regex("[A-Za-z0-9_-]+")
+
     fun isSoundCloudId(id: String): Boolean = toUrl(id) != null
 
     fun toId(url: String): String? {
@@ -22,7 +24,7 @@ object SoundCloudIds {
 
     private fun isTrackPath(path: String): Boolean {
         val segments = path.split('/')
-        return segments.size == 2 && segments.all { it.matches(Regex("[A-Za-z0-9_-]+")) } &&
+        return segments.size == 2 && segments.all { it.matches(permalinkSegment) } &&
             segments.first() !in setOf("discover", "charts", "search") &&
             segments.last() !in setOf("tracks", "albums", "sets", "reposts", "likes", "popular-tracks", "followers", "following")
     }

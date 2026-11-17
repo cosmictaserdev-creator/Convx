@@ -206,7 +206,7 @@ jobs:
         run: |
           ./gradlew :app:testUniversalFossDebugUnitTest --no-configuration-cache --console=plain --warning-mode summary
 
-      - name: Test SoundCloud client
+      - name: Test innertube module
         run: ./gradlew :innertube:testDebugUnitTest --no-configuration-cache --console=plain
 
       - name: Upload unit test report
