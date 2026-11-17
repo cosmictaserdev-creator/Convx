@@ -4,7 +4,10 @@ import com.music.innertube.models.AlbumItem
 import com.music.innertube.pages.ArtistSection
 
 internal fun List<ArtistSection>.featuredRelease(artistId: String): Pair<String, AlbumItem>? {
-    fun AlbumItem.belongsToArtist() = artists.isNullOrEmpty() || artists.any { it.id == artistId }
+    fun AlbumItem.belongsToArtist(): Boolean {
+        val releaseArtists = artists
+        return releaseArtists.isNullOrEmpty() || releaseArtists.any { it.id == artistId }
+    }
 
     firstOrNull {
         it.title.contains("Latest", ignoreCase = true) &&
