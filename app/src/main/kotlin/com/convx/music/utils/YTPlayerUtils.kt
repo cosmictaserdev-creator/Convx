@@ -10,6 +10,7 @@ import android.net.ConnectivityManager
 import androidx.media3.common.PlaybackException
 import com.music.innertube.soundcloud.SoundCloud
 import com.music.innertube.NewPipeExtractor
+import com.music.innertube.soundcloud.SoundCloudIds
 import com.music.innertube.YouTube
 import com.music.innertube.models.YouTubeClient
 import com.music.innertube.models.YouTubeClient.Companion.ANDROID_CREATOR
@@ -371,7 +372,7 @@ object YTPlayerUtils {
         requireYouTube: Boolean = false,
         preferAac: Boolean = false,
     ): Result<PlaybackData> {
-        if (videoId.startsWith("sc:")) {
+        if (videoId.startsWith(SoundCloudIds.PREFIX)) {
             return SoundCloud.resolveStream(videoId).map { it.toPlaybackData(videoId) }
         }
         if (context != null) {
@@ -1108,7 +1109,7 @@ object YTPlayerUtils {
         videoId: String,
         playlistId: String? = null,
     ): Result<PlayerResponse> {
-        if (videoId.startsWith("sc:")) {
+        if (videoId.startsWith(SoundCloudIds.PREFIX)) {
             return Result.failure(IllegalArgumentException("SoundCloud tracks do not have YouTube metadata"))
         }
         Timber.tag(logTag).d("Fetching metadata-only player response for videoId: $videoId using MAIN_CLIENT: ${MAIN_CLIENT.clientName}")
