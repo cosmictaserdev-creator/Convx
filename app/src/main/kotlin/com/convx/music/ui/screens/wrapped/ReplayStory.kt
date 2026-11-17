@@ -161,11 +161,10 @@ fun ReplayStory(
     val colorA by animateColorAsState(page.a, tween(900), label = "replayA")
     val colorB by animateColorAsState(page.b, tween(900), label = "replayB")
 
+    val toolbarChrome = com.convx.music.ui.component.rememberGlassScreenChrome(background = Color.Black)
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black)
-            .flowingGradient(colorA, colorB)
             .pointerInput(ready) {
                 if (!ready) return@pointerInput
                 detectTapGestures(
@@ -180,6 +179,13 @@ fun ReplayStory(
                 )
             },
     ) {
+        Box(
+            Modifier.fillMaxSize()
+                .then(toolbarChrome.screenModifier())
+                .then(toolbarChrome.contentModifier())
+                .background(Color.Black)
+                .flowingGradient(colorA, colorB),
+        ) {
         AnimatedContent(
             targetState = page.kind,
             transitionSpec = { fadeIn(tween(420, delayMillis = 120)) togetherWith fadeOut(tween(260)) },
@@ -190,6 +196,12 @@ fun ReplayStory(
                 PageContent(kind, state, manager)
             }
         }
+        }
+        com.convx.music.ui.component.TopFadeBlur(
+            hazeState = toolbarChrome.hazeState,
+            pageColor = Color.Black,
+            backdrop = toolbarChrome.backdrop,
+        )
         ReplayChrome(
             count = pages.size,
             index = index,

@@ -8,6 +8,8 @@ package com.convx.music.ui.screens.library
 import com.convx.music.ui.component.sf
 import com.convx.music.ui.component.SymbolIcon
 import androidx.compose.foundation.lazy.rememberLazyListState
+import com.convx.music.ui.component.ScreenScaffold
+import com.convx.music.ui.component.rememberTitleCollapseProgressState
 import com.convx.music.ui.component.ListScrollRail
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
@@ -96,10 +98,16 @@ fun LocalFolderScreen(
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val titleProgress = rememberTitleCollapseProgressState(lazyListState, titleItemKey = "title")
+    ScreenScaffold(
+        title = path.substringAfterLast('/'),
+        titleAlpha = 0f,
+        titleAlphaProvider = { titleProgress.value },
+        onBack = { navController.navigateUp() },
+    ) { chrome ->
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().then(chrome.contentModifier()),
             contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
         ) {
             if (songs.isNotEmpty()) {

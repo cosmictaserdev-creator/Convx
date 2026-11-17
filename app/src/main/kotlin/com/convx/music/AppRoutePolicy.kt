@@ -65,16 +65,24 @@ internal object AppRoutePolicy {
         "new_release",
         "charts_screen",
         "local_folders",
+        "local_music",
+        "history",
+        "stats",
+        "listen_together/party",
+        "listen_together/chat",
+        "ai_dj_set",
+        "update",
+        "wrapped",
+        "ambient_mode",
     )
     private val routesWithScreenTopHazePrefixes = setOf(
         "radio_station/",
         "youtube_browse/",
+        "local_folder/",
+        "network_browse/",
+        "song_insight/",
     )
-    private val routesWithoutTopHaze = setOf(
-        "listen_together/chat",
-        "wrapped",
-        "ambient_mode",
-    )
+
 
     fun isTabRoot(route: String?) = route != null && route in tabRootRoutes
     fun isWebViewRoute(route: String?) = route != null && route in webViewRoutes
@@ -84,20 +92,21 @@ internal object AppRoutePolicy {
     fun needsDownloadState(route: String?) =
         route != null && route !in routesWithoutDownloadState && !route.startsWith("settings")
 
-    fun showsFallbackTopHaze(route: String?) = route != null &&
-        route !in tabRootRoutes &&
-        route !in routesWithScreenTopHaze &&
-        routesWithScreenTopHazePrefixes.none { route.startsWith(it) } &&
-        route !in routesWithoutTopHaze &&
-        !route.startsWith("settings") &&
-        !isWebViewRoute(route) &&
-        !route.startsWith("album/") &&
-        !route.startsWith("artist/") &&
-        !route.startsWith("online_playlist/") &&
-        !route.startsWith("local_playlist/") &&
-        !route.startsWith("auto_playlist/") &&
-        !route.startsWith("cache_playlist/") &&
-        !route.startsWith("top_playlist/") &&
-        !route.startsWith("browse/") &&
-        !route.startsWith("search/")
+    fun showsFallbackTopHaze(route: String?): Boolean {
+        val path = route?.substringBefore('?') ?: return false
+        return path !in tabRootRoutes &&
+            path !in routesWithScreenTopHaze &&
+            routesWithScreenTopHazePrefixes.none { path.startsWith(it) } &&
+            !path.startsWith("settings") &&
+            !isWebViewRoute(path) &&
+            !path.startsWith("album/") &&
+            !path.startsWith("artist/") &&
+            !path.startsWith("online_playlist/") &&
+            !path.startsWith("local_playlist/") &&
+            !path.startsWith("auto_playlist/") &&
+            !path.startsWith("cache_playlist/") &&
+            !path.startsWith("top_playlist/") &&
+            !path.startsWith("browse/") &&
+            !path.startsWith("search/")
+    }
 }

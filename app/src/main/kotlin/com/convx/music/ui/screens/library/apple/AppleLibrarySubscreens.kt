@@ -213,6 +213,7 @@ internal fun AppleSubpage(
         TopFadeBlur(
             hazeState = haze,
             pageColor = colors.systemBackground,
+            backdrop = pageBackdrop,
             modifier = Modifier.align(Alignment.TopCenter),
             heightOverride = statusTop + com.convx.music.ui.component.TopBarContentHeight + 8.dp,
         )

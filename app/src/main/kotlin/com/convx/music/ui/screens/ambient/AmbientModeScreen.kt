@@ -360,7 +360,13 @@ fun AmbientModeScreen(navController: NavController) {
     val canvasBlurRadius = ambientCanvasBlur.coerceIn(0f, 24f)
     val canvasDimOpacity = ambientCanvasDim.coerceIn(0f, 0.75f)
 
+    val toolbarChrome = com.convx.music.ui.component.rememberGlassScreenChrome(background = Color.Black)
     Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            Modifier.fillMaxSize()
+                .then(toolbarChrome.screenModifier())
+                .then(toolbarChrome.contentModifier()),
+        ) {
         // Keep the existing ambient glow as the lightweight fallback while a canvas
         // is loading or when the current track has no canvas artwork. With Position & Fit
         // it also stays behind the whole layout, because it is what the feathered edge of
@@ -804,6 +810,13 @@ fun AmbientModeScreen(navController: NavController) {
                 )
             }
         }
+
+        }
+        com.convx.music.ui.component.TopFadeBlur(
+            hazeState = toolbarChrome.hazeState,
+            pageColor = Color.Black,
+            backdrop = toolbarChrome.backdrop,
+        )
 
         // This sits outside the gesture arena so a back-button tap cannot also be
         // interpreted as a play/pause tap. It fades away after idle time and is

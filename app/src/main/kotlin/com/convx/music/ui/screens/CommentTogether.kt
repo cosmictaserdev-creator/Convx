@@ -80,36 +80,18 @@ fun CommentTogetherScreen(navController: NavController) {
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.comments),
-                            style = AppTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        roomState?.roomCode?.let { code ->
-                            Text(
-                                text = "Room: $code",
-                                style = AppTheme.typography.labelMedium,
-                                color = AppTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        SymbolIcon(symbol = sf("SFChevronLeft"), contentDescription = null)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colorScheme.surface,
-                    titleContentColor = AppTheme.colorScheme.onSurface
-                )
-            )
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.comments),
+        titleAlpha = 1f,
+        onBack = { navController.navigateUp() },
+        actions = {
+            roomState?.roomCode?.let { code ->
+                Text(text = code, style = AppTheme.typography.labelMedium)
+            }
         },
+    ) { chrome ->
+    Scaffold(
+        modifier = Modifier.then(chrome.contentModifier()),
         bottomBar = {
             Column(
                 modifier = Modifier
@@ -186,7 +168,7 @@ fun CommentTogetherScreen(navController: NavController) {
                 )
             }
         },
-        contentWindowInsets = windowInsets
+        contentWindowInsets = windowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
     ) { padding ->
         Box(
             modifier = Modifier
@@ -200,7 +182,7 @@ fun CommentTogetherScreen(navController: NavController) {
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp, top = com.convx.music.ui.component.topBarHeight() + 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
@@ -217,6 +199,7 @@ fun CommentTogetherScreen(navController: NavController) {
             }
         }
     }
+}
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)

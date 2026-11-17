@@ -1,5 +1,7 @@
 package com.convx.music.ui.screens.library
 
+import com.convx.music.R
+import androidx.compose.ui.res.stringResource
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -59,10 +61,10 @@ fun LocalFoldersScreen(navController: NavController, viewModel: LocalMusicViewMo
     val scanning by viewModel.isScanning.collectAsStateWithLifecycle()
     val permission = rememberLocalAudioPermission { }
     LaunchedEffect(permission.granted) { if (permission.granted) viewModel.scanDevice(context, force = false) }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()) {
-        item {
-            Text("Folders", style = AppTheme.typography.headlineLarge, modifier = Modifier.padding(24.dp))
-        }
+    ScreenLazyPage(
+        title = stringResource(R.string.folders),
+        onBack = { navController.navigateUp() },
+    ) {
         if (!permission.granted) {
             item { LocalMusicPermissionPrompt(permission) }
         } else {
