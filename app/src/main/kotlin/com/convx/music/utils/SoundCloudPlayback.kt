@@ -5,7 +5,7 @@ import com.music.innertube.models.Thumbnails
 import com.music.innertube.models.response.PlayerResponse
 import com.music.innertube.soundcloud.SoundCloudStream
 
-internal const val SOUND_CLOUD_FORMAT_ITAG = 9998
+internal const val SOUND_CLOUD_FORMAT_ITAG = 9995
 
 internal fun SoundCloudStream.toPlaybackData(mediaId: String): YTPlayerUtils.PlaybackData {
     val baseMime = mimeType?.takeIf { it.isNotBlank() } ?: "audio/mpeg"
