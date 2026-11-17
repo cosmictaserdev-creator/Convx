@@ -688,11 +688,11 @@ fun Lyrics(
     val usesArchiveTuneRenderer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
         lyricsAnimationStyle == LyricsAnimationStyle.ARCHIVE_TUNE &&
         lines.hasKaraokeTimings()
+    val usesBitChordRenderer = lyricsAnimationStyle == LyricsAnimationStyle.BITCHORD && lines.isNotEmpty()
     val usesFlamingoRenderer = (lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO ||
-            lyricsAnimationStyle == LyricsAnimationStyle.CONVX_1 ||
-            lyricsAnimationStyle == LyricsAnimationStyle.BITCHORD) && lines.isNotEmpty()
+            lyricsAnimationStyle == LyricsAnimationStyle.CONVX_1) && lines.isNotEmpty()
     val usesCrawlRenderer = lyricsAnimationStyle == LyricsAnimationStyle.STAR_CRAWL && lines.isNotEmpty()
-    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer && !usesCrawlRenderer
+    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer && !usesCrawlRenderer && !usesBitChordRenderer
 
     val lazyListState = rememberLazyListState()
     val rubber = rememberLyricRubber(lazyListState)
@@ -795,7 +795,7 @@ fun Lyrics(
         initialScrollDone = false
     }
     LaunchedEffect(currentLineIndex, lastPreviewTime, initialScrollDone, isAutoScrollEnabled, scrollLyrics, isSeeking, hasProviderRow, lines, lazyListState.layoutInfo.totalItemsCount) {
-        if (!isSynced || usesFlamingoRenderer || usesCrawlRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
+        if (!isSynced || usesFlamingoRenderer || usesBitChordRenderer || usesCrawlRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
         // The playhead-to-line lookup starts asynchronously. Don't interpret its
         // initial -1 as line zero and briefly jump to the start of the lyrics.
         if (currentLineIndex < 0) return@LaunchedEffect
@@ -851,6 +851,20 @@ fun Lyrics(
                 isSynced = isSynced,
                 autoScrollEnabled = scrollLyrics,
                 onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else if (usesBitChordRenderer) {
+            // BitChord's own lyrics panel, ported as is, so the look and the motion match the original.
+            val lyricsOffset = currentSong?.song?.lyricsOffset ?: 0
+            com.convx.music.ui.component.bitchord.BitChordLyricsView(
+                lines = lines,
+                trackKey = currentSong?.id.orEmpty(),
+                isPlaying = isPlaying,
+                isSynced = isSynced,
+                positionMs = { sliderPositionProvider() ?: playerConnection.player.currentPosition },
+                offsetMs = lyricsOffset,
+                blur = lyricsStandardBlur,
+                onSeekMs = { if (changeLyrics && !isGuest) playerConnection.player.seekTo(it) },
                 modifier = Modifier.fillMaxSize(),
             )
         } else if (usesFlamingoRenderer) {
