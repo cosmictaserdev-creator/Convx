@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="soundcloud_title" translatable="false">SoundCloud</string>
-    <string name="soundcloud_notice">Mix SoundCloud tracks into search and Home. Uses SoundCloud\'s public web API, it can stop working without notice.</string>
+    <string name="soundcloud_notice">Unofficial. Mix SoundCloud tracks into search and Home using SoundCloud\'s website. It can stop working without notice.</string>
 </resources>
