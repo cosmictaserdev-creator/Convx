@@ -117,6 +117,7 @@ fun AppTopBar(
                 } else {
                     AppTheme.colorScheme.onSurface
                 }
+                val isHome = effectiveRoute == Screens.Home.route
                 if (chromeVisible) FrostedTopBar(
                     // The blur above spans the full width; only the content clears the side bar and cutouts.
                     modifier = Modifier
@@ -131,11 +132,11 @@ fun AppTopBar(
                     leading = {
                         // SF Pro Text is wider than Apple's Display face at this size.
                         Text(
-                            text = if (effectiveRoute == Screens.Home.route) stringResource(R.string.app_name)
+                            text = if (isHome) stringResource(R.string.home_logo_title)
                                 else titleRes?.let { stringResource(it) } ?: "",
                             style = AppTheme.typography.titleLarge.copy(
-                                fontFamily = if (effectiveRoute == Screens.Home.route) ConvxLogoFontFamily else SfProFontFamily,
-                                fontWeight = if (effectiveRoute == Screens.Home.route) FontWeight.Normal else FontWeight.Bold,
+                                fontFamily = if (isHome) ConvxLogoFontFamily else SfProFontFamily,
+                                fontWeight = if (isHome) FontWeight.Normal else FontWeight.Bold,
                                 fontSize = 34.sp,
                                 lineHeight = 41.sp,
                                 letterSpacing = (-0.6).sp,
