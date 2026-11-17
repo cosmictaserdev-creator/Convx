@@ -3,6 +3,8 @@ package com.music.innertube.soundcloud
 import java.net.URI
 
 object SoundCloudIds {
+    const val PREFIX = "sc:"
+
     private val permalinkSegment = Regex("[A-Za-z0-9_-]+")
 
     fun isSoundCloudId(id: String): Boolean = toUrl(id) != null
@@ -14,12 +16,12 @@ object SoundCloudIds {
             uri.userInfo != null || uri.port != -1
         ) return null
         val path = uri.rawPath.orEmpty().removePrefix("/").removeSuffix("/")
-        return path.takeIf(::isTrackPath)?.let { "sc:$it" }
+        return path.takeIf(::isTrackPath)?.let { "$PREFIX$it" }
     }
 
     fun toUrl(id: String): String? {
-        if (!id.startsWith("sc:")) return null
-        return id.removePrefix("sc:").takeIf(::isTrackPath)?.let { "https://soundcloud.com/$it" }
+        if (!id.startsWith(PREFIX)) return null
+        return id.removePrefix(PREFIX).takeIf(::isTrackPath)?.let { "https://soundcloud.com/$it" }
     }
 
     private fun isTrackPath(path: String): Boolean {
