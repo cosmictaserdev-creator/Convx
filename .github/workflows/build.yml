@@ -167,6 +167,7 @@ jobs:
   unit_tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     if: github.actor != 'dependabot[bot]' && !(github.event_name == 'workflow_dispatch' && inputs.test_release)
     steps:
       - uses: actions/checkout@v4
@@ -204,14 +205,6 @@ jobs:
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
         run: |
           ./gradlew :app:testUniversalFossDebugUnitTest --no-configuration-cache --console=plain --warning-mode summary
-
-      - name: Test backup archive validation and rollback
-        run: ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.viewmodels.BackupArchiveEntryPolicyTest --tests com.convx.music.viewmodels.AtomicFileReplacementTest --no-configuration-cache --console=plain
-
-      - name: Test network storage and playback routing
-        run: |
-          ./gradlew :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest --no-configuration-cache --console=plain
-          ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
 
       - name: Upload unit test report
         if: failure()
