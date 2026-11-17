@@ -31,5 +31,6 @@ dependencies {
     implementation(libs.newpipeextractor)
     testImplementation(libs.junit)
     testImplementation(kotlin("test-junit"))
+    testImplementation(libs.ktor.client.cio)
     testImplementation(libs.junit)
 }
