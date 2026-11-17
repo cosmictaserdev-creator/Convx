@@ -7,6 +7,7 @@ package com.convx.music.playback.queues
 
 import com.convx.music.extensions.toMediaItem
 import com.convx.music.models.toMediaMetadata
+import com.music.innertube.soundcloud.SoundCloudIds
 import com.music.innertube.models.SongItem
 import com.music.innertube.models.WatchEndpoint
 import com.music.innertube.models.YTItem
@@ -19,6 +20,9 @@ fun searchResultQueue(
 ): Queue {
     val songs = siblings.filterIsInstance<SongItem>().distinctBy { it.id }
     val startIndex = songs.indexOfFirst { it.id == song.id }
+    if (song.id.startsWith(SoundCloudIds.PREFIX) && (songs.size <= 1 || startIndex < 0)) {
+        return ListQueue(title = title, items = listOf(song.toMediaItem()), startIndex = 0)
+    }
     return if (songs.size > 1 && startIndex >= 0) {
         ListQueue(
             title = title,
