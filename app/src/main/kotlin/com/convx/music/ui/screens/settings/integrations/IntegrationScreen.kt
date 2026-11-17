@@ -17,11 +17,18 @@ import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.ui.ios.compat.Icon
 import com.convx.music.ui.ios.compat.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.convx.music.constants.SoundCloudEnabledKey
+import com.convx.music.utils.rememberPreference
+import com.convx.music.ui.ios.compat.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -39,6 +46,9 @@ fun IntegrationScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
+    var soundCloudEnabled by rememberPreference(SoundCloudEnabledKey, false)
+    val soundCloudTitle = stringResource(R.string.soundcloud_title)
+
     SettingsPage(
         navController = navController,
         title = stringResource(R.string.integrations),
@@ -48,6 +58,19 @@ fun IntegrationScreen(
         IntegrationCard(
             title = "Services",
             items = listOf(
+                IntegrationCardItem(
+                    icon = painterResource(R.drawable.music_note),
+                    title = { Text(soundCloudTitle) },
+                    description = { Text(stringResource(R.string.soundcloud_notice)) },
+                    trailingContent = {
+                        Switch(
+                            checked = soundCloudEnabled,
+                            onCheckedChange = { soundCloudEnabled = it },
+                            modifier = Modifier.semantics { contentDescription = soundCloudTitle },
+                        )
+                    },
+                    onClick = { soundCloudEnabled = !soundCloudEnabled },
+                ),
                 IntegrationCardItem(
                     icon = painterResource(R.drawable.discord),
                     title = { Text(stringResource(R.string.discord_integration)) },
