@@ -65,6 +65,7 @@ import com.convx.music.ui.ios.foundation.IosGlassSpec
 import com.convx.music.ui.ios.foundation.iosGlass
 import com.convx.music.ui.screens.Screens
 import com.convx.music.ui.theme.LocalAccentTextColor
+import com.convx.music.ui.theme.ConvxLogoFontFamily
 import com.convx.music.ui.theme.SfProFontFamily
 import com.convx.music.ui.theme.isHueless
 import dev.chrisbanes.haze.HazeState
@@ -130,10 +131,11 @@ fun AppTopBar(
                     leading = {
                         // SF Pro Text is wider than Apple's Display face at this size.
                         Text(
-                            text = titleRes?.let { stringResource(it) } ?: "",
+                            text = if (effectiveRoute == Screens.Home.route) stringResource(R.string.app_name)
+                                else titleRes?.let { stringResource(it) } ?: "",
                             style = AppTheme.typography.titleLarge.copy(
-                                fontFamily = SfProFontFamily,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = if (effectiveRoute == Screens.Home.route) ConvxLogoFontFamily else SfProFontFamily,
+                                fontWeight = if (effectiveRoute == Screens.Home.route) FontWeight.Normal else FontWeight.Bold,
                                 fontSize = 34.sp,
                                 lineHeight = 41.sp,
                                 letterSpacing = (-0.6).sp,
