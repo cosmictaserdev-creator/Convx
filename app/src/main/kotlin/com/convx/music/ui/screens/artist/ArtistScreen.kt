@@ -261,7 +261,7 @@ fun ArtistScreen(
     val showArtistBackgroundVideoPref by rememberPreference(key = ShowArtistBackgroundVideoKey, defaultValue = true)
     val showArtistBackgroundVideo = if (dataSaverEnabled) false else showArtistBackgroundVideoPref
     val inTabView = LocalTabView.current
-    val featuredRelease = remember(artistPage) { artistPage?.sections?.featuredRelease() }
+    val featuredRelease = remember(artistPage, viewModel.artistId) { artistPage?.sections?.featuredRelease(viewModel.artistId) }
     val firstSongShelf = remember(artistPage) {
         artistPage?.sections?.firstOrNull { (it.items.firstOrNull() as? SongItem)?.album != null }?.title
     }
@@ -1316,15 +1316,6 @@ private val ArtistCapsuleShape = com.convx.music.ui.component.shapes.ContinuousR
 
 private fun com.music.innertube.pages.ArtistSection.isFeaturedLatest(): Boolean =
     title.contains("Latest", ignoreCase = true) && items.firstOrNull() is AlbumItem
-
-/**
- * (section title, album) of the release the header card features: YouTube's "Latest release"
- * when the page has one, otherwise the first album/single shelf's lead item — iOS always shows
- * the card, and plenty of YouTube artist pages carry no "Latest" shelf.
- */
-private fun List<com.music.innertube.pages.ArtistSection>.featuredRelease(): Pair<String, AlbumItem>? =
-    (firstOrNull { it.isFeaturedLatest() } ?: firstOrNull { it.items.firstOrNull() is AlbumItem })
-        ?.let { it.title to it.items.first() as AlbumItem }
 
 /** Apple Music logo first, then a signature image, then the artist name. */
 @Composable
