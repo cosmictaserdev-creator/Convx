@@ -71,6 +71,7 @@ internal object AppRoutePolicy {
         "youtube_browse/",
     )
     private val routesWithoutTopHaze = setOf(
+        "listen_together/chat",
         "wrapped",
         "ambient_mode",
     )

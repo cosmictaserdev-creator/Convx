@@ -13,8 +13,8 @@ class AppRoutePolicyTest {
         ).forEach { assertFalse(it, AppRoutePolicy.showsFallbackTopHaze(it)) }
     }
 
-    @Test fun immersiveRoutesNeverReceiveTopHaze() {
-        listOf("wrapped", "ambient_mode").forEach {
+    @Test fun immersiveAndOpaqueRoutesNeverReceiveShellHaze() {
+        listOf("wrapped", "ambient_mode", "listen_together/chat").forEach {
             assertFalse(it, AppRoutePolicy.showsFallbackTopHaze(it))
         }
     }
