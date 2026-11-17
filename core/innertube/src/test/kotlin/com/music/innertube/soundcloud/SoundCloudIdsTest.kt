@@ -25,7 +25,7 @@ class SoundCloudIdsTest {
     }
 
     @Test fun rejectsEmptyAndNonTrackPaths() {
-        listOf("", "garbage", "https://soundcloud.com/artist", "https://soundcloud.com/artist/sets/list", "https://soundcloud.com/artist/../", "https://soundcloud.com/charts/top").forEach {
+        listOf("", "garbage", "https://soundcloud.com/artist", "https://soundcloud.com/artist/sets/list", "https://soundcloud.com/artist/sets", "https://soundcloud.com/artist/likes", "https://soundcloud.com/artist/../", "https://soundcloud.com/charts/top").forEach {
             assertNull(SoundCloudIds.toId(it))
         }
         listOf("", "sc:", "sc:artist", "sc:artist/track?x=y", "sc:../track", "youtube:artist/track").forEach {
