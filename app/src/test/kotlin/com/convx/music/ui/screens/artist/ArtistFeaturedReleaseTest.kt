@@ -2,6 +2,7 @@ package com.convx.music.ui.screens.artist
 
 import com.music.innertube.models.AlbumItem
 import com.music.innertube.models.Artist
+import com.music.innertube.models.BrowseEndpoint
 import com.music.innertube.pages.ArtistSection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -11,7 +12,7 @@ class ArtistFeaturedReleaseTest {
     private fun album(id: String, year: Int? = null, artist: String = "owner") =
         AlbumItem(id, "playlist-$id", title = id, artists = listOf(Artist(artist, artist)), year = year, thumbnail = "")
 
-    private fun shelf(title: String, vararg albums: AlbumItem) = ArtistSection(title, albums.toList(), null)
+    private fun shelf(title: String, vararg albums: AlbumItem) = ArtistSection(title, albums.toList(), BrowseEndpoint(browseId = "owner"))
 
     @Test fun latestShelfWins() {
         val latest = album("latest", 2020)
@@ -35,7 +36,7 @@ class ArtistFeaturedReleaseTest {
 
     @Test fun otherArtistsAreExcluded() {
         val own = album("own", 2020)
-        assertEquals("Albums" to own, listOf(shelf("Albums", own), shelf("Appears on", album("other", 2026, "other"))).featuredRelease("owner"))
+        assertEquals("Albums" to own, listOf(shelf("Albums", own), shelf("Appears on", album("other", 2026, "other")).copy(moreEndpoint = null)).featuredRelease("owner"))
     }
 
     @Test fun knownYearBeatsUnknownYear() {
@@ -51,4 +52,17 @@ class ArtistFeaturedReleaseTest {
     @Test fun emptyPageHasNoRelease() {
         assertNull(emptyList<ArtistSection>().featuredRelease("owner"))
     }
+    @Test fun noMatchingEndpointKeepsOldLeadItem() {
+        val old = album("old", 2010)
+        val sections = listOf(shelf("Albums", old), shelf("Singles", album("new", 2026)))
+            .map { it.copy(moreEndpoint = null) }
+        assertEquals("Albums" to old, sections.featuredRelease("owner"))
+    }
+
+    @Test fun matchingShelfExcludesUnknownOwnershipWithMissingArtistMetadata() {
+        val own = album("own", 2020).copy(artists = null)
+        val other = album("other", 2026).copy(artists = null)
+        assertEquals("Albums" to own, listOf(shelf("Appears on", other).copy(moreEndpoint = null), shelf("Albums", own)).featuredRelease("owner"))
+    }
+
 }
