@@ -8,6 +8,7 @@ package com.convx.music.utils
 import android.net.ConnectivityManager
 
 import androidx.media3.common.PlaybackException
+import com.music.innertube.soundcloud.SoundCloud
 import com.music.innertube.NewPipeExtractor
 import com.music.innertube.YouTube
 import com.music.innertube.models.YouTubeClient
@@ -370,6 +371,9 @@ object YTPlayerUtils {
         requireYouTube: Boolean = false,
         preferAac: Boolean = false,
     ): Result<PlaybackData> {
+        if (videoId.startsWith("sc:")) {
+            return SoundCloud.resolveStream(videoId).map { it.toPlaybackData(videoId) }
+        }
         if (context != null) {
             // Honor selected quality only when Saavn is enabled.
             val forceSelectedQuality = context.dataStore.get(EnableSaavnStreamingKey, false) &&
@@ -1104,6 +1108,9 @@ object YTPlayerUtils {
         videoId: String,
         playlistId: String? = null,
     ): Result<PlayerResponse> {
+        if (videoId.startsWith("sc:")) {
+            return Result.failure(IllegalArgumentException("SoundCloud tracks do not have YouTube metadata"))
+        }
         Timber.tag(logTag).d("Fetching metadata-only player response for videoId: $videoId using MAIN_CLIENT: ${MAIN_CLIENT.clientName}")
         return YouTube.player(videoId, playlistId, client = WEB_REMIX) // ANDROID_VR does not work with history
             .onSuccess { Timber.tag(logTag).d("Successfully fetched metadata") }

@@ -2007,6 +2007,7 @@ class MusicService :
         mediaId: String,
         playbackData: YTPlayerUtils.PlaybackData? = null
     ) {
+        if (mediaId.startsWith("sc:")) return
         if (!songRecoveryInFlight.add(mediaId)) return
         try {
             val song = database.song(mediaId).first()
@@ -2155,6 +2156,7 @@ class MusicService :
         }
 
         val currentMediaMetadata = player.currentMetadata ?: return
+        if (currentMediaMetadata.id.startsWith("sc:")) return
 
         val currentIndex = player.currentMediaItemIndex
         val currentMediaId = currentMediaMetadata.id
@@ -2196,6 +2198,7 @@ class MusicService :
         currentIndex: Int,
         requestVersion: Long,
     ) {
+        if (mediaId.startsWith("sc:")) return
         try {
             val relatedEndpoint = withContext(Dispatchers.IO) {
                 YouTube.next(WatchEndpoint(videoId = mediaId)).getOrNull()?.relatedEndpoint
@@ -2259,6 +2262,7 @@ class MusicService :
     }
 
     private suspend fun loadAutomixItems(playlistId: String) {
+        if (playlistId.startsWith("sc:")) return
         val firstResult = YouTube.next(WatchEndpoint(playlistId = playlistId)).getOrNull()
         if (firstResult == null) {
             loadAutomixFromRadio()
@@ -2277,6 +2281,7 @@ class MusicService :
 
     private suspend fun loadAutomixFromRadio() {
         val currentSong = player.currentMetadata ?: return
+        if (currentSong.id.startsWith("sc:")) return
         val radioResult = YouTube.next(WatchEndpoint(videoId = currentSong.id)).getOrNull()
 
         if (radioResult != null) {
@@ -3916,7 +3921,7 @@ class MusicService :
             }
         }
 
-        if (playbackStats.totalPlayTimeMs >= historyDurationMs) {
+        if (playbackStats.totalPlayTimeMs >= historyDurationMs && !mediaItem.mediaId.startsWith("sc:")) {
             CoroutineScope(Dispatchers.IO).launch {
                 val playbackUrl = database.format(mediaItem.mediaId).first()?.playbackUrl
                     ?: YTPlayerUtils.playerResponseForMetadata(mediaItem.mediaId, null)
