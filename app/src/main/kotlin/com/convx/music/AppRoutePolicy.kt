@@ -61,6 +61,18 @@ internal object AppRoutePolicy {
         "switch_channel",
         "listen_together_from_topbar",
         Screens.ListenTogether.route,
+        "mood_and_genres",
+        "new_release",
+        "charts_screen",
+        "local_folders",
+    )
+    private val routesWithScreenTopHazePrefixes = setOf(
+        "radio_station/",
+        "youtube_browse/",
+    )
+    private val routesWithoutTopHaze = setOf(
+        "wrapped",
+        "ambient_mode",
     )
 
     fun isTabRoot(route: String?) = route != null && route in tabRootRoutes
@@ -74,6 +86,8 @@ internal object AppRoutePolicy {
     fun showsFallbackTopHaze(route: String?) = route != null &&
         route !in tabRootRoutes &&
         route !in routesWithScreenTopHaze &&
+        routesWithScreenTopHazePrefixes.none { route.startsWith(it) } &&
+        route !in routesWithoutTopHaze &&
         !route.startsWith("settings") &&
         !isWebViewRoute(route) &&
         !route.startsWith("album/") &&
