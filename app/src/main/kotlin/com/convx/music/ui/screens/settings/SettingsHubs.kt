@@ -160,9 +160,9 @@ object SettingsHubs {
                 "Theme & colors",
                 listOf(
                     SettingsLink("Theme", R.drawable.palette, { systemPurple }, route("settings/appearance/theme"), "Accent, dark mode and pure black", "dark light accent color"),
-                    SettingsLink("Presets", R.drawable.palette, { systemPink }, route("settings/appearance/presets"), "Ready-made looks"),
+                    SettingsLink("Presets", R.drawable.grid_view, { systemPink }, route("settings/appearance/presets"), "Ready-made looks"),
                     SettingsLink("Make your own", R.drawable.edit, { systemOrange }, route("settings/appearance/diy"), "Design a theme from scratch", "diy"),
-                    SettingsLink("Liquid Glass", R.drawable.palette, { systemCyan }, route("settings/appearance/liquidglass"), "Blur, tint, highlights and lens", "glass blur"),
+                    SettingsLink("Liquid Glass", R.drawable.gradient, { systemCyan }, route("settings/appearance/liquidglass"), "Blur, tint, highlights and lens", "glass blur"),
                 ),
             ),
             SettingsLinkGroup(
@@ -172,7 +172,7 @@ object SettingsHubs {
                     SettingsLink("App icon", R.drawable.convx_logo, { systemBlue }, route("settings/appearance/appicon"), "Home screen icon"),
                     SettingsLink("Layout & home", R.drawable.sliders, { systemGreen }, route("settings/appearance"),
                         "Language, default tab, density, home", "language default tab density refresh rate"),
-                    SettingsLink("Home feed order", R.drawable.sliders, { systemOrange }, route("settings/home_feed_order"), "Arrange home sections"),
+                    SettingsLink("Home feed order", R.drawable.drag_handle, { systemOrange }, route("settings/home_feed_order"), "Arrange home sections"),
                 ),
             ),
             SettingsLinkGroup(
