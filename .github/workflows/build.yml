@@ -206,6 +206,9 @@ jobs:
         run: |
           ./gradlew :app:testUniversalFossDebugUnitTest --no-configuration-cache --console=plain --warning-mode summary
 
+      - name: Test SoundCloud client
+        run: ./gradlew :innertube:testDebugUnitTest --no-configuration-cache --console=plain
+
       - name: Upload unit test report
         if: failure()
         uses: actions/upload-artifact@v4
