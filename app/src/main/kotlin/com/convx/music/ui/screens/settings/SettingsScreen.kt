@@ -217,6 +217,10 @@ private fun rememberSearchEntries(): List<SearchEntry> {
                 hub.groups.flatMap { g -> g.links.map { SearchEntry(it, hub.title) } }
         }
         val treeTitles = fromTree.map { it.link.title.lowercase() }.toSet()
+        // A setting is also found by the name of the page it lives on: "ambient" finds every Ambient Mode setting.
+        val pageTitleByRoute = fromTree
+            .mapNotNull { e -> (e.link.action as? SettingsAction.Route)?.let { it.route to e.link.title } }
+            .toMap()
         fromTree + settings.filter { it.title.lowercase() !in treeTitles }.map { s ->
             SearchEntry(
                 SettingsLink(
@@ -229,7 +233,7 @@ private fun rememberSearchEntries(): List<SearchEntry> {
                         else -> SettingsAction.Route(s.route)
                     },
                     s.description,
-                    s.keywords,
+                    listOfNotNull(s.keywords.ifBlank { null }, pageTitleByRoute[s.route]).joinToString(" "),
                 ),
                 s.category,
             )
@@ -279,11 +283,8 @@ private fun LocalOnlyRow() {
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            Modifier.size(30.dp).clip(ContinuousRoundedRectangle(7.dp)).background(IosTheme.colors.systemOrange),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(painterResource(R.drawable.music_note), null, tint = Color.White, modifier = Modifier.size(18.dp))
+        Box(Modifier.size(30.dp), contentAlignment = Alignment.Center) {
+            Icon(painterResource(R.drawable.music_note), null, tint = IosTheme.colors.label, modifier = Modifier.size(22.dp))
         }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {

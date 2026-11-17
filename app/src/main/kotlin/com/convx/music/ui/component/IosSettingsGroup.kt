@@ -147,8 +147,9 @@ private fun IosSettingsItemRow(item: IosSettingsItem) {
 }
 
 /**
- * The filled rounded-square glyph tile iOS puts at the head of a settings row — the
- * icon sits on the accent, not tinted into a faint container.
+ * The glyph at the head of a settings row: a single-colour icon straight on the row, no filled
+ * tile behind it. It uses the label colour, so it follows the light and dark theme on its own.
+ * The slot keeps the old tile size so titles and dividers stay where they were.
  */
 @Composable
 private fun IosSettingsIconTile(icon: Painter, item: IosSettingsItem) {
@@ -157,23 +158,14 @@ private fun IosSettingsIconTile(icon: Painter, item: IosSettingsItem) {
     Box(contentAlignment = Alignment.TopEnd) {
         if (item.tintIcon) {
             Box(
-                modifier = Modifier
-                    .size(IosMetrics.IconTileSize)
-                    .clip(item.iconShape ?: ContinuousRoundedRectangle(IosMetrics.IconTileRadius))
-                    .background(
-                        when {
-                            !item.enabled -> colors.systemGray3
-                            item.isHighlighted -> IosTheme.tint
-                            else -> IosTheme.tint.copy(alpha = 0.9f)
-                        }
-                    ),
+                modifier = Modifier.size(IosMetrics.IconTileSize),
                 contentAlignment = Alignment.Center,
             ) {
                 Image(
                     painter = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    colorFilter = ColorFilter.tint(Color.White),
+                    modifier = Modifier.size(22.dp),
+                    colorFilter = ColorFilter.tint(if (item.enabled) colors.label else colors.systemGray3),
                 )
             }
         } else {
