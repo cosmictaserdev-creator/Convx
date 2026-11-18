@@ -83,7 +83,6 @@ internal object AppRoutePolicy {
         "song_insight/",
     )
 
-
     fun isTabRoot(route: String?) = route != null && route in tabRootRoutes
     fun isWebViewRoute(route: String?) = route != null && route in webViewRoutes
     fun showsNavigation(route: String?) = route == null || route !in routesWithoutNavigation

@@ -303,9 +303,14 @@ fun GlassEffectSettings(
         textColor = textColor,
     )
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.liquid_glass_settings),
+        titleAlpha = 1f,
+        onBack = navController::navigateUp,
+        onBackLongClick = navController::backToMain,
+    ) { chrome ->
     Column(
-        Modifier
+        Modifier.then(chrome.contentModifier())
             .widthIn(max = 720.dp)
             .fillMaxSize()
             .windowInsetsPadding(LocalPlayerAwareWindowInsets.current)
@@ -1023,18 +1028,7 @@ fun GlassEffectSettings(
 
     }
 
-    TopAppBar(
-            windowInsets = appTopBarWindowInsets(),
-        title = { Text(stringResource(R.string.liquid_glass_settings)) },
-        navigationIcon = {
-            AppIconButton(
-                onClick = navController::navigateUp,
-                onLongClick = navController::backToMain,
-            ) {
-                SymbolIcon(symbol = sf("arrow.left"), contentDescription = null)
-            }
-        }
-    )
+
 }
 
 /**

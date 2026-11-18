@@ -87,7 +87,6 @@ fun ScreenChromeBox(
         TopFadeBlur(
             hazeState = chrome.hazeState,
             pageColor = pageColor,
-            backdrop = chrome.backdrop,
             modifier = Modifier.align(Alignment.TopCenter),
         )
 

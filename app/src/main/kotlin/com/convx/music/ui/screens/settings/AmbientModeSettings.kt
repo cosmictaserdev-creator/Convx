@@ -168,8 +168,14 @@ fun AmbientModeSettings(
         defaultValue = true,
     )
 
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.ambient_mode),
+        titleAlpha = 1f,
+        onBack = navController::navigateUp,
+        onBackLongClick = navController::backToMain,
+    ) { chrome ->
     Column(
-        modifier = Modifier
+        modifier = Modifier.then(chrome.contentModifier())
             .windowInsetsPadding(
                 LocalPlayerAwareWindowInsets.current.only(
                     WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom,
@@ -543,22 +549,8 @@ fun AmbientModeSettings(
         Spacer(Modifier.height(36.dp))
     }
 
-    TopAppBar(
-        windowInsets = appTopBarWindowInsets(),
-        scrollBehavior = scrollBehavior,
-        title = { Text(stringResource(R.string.ambient_mode)) },
-        navigationIcon = {
-            IconButton(
-                onClick = navController::navigateUp,
-                onLongClick = navController::backToMain,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.arrow_back),
-                    contentDescription = null,
-                )
-            }
-        },
-    )
+
+    }
 }
 
 @Composable

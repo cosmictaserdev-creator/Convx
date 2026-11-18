@@ -230,11 +230,16 @@ fun PlayerThemeScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.player_theme),
+        titleAlpha = 1f,
+        onBack = navController::navigateUp,
+        onBackLongClick = navController::backToMain,
+    ) { chrome ->
     Column(
         // Scroll first, then pad: the padding belongs to the content, so rows travel under the
         // top bar and the side bar instead of being cut off at their edges.
-        Modifier
+        Modifier.then(chrome.contentModifier())
             .widthIn(max = 720.dp)
             .verticalScroll(rememberScrollState())
             .windowInsetsPadding(LocalPlayerAwareWindowInsets.current),
@@ -458,19 +463,7 @@ fun PlayerThemeScreen(
         )
     }
 
-    TopAppBar(
-            windowInsets = appTopBarWindowInsets(),
-        title = { Text(stringResource(R.string.player_theme)) },
-        navigationIcon = {
-            AppIconButton(
-                onClick = navController::navigateUp,
-                onLongClick = navController::backToMain,
-            ) {
-                SymbolIcon(symbol = sf("arrow.left"), contentDescription = null)
-            }
-        },
-        scrollBehavior = scrollBehavior,
-    )
+
 }
 
 @Composable
