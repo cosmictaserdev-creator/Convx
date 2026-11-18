@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFInsetFilledLefthalfArrowLeftRectangle (monochrome)
+ * Viewport: 29.9512 x 22.959
+ */
+public val SfSymbols.Monochrome.SFInsetFilledLefthalfArrowLeftRectangle: ImageVector
+    get() {
+        if (_sFInsetFilledLefthalfArrowLeftRectangle != null) {
+            return _sFInsetFilledLefthalfArrowLeftRectangle!!
+        }
+        _sFInsetFilledLefthalfArrowLeftRectangle = sfIcon(
+            name = "Monochrome.SFInsetFilledLefthalfArrowLeftRectangle",
+            viewportWidth = 29.9512f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L25.7812 22.959C28.3105 22.959 29.5898 21.6797 29.5898 19.1992L29.5898 3.76953C29.5898 1.2793 28.3105 0 25.7812 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L25.752 1.72852C27.0898 1.72852 27.8516 2.46094 27.8516 3.85742L27.8516 19.1016C27.8516 20.5078 27.0898 21.2305 25.752 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M4.51172 19.668L13.584 19.668C14.4434 19.668 14.8145 19.2871 14.8145 18.4277L14.8145 4.54102C14.8145 3.67188 14.4434 3.29102 13.584 3.29102L4.51172 3.29102C3.66211 3.29102 3.29102 3.67188 3.29102 4.54102L3.29102 18.4277C3.29102 19.2871 3.66211 19.668 4.51172 19.668Z", fillAlpha = 0.85f)
+            addSfPath("M16.8359 11.4746C16.8359 11.6699 16.9043 11.8066 17.0898 12.0117L20.5957 15.7031C20.752 15.8887 20.918 15.9961 21.1621 15.9961C21.543 15.9961 21.8164 15.7129 21.8164 15.3125C21.8164 15.127 21.748 14.9316 21.6016 14.7949L20.3125 13.5156L18.1738 11.4746L20.3125 9.42383L21.6016 8.1543C21.748 8.01758 21.8164 7.82227 21.8164 7.63672C21.8164 7.23633 21.543 6.94336 21.1621 6.94336C20.918 6.94336 20.752 7.06055 20.5957 7.23633L17.0898 10.9375C16.9043 11.123 16.8359 11.2793 16.8359 11.4746ZM25.4395 11.4746C25.4492 11.0742 25.1074 10.7324 24.7266 10.7324L20.9473 10.7324L18.0273 10.8105C17.6562 10.8203 17.3633 11.1035 17.3633 11.4746C17.3633 11.8359 17.6562 12.1289 18.0273 12.1387L20.9473 12.207L24.7266 12.207C25.1074 12.207 25.4297 11.8652 25.4395 11.4746Z", fillAlpha = 0.85f)
+        }
+        return _sFInsetFilledLefthalfArrowLeftRectangle!!
+    }
+
+private var _sFInsetFilledLefthalfArrowLeftRectangle: ImageVector? = null

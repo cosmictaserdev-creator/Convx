@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureFallCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFFigureFallCircleFill: ImageVector
+    get() {
+        if (_sFFigureFallCircleFill != null) {
+            return _sFFigureFallCircleFill!!
+        }
+        _sFFigureFallCircleFill = sfIcon(
+            name = "Monochrome.SFFigureFallCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7266 19.7266 25.4395 12.7148 25.4395C5.71289 25.4395 0 19.7266 0 12.7246C0 5.71289 5.71289 0 12.7148 0C19.7266 0 25.4395 5.71289 25.4395 12.7246ZM13.5742 6.31836L12.8613 8.75L6.63086 11.4941C6.21094 11.6797 6.06445 11.9922 6.14258 12.4609L6.57227 15.0879C6.72852 16.0352 8.02734 15.8398 7.88086 14.8926L7.51953 12.627L9.00391 12.041C9.22852 11.9629 9.43359 12.002 9.53125 12.207L10.8887 14.9121C11.2988 15.7227 11.6504 15.9668 11.9727 16.2109L16.3867 19.4531C17.1582 20.0098 18.0664 18.8965 17.207 18.2617L13.7695 15.7422C13.6035 15.6152 13.6133 15.3809 13.8086 15.2832L16.1426 13.9258L19.209 15.3906C20.0684 15.8008 20.7617 14.5996 19.7461 14.1113L16.4844 12.5488C16.0938 12.3633 15.7324 12.4316 15.4102 12.6172L13.8574 13.5156C13.6523 13.623 13.5059 13.5742 13.4277 13.4082L12.1973 10.8984C12.0703 10.6543 12.0996 10.4297 12.3535 10.3125L13.4863 9.78516C13.8574 9.61914 13.9941 9.50195 14.1113 9.14062L14.8145 6.66992C15.0781 5.72266 13.8281 5.40039 13.5742 6.31836ZM7.40234 7.80273C7.40234 8.68164 8.10547 9.38477 8.98438 9.38477C9.86328 9.38477 10.5664 8.68164 10.5664 7.80273C10.5664 6.91406 9.86328 6.2207 8.98438 6.2207C8.10547 6.2207 7.40234 6.91406 7.40234 7.80273Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureFallCircleFill!!
+    }
+
+private var _sFFigureFallCircleFill: ImageVector? = null

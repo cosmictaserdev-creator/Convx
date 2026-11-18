@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCameraMacroCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFCameraMacroCircle: ImageVector
+    get() {
+        if (_sFCameraMacroCircle != null) {
+            return _sFCameraMacroCircle!!
+        }
+        _sFCameraMacroCircle = sfIcon(
+            name = "Monochrome.SFCameraMacroCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M8.87695 6.81641C8.54492 7.54883 8.38867 8.28125 8.38867 9.00391C8.38867 11.4258 10.1074 13.3594 12.7051 13.3594C15.3223 13.3594 17.0312 11.4258 17.0312 9.00391C17.0312 8.28125 16.8848 7.54883 16.5527 6.81641C16.4355 6.52344 16.084 6.48438 15.8594 6.71875L14.3457 8.27148L13.0469 6.5918C12.8711 6.33789 12.5586 6.33789 12.3828 6.5918L11.0742 8.27148L9.55078 6.71875C9.33594 6.48438 8.98438 6.52344 8.87695 6.81641ZM12.2266 20.127C12.2266 20.3906 12.4414 20.5859 12.7051 20.5859C16.0352 20.5859 19.1113 18.5059 20.127 15.5469C20.2637 15.1953 20.1172 14.9316 19.7363 14.9316C16.4258 14.9316 13.916 16.9336 12.9688 19.5801L13.1934 19.7656L13.1934 12.6953L12.2266 12.6953ZM11.5332 17.9199C10.3125 16.1426 8.22266 14.9316 5.67383 14.9316C5.29297 14.9316 5.14648 15.1953 5.27344 15.5469C6.18164 18.1836 8.70117 20.1172 11.6016 20.4883C11.5625 20.3809 11.5332 20.2539 11.5332 20.127Z", fillAlpha = 0.85f)
+        }
+        return _sFCameraMacroCircle!!
+    }
+
+private var _sFCameraMacroCircle: ImageVector? = null

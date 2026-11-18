@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBackpackCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFBackpackCircle: ImageVector
+    get() {
+        if (_sFBackpackCircle != null) {
+            return _sFBackpackCircle!!
+        }
+        _sFBackpackCircle = sfIcon(
+            name = "Monochrome.SFBackpackCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M10.7031 20.4102L14.707 20.4102C16.9336 20.4102 18.0273 19.2969 18.0078 17.0312C17.9785 14.4043 17.959 12.4902 17.9004 11.0645C17.7148 6.89453 16.5723 5.69336 12.7051 5.69336C8.84766 5.69336 7.69531 6.89453 7.51953 11.0645C7.45117 12.4902 7.43164 14.4043 7.40234 17.0312C7.38281 19.2969 8.47656 20.4102 10.7031 20.4102ZM10.5762 17.832C10.0195 17.832 9.66797 17.4707 9.66797 16.9141L9.66797 13.6426C9.66797 13.0957 10.0195 12.7246 10.5762 12.7246L14.8438 12.7246C15.4004 12.7246 15.752 13.0957 15.752 13.6426L15.752 16.9141C15.752 17.4707 15.4004 17.832 14.8438 17.832ZM9.66797 15.2539L15.752 15.2539L15.752 14.4824L9.66797 14.4824ZM12.7051 4.19922C11.5234 4.19922 10.6738 5.03906 10.6738 6.16211L11.5527 6.16211C11.5527 5.53711 12.041 5.07812 12.7051 5.07812C13.3691 5.07812 13.8574 5.53711 13.8574 6.16211L14.7363 6.16211C14.7363 5.03906 13.8867 4.19922 12.7051 4.19922Z", fillAlpha = 0.85f)
+        }
+        return _sFBackpackCircle!!
+    }
+
+private var _sFBackpackCircle: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFExclamationmarkMessage (monochrome)
+ * Viewport: 29.2871 x 25.9863
+ */
+public val SfSymbols.Monochrome.SFExclamationmarkMessage: ImageVector
+    get() {
+        if (_sFExclamationmarkMessage != null) {
+            return _sFExclamationmarkMessage!!
+        }
+        _sFExclamationmarkMessage = sfIcon(
+            name = "Monochrome.SFExclamationmarkMessage",
+            viewportWidth = 29.2871f,
+            viewportHeight = 25.9863f
+        ) {
+            addSfPath("M14.4629 24.1602C22.8223 24.1602 28.9258 19.082 28.9258 12.0801C28.9258 5.05859 22.8125 0 14.4629 0C6.10352 0 0 5.05859 0 12.0801C0 14.3945 0.673828 16.543 1.875 18.3008C2.48047 19.209 2.70508 19.8535 2.70508 20.4004C2.70508 21.123 2.46094 21.6602 1.875 22.1875C0.986328 22.9297 1.43555 24.1602 2.59766 24.1602C4.16016 24.1602 5.9082 23.584 7.1875 22.6953C9.30664 23.6523 11.7871 24.1602 14.4629 24.1602ZM14.4629 22.4316C12.0117 22.4316 9.80469 21.9629 7.94922 21.123C7.26562 20.8105 6.74805 20.8984 6.08398 21.2988C5.42969 21.7285 4.60938 22.0801 3.81836 22.1973C4.17969 21.709 4.43359 21.1621 4.43359 20.4004C4.43359 19.502 4.10156 18.5059 3.32031 17.3242C2.29492 15.8398 1.72852 14.043 1.72852 12.0801C1.72852 6.09375 7.00195 1.72852 14.4629 1.72852C21.9238 1.72852 27.1973 6.09375 27.1973 12.0801C27.1973 18.0566 21.9238 22.4316 14.4629 22.4316Z", fillAlpha = 0.85f)
+            addSfPath("M14.4531 14.3457C14.9707 14.3457 15.2832 14.0332 15.293 13.457L15.4492 6.74805C15.459 6.18164 15.0293 5.76172 14.4434 5.76172C13.8477 5.76172 13.4277 6.17188 13.4375 6.73828L13.5938 13.457C13.6035 14.0234 13.9062 14.3457 14.4531 14.3457ZM14.4531 18.3105C15.1172 18.3105 15.6934 17.7832 15.6934 17.1191C15.6934 16.4453 15.127 15.918 14.4531 15.918C13.7695 15.918 13.2129 16.4551 13.2129 17.1191C13.2129 17.7734 13.7793 18.3105 14.4531 18.3105Z", fillAlpha = 0.85f)
+        }
+        return _sFExclamationmarkMessage!!
+    }
+
+private var _sFExclamationmarkMessage: ImageVector? = null

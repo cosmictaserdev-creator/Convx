@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowLeftAndRightSquareFill (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFArrowLeftAndRightSquareFill: ImageVector
+    get() {
+        if (_sFArrowLeftAndRightSquareFill != null) {
+            return _sFArrowLeftAndRightSquareFill!!
+        }
+        _sFArrowLeftAndRightSquareFill = sfIcon(
+            name = "Monochrome.SFArrowLeftAndRightSquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M22.959 3.76953L22.959 19.1992C22.959 21.6797 21.6797 22.959 19.1504 22.959L3.79883 22.959C1.2793 22.959 0 21.6992 0 19.1992L0 3.76953C0 1.26953 1.2793 0 3.79883 0L19.1504 0C21.6797 0 22.959 1.2793 22.959 3.76953ZM13.8672 7.62695C13.8672 7.88086 13.9551 8.06641 14.1113 8.23242L15.2344 9.33594L16.8444 10.7026L14.2969 10.625L8.71094 10.625L6.16337 10.7026L7.77344 9.33594L8.89648 8.23242C9.05273 8.06641 9.14062 7.88086 9.14062 7.62695C9.14062 7.16797 8.80859 6.81641 8.34961 6.81641C8.11523 6.81641 7.90039 6.91406 7.76367 7.05078L4.00391 10.8203C3.79883 11.0156 3.69141 11.2305 3.69141 11.4746C3.69141 11.709 3.79883 11.9336 4.00391 12.1191L7.76367 15.8887C7.91016 16.0449 8.11523 16.1328 8.34961 16.1328C8.80859 16.1328 9.14062 15.7715 9.14062 15.3125C9.14062 15.0684 9.05273 14.873 8.89648 14.7168L7.77344 13.6133L6.15143 12.2365L8.71094 12.3145L14.2969 12.3145L16.8564 12.2365L15.2344 13.6133L14.1113 14.7168C13.9551 14.873 13.8672 15.0684 13.8672 15.3125C13.8672 15.7715 14.209 16.1328 14.6582 16.1328C14.9023 16.1328 15.0977 16.0449 15.2441 15.8887L19.0039 12.1191C19.209 11.9336 19.3164 11.709 19.3164 11.4746C19.3164 11.2305 19.209 11.0156 19.0039 10.8203L15.2441 7.05078C15.1074 6.91406 14.9023 6.81641 14.6582 6.81641C14.209 6.81641 13.8672 7.16797 13.8672 7.62695Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowLeftAndRightSquareFill!!
+    }
+
+private var _sFArrowLeftAndRightSquareFill: ImageVector? = null

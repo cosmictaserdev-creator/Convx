@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFVolleyball (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFVolleyball: ImageVector
+    get() {
+        if (_sFVolleyball != null) {
+            return _sFVolleyball!!
+        }
+        _sFVolleyball = sfIcon(
+            name = "Dualtone.SFVolleyball",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M17.9688 23.877L18.2715 22.4805C15.3711 22.3828 13.3789 17.7246 12.9297 13.7402C17.8418 9.28711 21.2305 3.75 18.7012 1.61133L17.7734 2.68555C19.3066 3.97461 16.6309 8.44727 12.002 12.6562C7.4707 10.7129 2.74414 10 0.46875 12.6074L1.49414 13.4082C3.20312 11.582 7.1582 12.1191 11.5137 14.0234C12.0215 18.1641 14.2578 23.5938 17.9688 23.877ZM14.7363 20.0098C23.0859 14.9316 24.2871 8.49609 23.6523 6.38672L22.2852 6.79688C22.7734 8.42773 21.7285 14.209 13.8379 18.9062ZM11.4062 25.127L12.4609 23.9844C10.3809 23.3008 5.9668 19.043 5.76172 11.7969L4.32617 11.9238C4.54102 19.1309 8.79883 23.8281 11.4062 25.127ZM16.1621 8.55469L16.8262 7.29492C13.3887 4.79492 6.94336 2.86133 2.22656 6.11328L2.27539 7.63672C6.54297 4.29688 12.7148 6.07422 16.1621 8.55469ZM12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0ZM12.7148 1.48438C18.9258 1.48438 23.9551 6.51367 23.9551 12.7246C23.9551 18.9258 18.9258 23.9551 12.7148 23.9551C6.51367 23.9551 1.48438 18.9258 1.48438 12.7246C1.48438 6.51367 6.51367 1.48438 12.7148 1.48438Z", fillAlpha = 0.85f)
+        }
+        return _sFVolleyball!!
+    }
+
+private var _sFVolleyball: ImageVector? = null

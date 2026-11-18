@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTableFurniture (dualtone)
+ * Viewport: 29.7656 x 19.0137
+ */
+public val SfSymbols.Dualtone.SFTableFurniture: ImageVector
+    get() {
+        if (_sFTableFurniture != null) {
+            return _sFTableFurniture!!
+        }
+        _sFTableFurniture = sfIcon(
+            name = "Dualtone.SFTableFurniture",
+            viewportWidth = 29.7656f,
+            viewportHeight = 19.0137f
+        ) {
+            addSfPath("M0 1.13281L0 4.75586C0 5.42969 0.429688 5.85938 1.10352 5.85938L28.3008 5.85938C28.9746 5.85938 29.4043 5.42969 29.4043 4.75586L29.4043 1.13281C29.4043 0.449219 28.9746 0.0195312 28.3008 0.0195312L1.10352 0.0195312C0.429688 0.0195312 0 0.449219 0 1.13281ZM1.72852 2.10938C1.72852 1.9043 1.88477 1.74805 2.08008 1.74805L27.3242 1.74805C27.5195 1.74805 27.6758 1.9043 27.6758 2.10938L27.6758 3.7793C27.6758 3.97461 27.5195 4.13086 27.3242 4.13086L2.08008 4.13086C1.88477 4.13086 1.72852 3.97461 1.72852 3.7793ZM1.11328 19.0137L4.73633 19.0137C5.41016 19.0137 5.83984 18.5742 5.83984 17.9004L5.83984 4.72656L4.11133 4.72656L4.11133 16.9531C4.11133 17.1484 3.95508 17.3047 3.75 17.3047L2.08984 17.3047C1.88477 17.3047 1.72852 17.1484 1.72852 16.9531L1.72852 4.43359L0 4.43359L0 17.9004C0 18.5742 0.429688 19.0137 1.11328 19.0137ZM24.668 19.0137L28.291 19.0137C28.9746 19.0137 29.4043 18.5742 29.4043 17.9004L29.4043 4.43359L27.6758 4.43359L27.6758 16.9531C27.6758 17.1484 27.5195 17.3047 27.3145 17.3047L25.6543 17.3047C25.4492 17.3047 25.293 17.1484 25.293 16.9531L25.293 4.72656L23.5645 4.72656L23.5645 17.9004C23.5645 18.5742 23.9941 19.0137 24.668 19.0137Z", fillAlpha = 0.85f)
+        }
+        return _sFTableFurniture!!
+    }
+
+private var _sFTableFurniture: ImageVector? = null

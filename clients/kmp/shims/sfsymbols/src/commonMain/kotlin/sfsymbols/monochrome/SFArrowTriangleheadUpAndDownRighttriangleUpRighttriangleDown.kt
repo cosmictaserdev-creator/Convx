@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown (monochrome)
+ * Viewport: 27.4805 x 28.7793
+ */
+public val SfSymbols.Monochrome.SFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown: ImageVector
+    get() {
+        if (_sFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown != null) {
+            return _sFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown!!
+        }
+        _sFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown = sfIcon(
+            name = "Monochrome.SFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown",
+            viewportWidth = 27.4805f,
+            viewportHeight = 28.7793f
+        ) {
+            addSfPath("M27.1191 27.0703L27.1191 17.1191C27.1191 15.6934 26.4941 15.0586 25.0586 15.0586L9.98047 15.0586C9.02344 15.0586 8.49609 15.7617 8.49609 16.5527C8.49609 17.0801 8.74023 17.5781 9.25781 17.9395L24.4434 28.4082C24.8047 28.6523 25.2246 28.7598 25.6055 28.7598C26.416 28.7598 27.1191 28.2227 27.1191 27.0703ZM25.3711 26.4551C25.3711 26.6406 25.1953 26.6699 25.0684 26.582L10.8398 17.0312C10.7227 16.9629 10.7617 16.8262 10.8984 16.8262L24.8438 16.8262C25.2832 16.8262 25.3711 16.9141 25.3711 17.3438ZM27.1191 1.68945C27.1191 0.537109 26.416 0 25.6055 0C25.2246 0 24.8047 0.107422 24.4434 0.351562L9.25781 10.8203C8.74023 11.1816 8.49609 11.6797 8.49609 12.2168C8.49609 12.998 9.02344 13.7012 9.98047 13.7012L25.0586 13.7012C26.4941 13.7012 27.1191 13.0762 27.1191 11.6406ZM25.3711 2.31445L25.3711 11.416C25.3711 11.8555 25.2832 11.9434 24.8438 11.9434L10.8984 11.9434C10.7617 11.9434 10.7227 11.8066 10.8398 11.7285L25.0684 2.17773C25.1953 2.08984 25.3711 2.11914 25.3711 2.31445Z", fillAlpha = 0.85f)
+            addSfPath("M0.820312 6.89453L5.74219 6.89453C6.5332 6.89453 6.81641 6.13281 6.33789 5.50781L3.90625 2.25586C3.58398 1.82617 2.96875 1.83594 2.65625 2.25586L0.234375 5.50781C-0.244141 6.13281 0.0390625 6.89453 0.820312 6.89453ZM3.29102 24.0918C3.64258 24.0918 3.93555 23.7988 3.93555 23.4473L3.93555 5.3125C3.93555 4.9707 3.64258 4.67773 3.29102 4.67773C2.93945 4.67773 2.64648 4.9707 2.64648 5.3125L2.64648 23.4473C2.64648 23.7988 2.93945 24.0918 3.29102 24.0918ZM0.820312 21.8652C0.0390625 21.8652-0.244141 22.627 0.234375 23.2617L2.65625 26.5039C2.97852 26.9434 3.58398 26.9336 3.90625 26.5039L6.33789 23.2617C6.79688 22.6465 6.55273 21.8652 5.74219 21.8652Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown!!
+    }
+
+private var _sFArrowTriangleheadUpAndDownRighttriangleUpRighttriangleDown: ImageVector? = null

@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArchivebox (monochrome)
+ * Viewport: 25.332 x 22.9785
+ */
+public val SfSymbols.Monochrome.SFArchivebox: ImageVector
+    get() {
+        if (_sFArchivebox != null) {
+            return _sFArchivebox!!
+        }
+        _sFArchivebox = sfIcon(
+            name = "Monochrome.SFArchivebox",
+            viewportWidth = 25.332f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M5.51758 22.9785L19.4434 22.9785C21.8457 22.9785 23.1348 21.7285 23.1348 19.3359L23.1348 5.84961L21.3965 5.84961L21.3965 19.4043C21.3965 20.6641 20.6934 21.3477 19.4531 21.3477L5.51758 21.3477C4.24805 21.3477 3.56445 20.6641 3.56445 19.4043L3.56445 5.84961L1.83594 5.84961L1.83594 19.3359C1.83594 21.7383 3.125 22.9785 5.51758 22.9785ZM8.27148 11.6797L16.6992 11.6797C17.207 11.6797 17.5391 11.3379 17.5391 10.8203L17.5391 10.4395C17.5391 9.91211 17.207 9.58984 16.6992 9.58984L8.27148 9.58984C7.77344 9.58984 7.44141 9.91211 7.44141 10.4395L7.44141 10.8203C7.44141 11.3379 7.77344 11.6797 8.27148 11.6797ZM2.24609 6.64062L22.7246 6.64062C24.1699 6.64062 24.9707 5.72266 24.9707 4.29688L24.9707 2.37305C24.9707 0.9375 24.1699 0.0292969 22.7246 0.0292969L2.24609 0.0292969C0.859375 0.0292969 0 0.9375 0 2.37305L0 4.29688C0 5.72266 0.800781 6.64062 2.24609 6.64062ZM2.64648 5.00977C2.01172 5.00977 1.72852 4.70703 1.72852 4.0625L1.72852 2.59766C1.72852 1.96289 2.01172 1.66016 2.64648 1.66016L22.334 1.66016C22.9688 1.66016 23.2422 1.96289 23.2422 2.59766L23.2422 4.0625C23.2422 4.70703 22.9688 5.00977 22.334 5.00977Z", fillAlpha = 0.85f)
+        }
+        return _sFArchivebox!!
+    }
+
+private var _sFArchivebox: ImageVector? = null

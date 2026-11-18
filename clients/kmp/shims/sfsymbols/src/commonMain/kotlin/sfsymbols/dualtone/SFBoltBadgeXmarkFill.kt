@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBoltBadgeXmarkFill (dualtone)
+ * Viewport: 31.4258 x 31.3184
+ */
+public val SfSymbols.Dualtone.SFBoltBadgeXmarkFill: ImageVector
+    get() {
+        if (_sFBoltBadgeXmarkFill != null) {
+            return _sFBoltBadgeXmarkFill!!
+        }
+        _sFBoltBadgeXmarkFill = sfIcon(
+            name = "Dualtone.SFBoltBadgeXmarkFill",
+            viewportWidth = 31.4258f,
+            viewportHeight = 31.3184f
+        ) {
+            addSfPath("M20.0391 2.96875L16.2402 13.2422L23.4082 13.2422C23.8672 13.2422 24.1699 13.5645 24.1699 13.9648C24.1699 14.2188 24.0625 14.4434 23.877 14.6875L23.1582 15.5867C19.0208 15.7874 15.6738 19.2548 15.6738 23.4375C15.6738 23.9002 15.7143 24.3538 15.7998 24.7926L12.4805 28.9453C11.7383 29.8633 10.5762 29.2773 11.0059 28.1445L14.7949 17.8613L7.63672 17.8613C7.17773 17.8613 6.86523 17.5488 6.86523 17.1484C6.86523 16.8945 6.98242 16.6699 7.16797 16.4258L18.5645 2.16797C19.3066 1.24023 20.4688 1.82617 20.0391 2.96875Z", fillAlpha = 0.425f)
+            addSfPath("M29.8633 23.4375C29.8633 26.8945 26.9824 29.7559 23.5547 29.7559C20.0977 29.7559 17.2363 26.9141 17.2363 23.4375C17.2363 19.9805 20.0977 17.1289 23.5547 17.1289C27.0215 17.1289 29.8633 19.9707 29.8633 23.4375ZM25.4492 20.4785L23.5352 22.4023L21.7383 20.625C21.4648 20.3613 21.0352 20.3516 20.752 20.625C20.4688 20.8887 20.4785 21.3379 20.752 21.6211L22.5293 23.4082L20.6055 25.332C20.3027 25.6348 20.3418 26.084 20.625 26.3672C20.918 26.6602 21.3672 26.6895 21.6699 26.3965L23.5938 24.4727L25.3809 26.25C25.6543 26.5234 26.0938 26.5234 26.377 26.25C26.6504 25.9766 26.6504 25.5371 26.377 25.2539L24.5996 23.4668L26.5137 21.5527C26.8164 21.25 26.7773 20.791 26.4844 20.5078C26.2012 20.2344 25.752 20.1758 25.4492 20.4785Z", fillAlpha = 0.85f)
+        }
+        return _sFBoltBadgeXmarkFill!!
+    }
+
+private var _sFBoltBadgeXmarkFill: ImageVector? = null

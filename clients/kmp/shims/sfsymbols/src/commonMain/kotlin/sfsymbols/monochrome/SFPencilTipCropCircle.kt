@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPencilTipCropCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFPencilTipCropCircle: ImageVector
+    get() {
+        if (_sFPencilTipCropCircle != null) {
+            return _sFPencilTipCropCircle!!
+        }
+        _sFPencilTipCropCircle = sfIcon(
+            name = "Monochrome.SFPencilTipCropCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7461 19.7363 25.4395 12.7148 25.4395C5.69336 25.4395 0 19.7461 0 12.7246C0 5.70312 5.69336 0 12.7148 0C19.7363 0 25.4395 5.70312 25.4395 12.7246ZM1.81641 12.7246C1.81641 16.6522 3.88689 20.0901 7.00439 21.9976L6.875 22.5977C6.78711 22.9785 7.05078 23.3496 7.42188 23.4277C7.8125 23.4961 8.18359 23.2617 8.26172 22.8906L8.30555 22.6883C9.65052 23.2916 11.1435 23.623 12.7148 23.623C14.2932 23.623 15.7924 23.2887 17.1418 22.6798L17.1875 22.8906C17.2559 23.2227 17.5586 23.4473 17.9102 23.4375C18.2422 23.4277 18.6719 23.0371 18.584 22.5977L18.4504 21.9824C21.5539 20.0716 23.6133 16.6416 23.6133 12.7246C23.6133 6.69922 18.7402 1.82617 12.7148 1.82617C6.68945 1.82617 1.81641 6.69922 1.81641 12.7246Z", fillAlpha = 0.85f)
+            addSfPath("M11.9922 6.99219L9.66797 14.0332L15.7812 14.0332L13.457 6.99219C13.2129 6.26953 12.2363 6.26953 11.9922 6.99219ZM17.9102 23.4375C18.2422 23.4277 18.6719 23.0371 18.584 22.5977L16.7969 14.3652C16.6797 13.7988 16.2109 13.3789 15.6641 13.3789L9.78516 13.3789C9.23828 13.3789 8.7793 13.7988 8.65234 14.3555L6.875 22.5977C6.78711 22.9785 7.05078 23.3496 7.42188 23.4277C7.8125 23.4961 8.18359 23.2617 8.26172 22.8906L10.0391 14.6875L9.86328 14.7949L15.5859 14.7949L15.4102 14.6875L17.1875 22.8906C17.2559 23.2227 17.5586 23.4473 17.9102 23.4375Z", fillAlpha = 0.85f)
+        }
+        return _sFPencilTipCropCircle!!
+    }
+
+private var _sFPencilTipCropCircle: ImageVector? = null

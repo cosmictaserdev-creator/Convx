@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBanknoteFill (monochrome)
+ * Viewport: 33.0176 x 20.3809
+ */
+public val SfSymbols.Monochrome.SFBanknoteFill: ImageVector
+    get() {
+        if (_sFBanknoteFill != null) {
+            return _sFBanknoteFill!!
+        }
+        _sFBanknoteFill = sfIcon(
+            name = "Monochrome.SFBanknoteFill",
+            viewportWidth = 33.0176f,
+            viewportHeight = 20.3809f
+        ) {
+            addSfPath("M3.38867 16.709C3.38867 16.8945 3.48633 16.9824 3.66211 16.9824L13.6328 16.9824C12.2266 15.6836 11.3867 13.2617 11.3867 10.1758C11.3867 7.09961 12.2168 4.69727 13.6133 3.39844L3.66211 3.39844C3.48633 3.39844 3.38867 3.48633 3.38867 3.67188ZM12.7051 10.1758C12.7051 14.1309 14.1406 16.7773 16.2891 16.7773C18.4863 16.7773 19.9609 14.1309 19.9609 10.1758C19.9609 6.2207 18.4863 3.58398 16.2891 3.58398C14.1406 3.58398 12.7051 6.2207 12.7051 10.1758ZM19.0039 16.9824L28.9844 16.9824C29.1602 16.9824 29.2578 16.8945 29.2578 16.709L29.2578 3.67188C29.2578 3.48633 29.1602 3.39844 28.9844 3.39844L19.0137 3.39844C20.4297 4.69727 21.2695 7.09961 21.2695 10.1758C21.2695 13.2617 20.4199 15.6836 19.0039 16.9824Z", fillAlpha = 0.85f)
+            addSfPath("M0 19.4629C0 20.0195 0.361328 20.3711 0.908203 20.3711L31.7383 20.3711C32.2949 20.3711 32.6562 20.0195 32.6562 19.4629L32.6562 0.908203C32.6562 0.361328 32.2949 0 31.7383 0L0.908203 0C0.361328 0 0 0.361328 0 0.908203ZM2.22656 17.4609L2.22656 2.91992C2.22656 2.4707 2.48047 2.22656 2.90039 2.22656L29.7461 2.22656C30.1758 2.22656 30.4297 2.4707 30.4297 2.91992L30.4297 17.4609C30.4297 17.9004 30.1758 18.1445 29.7461 18.1445L2.90039 18.1445C2.48047 18.1445 2.22656 17.9004 2.22656 17.4609Z", fillAlpha = 0.85f)
+        }
+        return _sFBanknoteFill!!
+    }
+
+private var _sFBanknoteFill: ImageVector? = null

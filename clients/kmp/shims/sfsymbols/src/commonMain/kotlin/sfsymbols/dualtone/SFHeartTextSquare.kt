@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHeartTextSquare (dualtone)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Dualtone.SFHeartTextSquare: ImageVector
+    get() {
+        if (_sFHeartTextSquare != null) {
+            return _sFHeartTextSquare!!
+        }
+        _sFHeartTextSquare = sfIcon(
+            name = "Dualtone.SFHeartTextSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.425f)
+            addSfPath("M6.21094 3.96484C5.16602 3.96484 4.39453 4.77539 4.39453 5.87891C4.39453 7.57812 6.2207 9.08203 7.46094 9.90234C7.56836 9.9707 7.67578 10.0293 7.75391 10.0293C7.83203 10.0293 7.92969 9.9707 8.03711 9.90234C9.27734 9.14062 11.0938 7.57812 11.0938 5.87891C11.0938 4.77539 10.3223 3.96484 9.24805 3.96484C8.59375 3.96484 8.04688 4.375 7.74414 4.93164C7.43164 4.375 6.89453 3.96484 6.21094 3.96484Z", fillAlpha = 0.85f)
+            addSfPath("M5.08789 14.1406L17.627 14.1406C18.0176 14.1406 18.3105 13.8379 18.3105 13.4473C18.3105 13.0762 18.0176 12.7832 17.627 12.7832L5.08789 12.7832C4.6875 12.7832 4.39453 13.0762 4.39453 13.4473C4.39453 13.8379 4.6875 14.1406 5.08789 14.1406Z", fillAlpha = 0.85f)
+            addSfPath("M5.08789 18.3789L14.209 18.3789C14.5996 18.3789 14.8926 18.0859 14.8926 17.7148C14.8926 17.3242 14.5996 17.0215 14.209 17.0215L5.08789 17.0215C4.6875 17.0215 4.39453 17.3242 4.39453 17.7148C4.39453 18.0859 4.6875 18.3789 5.08789 18.3789Z", fillAlpha = 0.85f)
+        }
+        return _sFHeartTextSquare!!
+    }
+
+private var _sFHeartTextSquare: ImageVector? = null

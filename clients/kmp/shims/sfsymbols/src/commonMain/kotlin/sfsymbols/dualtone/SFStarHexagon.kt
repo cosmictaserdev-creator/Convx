@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFStarHexagon (dualtone)
+ * Viewport: 25.2344 x 27.9248
+ */
+public val SfSymbols.Dualtone.SFStarHexagon: ImageVector
+    get() {
+        if (_sFStarHexagon != null) {
+            return _sFStarHexagon!!
+        }
+        _sFStarHexagon = sfIcon(
+            name = "Dualtone.SFStarHexagon",
+            viewportWidth = 25.2344f,
+            viewportHeight = 27.9248f
+        ) {
+            addSfPath("M1.34766 21.9067L11.0938 27.5513C11.9531 28.0493 12.9297 28.0493 13.7793 27.5513L23.5352 21.9067C24.375 21.4185 24.873 20.5688 24.873 19.5825L24.873 8.32275C24.873 7.34619 24.375 6.48682 23.5352 5.99854L13.7793 0.373535C12.9297-0.124512 11.9531-0.124512 11.0938 0.373535L1.34766 5.99854C0.498047 6.48682 0 7.34619 0 8.32275L0 19.5825C0 20.5688 0.498047 21.4185 1.34766 21.9067ZM1.72852 19.3188L1.72852 8.58643C1.72852 8.07861 1.99219 7.63916 2.43164 7.37549L11.7383 1.99463C12.1777 1.74072 12.6953 1.74072 13.1348 1.99463L22.4414 7.37549C22.8906 7.63916 23.1445 8.07861 23.1445 8.58643L23.1445 19.3188C23.1445 19.8267 22.8906 20.2759 22.4414 20.5298L13.1445 25.9204C12.7051 26.1743 12.1777 26.1743 11.7285 25.9204L2.43164 20.5298C1.99219 20.2759 1.72852 19.8267 1.72852 19.3188Z", fillAlpha = 0.425f)
+            addSfPath("M8.75 20.4419L12.4414 17.7368L16.1328 20.4419C16.7773 20.9204 17.4707 20.4321 17.2168 19.6606L15.7617 15.3052L19.4922 12.6489C20.0586 12.229 19.8926 11.3403 19.0723 11.3501L14.4922 11.3794L13.0957 7.01416C12.8711 6.28174 12.0117 6.28174 11.7773 7.01416L10.3809 11.3794L5.81055 11.3501C5 11.3403 4.79492 12.2095 5.39062 12.6489L9.11133 15.3052L7.66602 19.6606C7.41211 20.4321 8.10547 20.9204 8.75 20.4419Z", fillAlpha = 0.85f)
+        }
+        return _sFStarHexagon!!
+    }
+
+private var _sFStarHexagon: ImageVector? = null

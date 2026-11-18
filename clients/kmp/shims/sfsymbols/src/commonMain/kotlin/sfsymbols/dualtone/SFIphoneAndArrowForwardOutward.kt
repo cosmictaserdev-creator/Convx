@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneAndArrowForwardOutward (dualtone)
+ * Viewport: 30.2832 x 26.2402
+ */
+public val SfSymbols.Dualtone.SFIphoneAndArrowForwardOutward: ImageVector
+    get() {
+        if (_sFIphoneAndArrowForwardOutward != null) {
+            return _sFIphoneAndArrowForwardOutward!!
+        }
+        _sFIphoneAndArrowForwardOutward = sfIcon(
+            name = "Dualtone.SFIphoneAndArrowForwardOutward",
+            viewportWidth = 30.2832f,
+            viewportHeight = 26.2402f
+        ) {
+            addSfPath("M22.793 3.22266L22.793 10.0488L21.0645 10.0488L21.0645 3.47656C21.0645 2.33398 20.4395 1.72852 19.248 1.72852L10.6738 1.72852C9.48242 1.72852 8.85742 2.33398 8.85742 3.47656L8.85742 22.7441C8.85742 23.8867 9.48242 24.4922 10.6738 24.4922L19.248 24.4922C20.4395 24.4922 21.0645 23.8867 21.0645 22.7441L21.0645 16.1621L22.793 16.1621L22.793 22.998C22.793 24.9707 21.4941 26.2207 19.4629 26.2207L10.459 26.2207C8.42773 26.2207 7.12891 24.9707 7.12891 22.998L7.12891 3.22266C7.12891 1.25 8.42773 0 10.459 0L19.4629 0C21.4941 0 22.793 1.25 22.793 3.22266Z", fillAlpha = 0.425f)
+            addSfPath("M24.6094 8.81836C24.6094 9.02344 24.6973 9.25781 24.873 9.41406L27.0996 11.5332L28.7402 13.1055L27.0996 14.6582L24.873 16.7871C24.6973 16.9434 24.6094 17.168 24.6094 17.373C24.6094 17.8125 24.9316 18.1543 25.3711 18.1543C25.5957 18.1543 25.7715 18.0664 25.9375 17.9004L30 13.7207C30.2148 13.5059 30.2832 13.3203 30.2832 13.1055C30.2832 12.8809 30.2148 12.6953 30 12.4805L25.9375 8.30078C25.7715 8.13477 25.5957 8.03711 25.3711 8.03711C24.9316 8.03711 24.6094 8.36914 24.6094 8.81836ZM14.9316 13.1055C14.9316 13.5645 15.3125 13.9551 15.7617 13.9551L26.0547 13.9551L29.1699 13.8281C29.5703 13.8086 29.9023 13.4961 29.9023 13.1055C29.9023 12.7051 29.5703 12.3926 29.1699 12.373L26.0547 12.2461L15.7617 12.2461C15.3125 12.2461 14.9316 12.6367 14.9316 13.1055Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneAndArrowForwardOutward!!
+    }
+
+private var _sFIphoneAndArrowForwardOutward: ImageVector? = null

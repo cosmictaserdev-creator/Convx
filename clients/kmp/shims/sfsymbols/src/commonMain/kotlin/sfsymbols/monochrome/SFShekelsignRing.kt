@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFShekelsignRing (monochrome)
+ * Viewport: 28.291 x 27.9395
+ */
+public val SfSymbols.Monochrome.SFShekelsignRing: ImageVector
+    get() {
+        if (_sFShekelsignRing != null) {
+            return _sFShekelsignRing!!
+        }
+        _sFShekelsignRing = sfIcon(
+            name = "Monochrome.SFShekelsignRing",
+            viewportWidth = 28.291f,
+            viewportHeight = 27.9395f
+        ) {
+            addSfPath("M13.9648 27.9297C21.6406 27.9297 27.9297 21.6504 27.9297 13.9648C27.9297 6.2793 21.6406 0 13.9648 0C6.28906 0 0 6.2793 0 13.9648C0 21.6504 6.28906 27.9297 13.9648 27.9297ZM13.9648 23.3398C8.7793 23.3398 4.58008 19.1504 4.58008 13.9648C4.58008 8.7793 8.7793 4.58008 13.9648 4.58008C19.1504 4.58008 23.3496 8.7793 23.3496 13.9648C23.3496 19.1504 19.1504 23.3398 13.9648 23.3398Z", fillAlpha = 0.85f)
+            addSfPath("M9.36523 19.5215C9.69727 19.5215 9.91211 19.3066 9.91211 18.9453L9.91211 9.73633L12.8027 9.73633C14.2676 9.73633 14.9512 10.1465 14.9512 11.7969L14.9512 15.6836C14.9512 16.0449 15.1562 16.2793 15.498 16.2793C15.8398 16.2793 16.0547 16.0449 16.0547 15.6836L16.0547 11.5625C16.0547 9.57031 15.2148 8.52539 13.1738 8.52539L9.63867 8.52539C9.12109 8.52539 8.79883 8.83789 8.79883 9.35547L8.79883 18.9453C8.79883 19.3066 9.02344 19.5215 9.36523 19.5215ZM12.6758 19.4238L16.2988 19.4238C18.418 19.4238 19.1211 18.291 19.1211 16.1719L19.1211 9.01367C19.1211 8.64258 18.916 8.4082 18.5742 8.4082C18.2324 8.4082 18.0078 8.64258 18.0078 9.01367L18.0078 16.123C18.0078 17.7637 17.627 18.2031 15.9863 18.2031L12.9785 18.2031L12.9785 12.2363C12.9785 11.875 12.7734 11.6602 12.4316 11.6602C12.0996 11.6602 11.875 11.875 11.875 12.2363L11.875 18.623C11.875 19.1309 12.207 19.4238 12.6758 19.4238Z", fillAlpha = 0.85f)
+        }
+        return _sFShekelsignRing!!
+    }
+
+private var _sFShekelsignRing: ImageVector? = null

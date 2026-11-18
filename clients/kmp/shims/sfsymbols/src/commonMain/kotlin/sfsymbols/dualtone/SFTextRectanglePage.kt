@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTextRectanglePage (dualtone)
+ * Viewport: 21.3281 x 26.9238
+ */
+public val SfSymbols.Dualtone.SFTextRectanglePage: ImageVector
+    get() {
+        if (_sFTextRectanglePage != null) {
+            return _sFTextRectanglePage!!
+        }
+        _sFTextRectanglePage = sfIcon(
+            name = "Dualtone.SFTextRectanglePage",
+            viewportWidth = 21.3281f,
+            viewportHeight = 26.9238f
+        ) {
+            addSfPath("M0 23.125C0 25.6445 1.25977 26.9238 3.75977 26.9238L17.207 26.9238C19.707 26.9238 20.9668 25.6445 20.9668 23.125L20.9668 3.80859C20.9668 1.28906 19.707 0.00976562 17.207 0.00976562L3.75977 0.00976562C1.25977 0.00976562 0 1.28906 0 3.80859ZM1.72852 23.0859L1.72852 3.84766C1.72852 2.48047 2.45117 1.73828 3.85742 1.73828L17.1094 1.73828C18.5156 1.73828 19.2383 2.48047 19.2383 3.84766L19.2383 23.0859C19.2383 24.4531 18.5156 25.1953 17.1094 25.1953L3.85742 25.1953C2.45117 25.1953 1.72852 24.4531 1.72852 23.0859Z", fillAlpha = 0.85f)
+            addSfPath("M5.46875 6.24023L15.8691 6.24023C16.2598 6.24023 16.5527 5.9375 16.5527 5.55664C16.5527 5.18555 16.2598 4.89258 15.8691 4.89258L5.46875 4.89258C5.06836 4.89258 4.77539 5.18555 4.77539 5.55664C4.77539 5.9375 5.06836 6.24023 5.46875 6.24023ZM5.46875 9.84375L11.7383 9.84375C12.1289 9.84375 12.4219 9.54102 12.4219 9.15039C12.4219 8.7793 12.1289 8.48633 11.7383 8.48633L5.46875 8.48633C5.06836 8.48633 4.77539 8.7793 4.77539 9.15039C4.77539 9.54102 5.06836 9.84375 5.46875 9.84375ZM5.67383 22.832L15.3027 22.832C16.4062 22.832 16.9727 22.2656 16.9727 21.1621L16.9727 13.75C16.9727 12.6367 16.4062 12.0801 15.3027 12.0801L5.67383 12.0801C4.59961 12.0801 3.99414 12.6367 3.99414 13.75L3.99414 21.1621C3.99414 22.2656 4.59961 22.832 5.67383 22.832Z", fillAlpha = 0.85f)
+        }
+        return _sFTextRectanglePage!!
+    }
+
+private var _sFTextRectanglePage: ImageVector? = null

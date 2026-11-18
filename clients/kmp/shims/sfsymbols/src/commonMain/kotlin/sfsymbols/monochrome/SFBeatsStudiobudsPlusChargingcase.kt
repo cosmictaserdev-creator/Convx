@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBeatsStudiobudsPlusChargingcase (monochrome)
+ * Viewport: 32.0801 x 22.7246
+ */
+public val SfSymbols.Monochrome.SFBeatsStudiobudsPlusChargingcase: ImageVector
+    get() {
+        if (_sFBeatsStudiobudsPlusChargingcase != null) {
+            return _sFBeatsStudiobudsPlusChargingcase!!
+        }
+        _sFBeatsStudiobudsPlusChargingcase = sfIcon(
+            name = "Monochrome.SFBeatsStudiobudsPlusChargingcase",
+            viewportWidth = 32.0801f,
+            viewportHeight = 22.7246f
+        ) {
+            addSfPath("M0 11.3574C0 15.5859 2.03125 19.4141 6.07422 21.3574C8.01758 22.3047 10.5176 22.7246 14.0332 22.7246L17.6855 22.7246C21.2012 22.7246 23.6914 22.3047 25.6445 21.3574C29.6875 19.4141 31.7188 15.5859 31.7188 11.3574C31.7188 7.57812 29.6582 3.76953 25.6445 1.83594C23.6914 0.878906 21.2012 0.46875 17.6855 0.46875L14.0332 0.46875C10.5176 0.46875 8.01758 0.878906 6.07422 1.83594C2.05078 3.76953 0 7.57812 0 11.3574ZM1.73828 11.3574C1.73828 7.23633 4.55078 3.71094 8.85742 2.68555C10.2441 2.36328 11.9336 2.19727 14.0332 2.19727L17.6855 2.19727C20.9766 2.19727 23.2129 2.57812 24.8926 3.39844C28.0469 4.91211 29.9805 7.94922 29.9805 11.3574C29.9805 16.6309 26.4453 20.3906 20.7617 20.8496C19.8438 20.9473 18.8281 20.9961 17.6855 20.9961L14.0332 20.9961C10.7422 20.9961 8.50586 20.6152 6.82617 19.7949C3.59375 18.2422 1.73828 15.1758 1.73828 11.3574ZM2.19727 6.77734L29.541 6.77734L29.541 5.64453L2.19727 5.64453ZM15.8691 15.7324C17.2559 15.7324 18.4082 14.6094 18.4082 13.252C18.4082 11.8359 17.2461 10.6738 15.8691 10.6738C15.3613 10.6738 14.9023 10.8105 14.4922 11.1328L14.4922 9.11133L13.3398 9.60938L13.3398 13.252C13.3398 14.6289 14.4434 15.7324 15.8691 15.7324ZM15.8691 14.6094C15.1172 14.6094 14.4922 13.9844 14.4922 13.252C14.4922 12.4902 15.127 11.8652 15.8691 11.8652C16.6211 11.8652 17.2461 12.5098 17.2461 13.252C17.2461 13.9844 16.6211 14.6094 15.8691 14.6094Z", fillAlpha = 0.85f)
+        }
+        return _sFBeatsStudiobudsPlusChargingcase!!
+    }
+
+private var _sFBeatsStudiobudsPlusChargingcase: ImageVector? = null

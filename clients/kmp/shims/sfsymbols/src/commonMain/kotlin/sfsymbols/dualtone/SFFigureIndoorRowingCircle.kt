@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureIndoorRowingCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFFigureIndoorRowingCircle: ImageVector
+    get() {
+        if (_sFFigureIndoorRowingCircle != null) {
+            return _sFFigureIndoorRowingCircle!!
+        }
+        _sFFigureIndoorRowingCircle = sfIcon(
+            name = "Dualtone.SFFigureIndoorRowingCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M10.4785 8.92578C11.3184 8.92578 11.9922 8.25195 11.9922 7.40234C11.9922 6.5625 11.3184 5.88867 10.4785 5.88867C9.62891 5.88867 8.95508 6.5625 8.95508 7.40234C8.95508 8.25195 9.62891 8.92578 10.4785 8.92578ZM6.79688 14.248C6.49414 15.3906 7.22656 16.1133 8.11523 16.1133C8.4082 16.1133 8.70117 16.0449 8.98438 15.8887L12.7637 13.877L16.9434 15.9766C17.4609 16.2305 17.8711 16.0254 18.0176 15.7031C18.1836 15.3906 18.0859 14.9414 17.5977 14.6973L13.2227 12.5C12.9395 12.3633 12.6172 12.3438 12.3242 12.4805L9.50195 13.7012L10.0684 11.7188C10.166 11.3574 10.4785 11.1133 10.8496 11.1133L16.4746 11.1133C16.875 11.1133 17.1973 10.8008 17.1973 10.4004C17.1973 10.0098 16.875 9.6875 16.4746 9.6875L10.332 9.6875C8.93555 9.6875 7.79297 10.498 7.48047 11.6797ZM6.57227 18.3105L18.8477 18.3105C19.0723 18.3105 19.2383 18.1445 19.2383 17.9199C19.2383 17.6953 19.0723 17.5293 18.8477 17.5293L6.57227 17.5293C6.34766 17.5293 6.18164 17.6953 6.18164 17.9199C6.18164 18.1445 6.34766 18.3105 6.57227 18.3105Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureIndoorRowingCircle!!
+    }
+
+private var _sFFigureIndoorRowingCircle: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFNairasignSquare (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFNairasignSquare: ImageVector
+    get() {
+        if (_sFNairasignSquare != null) {
+            return _sFNairasignSquare!!
+        }
+        _sFNairasignSquare = sfIcon(
+            name = "Monochrome.SFNairasignSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M8.29102 17.1973C8.66211 17.1973 8.92578 16.9336 8.92578 16.5527L8.92578 8.06641L9.00391 8.06641L13.3105 16.5527C13.5156 16.9629 13.8281 17.1973 14.2578 17.1973C14.8633 17.1973 15.127 16.7871 15.127 16.3574L15.127 6.41602C15.127 6.01562 14.873 5.76172 14.4922 5.76172C14.1113 5.76172 13.8672 6.01562 13.8672 6.41602L13.8672 14.9219L13.7793 14.9219L9.47266 6.41602C9.27734 6.00586 8.95508 5.76172 8.52539 5.76172C8.00781 5.76172 7.65625 6.10352 7.65625 6.60156L7.65625 16.5527C7.65625 16.9336 7.91992 17.1973 8.29102 17.1973ZM6.60156 11.5039C6.60156 11.7188 6.77734 11.8945 6.99219 11.8945L15.8008 11.8945C16.0156 11.8945 16.1914 11.7188 16.1914 11.5039C16.1914 11.2891 16.0156 11.1133 15.8008 11.1133L6.99219 11.1133C6.77734 11.1133 6.60156 11.2891 6.60156 11.5039Z", fillAlpha = 0.85f)
+        }
+        return _sFNairasignSquare!!
+    }
+
+private var _sFNairasignSquare: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonCropCircleBadgeExclamationmark (dualtone)
+ * Viewport: 38.4082 x 28.8574
+ */
+public val SfSymbols.Dualtone.SFPersonCropCircleBadgeExclamationmark: ImageVector
+    get() {
+        if (_sFPersonCropCircleBadgeExclamationmark != null) {
+            return _sFPersonCropCircleBadgeExclamationmark!!
+        }
+        _sFPersonCropCircleBadgeExclamationmark = sfIcon(
+            name = "Dualtone.SFPersonCropCircleBadgeExclamationmark",
+            viewportWidth = 38.4082f,
+            viewportHeight = 28.8574f
+        ) {
+            addSfPath("M31.748 14.4238C31.748 21.4453 26.0449 27.1387 19.0234 27.1387C17.1862 27.1387 15.44 26.7489 13.8673 26.0395C15.0344 24.6674 15.7422 22.8984 15.7422 20.9863C15.7422 20.3375 15.6622 19.7063 15.503 19.1053C16.5531 18.8257 17.7383 18.6621 19.0234 18.6621C22.9212 18.6621 25.8924 20.1615 27.0998 21.728C28.8577 19.8038 29.9219 17.2396 29.9219 14.4238C29.9219 8.39844 25.0488 3.52539 19.0234 3.52539C13.4358 3.52539 8.83923 7.71602 8.20801 13.1325C8.09788 13.1177 7.98475 13.1152 7.87109 13.1152C7.35704 13.1152 6.85379 13.1657 6.36711 13.265C6.94707 6.7846 12.3931 1.69922 19.0234 1.69922C26.0449 1.69922 31.748 7.40234 31.748 14.4238ZM23.3301 11.7676C23.3301 14.4629 21.4453 16.5332 19.0234 16.5137C16.6016 16.4941 14.7266 14.4629 14.7168 11.7676C14.707 9.22852 16.6211 7.11914 19.0234 7.11914C21.4258 7.11914 23.3301 9.22852 23.3301 11.7676Z", fillAlpha = 0.425f)
+            addSfPath("M14.1895 20.9863C14.1895 24.4434 11.2988 27.3047 7.87109 27.3047C4.41406 27.3047 1.55273 24.4629 1.55273 20.9863C1.55273 17.5293 4.41406 14.668 7.87109 14.668C11.3379 14.668 14.1895 17.5195 14.1895 20.9863ZM6.8457 23.9746C6.8457 24.541 7.30469 25 7.86133 25C8.41797 25 8.87695 24.541 8.88672 23.9746C8.88672 23.4375 8.42773 22.9688 7.86133 22.9688C7.31445 22.9688 6.8457 23.4277 6.8457 23.9746ZM7.07031 17.7148L7.16797 21.3965C7.17773 21.7969 7.46094 22.0801 7.87109 22.0801C8.28125 22.0801 8.56445 21.7969 8.57422 21.3965L8.67188 17.7148C8.68164 17.2363 8.35938 16.9043 7.87109 16.9043C7.38281 16.9043 7.06055 17.2363 7.07031 17.7148Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonCropCircleBadgeExclamationmark!!
+    }
+
+private var _sFPersonCropCircleBadgeExclamationmark: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFClockArrowTriangleheadClockwiseRotate90PathDotted (monochrome)
+ * Viewport: 29.9249 x 25.459
+ */
+public val SfSymbols.Monochrome.SFClockArrowTriangleheadClockwiseRotate90PathDotted: ImageVector
+    get() {
+        if (_sFClockArrowTriangleheadClockwiseRotate90PathDotted != null) {
+            return _sFClockArrowTriangleheadClockwiseRotate90PathDotted!!
+        }
+        _sFClockArrowTriangleheadClockwiseRotate90PathDotted = sfIcon(
+            name = "Monochrome.SFClockArrowTriangleheadClockwiseRotate90PathDotted",
+            viewportWidth = 29.9249f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M29.1275 10.3613L23.4439 10.3613C22.6529 10.3613 22.4283 10.9082 22.8775 11.5332L25.651 15.4883C26.0123 16.0156 26.5494 16.0254 26.9205 15.4883L29.6939 11.543C30.1431 10.9082 29.9283 10.3613 29.1275 10.3613ZM14.7818 25.4395C15.2701 25.4395 15.69 25.0293 15.69 24.5312C15.69 24.0332 15.2701 23.623 14.7818 23.623C8.75642 23.623 3.88337 18.75 3.88337 12.7246C3.88337 6.69922 8.75642 1.82617 14.7818 1.82617C20.8072 1.82617 25.6802 6.69922 25.6802 12.7246C25.6802 13.2324 26.1002 13.6328 26.5982 13.6328C27.0767 13.6328 27.4869 13.2422 27.4967 12.7344C27.4869 5.69336 21.8033 0 14.7818 0C7.76033 0 2.06697 5.70312 2.06697 12.7246C2.06697 19.7461 7.76033 25.4395 14.7818 25.4395ZM18.8736 24.7852C19.4302 24.7852 19.899 24.3164 19.899 23.75C19.899 23.1836 19.4302 22.7148 18.8736 22.7148C18.2974 22.7148 17.8385 23.1836 17.8385 23.75C17.8385 24.3164 18.2974 24.7852 18.8736 24.7852ZM22.4185 22.8418C22.9849 22.8418 23.4537 22.373 23.4537 21.8066C23.4537 21.2402 22.9849 20.7715 22.4185 20.7715C21.8521 20.7715 21.3834 21.2402 21.3834 21.8066C21.3834 22.373 21.8521 22.8418 22.4185 22.8418ZM25.0162 19.7949C25.5826 19.7949 26.0513 19.3262 26.0513 18.7695C26.0513 18.1934 25.5826 17.7246 25.0162 17.7246C24.4498 17.7246 23.981 18.1934 23.981 18.7695C23.981 19.3262 24.4498 19.7949 25.0162 19.7949Z", fillAlpha = 0.85f)
+            addSfPath("M8.024 14.0039L14.772 14.0039C15.2017 14.0039 15.5338 13.6719 15.5338 13.2422L15.5338 4.53125C15.5338 4.11133 15.2017 3.7793 14.772 3.7793C14.3521 3.7793 14.0201 4.11133 14.0201 4.53125L14.0201 12.4902L8.024 12.4902C7.59431 12.4902 7.26228 12.8223 7.26228 13.2422C7.26228 13.6719 7.59431 14.0039 8.024 14.0039Z", fillAlpha = 0.85f)
+        }
+        return _sFClockArrowTriangleheadClockwiseRotate90PathDotted!!
+    }
+
+private var _sFClockArrowTriangleheadClockwiseRotate90PathDotted: ImageVector? = null

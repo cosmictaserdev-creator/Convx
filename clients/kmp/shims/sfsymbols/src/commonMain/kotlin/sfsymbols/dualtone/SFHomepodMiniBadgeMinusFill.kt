@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHomepodMiniBadgeMinusFill (dualtone)
+ * Viewport: 36.9336 x 28.8574
+ */
+public val SfSymbols.Dualtone.SFHomepodMiniBadgeMinusFill: ImageVector
+    get() {
+        if (_sFHomepodMiniBadgeMinusFill != null) {
+            return _sFHomepodMiniBadgeMinusFill!!
+        }
+        _sFHomepodMiniBadgeMinusFill = sfIcon(
+            name = "Dualtone.SFHomepodMiniBadgeMinusFill",
+            viewportWidth = 36.9336f,
+            viewportHeight = 28.8574f
+        ) {
+            addSfPath("M27.3828 6.11328C29.3485 8.1227 30.3842 10.6089 30.5741 13.2654C30.0852 13.1658 29.5794 13.1152 29.0625 13.1152C24.7461 13.1152 21.1914 16.6699 21.1914 20.9863C21.1914 22.6415 21.7103 24.1823 22.5964 25.4517C21.4782 25.6602 20.0917 25.752 18.2812 25.752C13.6035 25.752 11.748 25.1367 9.99023 23.4961C7.45117 21.1719 5.94727 17.8125 5.94727 14.209C5.94727 11.2012 6.98242 8.35938 9.18945 6.11328C9.61914 5.625 10.0781 5.60547 10.4883 5.94727C12.0312 7.38281 14.2969 8.125 18.2812 8.125C22.2656 8.125 24.5312 7.38281 26.084 5.94727C26.4941 5.60547 26.9531 5.625 27.3828 6.11328Z", fillAlpha = 0.425f)
+            addSfPath("M24.2969 4.91211C24.2969 5.86914 21.875 6.5625 18.2812 6.5625C14.6875 6.5625 12.2754 5.86914 12.2754 4.91211C12.2754 3.94531 14.6875 3.25195 18.2812 3.25195C21.875 3.25195 24.2969 3.94531 24.2969 4.91211Z", fillAlpha = 0.425f)
+            addSfPath("M35.3809 20.9863C35.3809 24.4434 32.4902 27.3047 29.0625 27.3047C25.6055 27.3047 22.7441 24.4629 22.7441 20.9863C22.7441 17.5293 25.6055 14.668 29.0625 14.668C32.5293 14.668 35.3809 17.5195 35.3809 20.9863ZM25.7812 20.2734C25.3906 20.2734 25.0684 20.6055 25.0684 20.9863C25.0684 21.3574 25.3906 21.6992 25.7812 21.6992L32.3438 21.6992C32.7246 21.6992 33.0469 21.3574 33.0469 20.9863C33.0469 20.6055 32.7246 20.2734 32.3438 20.2734Z", fillAlpha = 0.85f)
+        }
+        return _sFHomepodMiniBadgeMinusFill!!
+    }
+
+private var _sFHomepodMiniBadgeMinusFill: ImageVector? = null

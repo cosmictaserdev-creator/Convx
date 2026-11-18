@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonalhotspot (dualtone)
+ * Viewport: 36.1621 x 20.3418
+ */
+public val SfSymbols.Dualtone.SFPersonalhotspot: ImageVector
+    get() {
+        if (_sFPersonalhotspot != null) {
+            return _sFPersonalhotspot!!
+        }
+        _sFPersonalhotspot = sfIcon(
+            name = "Dualtone.SFPersonalhotspot",
+            viewportWidth = 36.1621f,
+            viewportHeight = 20.3418f
+        ) {
+            addSfPath("M7.13867 14.4238L8.4082 14.4238C8.33984 13.8672 8.29102 13.252 8.36914 12.6953L7.28516 12.6953C4.11133 12.6953 1.82617 10.4492 1.82617 7.26562C1.82617 4.10156 4.11133 1.8457 7.28516 1.8457L18.3691 1.8457C21.543 1.8457 23.8281 4.10156 23.8281 7.26562C23.8281 10.4492 21.5527 12.6953 18.3691 12.6953L13.8672 12.6953C13.7207 13.1152 13.7695 13.9355 14.082 14.4238L18.5156 14.4238C22.6758 14.4238 25.6543 11.4941 25.6543 7.26562C25.6543 3.04688 22.6758 0.117188 18.5156 0.117188L7.13867 0.117188C2.98828 0.117188 0 3.04688 0 7.26562C0 11.4941 2.98828 14.4238 7.13867 14.4238ZM17.2852 20.3418L28.6621 20.3418C32.8223 20.3418 35.8008 17.4121 35.8008 13.1836C35.8008 8.95508 32.8223 6.02539 28.6621 6.02539L27.3926 6.02539C27.4609 6.5918 27.5098 7.20703 27.4414 7.75391L28.5156 7.75391C31.6992 7.75391 33.9746 10 33.9746 13.1836C33.9746 16.3477 31.6895 18.6133 28.5156 18.6133L17.4316 18.6133C14.2578 18.6133 11.9727 16.3477 11.9727 13.1836C11.9727 10 14.248 7.75391 17.4316 7.75391L21.9434 7.75391C22.0898 7.33398 22.041 6.52344 21.7188 6.02539L17.2852 6.02539C13.125 6.02539 10.1465 8.95508 10.1465 13.1836C10.1465 17.4121 13.125 20.3418 17.2852 20.3418Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonalhotspot!!
+    }
+
+private var _sFPersonalhotspot: ImageVector? = null

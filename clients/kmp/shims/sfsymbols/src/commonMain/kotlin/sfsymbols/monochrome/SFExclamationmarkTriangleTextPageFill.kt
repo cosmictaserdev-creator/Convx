@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFExclamationmarkTriangleTextPageFill (monochrome)
+ * Viewport: 21.3281 x 27.0215
+ */
+public val SfSymbols.Monochrome.SFExclamationmarkTriangleTextPageFill: ImageVector
+    get() {
+        if (_sFExclamationmarkTriangleTextPageFill != null) {
+            return _sFExclamationmarkTriangleTextPageFill!!
+        }
+        _sFExclamationmarkTriangleTextPageFill = sfIcon(
+            name = "Monochrome.SFExclamationmarkTriangleTextPageFill",
+            viewportWidth = 21.3281f,
+            viewportHeight = 27.0215f
+        ) {
+            addSfPath("M5.42969 17.5C5.01953 17.5 4.7168 17.1875 4.7168 16.7969C4.7168 16.416 5.01953 16.1133 5.42969 16.1133L15.5762 16.1133C15.9766 16.1133 16.2793 16.416 16.2793 16.7969C16.2793 17.1875 15.9766 17.5 15.5762 17.5ZM5.42969 21.4355C5.01953 21.4355 4.7168 21.1328 4.7168 20.7324C4.7168 20.3418 5.01953 20.0293 5.42969 20.0293L10.2734 20.0293C10.6836 20.0293 10.9766 20.3418 10.9766 20.7324C10.9766 21.1328 10.6836 21.4355 10.2734 21.4355ZM7.01172 12.9199C6.34766 12.9199 5.92773 12.4316 5.92773 11.8359C5.92773 11.6602 5.9668 11.4844 6.07422 11.3281L9.58008 5.04883C9.77539 4.70703 10.1465 4.50195 10.5078 4.50195C10.8691 4.50195 11.2305 4.70703 11.4355 5.04883L14.9414 11.3281C15.0391 11.4844 15.0879 11.6602 15.0879 11.8359C15.0879 12.4316 14.6777 12.9199 14.0039 12.9199ZM10.498 11.6699C10.8594 11.6699 11.1621 11.377 11.1719 11.0156C11.1719 10.6641 10.8594 10.3711 10.498 10.3711C10.1562 10.3711 9.84375 10.6543 9.84375 11.0156C9.84375 11.377 10.1465 11.6699 10.498 11.6699ZM10.498 9.78516C10.7617 9.78516 10.9668 9.60938 10.9668 9.3457L11.0156 6.97266C11.0352 6.66016 10.8105 6.44531 10.498 6.44531C10.1953 6.44531 9.99023 6.66016 10 6.97266L10.0488 9.3457C10.0488 9.60938 10.2441 9.78516 10.498 9.78516ZM0 23.1152C0 25.6348 1.25977 26.9141 3.75977 26.9141L17.207 26.9141C19.707 26.9141 20.9668 25.6348 20.9668 23.1152L20.9668 3.79883C20.9668 1.2793 19.707 0 17.207 0L3.75977 0C1.25977 0 0 1.2793 0 3.79883Z", fillAlpha = 0.85f)
+        }
+        return _sFExclamationmarkTriangleTextPageFill!!
+    }
+
+private var _sFExclamationmarkTriangleTextPageFill: ImageVector? = null

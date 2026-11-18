@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSterlingsignCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.4395
+ */
+public val SfSymbols.Dualtone.SFSterlingsignCircleFill: ImageVector
+    get() {
+        if (_sFSterlingsignCircleFill != null) {
+            return _sFSterlingsignCircleFill!!
+        }
+        _sFSterlingsignCircleFill = sfIcon(
+            name = "Dualtone.SFSterlingsignCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.4395f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7148C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7148C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M8.62305 18.3203C8.28125 18.3203 8.02734 18.0762 8.02734 17.7344C8.02734 17.4023 8.25195 17.1875 8.56445 17.0703C9.74609 16.6699 10.4297 15.7422 10.4297 14.4824C10.4297 14.0625 10.3516 13.623 10.2246 13.1641L8.57422 13.1641C8.28125 13.1641 8.06641 12.9688 8.06641 12.6953C8.06641 12.4316 8.28125 12.2363 8.57422 12.2363L9.98047 12.2363C9.79492 11.6211 9.70703 11.1133 9.70703 10.5859C9.70703 8.33984 11.3379 7.01172 13.7598 7.01172C14.5996 7.01172 15.1562 7.08008 15.8398 7.35352C16.1328 7.4707 16.3574 7.64648 16.3574 7.94922C16.3574 8.27148 16.1621 8.44727 15.8398 8.44727C15.6934 8.44727 15.4883 8.4082 15.2832 8.35938C14.9023 8.24219 14.4824 8.16406 13.8965 8.16406C12.1777 8.16406 11.084 9.07227 11.084 10.5469C11.084 11.084 11.1523 11.5137 11.3477 12.2363L14.9707 12.2363C15.2637 12.2363 15.4883 12.4316 15.4883 12.6953C15.4883 12.9688 15.2637 13.1641 14.9707 13.1641L11.6113 13.1641C11.6992 13.5352 11.748 13.9453 11.748 14.4336C11.748 15.5566 11.2402 16.7676 10.1953 17.1289L10.1953 17.1875L16.2793 17.1875C16.6211 17.1875 16.8945 17.4219 16.8945 17.7539C16.8945 18.0859 16.6211 18.3203 16.2793 18.3203Z", fillAlpha = 0.85f)
+        }
+        return _sFSterlingsignCircleFill!!
+    }
+
+private var _sFSterlingsignCircleFill: ImageVector? = null

@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPowerplugPortrait (dualtone)
+ * Viewport: 18.1543 x 28.4277
+ */
+public val SfSymbols.Dualtone.SFPowerplugPortrait: ImageVector
+    get() {
+        if (_sFPowerplugPortrait != null) {
+            return _sFPowerplugPortrait!!
+        }
+        _sFPowerplugPortrait = sfIcon(
+            name = "Dualtone.SFPowerplugPortrait",
+            viewportWidth = 18.1543f,
+            viewportHeight = 28.4277f
+        ) {
+            addSfPath("M7.24609 28.3984L10.5371 28.3984C11.9824 28.3984 12.8223 27.5781 12.8223 26.1035L12.8223 21.3477C12.8223 20.0488 13.3691 19.3848 14.5898 18.4766C16.6797 16.9141 17.793 14.5117 17.793 11.9727L17.793 8.31055C17.793 6.875 16.9629 6.21094 15.5273 6.21094L14.1895 6.21094L14.1895 1.47461C14.1895 0.664062 13.5449 0 12.7344 0C11.9043 0 11.25 0.664062 11.25 1.47461L11.25 6.21094L6.52344 6.21094L6.52344 1.47461C6.52344 0.664062 5.85938 0 5.06836 0C4.23828 0 3.58398 0.664062 3.58398 1.47461L3.58398 6.21094L2.22656 6.21094C0.78125 6.21094 0 6.875 0 8.31055L0 11.9727C0 14.5117 1.09375 16.9141 3.20312 18.4766C4.42383 19.3848 4.9707 20.0488 4.9707 21.3477L4.9707 26.1035C4.9707 27.5684 5.76172 28.3984 7.24609 28.3984ZM7.24609 26.6699C6.9043 26.6699 6.70898 26.4551 6.70898 26.1035L6.70898 21.3477C6.70898 19.4531 5.87891 18.3105 4.22852 17.0801C2.50977 15.8008 1.72852 14.1113 1.72852 11.9727L1.72852 8.48633C1.72852 8.1543 1.91406 7.94922 2.22656 7.94922L15.5273 7.94922C15.8496 7.94922 16.0645 8.1543 16.0645 8.48633L16.0645 11.9727C16.0645 14.1016 15.2734 15.8008 13.5547 17.0801C11.9141 18.3008 11.0938 19.4531 11.0938 21.3477L11.0938 26.1035C11.0938 26.4551 10.8691 26.6699 10.5371 26.6699Z", fillAlpha = 0.85f)
+        }
+        return _sFPowerplugPortrait!!
+    }
+
+private var _sFPowerplugPortrait: ImageVector? = null

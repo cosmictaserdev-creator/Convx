@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBubbleLeftAndTextBubbleRightFill (dualtone)
+ * Viewport: 37.9395 x 31.2793
+ */
+public val SfSymbols.Dualtone.SFBubbleLeftAndTextBubbleRightFill: ImageVector
+    get() {
+        if (_sFBubbleLeftAndTextBubbleRightFill != null) {
+            return _sFBubbleLeftAndTextBubbleRightFill!!
+        }
+        _sFBubbleLeftAndTextBubbleRightFill = sfIcon(
+            name = "Dualtone.SFBubbleLeftAndTextBubbleRightFill",
+            viewportWidth = 37.9395f,
+            viewportHeight = 31.2793f
+        ) {
+            addSfPath("M28.6773 6.45508L19.2871 6.45508C15.0781 6.45508 12.6465 8.95508 12.6465 13.0859L12.6465 20.3125C12.6465 21.5907 12.8793 22.7109 13.3268 23.6474L10.1562 26.4453C9.52148 27.002 9.15039 27.2852 8.61328 27.2852C7.87109 27.2852 7.43164 26.7578 7.43164 25.918L7.43164 22.5586L6.69922 22.5586C3.16406 22.5586 1.19141 20.5566 1.19141 17.0605L1.19141 7.09961C1.19141 3.60352 3.16406 1.5918 6.69922 1.5918L23.1934 1.5918C26.5137 1.5918 28.4461 3.36528 28.6773 6.45508Z", fillAlpha = 0.425f)
+            addSfPath("M20.6055 15.2539C20.1172 15.2539 19.7656 14.8828 19.7656 14.4141C19.7656 13.9258 20.1172 13.5742 20.6055 13.5742L30.0391 13.5742C30.5273 13.5742 30.8984 13.9258 30.8984 14.4141C30.8984 14.8828 30.5273 15.2539 30.0391 15.2539ZM20.6055 19.9316C20.1172 19.9316 19.7656 19.5898 19.7656 19.1016C19.7656 18.6328 20.1172 18.252 20.6055 18.252L27.5293 18.252C28.0078 18.252 28.3887 18.6328 28.3887 19.1016C28.3887 19.5898 28.0078 19.9316 27.5293 19.9316ZM19.2871 25.3613L24.082 25.3613L28.2031 28.8867C28.8281 29.4336 29.1992 29.7168 29.707 29.7168C30.4492 29.7168 30.8691 29.1895 30.8691 28.3789L30.8691 25.3613L31.3086 25.3613C34.6289 25.3613 36.3867 23.5742 36.3867 20.293L36.3867 13.0859C36.3867 9.80469 34.6289 8.00781 31.3086 8.00781L19.2871 8.00781C15.957 8.00781 14.1992 9.80469 14.1992 13.0859L14.1992 20.3125C14.1992 23.584 15.957 25.3613 19.2871 25.3613Z", fillAlpha = 0.85f)
+        }
+        return _sFBubbleLeftAndTextBubbleRightFill!!
+    }
+
+private var _sFBubbleLeftAndTextBubbleRightFill: ImageVector? = null

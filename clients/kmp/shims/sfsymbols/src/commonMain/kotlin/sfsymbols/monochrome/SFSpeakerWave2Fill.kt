@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSpeakerWave2Fill (monochrome)
+ * Viewport: 28.0469 x 21.9434
+ */
+public val SfSymbols.Monochrome.SFSpeakerWave2Fill: ImageVector
+    get() {
+        if (_sFSpeakerWave2Fill != null) {
+            return _sFSpeakerWave2Fill!!
+        }
+        _sFSpeakerWave2Fill = sfIcon(
+            name = "Monochrome.SFSpeakerWave2Fill",
+            viewportWidth = 28.0469f,
+            viewportHeight = 21.9434f
+        ) {
+            addSfPath("M23.916 19.5801C24.3164 19.8535 24.8145 19.7656 25.0977 19.3555C26.7188 17.168 27.6855 14.0918 27.6855 10.9668C27.6855 7.83203 26.7285 4.73633 25.0977 2.57812C24.8145 2.16797 24.3164 2.07031 23.916 2.34375C23.5254 2.61719 23.457 3.11523 23.7695 3.56445C25.2051 5.55664 26.0156 8.20312 26.0156 10.9668C26.0156 13.7305 25.1855 16.3672 23.7695 18.3691C23.4668 18.8086 23.5254 19.3164 23.916 19.5801Z", fillAlpha = 0.85f)
+            addSfPath("M19.4043 16.2891C19.7754 16.543 20.2832 16.4551 20.5664 16.0449C21.5332 14.7754 22.1387 12.9297 22.1387 10.9668C22.1387 8.99414 21.5332 7.1582 20.5664 5.87891C20.2832 5.46875 19.7754 5.39062 19.4043 5.64453C18.9746 5.94727 18.9062 6.47461 19.2383 6.92383C20.0391 8.01758 20.4688 9.41406 20.4688 10.9668C20.4688 12.5098 20.0293 13.8965 19.2383 15.0098C18.916 15.459 18.9746 15.9766 19.4043 16.2891Z", fillAlpha = 0.85f)
+            addSfPath("M13.4668 21.9434C14.2285 21.9434 14.7461 21.3867 14.7461 20.6445L14.7461 1.35742C14.7461 0.615234 14.2285 0.00976562 13.4473 0.00976562C12.9102 0.00976562 12.5488 0.253906 11.9824 0.771484L6.52344 5.94727C6.43555 6.03516 6.31836 6.07422 6.17188 6.07422L2.4707 6.07422C0.908203 6.07422 0 6.98242 0 8.64258L0 13.3691C0 15.0195 0.908203 15.9277 2.4707 15.9277L6.17188 15.9277C6.31836 15.9277 6.43555 15.9766 6.52344 16.0645L11.9824 21.2305C12.4902 21.709 12.9297 21.9434 13.4668 21.9434Z", fillAlpha = 0.85f)
+        }
+        return _sFSpeakerWave2Fill!!
+    }
+
+private var _sFSpeakerWave2Fill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIpadAndArrowForward (monochrome)
+ * Viewport: 31.2598 x 27.998
+ */
+public val SfSymbols.Monochrome.SFIpadAndArrowForward: ImageVector
+    get() {
+        if (_sFIpadAndArrowForward != null) {
+            return _sFIpadAndArrowForward!!
+        }
+        _sFIpadAndArrowForward = sfIcon(
+            name = "Monochrome.SFIpadAndArrowForward",
+            viewportWidth = 31.2598f,
+            viewportHeight = 27.998f
+        ) {
+            addSfPath("M25.8105 3.32031L25.8105 24.6777C25.8105 26.6992 24.4629 27.998 22.373 27.998L8.52539 27.998C6.43555 27.998 5.08789 26.6992 5.08789 24.6777L5.08789 17.0508L6.82617 17.0508L6.82617 24.4043C6.82617 25.5859 7.51953 26.2598 8.74023 26.2598L22.168 26.2598C23.3887 26.2598 24.082 25.5859 24.082 24.4043L24.082 3.59375C24.082 2.40234 23.3887 1.72852 22.168 1.72852L8.74023 1.72852C7.51953 1.72852 6.82617 2.40234 6.82617 3.59375L6.82617 10.9375L5.08789 10.9375L5.08789 3.32031C5.08789 1.29883 6.43555 0 8.52539 0L22.373 0C24.4629 0 25.8105 1.29883 25.8105 3.32031Z", fillAlpha = 0.85f)
+            addSfPath("M9.67773 9.69727C9.67773 9.90234 9.76562 10.1367 9.94141 10.293L12.168 12.4121L13.8184 13.9844L12.168 15.5371L9.94141 17.666C9.76562 17.8223 9.67773 18.0469 9.67773 18.252C9.67773 18.6914 10 19.0332 10.4395 19.0332C10.6738 19.0332 10.8398 18.9453 11.0059 18.7793L15.0781 14.5996C15.2832 14.3848 15.3613 14.1992 15.3613 13.9844C15.3613 13.7598 15.2832 13.5742 15.0781 13.3594L11.0059 9.17969C10.8398 9.01367 10.6738 8.91602 10.4395 8.91602C10 8.91602 9.67773 9.24805 9.67773 9.69727ZM0 13.9844C0 14.4434 0.380859 14.834 0.839844 14.834L11.123 14.834L14.2383 14.707C14.6387 14.6875 14.9707 14.375 14.9707 13.9844C14.9707 13.584 14.6387 13.2715 14.2383 13.252L11.123 13.125L0.839844 13.125C0.380859 13.125 0 13.5156 0 13.9844Z", fillAlpha = 0.85f)
+        }
+        return _sFIpadAndArrowForward!!
+    }
+
+private var _sFIpadAndArrowForward: ImageVector? = null

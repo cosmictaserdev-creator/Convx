@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonalhotspotCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFPersonalhotspotCircleFill: ImageVector
+    get() {
+        if (_sFPersonalhotspotCircleFill != null) {
+            return _sFPersonalhotspotCircleFill!!
+        }
+        _sFPersonalhotspotCircleFill = sfIcon(
+            name = "Dualtone.SFPersonalhotspotCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.459C19.7266 25.459 25.4395 19.7461 25.4395 12.7344C25.4395 5.73242 19.7266 0.0195312 12.7148 0.0195312C5.71289 0.0195312 0 5.73242 0 12.7344C0 19.7461 5.71289 25.459 12.7148 25.459Z", fillAlpha = 0.2125f)
+            addSfPath("M3.99414 11.377C3.99414 9.27734 5.49805 7.76367 7.59766 7.76367L12.998 7.76367C15.0977 7.76367 16.6016 9.27734 16.6016 11.377C16.6016 13.4766 15.0977 14.9805 12.998 14.9805L11.0742 14.9805C10.752 14.6094 10.7227 14.0723 10.8301 13.7402L12.9297 13.7402C14.3359 13.7402 15.3027 12.7734 15.3027 11.377C15.3027 9.99023 14.3262 9.01367 12.9297 9.01367L7.67578 9.01367C6.2793 9.01367 5.30273 9.99023 5.30273 11.377C5.30273 12.7734 6.26953 13.7402 7.67578 13.7402L8.17383 13.7402C8.125 14.1113 8.1543 14.6582 8.22266 14.9805L7.59766 14.9805C5.49805 14.9805 3.99414 13.4766 3.99414 11.377ZM8.80859 14.1895C8.80859 12.0898 10.3125 10.5859 12.4121 10.5859L14.3457 10.5859C14.6582 10.918 14.6973 11.5137 14.5605 11.8262L12.4805 11.8262C11.084 11.8262 10.1074 12.793 10.1074 14.1895C10.1074 15.5762 11.084 16.5527 12.4805 16.5527L17.7344 16.5527C19.1309 16.5527 20.1074 15.5762 20.1074 14.1895C20.1074 12.793 19.1406 11.8262 17.7344 11.8262L17.2461 11.8262C17.3047 11.2793 17.2461 10.9277 17.1973 10.5859L17.8223 10.5859C19.9219 10.5859 21.416 12.0898 21.416 14.1895C21.416 16.2891 19.9121 17.8027 17.8223 17.8027L12.4121 17.8027C10.3223 17.8027 8.80859 16.2891 8.80859 14.1895Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonalhotspotCircleFill!!
+    }
+
+private var _sFPersonalhotspotCircleFill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowDownToLineCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFArrowDownToLineCircle: ImageVector
+    get() {
+        if (_sFArrowDownToLineCircle != null) {
+            return _sFArrowDownToLineCircle!!
+        }
+        _sFArrowDownToLineCircle = sfIcon(
+            name = "Dualtone.SFArrowDownToLineCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M12.6953 16.8652C12.9004 16.8652 13.0859 16.7676 13.2422 16.6113L17.5684 12.2461C17.7441 12.0703 17.8223 11.8848 17.8223 11.6699C17.8223 11.2695 17.5391 10.957 17.1191 10.957C16.9141 10.957 16.7188 11.0254 16.5723 11.1816L15.5762 12.1875L13.3105 14.6875L13.4277 12.373L13.4277 6.2793C13.4277 5.85938 13.1152 5.54688 12.6953 5.54688C12.2559 5.54688 11.9629 5.85938 11.9629 6.2793L11.9629 12.373L12.0801 14.6973L9.76562 12.168L8.84766 11.1816C8.70117 11.0254 8.52539 10.957 8.30078 10.957C7.87109 10.957 7.58789 11.25 7.58789 11.6699C7.58789 11.8555 7.69531 12.0898 7.82227 12.2266L12.1484 16.6113C12.3047 16.7773 12.5 16.8652 12.6953 16.8652ZM7.98828 19.3652L17.4316 19.3652C17.8516 19.3652 18.1445 19.0527 18.1445 18.623C18.1445 18.2129 17.8516 17.9102 17.4316 17.9102L7.98828 17.9102C7.55859 17.9102 7.26562 18.2129 7.26562 18.623C7.26562 19.0527 7.55859 19.3652 7.98828 19.3652Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowDownToLineCircle!!
+    }
+
+private var _sFArrowDownToLineCircle: ImageVector? = null

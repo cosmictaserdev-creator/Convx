@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRadicandSquareroot (monochrome)
+ * Viewport: 26.1621 x 21.8848
+ */
+public val SfSymbols.Monochrome.SFRadicandSquareroot: ImageVector
+    get() {
+        if (_sFRadicandSquareroot != null) {
+            return _sFRadicandSquareroot!!
+        }
+        _sFRadicandSquareroot = sfIcon(
+            name = "Monochrome.SFRadicandSquareroot",
+            viewportWidth = 26.1621f,
+            viewportHeight = 21.8848f
+        ) {
+            addSfPath("M4.44336 21.8848C5.42969 21.8848 5.94727 21.1914 6.2207 20.3027L11.8555 1.91406L24.7852 1.91406C25.3906 1.91406 25.8008 1.5332 25.8008 0.957031C25.8008 0.390625 25.3906 0.0195312 24.7852 0.0195312L11.8262 0.0195312C10.752 0.0195312 10.2637 0.419922 9.9707 1.33789L4.57031 19.3457L4.38477 19.3457L1.96289 10.8789C1.79688 10.293 1.48438 10.0195 0.976562 10.0195C0.419922 10.0195 0 10.4199 0 10.9473C0 11.1523 0.0488281 11.3477 0.107422 11.5234L2.79297 20.4199C3.05664 21.2793 3.53516 21.8848 4.44336 21.8848Z", fillAlpha = 0.85f)
+            addSfPath("M14.2676 19.4531C14.6582 19.4531 14.8633 19.3164 15.166 18.8965L18.1934 14.5312L18.252 14.5312L21.2598 18.8965C21.5625 19.3164 21.7676 19.4531 22.1582 19.4531C22.6953 19.4531 23.0859 19.0918 23.0859 18.584C23.0859 18.3398 23.0273 18.1641 22.8711 17.9492L19.4238 13.1543L22.9004 8.33984C23.0664 8.11523 23.125 7.92969 23.125 7.70508C23.125 7.23633 22.7441 6.875 22.2266 6.875C21.8457 6.875 21.6211 7.01172 21.3477 7.40234L18.4082 11.7773L18.3496 11.7773L15.3516 7.39258C15.0781 7.01172 14.8535 6.875 14.4434 6.875C13.9355 6.875 13.5156 7.26562 13.5156 7.76367C13.5156 8.01758 13.584 8.19336 13.7695 8.4375L17.0898 13.1055L13.6035 18.0176C13.4375 18.2324 13.3887 18.3887 13.3887 18.6328C13.3887 19.0918 13.7695 19.4531 14.2676 19.4531Z", fillAlpha = 0.85f)
+        }
+        return _sFRadicandSquareroot!!
+    }
+
+private var _sFRadicandSquareroot: ImageVector? = null

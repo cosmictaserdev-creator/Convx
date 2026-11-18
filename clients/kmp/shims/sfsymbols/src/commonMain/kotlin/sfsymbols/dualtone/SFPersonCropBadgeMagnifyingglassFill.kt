@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonCropBadgeMagnifyingglassFill (dualtone)
+ * Viewport: 35.7715 x 31.5723
+ */
+public val SfSymbols.Dualtone.SFPersonCropBadgeMagnifyingglassFill: ImageVector
+    get() {
+        if (_sFPersonCropBadgeMagnifyingglassFill != null) {
+            return _sFPersonCropBadgeMagnifyingglassFill!!
+        }
+        _sFPersonCropBadgeMagnifyingglassFill = sfIcon(
+            name = "Dualtone.SFPersonCropBadgeMagnifyingglassFill",
+            viewportWidth = 35.7715f,
+            viewportHeight = 31.5723f
+        ) {
+            addSfPath("M30.4297 15.7812C30.4297 22.7832 24.7168 28.4961 17.7051 28.4961C16.9672 28.4961 16.2436 28.4326 15.5439 28.2976C15.4161 27.9319 15.1999 27.6023 14.9219 27.3242L13.7205 26.1081C14.9649 26.6 16.323 26.8652 17.7051 26.8652C20.7422 26.8652 23.6816 25.5762 25.5957 23.5352C24.209 21.3379 21.1426 20.0293 17.7051 20.0293C15.9612 20.0293 14.3211 20.3653 12.9483 20.9771C12.3162 18.0269 9.67704 15.7812 6.54297 15.7812C6.01118 15.7812 5.4935 15.8463 5.00012 15.9758C4.99074 15.9124 4.99023 15.8469 4.99023 15.7812C4.99023 8.76953 10.7031 3.05664 17.7051 3.05664C24.7168 3.05664 30.4297 8.76953 30.4297 15.7812ZM13.3984 13.1348C13.3984 15.8398 15.2832 17.8711 17.7051 17.8906C20.127 17.9102 22.0117 15.8398 22.0117 13.1348C22.0117 10.5957 20.1074 8.48633 17.7051 8.48633C15.3027 8.48633 13.3789 10.5957 13.3984 13.1348Z", fillAlpha = 0.425f)
+            addSfPath("M6.54297 27.3438C9.28711 27.3438 11.5332 25.0879 11.5332 22.3438C11.5332 19.5996 9.28711 17.3438 6.54297 17.3438C3.79883 17.3438 1.55273 19.5996 1.55273 22.3438C1.55273 25.0879 3.79883 27.3438 6.54297 27.3438ZM6.55273 25.8691C4.62891 25.8691 3.02734 24.2676 3.02734 22.334C3.02734 20.4199 4.62891 18.8184 6.55273 18.8184C8.48633 18.8184 10.0684 20.4199 10.0684 22.334C10.0684 24.2773 8.48633 25.8691 6.55273 25.8691ZM13.2324 30.0195C13.7598 30.0195 14.1211 29.6289 14.1211 29.0918C14.1211 28.8281 13.9941 28.6035 13.8086 28.418L10.4199 24.9902L9.07227 26.2891L12.4609 29.668C12.6855 29.8926 12.9199 30.0195 13.2324 30.0195Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonCropBadgeMagnifyingglassFill!!
+    }
+
+private var _sFPersonCropBadgeMagnifyingglassFill: ImageVector? = null

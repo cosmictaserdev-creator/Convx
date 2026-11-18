@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCrossCaseFill (monochrome)
+ * Viewport: 29.1504 x 24.1699
+ */
+public val SfSymbols.Monochrome.SFCrossCaseFill: ImageVector
+    get() {
+        if (_sFCrossCaseFill != null) {
+            return _sFCrossCaseFill!!
+        }
+        _sFCrossCaseFill = sfIcon(
+            name = "Monochrome.SFCrossCaseFill",
+            viewportWidth = 29.1504f,
+            viewportHeight = 24.1699f
+        ) {
+            addSfPath("M20.6641 3.22266L20.6641 4.47266L25.0879 4.47266C27.5684 4.47266 28.7891 5.67383 28.7891 8.13477L28.7891 20.5078C28.7891 22.959 27.5684 24.1602 25.0879 24.1602L3.70117 24.1602C1.23047 24.1602 0 22.959 0 20.5078L0 8.13477C0 5.67383 1.23047 4.47266 3.70117 4.47266L8.125 4.47266L8.125 3.22266C8.125 1.05469 9.4043 0 11.4355 0L17.3535 0C19.4824 0 20.6641 1.05469 20.6641 3.22266ZM13.3008 8.48633C12.6562 8.48633 12.2168 8.92578 12.2168 9.58984L12.2168 12.1094L9.67773 12.1094C9.02344 12.1094 8.58398 12.5586 8.58398 13.2031L8.58398 15.4004C8.58398 16.0449 9.0332 16.4844 9.67773 16.4844L12.2168 16.4844L12.2168 19.0234C12.2168 19.6777 12.6562 20.1172 13.3008 20.1172L15.4883 20.1172C16.1426 20.1172 16.582 19.6777 16.582 19.0234L16.582 16.4844L19.1211 16.4844C19.7754 16.4844 20.2246 16.0449 20.2246 15.4004L20.2246 13.2031C20.2246 12.5586 19.7754 12.1094 19.1211 12.1094L16.582 12.1094L16.582 9.58984C16.582 8.92578 16.1426 8.48633 15.4883 8.48633ZM11.3965 1.58203C10.3809 1.58203 9.79492 2.13867 9.79492 3.10547L9.79492 4.47266L18.9941 4.47266L18.9941 3.10547C18.9941 2.13867 18.4082 1.58203 17.3828 1.58203Z", fillAlpha = 0.85f)
+        }
+        return _sFCrossCaseFill!!
+    }
+
+private var _sFCrossCaseFill: ImageVector? = null

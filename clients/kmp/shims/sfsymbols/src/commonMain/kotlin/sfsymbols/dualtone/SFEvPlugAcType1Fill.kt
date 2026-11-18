@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFEvPlugAcType1Fill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFEvPlugAcType1Fill: ImageVector
+    get() {
+        if (_sFEvPlugAcType1Fill != null) {
+            return _sFEvPlugAcType1Fill!!
+        }
+        _sFEvPlugAcType1Fill = sfIcon(
+            name = "Dualtone.SFEvPlugAcType1Fill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M8.08594 11.6992C6.47461 11.6992 5.17578 10.4004 5.17578 8.78906C5.17578 7.1875 6.47461 5.86914 8.08594 5.86914C9.69727 5.86914 11.0059 7.1875 11.0059 8.78906C11.0059 10.4004 9.69727 11.6992 8.08594 11.6992ZM17.3242 11.6992C15.7129 11.6992 14.4141 10.4004 14.4141 8.78906C14.4141 7.1875 15.7129 5.86914 17.3242 5.86914C18.9355 5.86914 20.2441 7.1875 20.2441 8.78906C20.2441 10.4004 18.9355 11.6992 17.3242 11.6992ZM12.7051 22.1973C11.0938 22.1973 9.79492 20.8887 9.79492 19.2773C9.79492 17.6758 11.0938 16.3672 12.7051 16.3672C14.3164 16.3672 15.625 17.6758 15.625 19.2773C15.625 20.8887 14.3164 22.1973 12.7051 22.1973ZM6.13281 18.0859C4.99023 18.0859 4.04297 17.1484 4.04297 15.9961C4.04297 14.8438 4.99023 13.9062 6.13281 13.9062C7.29492 13.9062 8.23242 14.8438 8.23242 15.9961C8.23242 17.1484 7.29492 18.0859 6.13281 18.0859ZM19.2773 18.0859C18.125 18.0859 17.1875 17.1484 17.1875 15.9961C17.1875 14.8438 18.125 13.9062 19.2773 13.9062C20.4297 13.9062 21.3672 14.8438 21.3672 15.9961C21.3672 17.1484 20.4297 18.0859 19.2773 18.0859Z", fillAlpha = 0.85f)
+        }
+        return _sFEvPlugAcType1Fill!!
+    }
+
+private var _sFEvPlugAcType1Fill: ImageVector? = null

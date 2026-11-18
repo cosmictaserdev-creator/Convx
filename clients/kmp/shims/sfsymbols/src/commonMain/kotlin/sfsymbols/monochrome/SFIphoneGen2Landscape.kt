@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneGen2Landscape (monochrome)
+ * Viewport: 26.5918 x 15.6934
+ */
+public val SfSymbols.Monochrome.SFIphoneGen2Landscape: ImageVector
+    get() {
+        if (_sFIphoneGen2Landscape != null) {
+            return _sFIphoneGen2Landscape!!
+        }
+        _sFIphoneGen2Landscape = sfIcon(
+            name = "Monochrome.SFIphoneGen2Landscape",
+            viewportWidth = 26.5918f,
+            viewportHeight = 15.6934f
+        ) {
+            addSfPath("M26.2305 12.3242L26.2305 3.33008C26.2305 1.28906 24.9805 0 23.0078 0L3.23242 0C1.26953 0 0 1.28906 0 3.33008L0 12.3242C0 14.3652 1.26953 15.6543 3.23242 15.6543L23.0078 15.6543C24.9805 15.6543 26.2305 14.3652 26.2305 12.3242ZM24.502 12.1191C24.502 13.3008 23.9062 13.9258 22.7539 13.9258L3.49609 13.9258C2.34375 13.9258 1.74805 13.3008 1.74805 12.1191L1.74805 10.5371C1.74805 10.3516 1.8457 10.2441 2.03125 10.2441L2.28516 10.2441C2.77344 10.2441 3.10547 9.93164 3.10547 9.43359L3.10547 6.21094C3.10547 5.72266 2.77344 5.40039 2.28516 5.40039L2.03125 5.40039C1.8457 5.40039 1.74805 5.30273 1.74805 5.11719L1.74805 3.54492C1.74805 2.35352 2.34375 1.72852 3.49609 1.72852L22.7539 1.72852C23.9062 1.72852 24.502 2.35352 24.502 3.54492ZM9.78516 13.0273L16.4648 13.0273C16.7773 13.0273 17.002 12.8125 17.002 12.5C17.002 12.1777 16.7773 11.9629 16.4648 11.9629L9.78516 11.9629C9.48242 11.9629 9.25781 12.1777 9.25781 12.5C9.25781 12.8125 9.48242 13.0273 9.78516 13.0273Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneGen2Landscape!!
+    }
+
+private var _sFIphoneGen2Landscape: ImageVector? = null

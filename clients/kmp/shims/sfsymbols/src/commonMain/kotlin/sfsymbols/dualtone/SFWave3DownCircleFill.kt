@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFWave3DownCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFWave3DownCircleFill: ImageVector
+    get() {
+        if (_sFWave3DownCircleFill != null) {
+            return _sFWave3DownCircleFill!!
+        }
+        _sFWave3DownCircleFill = sfIcon(
+            name = "Dualtone.SFWave3DownCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.459C19.7266 25.459 25.4395 19.7461 25.4395 12.7344C25.4395 5.73242 19.7266 0.0195312 12.7148 0.0195312C5.71289 0.0195312 0 5.73242 0 12.7344C0 19.7461 5.71289 25.459 12.7148 25.459Z", fillAlpha = 0.2125f)
+            addSfPath("M12.6953 18.0371C9.7168 18.0371 6.83594 17.1582 4.52148 15.5371C4.14062 15.2637 4.05273 14.8047 4.29688 14.4531C4.56055 14.0918 5.01953 14.0332 5.39062 14.2969C7.38281 15.7227 9.98047 16.5234 12.6953 16.5234C15.4297 16.5234 18.0078 15.7324 20 14.2969C20.3711 14.0332 20.8301 14.0918 21.0938 14.4531C21.3477 14.8145 21.2598 15.2734 20.8691 15.5371C18.5352 17.1582 15.6641 18.0371 12.6953 18.0371Z", fillAlpha = 0.85f)
+            addSfPath("M12.6953 13.9551C10.498 13.9551 8.4082 13.3105 6.79688 12.1289C6.43555 11.8652 6.34766 11.416 6.60156 11.0645C6.83594 10.7227 7.31445 10.6348 7.70508 10.8984C9.02344 11.875 10.8105 12.4219 12.6953 12.4219C14.5801 12.4219 16.3672 11.875 17.6855 10.8984C18.0762 10.6348 18.5547 10.7227 18.7891 11.0645C19.043 11.416 18.9551 11.8652 18.5938 12.1289C17.0117 13.3105 14.9219 13.9551 12.6953 13.9551Z", fillAlpha = 0.85f)
+            addSfPath("M12.6953 9.87305C11.3379 9.87305 9.99023 9.46289 9.07227 8.75977C8.7207 8.51562 8.63281 8.03711 8.87695 7.69531C9.16016 7.30469 9.62891 7.24609 10.0293 7.5293C10.7129 8.03711 11.6992 8.33984 12.6953 8.33984C13.7109 8.33984 14.6973 8.03711 15.3613 7.5293C15.7617 7.23633 16.25 7.29492 16.5234 7.69531C16.7578 8.03711 16.6699 8.50586 16.3281 8.75977C15.3613 9.46289 14.0234 9.87305 12.6953 9.87305Z", fillAlpha = 0.85f)
+        }
+        return _sFWave3DownCircleFill!!
+    }
+
+private var _sFWave3DownCircleFill: ImageVector? = null

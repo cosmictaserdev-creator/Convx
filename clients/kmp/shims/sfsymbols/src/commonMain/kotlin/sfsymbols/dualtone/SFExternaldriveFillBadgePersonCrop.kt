@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFExternaldriveFillBadgePersonCrop (dualtone)
+ * Viewport: 41.875 x 28.3496
+ */
+public val SfSymbols.Dualtone.SFExternaldriveFillBadgePersonCrop: ImageVector
+    get() {
+        if (_sFExternaldriveFillBadgePersonCrop != null) {
+            return _sFExternaldriveFillBadgePersonCrop!!
+        }
+        _sFExternaldriveFillBadgePersonCrop = sfIcon(
+            name = "Dualtone.SFExternaldriveFillBadgePersonCrop",
+            viewportWidth = 41.875f,
+            viewportHeight = 28.3496f
+        ) {
+            addSfPath("M35.1562 19.707C35.1562 22.5586 33.1055 24.5996 30.2344 24.5996L14.5424 24.5996C15.3039 23.3994 15.7422 21.9833 15.7422 20.4785C15.7422 18.259 14.8066 16.2452 13.3084 14.8145L30.2344 14.8145C33.1055 14.8145 35.1562 16.8652 35.1562 19.707ZM28.4766 19.7363C28.4766 20.625 29.209 21.3086 30.0781 21.3086C30.918 21.3086 31.6406 20.6055 31.6406 19.7363C31.6406 18.8965 30.918 18.1641 30.0781 18.1641C29.209 18.1641 28.4766 18.8965 28.4766 19.7363ZM30.1855 6.55273L33.3691 14.0039C32.4512 13.5254 31.3965 13.252 30.2344 13.252L11.2695 13.252C11.1742 13.252 11.0796 13.2538 10.9867 13.2603C10.2742 12.946 9.50639 12.7377 8.7038 12.6534L11.3184 6.55273C12.0703 4.73633 13.623 3.76953 15.6836 3.76953L25.8203 3.76953C27.8809 3.76953 29.4238 4.73633 30.1855 6.55273Z", fillAlpha = 0.425f)
+            addSfPath("M14.1895 20.4785C14.1895 23.9355 11.2988 26.7871 7.87109 26.7871C4.41406 26.7871 1.55273 23.9551 1.55273 20.4785C1.55273 17.0215 4.41406 14.1602 7.87109 14.1602C11.3379 14.1602 14.1895 17.0117 14.1895 20.4785ZM4.12109 23.6426L4.12109 23.7012C4.62891 24.6289 6.08398 25.5078 7.88086 25.5078C9.66797 25.5078 11.084 24.6484 11.6211 23.7012L11.6211 23.6523C11.2207 22.8711 9.89258 21.9531 7.87109 21.9531C5.84961 21.9531 4.52148 22.8711 4.12109 23.6426ZM5.80078 18.6426C5.80078 19.9512 6.68945 20.9375 7.86133 20.9375C9.0332 20.9375 9.93164 19.9512 9.93164 18.6426C9.93164 17.4609 9.0332 16.4453 7.86133 16.4453C6.69922 16.4453 5.80078 17.4609 5.80078 18.6426Z", fillAlpha = 0.85f)
+        }
+        return _sFExternaldriveFillBadgePersonCrop!!
+    }
+
+private var _sFExternaldriveFillBadgePersonCrop: ImageVector? = null

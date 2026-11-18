@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCircleGridCrossDownFilled (dualtone)
+ * Viewport: 29.5801 x 29.8535
+ */
+public val SfSymbols.Dualtone.SFCircleGridCrossDownFilled: ImageVector
+    get() {
+        if (_sFCircleGridCrossDownFilled != null) {
+            return _sFCircleGridCrossDownFilled!!
+        }
+        _sFCircleGridCrossDownFilled = sfIcon(
+            name = "Dualtone.SFCircleGridCrossDownFilled",
+            viewportWidth = 29.5801f,
+            viewportHeight = 29.8535f
+        ) {
+            addSfPath("M14.6094 29.8242C17.6172 29.8242 20.0879 27.3438 20.0879 24.3359C20.0879 21.3379 17.6172 18.8574 14.6094 18.8574C11.582 18.8574 9.12109 21.3379 9.12109 24.3359C9.12109 27.3438 11.582 29.8242 14.6094 29.8242Z", fillAlpha = 0.85f)
+            addSfPath("M23.7402 20.4004C26.7383 20.4004 29.2188 17.9102 29.2188 14.9121C29.2188 11.9141 26.7383 9.43359 23.7402 9.43359C20.7031 9.43359 18.2422 11.9141 18.2422 14.9121C18.2422 17.9102 20.7031 20.4004 23.7402 20.4004ZM23.7402 18.7012C21.5918 18.7012 19.9316 17.041 19.9316 14.9121C19.9316 12.8027 21.5918 11.084 23.7402 11.084C25.8594 11.084 27.5293 12.8027 27.5293 14.9121C27.5293 17.041 25.8594 18.7012 23.7402 18.7012Z", fillAlpha = 0.425f)
+            addSfPath("M5.49805 20.4004C8.49609 20.4004 10.9668 17.9102 10.9668 14.9121C10.9668 11.9141 8.49609 9.43359 5.49805 9.43359C2.46094 9.43359 0 11.9141 0 14.9121C0 17.9102 2.46094 20.4004 5.49805 20.4004ZM5.49805 18.7012C3.34961 18.7012 1.68945 17.041 1.68945 14.9121C1.68945 12.8027 3.34961 11.084 5.49805 11.084C7.61719 11.084 9.28711 12.8027 9.28711 14.9121C9.28711 17.041 7.61719 18.7012 5.49805 18.7012Z", fillAlpha = 0.425f)
+            addSfPath("M14.6094 10.9668C17.6074 10.9668 20.0879 8.48633 20.0879 5.47852C20.0879 2.49023 17.6074 0 14.6094 0C11.5723 0 9.11133 2.49023 9.11133 5.47852C9.11133 8.48633 11.5723 10.9668 14.6094 10.9668ZM14.6094 9.27734C12.4609 9.27734 10.8008 7.61719 10.8008 5.47852C10.8008 3.36914 12.4609 1.65039 14.6094 1.65039C16.7285 1.65039 18.3984 3.36914 18.3984 5.47852C18.3984 7.61719 16.7285 9.27734 14.6094 9.27734Z", fillAlpha = 0.425f)
+        }
+        return _sFCircleGridCrossDownFilled!!
+    }
+
+private var _sFCircleGridCrossDownFilled: ImageVector? = null

@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCheckmark (monochrome)
+ * Viewport: 21.6797 x 21.8262
+ */
+public val SfSymbols.Monochrome.SFCheckmark: ImageVector
+    get() {
+        if (_sFCheckmark != null) {
+            return _sFCheckmark!!
+        }
+        _sFCheckmark = sfIcon(
+            name = "Monochrome.SFCheckmark",
+            viewportWidth = 21.6797f,
+            viewportHeight = 21.8262f
+        ) {
+            addSfPath("M7.90039 21.8262C8.35938 21.8262 8.70117 21.6211 8.95508 21.25L21.0449 2.29492C21.2402 1.99219 21.3184 1.75781 21.3184 1.52344C21.3184 0.927734 20.9277 0.537109 20.332 0.537109C19.9219 0.537109 19.6777 0.683594 19.4336 1.08398L7.85156 19.3848L1.93359 11.8652C1.66992 11.5039 1.41602 11.3477 1.01562 11.3477C0.419922 11.3477 0 11.7578 0 12.3438C0 12.5977 0.0976562 12.8613 0.3125 13.125L6.80664 21.2305C7.12891 21.6406 7.45117 21.8262 7.90039 21.8262Z", fillAlpha = 0.85f)
+        }
+        return _sFCheckmark!!
+    }
+
+private var _sFCheckmark: ImageVector? = null

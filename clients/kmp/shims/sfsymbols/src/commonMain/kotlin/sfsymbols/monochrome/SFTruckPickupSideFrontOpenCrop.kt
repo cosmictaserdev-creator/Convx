@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTruckPickupSideFrontOpenCrop (monochrome)
+ * Viewport: 22.959 x 22.2949
+ */
+public val SfSymbols.Monochrome.SFTruckPickupSideFrontOpenCrop: ImageVector
+    get() {
+        if (_sFTruckPickupSideFrontOpenCrop != null) {
+            return _sFTruckPickupSideFrontOpenCrop!!
+        }
+        _sFTruckPickupSideFrontOpenCrop = sfIcon(
+            name = "Monochrome.SFTruckPickupSideFrontOpenCrop",
+            viewportWidth = 22.959f,
+            viewportHeight = 22.2949f
+        ) {
+            addSfPath("M22.5879 2.19727L22.5879 0.400391C20.7227 0.800781 19.1406 1.48438 17.4121 2.56836L11.5527 6.25L6.24023 7.02148C1.95312 7.63672 0.0878906 9.42383 0.0878906 12.7148L0.0878906 15.6738C0.0878906 17.8516 1.2793 19.082 3.4082 19.082L7.06055 19.082L7.06055 17.3535L3.50586 17.3535C2.42188 17.3535 1.82617 16.6504 1.82617 15.459L1.82617 12.7148C1.82617 10.4297 3.23242 9.20898 6.46484 8.75L12.1387 7.91992L18.3301 4.05273C19.7461 3.16406 21.0742 2.56836 22.5879 2.19727ZM22.5977 19.082L22.5977 17.3535L14.0918 17.3535L14.0918 19.082ZM10.5273 22.2949C13.1152 22.2949 15.1172 20.2832 15.1172 17.6855C15.1172 15.0977 13.1152 13.0957 10.5273 13.0957C7.91992 13.0957 5.91797 15.0977 5.91797 17.6855C5.91797 20.2832 7.91992 22.2949 10.5273 22.2949ZM10.5273 20.5469C8.91602 20.5469 7.66602 19.2969 7.66602 17.6855C7.66602 16.084 8.91602 14.8242 10.5273 14.8242C12.1289 14.8242 13.3887 16.084 13.3887 17.6855C13.3887 19.2969 12.1289 20.5469 10.5273 20.5469ZM0.810547 1.62109L5.09766 1.62109C5.61523 1.62109 5.9668 1.73828 6.26953 2.05078L11.416 7.19727L12.9004 6.37695L7.54883 1.01562C6.88477 0.341797 6.02539 0.0585938 4.92188 0.0585938L0.810547 0.0585938C0.3125 0.0585938 0 0.371094 0 0.839844C0 1.29883 0.3125 1.62109 0.810547 1.62109Z", fillAlpha = 0.85f)
+        }
+        return _sFTruckPickupSideFrontOpenCrop!!
+    }
+
+private var _sFTruckPickupSideFrontOpenCrop: ImageVector? = null

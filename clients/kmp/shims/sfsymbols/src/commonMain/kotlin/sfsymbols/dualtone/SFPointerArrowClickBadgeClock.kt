@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPointerArrowClickBadgeClock (dualtone)
+ * Viewport: 29.1895 x 35.8105
+ */
+public val SfSymbols.Dualtone.SFPointerArrowClickBadgeClock: ImageVector
+    get() {
+        if (_sFPointerArrowClickBadgeClock != null) {
+            return _sFPointerArrowClickBadgeClock!!
+        }
+        _sFPointerArrowClickBadgeClock = sfIcon(
+            name = "Dualtone.SFPointerArrowClickBadgeClock",
+            viewportWidth = 29.1895f,
+            viewportHeight = 35.8105f
+        ) {
+            addSfPath("M3.95463 14.6841C3.64316 15.6992 3.47656 16.7793 3.47656 17.9004C3.47656 22.041 5.79102 25.6445 9.08203 27.4316C10.3125 28.1445 9.4043 29.6582 8.27148 29.0137C4.42383 26.9434 1.65039 22.7051 1.65039 17.9004C1.65039 16.3751 1.9264 14.9075 2.44452 13.5519C2.89542 13.9917 3.40245 14.373 3.95463 14.6841ZM27.0898 17.9004C27.0898 18.5156 26.6602 18.8477 26.2207 18.8477C25.752 18.8477 25.2637 18.5254 25.2637 17.9004C25.2637 12.3127 21.1083 7.74302 15.7024 7.0925C15.6385 6.44217 15.4931 5.81428 15.269 5.22279C21.8178 5.68797 27.0898 11.2456 27.0898 17.9004Z", fillAlpha = 0.425f)
+            addSfPath("M14.8535 16.6797L21.7383 23.8867C22.041 24.2188 21.8262 24.6484 21.3965 24.6582L18.5938 24.7266L20.5957 29.375C20.8203 29.9023 20.5762 30.4785 20.0586 30.6836C19.541 30.8984 18.9355 30.6543 18.7305 30.1562L16.8066 25.4004L14.8535 27.3633C14.5605 27.6562 14.0332 27.5098 14.043 27.0605L14.0918 16.9824C14.1016 16.5527 14.5605 16.377 14.8535 16.6797Z", fillAlpha = 0.85f)
+            addSfPath("M14.1895 7.87109C14.1895 11.3281 11.2988 14.1895 7.87109 14.1895C4.41406 14.1895 1.55273 11.3477 1.55273 7.87109C1.55273 4.41406 4.41406 1.5625 7.87109 1.5625C11.3379 1.5625 14.1895 4.4043 14.1895 7.87109ZM7.2168 4.0918L7.2168 7.40234L4.84375 7.40234C4.45312 7.40234 4.13086 7.72461 4.13086 8.10547C4.13086 8.50586 4.44336 8.82812 4.84375 8.82812L7.92969 8.82812C8.33008 8.82812 8.64258 8.50586 8.64258 8.10547L8.64258 4.0918C8.64258 3.71094 8.33008 3.39844 7.92969 3.39844C7.5293 3.39844 7.2168 3.71094 7.2168 4.0918Z", fillAlpha = 0.85f)
+        }
+        return _sFPointerArrowClickBadgeClock!!
+    }
+
+private var _sFPointerArrowClickBadgeClock: ImageVector? = null

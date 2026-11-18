@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSliderHorizontalBelowSquareAndSquareFilled (monochrome)
+ * Viewport: 31.2891 x 27.5098
+ */
+public val SfSymbols.Monochrome.SFSliderHorizontalBelowSquareAndSquareFilled: ImageVector
+    get() {
+        if (_sFSliderHorizontalBelowSquareAndSquareFilled != null) {
+            return _sFSliderHorizontalBelowSquareAndSquareFilled!!
+        }
+        _sFSliderHorizontalBelowSquareAndSquareFilled = sfIcon(
+            name = "Monochrome.SFSliderHorizontalBelowSquareAndSquareFilled",
+            viewportWidth = 31.2891f,
+            viewportHeight = 27.5098f
+        ) {
+            addSfPath("M4.29688 24.6094C4.29688 24.9081 4.34261 25.1968 4.42752 25.4687L0.869141 25.4688C0.380859 25.4688 0 25.0879 0 24.6094C0 24.1211 0.380859 23.7402 0.869141 23.7402L4.42943 23.7402C4.34321 24.0149 4.29688 24.3069 4.29688 24.6094ZM30.9277 24.6094C30.9277 25.0879 30.5469 25.4688 30.0586 25.4688L9.97587 25.4687C10.0613 25.1968 10.1074 24.9081 10.1074 24.6094C10.1074 24.3069 10.0607 24.0149 9.97395 23.7402L30.0586 23.7402C30.5469 23.7402 30.9277 24.1211 30.9277 24.6094Z", fillAlpha = 0.85f)
+            addSfPath("M7.19727 27.5098C8.79883 27.5098 10.1074 26.2012 10.1074 24.6094C10.1074 23.0078 8.79883 21.6992 7.19727 21.6992C5.5957 21.6992 4.29688 23.0078 4.29688 24.6094C4.29688 26.2012 5.5957 27.5098 7.19727 27.5098ZM7.19727 26.123C6.33789 26.123 5.67383 25.4492 5.67383 24.5996C5.67383 23.7402 6.33789 23.0762 7.19727 23.0762C8.04688 23.0762 8.7207 23.7402 8.7207 24.5996C8.7207 25.4492 8.04688 26.123 7.19727 26.123Z", fillAlpha = 0.85f)
+            addSfPath("M27.9395 16.8066C29.8535 16.8066 30.9277 15.7617 30.9277 13.8379L30.9277 5.66406C30.9277 3.74023 29.8535 2.69531 27.9395 2.69531L19.6973 2.69531C17.7734 2.69531 16.6797 3.75 16.6797 5.66406L16.6797 13.8379C16.6797 15.752 17.7734 16.8066 19.6973 16.8066Z", fillAlpha = 0.85f)
+            addSfPath("M11.4355 16.9336C13.4082 16.9336 14.502 15.8594 14.502 13.9258L14.502 5.58594C14.502 3.64258 13.4082 2.56836 11.4355 2.56836L3.05664 2.56836C1.09375 2.56836 0 3.64258 0 5.58594L0 13.9258C0 15.8594 1.09375 16.9336 3.05664 16.9336ZM11.416 15.2441L3.07617 15.2441C2.12891 15.2441 1.69922 14.8047 1.69922 13.8477L1.69922 5.6543C1.69922 4.70703 2.12891 4.25781 3.07617 4.25781L11.416 4.25781C12.3633 4.25781 12.8027 4.70703 12.8027 5.6543L12.8027 13.8477C12.8027 14.8047 12.3633 15.2441 11.416 15.2441Z", fillAlpha = 0.85f)
+        }
+        return _sFSliderHorizontalBelowSquareAndSquareFilled!!
+    }
+
+private var _sFSliderHorizontalBelowSquareAndSquareFilled: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFP4ButtonHorizontalFill (dualtone)
+ * Viewport: 29.6387 x 22.2949
+ */
+public val SfSymbols.Dualtone.SFP4ButtonHorizontalFill: ImageVector
+    get() {
+        if (_sFP4ButtonHorizontalFill != null) {
+            return _sFP4ButtonHorizontalFill!!
+        }
+        _sFP4ButtonHorizontalFill = sfIcon(
+            name = "Dualtone.SFP4ButtonHorizontalFill",
+            viewportWidth = 29.6387f,
+            viewportHeight = 22.2949f
+        ) {
+            addSfPath("M9.59961 22.2754L19.6777 22.2754C26.8164 22.2754 29.2773 19.6094 29.2773 13.0371L29.2773 9.23828C29.2773 2.66602 26.8164 0 19.6777 0L9.59961 0C2.46094 0 0 2.66602 0 9.23828L0 13.0371C0 19.6094 2.46094 22.2754 9.59961 22.2754Z", fillAlpha = 0.2125f)
+            addSfPath("M8.82812 16.4844C8.29102 16.4844 7.99805 16.1621 7.99805 15.625L7.99805 6.77734C7.99805 6.21094 8.34961 5.89844 8.81836 5.89844L11.2012 5.89844C13.0371 5.89844 14.1504 7.41211 14.1504 9.3457C14.1504 11.2988 13.0273 12.7832 11.1035 12.7832L9.64844 12.7832L9.64844 15.625C9.64844 16.1523 9.375 16.4844 8.82812 16.4844ZM9.64844 11.4453L10.7715 11.4453C11.9824 11.4453 12.5 10.5566 12.5 9.3457C12.5 8.08594 11.9434 7.25586 10.7812 7.25586L9.64844 7.25586ZM19.9414 16.5234C19.5703 16.5234 19.1504 16.2891 19.1504 15.6934L19.1504 14.2188L16.1523 14.2188C15.5762 14.2188 15.1953 13.8379 15.1953 13.2812C15.1953 12.9199 15.2637 12.627 15.4492 12.1875L17.9492 6.88477C18.2812 6.17188 18.6621 5.76172 19.4629 5.76172C20.1855 5.76172 20.7129 6.17188 20.7129 6.99219L20.7129 12.8906L21.2598 12.8906C21.6992 12.8906 21.9141 13.1738 21.9141 13.5449C21.9141 13.9355 21.6992 14.2188 21.2598 14.2188L20.7129 14.2188L20.7129 15.6934C20.7129 16.2402 20.3613 16.5234 19.9414 16.5234ZM19.1797 12.9199L19.1797 7.24609L19.1309 7.24609L16.6113 12.8516L16.6113 12.9199Z", fillAlpha = 0.85f)
+        }
+        return _sFP4ButtonHorizontalFill!!
+    }
+
+private var _sFP4ButtonHorizontalFill: ImageVector? = null

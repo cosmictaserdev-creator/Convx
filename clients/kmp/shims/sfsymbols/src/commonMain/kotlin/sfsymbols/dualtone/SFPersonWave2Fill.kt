@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonWave2Fill (dualtone)
+ * Viewport: 30.5664 x 29.5759
+ */
+public val SfSymbols.Dualtone.SFPersonWave2Fill: ImageVector
+    get() {
+        if (_sFPersonWave2Fill != null) {
+            return _sFPersonWave2Fill!!
+        }
+        _sFPersonWave2Fill = sfIcon(
+            name = "Dualtone.SFPersonWave2Fill",
+            viewportWidth = 30.5664f,
+            viewportHeight = 29.5759f
+        ) {
+            addSfPath("M26.7969 17.3905C27.1973 17.6639 27.6855 17.5761 27.9785 17.1659C29.5898 14.9784 30.5664 11.9022 30.5664 8.77722C30.5664 5.64246 29.5996 2.54675 27.9785 0.388551C27.6855-0.0216051 27.1973-0.119261 26.7969 0.154176C26.3965 0.427614 26.3281 0.925661 26.6504 1.37488C28.0859 3.36707 28.8965 6.01355 28.8965 8.77722C28.8965 11.5409 28.0664 14.1776 26.6504 16.1796C26.3379 16.619 26.3965 17.1268 26.7969 17.3905Z", fillAlpha = 0.425f)
+            addSfPath("M22.2852 14.0995C22.6465 14.3534 23.1543 14.2655 23.4473 13.8553C24.4043 12.5858 25.0098 10.7401 25.0098 8.77722C25.0098 6.80457 24.4043 4.96863 23.4473 3.68933C23.1543 3.27918 22.6465 3.20105 22.2852 3.45496C21.8555 3.75769 21.7773 4.28504 22.1191 4.73425C22.9199 5.828 23.3398 7.22449 23.3398 8.77722C23.3398 10.3202 22.9102 11.7069 22.1191 12.8202C21.7871 13.2694 21.8555 13.787 22.2852 14.0995Z", fillAlpha = 0.425f)
+            addSfPath("M4.72656 26.0428L20.8301 26.0428C22.6465 26.0428 23.3496 25.5253 23.3496 24.4315C23.3496 21.1893 19.2871 16.7167 12.7734 16.7167C6.26953 16.7167 2.20703 21.1893 2.20703 24.4315C2.20703 25.5253 2.91016 26.0428 4.72656 26.0428ZM12.793 14.4608C15.5078 14.4608 17.793 12.0389 17.793 8.91394C17.793 5.8573 15.4883 3.52332 12.793 3.52332C10.0879 3.52332 7.77344 5.89636 7.79297 8.93347C7.79297 12.0389 10.0781 14.4608 12.793 14.4608Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonWave2Fill!!
+    }
+
+private var _sFPersonWave2Fill: ImageVector? = null

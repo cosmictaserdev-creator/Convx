@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBahtsignCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFBahtsignCircle: ImageVector
+    get() {
+        if (_sFBahtsignCircle != null) {
+            return _sFBahtsignCircle!!
+        }
+        _sFBahtsignCircle = sfIcon(
+            name = "Monochrome.SFBahtsignCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M10.2051 18.2129L13.3203 18.2129C15.4199 18.2129 17.0898 17.2461 17.0898 15.166C17.0898 13.623 15.9961 12.6172 14.502 12.4414L14.502 12.3633C15.6641 12.1875 16.5234 11.1035 16.5234 9.92188C16.5234 8.0957 14.9902 7.1875 13.3008 7.1875L10.2051 7.1875C9.6875 7.1875 9.39453 7.53906 9.39453 8.01758L9.39453 17.3926C9.39453 17.8711 9.69727 18.2129 10.2051 18.2129ZM10.6934 12.002L10.6934 8.29102L12.9883 8.29102C14.248 8.29102 15.2344 8.81836 15.2344 10.0781C15.2344 11.4648 14.0918 12.002 12.666 12.002ZM10.6934 17.1191L10.6934 13.0762L12.959 13.0762C14.4824 13.0762 15.7617 13.5742 15.7617 15.0879C15.7617 16.5723 14.5801 17.1191 13.0859 17.1191ZM12.7051 19.6582C12.9395 19.6582 13.0859 19.502 13.0859 19.2676L13.0859 6.05469C13.0859 5.81055 12.9297 5.6543 12.7051 5.6543C12.4707 5.6543 12.3145 5.81055 12.3145 6.05469L12.3145 19.2676C12.3145 19.502 12.4707 19.6582 12.7051 19.6582Z", fillAlpha = 0.85f)
+        }
+        return _sFBahtsignCircle!!
+    }
+
+private var _sFBahtsignCircle: ImageVector? = null

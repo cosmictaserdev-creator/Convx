@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonTextRectangleFill (dualtone)
+ * Viewport: 29.9512 x 22.959
+ */
+public val SfSymbols.Dualtone.SFPersonTextRectangleFill: ImageVector
+    get() {
+        if (_sFPersonTextRectangleFill != null) {
+            return _sFPersonTextRectangleFill!!
+        }
+        _sFPersonTextRectangleFill = sfIcon(
+            name = "Dualtone.SFPersonTextRectangleFill",
+            viewportWidth = 29.9512f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L25.7812 22.959C28.3105 22.959 29.5898 21.6797 29.5898 19.1992L29.5898 3.76953C29.5898 1.2793 28.3105 0 25.7812 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959Z", fillAlpha = 0.2125f)
+            addSfPath("M17.7539 7.08984C17.3535 7.08984 17.0605 6.78711 17.0605 6.40625C17.0605 6.02539 17.3535 5.73242 17.7539 5.73242L24.7656 5.73242C25.1562 5.73242 25.4492 6.02539 25.4492 6.40625C25.4492 6.78711 25.1562 7.08984 24.7656 7.08984ZM17.7539 12.168C17.3535 12.168 17.0605 11.8652 17.0605 11.4844C17.0605 11.1133 17.3535 10.8203 17.7539 10.8203L24.7656 10.8203C25.1562 10.8203 25.4492 11.1133 25.4492 11.4844C25.4492 11.8652 25.1562 12.168 24.7656 12.168ZM17.7539 17.2461C17.3535 17.2461 17.0605 16.9531 17.0605 16.582C17.0605 16.2012 17.3535 15.8984 17.7539 15.8984L24.7656 15.8984C25.1562 15.8984 25.4492 16.2012 25.4492 16.582C25.4492 16.9531 25.1562 17.2461 24.7656 17.2461ZM4.41406 17.3242C4.0332 17.3242 3.85742 17.0703 3.85742 16.7188C3.85742 15.5078 5.64453 12.3633 9.45312 12.3633C13.2617 12.3633 15.0586 15.5078 15.0586 16.7188C15.0586 17.0703 14.873 17.3242 14.4922 17.3242ZM9.45312 11.4746C7.91016 11.4746 6.66016 10.1758 6.66016 8.4375C6.66016 6.80664 7.91016 5.44922 9.45312 5.44922C10.9961 5.44922 12.2363 6.80664 12.2363 8.4375C12.2363 10.1758 10.9961 11.4844 9.45312 11.4746Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonTextRectangleFill!!
+    }
+
+private var _sFPersonTextRectangleFill: ImageVector? = null

@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPointBottomleftForwardToArrowTriangleUturnScurvepathFill (dualtone)
+ * Viewport: 22.3926 x 31.7733
+ */
+public val SfSymbols.Dualtone.SFPointBottomleftForwardToArrowTriangleUturnScurvepathFill: ImageVector
+    get() {
+        if (_sFPointBottomleftForwardToArrowTriangleUturnScurvepathFill != null) {
+            return _sFPointBottomleftForwardToArrowTriangleUturnScurvepathFill!!
+        }
+        _sFPointBottomleftForwardToArrowTriangleUturnScurvepathFill = sfIcon(
+            name = "Dualtone.SFPointBottomleftForwardToArrowTriangleUturnScurvepathFill",
+            viewportWidth = 22.3926f,
+            viewportHeight = 31.7733f
+        ) {
+            addSfPath("M7.75585 24.9247L7.40234 24.9247C6.92383 24.9247 6.5332 25.3154 6.5332 25.7841C6.5332 26.2626 6.92383 26.6533 7.40234 26.6533L7.7492 26.6533C7.35266 28.3988 5.78978 29.7001 3.91602 29.7001C1.75781 29.7001 0 27.9423 0 25.7744C0 23.6162 1.75781 21.8583 3.91602 21.8583C5.79913 21.8583 7.36826 23.1727 7.75585 24.9247Z", fillAlpha = 0.425f)
+            addSfPath("M7.40234 26.6533L15.5371 26.6533C19.5215 26.6533 22.0312 24.5927 22.0312 21.331C22.0312 18.0205 19.5312 15.8232 14.8438 15.3447L7.45117 14.5732C3.71094 14.1826 1.73828 12.6591 1.73828 10.4423C1.73828 8.2353 3.56445 6.84858 6.49414 6.84858L11.6406 6.84858L10.4199 5.84272C10.166 5.62787 9.96094 5.38373 9.81445 5.12006L6.49414 5.12006C2.50977 5.12006 0 7.18061 0 10.4423C0 13.7529 2.50977 15.9599 7.1582 16.4287L14.5801 17.2001C18.3203 17.5908 20.3027 19.1142 20.3027 21.331C20.3027 23.538 18.4668 24.9247 15.5371 24.9247L7.40234 24.9247C6.92383 24.9247 6.5332 25.3154 6.5332 25.7841C6.5332 26.2626 6.92383 26.6533 7.40234 26.6533Z", fillAlpha = 0.425f)
+            addSfPath("M15.293 6.51655L15.293 0.764593C15.293 0.129827 14.707-0.241266 14.1992 0.178656L10.7715 2.99116C10.293 3.39155 10.2832 3.88959 10.7715 4.29975L14.1992 7.09272C14.707 7.51264 15.293 7.17084 15.293 6.51655ZM15.3027 10.6962C15.3027 11.165 15.6543 11.4384 16.1133 11.4384L17.7148 11.4384C20.3223 11.4384 22.2168 9.78803 22.2168 7.14155C22.2168 4.52436 20.332 2.8935 17.7246 2.8935L14.2969 2.8935C13.877 2.8935 13.5449 3.22553 13.5449 3.63569C13.5449 4.04584 13.877 4.37787 14.2969 4.37787L17.7246 4.37787C19.4336 4.37787 20.6836 5.35444 20.6836 7.08295C20.6836 8.85053 19.4629 9.94428 17.7148 9.94428L16.084 9.94428C15.6543 9.94428 15.3027 10.2177 15.3027 10.6962Z", fillAlpha = 0.85f)
+        }
+        return _sFPointBottomleftForwardToArrowTriangleUturnScurvepathFill!!
+    }
+
+private var _sFPointBottomleftForwardToArrowTriangleUturnScurvepathFill: ImageVector? = null

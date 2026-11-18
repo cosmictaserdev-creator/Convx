@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPhotoStackFill (monochrome)
+ * Viewport: 30.9473 x 31.5918
+ */
+public val SfSymbols.Monochrome.SFPhotoStackFill: ImageVector
+    get() {
+        if (_sFPhotoStackFill != null) {
+            return _sFPhotoStackFill!!
+        }
+        _sFPhotoStackFill = sfIcon(
+            name = "Monochrome.SFPhotoStackFill",
+            viewportWidth = 30.9473f,
+            viewportHeight = 31.5918f
+        ) {
+            addSfPath("M23.2553 3.47656L7.34027 3.47656C7.40286 2.59177 7.97731 2.08008 8.91602 2.08008L21.6699 2.08008C22.6086 2.08008 23.1917 2.59177 23.2553 3.47656Z", fillAlpha = 0.85f)
+            addSfPath("M25.7757 6.89437C25.4256 6.84087 25.0548 6.81641 24.668 6.81641L5.91797 6.81641C5.53106 6.81641 5.16024 6.84065 4.81033 6.89376C4.94314 5.85538 5.65863 5.27344 6.80664 5.27344L23.7793 5.27344C24.9275 5.27344 25.6431 5.85561 25.7757 6.89437Z", fillAlpha = 0.85f)
+            addSfPath("M28.4668 12.6953L28.4668 25.7129C28.4668 28.2031 27.1875 29.4824 24.668 29.4824L5.91797 29.4824C3.38867 29.4824 2.11914 28.2129 2.11914 25.7129L2.11914 12.6953C2.11914 10.1953 3.38867 8.93555 5.91797 8.93555L24.668 8.93555C27.1875 8.93555 28.4668 10.2051 28.4668 12.6953ZM17.8027 18.8867L12.4707 23.5547L10.3809 21.6602C9.88281 21.2012 9.36523 20.9668 8.7793 20.9668C8.23242 20.9668 7.76367 21.2012 7.25586 21.6504L4.04297 24.4922L4.04297 25.498C4.04297 26.8555 4.76562 27.5586 6.09375 27.5586L24.502 27.5586C25.791 27.5586 26.543 26.8555 26.543 25.498L26.543 23.6816L21.4258 18.8965C20.8984 18.3984 20.2734 18.1543 19.6094 18.1543C18.9355 18.1543 18.3691 18.3789 17.8027 18.8867ZM8.7793 16.25C8.7793 17.793 10.0293 19.0723 11.582 19.0723C13.1152 19.0723 14.3652 17.793 14.3652 16.25C14.3652 14.7266 13.1152 13.457 11.582 13.457C10.0293 13.457 8.7793 14.7266 8.7793 16.25Z", fillAlpha = 0.85f)
+        }
+        return _sFPhotoStackFill!!
+    }
+
+private var _sFPhotoStackFill: ImageVector? = null

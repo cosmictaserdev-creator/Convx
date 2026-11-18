@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandRaisedSquareFill (dualtone)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Dualtone.SFHandRaisedSquareFill: ImageVector
+    get() {
+        if (_sFHandRaisedSquareFill != null) {
+            return _sFHandRaisedSquareFill!!
+        }
+        _sFHandRaisedSquareFill = sfIcon(
+            name = "Dualtone.SFHandRaisedSquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959Z", fillAlpha = 0.2125f)
+            addSfPath("M6.18164 13.9355L6.18164 6.91406C6.18164 6.47461 6.55273 6.11328 6.99219 6.11328C7.43164 6.11328 7.79297 6.47461 7.79297 6.91406L7.79297 11.2891C7.99805 11.1523 8.21289 11.0156 8.47656 10.9082L8.47656 4.54102C8.47656 4.10156 8.84766 3.74023 9.27734 3.74023C9.7168 3.74023 10.0879 4.10156 10.0879 4.54102L10.0879 10.3906C10.332 10.3418 10.5762 10.3125 10.8203 10.293L10.8203 3.82812C10.8203 3.39844 11.1816 3.02734 11.6309 3.02734C12.0703 3.02734 12.4316 3.39844 12.4316 3.82812L12.4316 10.3809C12.666 10.4395 12.8906 10.5176 13.1055 10.5859L13.1055 5.01953C13.1055 4.58984 13.4668 4.22852 13.9062 4.22852C14.3359 4.22852 14.707 4.58984 14.707 5.01953L14.707 12.8809C14.707 13.1641 14.8242 13.2812 15 13.2812C15.1367 13.2812 15.2734 13.1934 15.3809 12.9199L16.4258 10.625C16.7285 9.99023 17.0117 9.72656 17.4512 9.72656C17.8711 9.72656 18.1836 10 18.1836 10.4102C18.1836 10.7129 17.959 11.3477 17.793 11.9043C17.3535 13.3984 16.9336 14.7168 16.3965 15.8789C15.3809 18.2617 13.7207 19.2773 11.3867 19.2773C8.36914 19.2773 6.18164 17.3047 6.18164 13.9355Z", fillAlpha = 0.85f)
+        }
+        return _sFHandRaisedSquareFill!!
+    }
+
+private var _sFHandRaisedSquareFill: ImageVector? = null

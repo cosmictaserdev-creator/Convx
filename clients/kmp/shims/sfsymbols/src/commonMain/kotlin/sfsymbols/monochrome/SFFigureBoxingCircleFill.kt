@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureBoxingCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFFigureBoxingCircleFill: ImageVector
+    get() {
+        if (_sFFigureBoxingCircleFill != null) {
+            return _sFFigureBoxingCircleFill!!
+        }
+        _sFFigureBoxingCircleFill = sfIcon(
+            name = "Monochrome.SFFigureBoxingCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7266 19.7266 25.4395 12.7148 25.4395C5.71289 25.4395 0 19.7266 0 12.7246C0 5.71289 5.71289 0 12.7148 0C19.7266 0 25.4395 5.71289 25.4395 12.7246ZM10.4199 7.69531C9.82422 7.69531 9.32617 7.87109 8.84766 8.33984L7.45117 9.76562C6.97266 10.2344 7.23633 11.0156 7.88086 11.0156L9.20898 11.0156L8.91602 11.8652C8.76953 12.3242 8.70117 12.793 8.70117 13.252L8.70117 16.9824L6.52344 19.4727C6.24023 19.7852 6.26953 20.2441 6.58203 20.5273C6.88477 20.7715 7.34375 20.752 7.62695 20.4395L9.95117 17.7832C10.0879 17.6172 10.166 17.4512 10.1855 17.2559L10.5078 14.1016C10.5176 14.0137 10.6348 13.9746 10.6934 14.0527L12.7539 16.4355L12.7539 20.0977C12.7539 20.498 13.0859 20.8398 13.4961 20.8398C13.8867 20.8398 14.2285 20.498 14.2285 20.0977L14.2285 16.1816C14.2285 15.9863 14.1699 15.8594 14.0723 15.7227L11.9043 12.5586L12.959 9.4043C13.0176 9.22852 13.1348 9.16992 13.291 9.16992L17.9492 9.16992C18.1055 9.60938 18.5156 9.91211 19.0039 9.91211C19.5996 9.91211 20.1074 9.42383 20.1074 8.79883C20.1074 8.20312 19.5996 7.69531 19.0039 7.69531ZM11.2012 5.36133C11.2012 6.2207 11.8848 6.91406 12.7539 6.91406C13.6035 6.91406 14.2871 6.2207 14.2871 5.36133C14.2871 4.50195 13.6035 3.81836 12.7539 3.81836C11.8848 3.81836 11.2012 4.50195 11.2012 5.36133Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureBoxingCircleFill!!
+    }
+
+private var _sFFigureBoxingCircleFill: ImageVector? = null

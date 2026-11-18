@@ -1,0 +1,31 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHearingdeviceAndSignalMeterFill (monochrome)
+ * Viewport: 28.1641 x 27.1973
+ */
+public val SfSymbols.Monochrome.SFHearingdeviceAndSignalMeterFill: ImageVector
+    get() {
+        if (_sFHearingdeviceAndSignalMeterFill != null) {
+            return _sFHearingdeviceAndSignalMeterFill!!
+        }
+        _sFHearingdeviceAndSignalMeterFill = sfIcon(
+            name = "Monochrome.SFHearingdeviceAndSignalMeterFill",
+            viewportWidth = 28.1641f,
+            viewportHeight = 27.1973f
+        ) {
+            addSfPath("M9.08203 21.0156C9.08203 24.4043 11.2109 26.582 14.5215 26.582C17.0215 26.582 18.916 25.4199 20.0781 23.252L21.0938 21.3867C23.7695 16.3184 28.1641 15.8887 28.1641 9.70703C28.1641 3.87695 24.4043 0 18.7598 0C12.9785 0 9.08203 3.93555 9.08203 9.77539ZM12.6953 17.5977C12.6953 15.2734 15.332 15.6738 15.332 14.1309C15.332 12.8418 12.6953 11.9043 12.6953 9.07227C12.6953 5.89844 15.127 3.59375 18.7207 3.59375C22.334 3.59375 24.7461 5.99609 24.7461 9.60938C24.7461 10.0684 24.3555 10.4492 23.8965 10.4492C23.4473 10.4492 23.0469 10.0684 23.0469 9.60938C23.0469 6.99219 21.3574 5.2832 18.7207 5.2832C16.123 5.2832 14.3848 6.89453 14.3848 9.07227C14.3848 11.7871 18.3105 12.3535 18.3105 16.084C18.3105 18.0859 16.9922 19.6777 15.0977 19.6875C13.6621 19.6875 12.6953 18.8477 12.6953 17.5977Z", fillAlpha = 0.85f)
+            addSfPath("M2.61719 5.80078C3.7207 5.80078 4.61914 4.91211 4.61914 3.79883C4.61914 2.69531 3.7207 1.79688 2.61719 1.79688C1.50391 1.79688 0.605469 2.69531 0.605469 3.79883C0.605469 4.91211 1.50391 5.80078 2.61719 5.80078Z", fillAlpha = 0.85f)
+            addSfPath("M2.61719 12.3242C3.7207 12.3242 4.61914 11.4258 4.61914 10.3223C4.61914 9.20898 3.7207 8.32031 2.61719 8.32031C1.50391 8.32031 0.605469 9.20898 0.605469 10.3223C0.605469 11.4258 1.50391 12.3242 2.61719 12.3242Z", fillAlpha = 0.85f)
+            addSfPath("M2.61719 18.8672C3.7207 18.8672 4.61914 17.9688 4.61914 16.8652C4.61914 15.752 3.7207 14.8535 2.61719 14.8535C1.50391 14.8535 0.605469 15.752 0.605469 16.8652C0.605469 17.9688 1.50391 18.8672 2.61719 18.8672Z", fillAlpha = 0.85f)
+            addSfPath("M2.61719 25.3809C3.7207 25.3809 4.61914 24.4922 4.61914 23.3789C4.61914 22.2754 3.7207 21.377 2.61719 21.377C1.50391 21.377 0.605469 22.2754 0.605469 23.3789C0.605469 24.4922 1.50391 25.3809 2.61719 25.3809Z", fillAlpha = 0.85f)
+        }
+        return _sFHearingdeviceAndSignalMeterFill!!
+    }
+
+private var _sFHearingdeviceAndSignalMeterFill: ImageVector? = null

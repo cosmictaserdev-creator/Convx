@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFEurozonesignSquareFill (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFEurozonesignSquareFill: ImageVector
+    get() {
+        if (_sFEurozonesignSquareFill != null) {
+            return _sFEurozonesignSquareFill!!
+        }
+        _sFEurozonesignSquareFill = sfIcon(
+            name = "Monochrome.SFEurozonesignSquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M22.959 3.76953L22.959 19.1992C22.959 21.6797 21.6797 22.959 19.1504 22.959L3.79883 22.959C1.2793 22.959 0 21.6992 0 19.1992L0 3.76953C0 1.26953 1.2793 0 3.79883 0L19.1504 0C21.6797 0 22.959 1.2793 22.959 3.76953ZM5.84961 6.26953C5.42969 6.26953 5.20508 6.52344 5.20508 6.94336L5.20508 16.0449C5.20508 16.4746 5.41016 16.7285 5.84961 16.7285L9.93164 16.7285C10.293 16.7285 10.5273 16.5137 10.5273 16.1621C10.5273 15.8105 10.293 15.5859 9.93164 15.5859L6.50391 15.5859L6.50391 11.9336L9.77539 11.9336C10.1074 11.9336 10.3223 11.709 10.3223 11.3867C10.3223 11.0645 10.1074 10.8398 9.77539 10.8398L6.50391 10.8398L6.50391 7.40234L9.93164 7.40234C10.293 7.40234 10.5273 7.17773 10.5273 6.82617C10.5273 6.47461 10.293 6.26953 9.93164 6.26953ZM12.6855 6.26953C12.3438 6.26953 12.0996 6.48438 12.0996 6.82617C12.0996 7.16797 12.3438 7.40234 12.6855 7.40234L16.6699 7.40234L16.6699 7.46094L12.2363 15.498C12.1289 15.6836 12.0605 15.8691 12.0605 16.0742C12.0605 16.5234 12.3828 16.7285 12.7246 16.7285L17.7441 16.7285C18.0859 16.7285 18.2812 16.4941 18.2812 16.1621C18.2812 15.8301 18.0859 15.5859 17.7441 15.5859L13.5742 15.5859L13.5742 15.5273L17.9688 7.50977C18.0762 7.33398 18.1641 7.13867 18.1641 6.92383C18.1641 6.54297 17.9102 6.26953 17.4902 6.26953Z", fillAlpha = 0.85f)
+        }
+        return _sFEurozonesignSquareFill!!
+    }
+
+private var _sFEurozonesignSquareFill: ImageVector? = null

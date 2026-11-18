@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBrakesignal (dualtone)
+ * Viewport: 35.4102 x 24.3262
+ */
+public val SfSymbols.Dualtone.SFBrakesignal: ImageVector
+    get() {
+        if (_sFBrakesignal != null) {
+            return _sFBrakesignal!!
+        }
+        _sFBrakesignal = sfIcon(
+            name = "Dualtone.SFBrakesignal",
+            viewportWidth = 35.4102f,
+            viewportHeight = 24.3262f
+        ) {
+            addSfPath("M0 12.1582C0 16.0938 1.29883 19.7266 3.48633 22.6562C3.82812 23.1055 4.38477 23.1543 4.81445 22.8125C5.20508 22.4805 5.25391 21.9629 4.95117 21.5332C2.98828 18.9258 1.82617 15.6641 1.82617 12.1582C1.82617 8.63281 2.98828 5.39062 4.95117 2.76367C5.25391 2.35352 5.21484 1.83594 4.81445 1.49414C4.39453 1.15234 3.81836 1.21094 3.48633 1.66016C1.29883 4.58008 0 8.21289 0 12.1582ZM35.0488 12.1582C35.0488 8.21289 33.75 4.58008 31.5527 1.66016C31.2207 1.21094 30.6543 1.15234 30.2246 1.49414C29.834 1.83594 29.7949 2.35352 30.0977 2.76367C32.0605 5.39062 33.2129 8.63281 33.2129 12.1582C33.2129 15.6641 32.0605 18.9258 30.0977 21.5332C29.7949 21.9629 29.834 22.4805 30.2246 22.8125C30.6543 23.1543 31.2207 23.1055 31.5527 22.6562C33.75 19.7266 35.0488 16.0938 35.0488 12.1582Z", fillAlpha = 0.85f)
+            addSfPath("M17.5195 24.3066C24.2285 24.3066 29.6777 18.8672 29.6777 12.1582C29.6777 5.44922 24.2285 0 17.5195 0C10.8105 0 5.37109 5.44922 5.37109 12.1582C5.37109 18.8672 10.8105 24.3066 17.5195 24.3066ZM17.5195 22.4902C11.8164 22.4902 7.1875 17.8613 7.1875 12.1582C7.1875 6.45508 11.8164 1.81641 17.5195 1.81641C23.2227 1.81641 27.8613 6.45508 27.8613 12.1582C27.8613 17.8613 23.2227 22.4902 17.5195 22.4902Z", fillAlpha = 0.85f)
+        }
+        return _sFBrakesignal!!
+    }
+
+private var _sFBrakesignal: ImageVector? = null

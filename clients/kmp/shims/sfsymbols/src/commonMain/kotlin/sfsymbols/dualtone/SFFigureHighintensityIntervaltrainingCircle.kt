@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureHighintensityIntervaltrainingCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFFigureHighintensityIntervaltrainingCircle: ImageVector
+    get() {
+        if (_sFFigureHighintensityIntervaltrainingCircle != null) {
+            return _sFFigureHighintensityIntervaltrainingCircle!!
+        }
+        _sFFigureHighintensityIntervaltrainingCircle = sfIcon(
+            name = "Dualtone.SFFigureHighintensityIntervaltrainingCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M13.2715 6.99219C14.1016 6.99219 14.7852 6.30859 14.7852 5.46875C14.7852 4.63867 14.1016 3.95508 13.2715 3.95508C12.4219 3.95508 11.748 4.63867 11.748 5.46875C11.748 6.30859 12.4219 6.99219 13.2715 6.99219ZM14.8926 11.0938C15.1953 11.3965 15.7324 11.377 15.9766 10.9863L17.6758 8.26172C18.1836 7.43164 16.9629 6.77734 16.4941 7.5293L15.2637 9.50195L14.3066 8.53516C13.3887 7.61719 12.373 7.43164 10.9766 7.58789L8.49609 7.87109C8.17383 7.90039 7.91992 8.16406 7.88086 8.4668L7.53906 11.2012C7.42188 12.0801 8.79883 12.3047 8.91602 11.3672L9.18945 9.17969L10.4785 9.0332C10.6641 9.02344 10.791 9.15039 10.7617 9.3457L10.4297 12.0117C10.2734 13.2812 11.0059 14.0137 12.2559 13.9258L14.8145 13.7402L14.043 16.5234C13.7891 17.4707 15.1465 17.793 15.3906 16.8945L16.3965 13.1738C16.5234 12.7051 16.2012 12.3047 15.6738 12.3047L13.0273 12.3047L13.3691 10.0195C13.3984 9.79492 13.5938 9.79492 13.7207 9.92188ZM11.123 14.3457L10.9473 16.9238L9.64844 20.2051C9.41406 20.7812 9.83398 21.1914 10.2637 21.1914C10.5371 21.1914 10.8008 21.0352 10.9375 20.6934L12.2754 17.3438C12.2949 17.2852 12.3047 17.2363 12.3242 17.1875L12.7344 14.4727L12.3047 14.5117C11.875 14.541 11.543 14.502 11.123 14.3457Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureHighintensityIntervaltrainingCircle!!
+    }
+
+private var _sFFigureHighintensityIntervaltrainingCircle: ImageVector? = null

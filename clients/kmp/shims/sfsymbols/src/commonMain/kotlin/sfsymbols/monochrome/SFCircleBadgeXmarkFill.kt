@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCircleBadgeXmarkFill (monochrome)
+ * Viewport: 37.666 x 28.8574
+ */
+public val SfSymbols.Monochrome.SFCircleBadgeXmarkFill: ImageVector
+    get() {
+        if (_sFCircleBadgeXmarkFill != null) {
+            return _sFCircleBadgeXmarkFill!!
+        }
+        _sFCircleBadgeXmarkFill = sfIcon(
+            name = "Monochrome.SFCircleBadgeXmarkFill",
+            viewportWidth = 37.666f,
+            viewportHeight = 28.8574f
+        ) {
+            addSfPath("M31.3183 13.2677C30.8254 13.1668 30.3157 13.1152 29.7949 13.1152C25.4785 13.1152 21.9141 16.6699 21.9141 20.9863C21.9141 22.9101 22.617 24.6794 23.7808 26.0487C22.2138 26.7518 20.4771 27.1387 18.6523 27.1387C11.6504 27.1387 5.9375 21.4258 5.9375 14.4238C5.9375 7.41211 11.6504 1.69922 18.6523 1.69922C25.2738 1.69922 30.737 6.79392 31.3183 13.2677Z", fillAlpha = 0.85f)
+            addSfPath("M36.1035 20.9863C36.1035 24.4434 33.2227 27.3047 29.7949 27.3047C26.3281 27.3047 23.4766 24.4629 23.4766 20.9863C23.4766 17.5293 26.3281 14.668 29.7949 14.668C33.252 14.668 36.1035 17.5195 36.1035 20.9863ZM31.6895 18.0273L29.7754 19.9512L27.9785 18.1738C27.7051 17.9004 27.2754 17.9004 26.9824 18.1738C26.6992 18.4375 26.7188 18.877 26.9824 19.1602L28.7695 20.957L26.8457 22.8809C26.543 23.1738 26.582 23.623 26.8652 23.916C27.1582 24.1992 27.6074 24.2383 27.9004 23.9453L29.834 22.0117L31.6113 23.7988C31.8945 24.0625 32.334 24.0723 32.6074 23.7988C32.8906 23.5156 32.8809 23.0762 32.6074 22.793L30.8301 21.0156L32.7539 19.0918C33.0566 18.7891 33.0078 18.3398 32.7246 18.0566C32.4316 17.7734 31.9922 17.7246 31.6895 18.0273Z", fillAlpha = 0.85f)
+        }
+        return _sFCircleBadgeXmarkFill!!
+    }
+
+private var _sFCircleBadgeXmarkFill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFDotSquareshapeSplit2x2 (monochrome)
+ * Viewport: 23.3203 x 22.9785
+ */
+public val SfSymbols.Monochrome.SFDotSquareshapeSplit2x2: ImageVector
+    get() {
+        if (_sFDotSquareshapeSplit2x2 != null) {
+            return _sFDotSquareshapeSplit2x2!!
+        }
+        _sFDotSquareshapeSplit2x2 = sfIcon(
+            name = "Monochrome.SFDotSquareshapeSplit2x2",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M22.959 0.908203L22.959 22.0508C22.959 22.5977 22.5977 22.959 22.0508 22.959L0.908203 22.959C0.361328 22.959 0 22.5977 0 22.0508L0 0.908203C0 0.361328 0.361328 0 0.908203 0L22.0508 0C22.5977 0 22.959 0.361328 22.959 0.908203ZM2.07031 21.2305L10.6152 21.2305L10.6152 16.9247C10.9003 16.9778 11.1946 17.002 11.4941 17.002C11.7836 17.002 12.068 16.9792 12.3437 16.9288L12.3437 21.2305L20.8887 21.2305C21.1328 21.2305 21.2305 21.1328 21.2305 20.8887L21.2305 12.373L16.9139 12.373C16.9676 12.0852 16.9922 11.7876 16.9922 11.4844C16.9922 11.1949 16.9692 10.9104 16.9183 10.6348L21.2305 10.6348L21.2305 2.07031C21.2305 1.82617 21.1328 1.72852 20.8887 1.72852L12.3437 1.72852L12.3437 6.07901C12.068 6.02859 11.7836 6.00586 11.4941 6.00586C11.1946 6.00586 10.9003 6.03005 10.6152 6.08307L10.6152 1.72852L2.07031 1.72852C1.82617 1.72852 1.72852 1.82617 1.72852 2.07031L1.72852 10.6348L6.05072 10.6348C5.99962 10.9104 5.97656 11.1949 5.97656 11.4844C5.97656 11.7876 6.00123 12.0852 6.05517 12.373L1.72852 12.373L1.72852 20.8887C1.72852 21.1328 1.82617 21.2305 2.07031 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M11.4941 15.4395C13.6523 15.4395 15.4297 13.6816 15.4297 11.4844C15.4297 9.32617 13.6523 7.56836 11.4941 7.56836C9.31641 7.56836 7.53906 9.32617 7.53906 11.4844C7.53906 13.6816 9.31641 15.4395 11.4941 15.4395Z", fillAlpha = 0.85f)
+        }
+        return _sFDotSquareshapeSplit2x2!!
+    }
+
+private var _sFDotSquareshapeSplit2x2: ImageVector? = null

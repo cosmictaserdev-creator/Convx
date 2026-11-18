@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFZrButtonRoundedtopHorizontalFill (monochrome)
+ * Viewport: 28.9941 x 21.6504
+ */
+public val SfSymbols.Monochrome.SFZrButtonRoundedtopHorizontalFill: ImageVector
+    get() {
+        if (_sFZrButtonRoundedtopHorizontalFill != null) {
+            return _sFZrButtonRoundedtopHorizontalFill!!
+        }
+        _sFZrButtonRoundedtopHorizontalFill = sfIcon(
+            name = "Monochrome.SFZrButtonRoundedtopHorizontalFill",
+            viewportWidth = 28.9941f,
+            viewportHeight = 21.6504f
+        ) {
+            addSfPath("M28.6328 9.99023L28.6328 17.959C28.6328 20.3809 27.373 21.6309 24.9316 21.6309L3.71094 21.6309C1.25977 21.6309 0 20.3906 0 17.959L0 9.99023C0 3.31055 3.10547 0 10.2441 0L18.3887 0C25.5371 0 28.6328 3.31055 28.6328 9.99023ZM15.8301 5.76172C15.3223 5.76172 15.0293 6.07422 15.0293 6.5918L15.0293 15.1953C15.0293 15.7031 15.332 16.0352 15.8496 16.0352C16.3379 16.0352 16.6406 15.7129 16.6406 15.1953L16.6406 11.9141L17.9883 11.9141L19.3945 15.3906C19.5605 15.8008 19.8047 16.0352 20.2344 16.0352C20.6055 16.0352 20.9961 15.8105 20.9961 15.2539C20.9961 15.1367 20.9277 14.9121 20.8203 14.668L19.5215 11.5723C20.5273 11.0938 21.0254 10.0391 21.0254 8.82812C21.0254 6.86523 19.8633 5.76172 17.9395 5.76172ZM8.00781 5.78125C7.63672 5.78125 7.32422 6.09375 7.32422 6.45508C7.32422 6.83594 7.63672 7.13867 8.00781 7.13867L11.4355 7.13867L11.4355 7.2168L7.5 14.4922C7.36328 14.7363 7.31445 14.9023 7.31445 15.166C7.31445 15.6543 7.65625 15.9375 8.125 15.9375L12.6855 15.9375C13.0566 15.9375 13.3594 15.625 13.3594 15.2441C13.3594 14.8828 13.0566 14.5703 12.6855 14.5703L9.12109 14.5703L9.12109 14.502L13.0176 7.23633C13.125 7.02148 13.2031 6.8457 13.2031 6.57227C13.2031 6.10352 12.8906 5.78125 12.4023 5.78125ZM19.3945 8.86719C19.3945 9.93164 18.9062 10.7031 17.793 10.7031L16.6406 10.7031L16.6406 7.05078L17.7832 7.05078C18.8184 7.05078 19.3945 7.77344 19.3945 8.86719Z", fillAlpha = 0.85f)
+        }
+        return _sFZrButtonRoundedtopHorizontalFill!!
+    }
+
+private var _sFZrButtonRoundedtopHorizontalFill: ImageVector? = null

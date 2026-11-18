@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIcloudAndArrowDownFill (monochrome)
+ * Viewport: 31.5625 x 29.9902
+ */
+public val SfSymbols.Monochrome.SFIcloudAndArrowDownFill: ImageVector
+    get() {
+        if (_sFIcloudAndArrowDownFill != null) {
+            return _sFIcloudAndArrowDownFill!!
+        }
+        _sFIcloudAndArrowDownFill = sfIcon(
+            name = "Monochrome.SFIcloudAndArrowDownFill",
+            viewportWidth = 31.5625f,
+            viewportHeight = 29.9902f
+        ) {
+            addSfPath("M0 16.7676C0 19.9902 2.37305 22.5586 6.40625 22.5586L25.2441 22.5586C28.9941 22.5586 31.2012 20.293 31.2012 17.3145C31.2012 14.834 29.7363 12.7637 27.2559 11.8359C27.3242 6.28906 23.3594 2.25586 18.3008 2.25586C14.873 2.25586 12.4805 4.11133 11.0352 6.34766C8.17383 5.52734 4.62891 7.71484 4.58984 11.2012C1.78711 11.582 0 13.8477 0 16.7676ZM11.3184 24.3066C11.5234 24.3066 11.7578 24.3945 11.9141 24.5703L14.0332 26.7969L15.6055 28.4473L17.1582 26.7969L19.2871 24.5703C19.4336 24.3945 19.6582 24.3066 19.873 24.3066C20.3125 24.3066 20.6543 24.6289 20.6543 25.0684C20.6543 25.3027 20.5664 25.4688 20.4004 25.6348L16.2207 29.707C16.0059 29.9121 15.8203 29.9902 15.6055 29.9902C15.3809 29.9902 15.1953 29.9121 14.9805 29.707L10.791 25.6348C10.6348 25.4688 10.5371 25.3027 10.5371 25.0684C10.5371 24.6289 10.8691 24.3066 11.3184 24.3066ZM15.6055 13.8672C16.0645 13.8672 16.4551 14.248 16.4551 14.6973L16.4551 25.752L16.3281 28.8672C16.3086 29.2676 15.9961 29.5996 15.6055 29.5996C15.2051 29.5996 14.8926 29.2676 14.873 28.8672L14.7461 25.752L14.7461 14.6973C14.7461 14.248 15.1367 13.8672 15.6055 13.8672Z", fillAlpha = 0.85f)
+        }
+        return _sFIcloudAndArrowDownFill!!
+    }
+
+private var _sFIcloudAndArrowDownFill: ImageVector? = null

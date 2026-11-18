@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowUpToLineCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFArrowUpToLineCircle: ImageVector
+    get() {
+        if (_sFArrowUpToLineCircle != null) {
+            return _sFArrowUpToLineCircle!!
+        }
+        _sFArrowUpToLineCircle = sfIcon(
+            name = "Monochrome.SFArrowUpToLineCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M12.6953 19.9902C13.1152 19.9902 13.4277 19.6875 13.4277 19.2578L13.4277 13.1641L13.3105 10.8496L15.5273 13.3008L16.5723 14.3555C16.7285 14.5117 16.9141 14.5801 17.1191 14.5801C17.5391 14.5801 17.8223 14.2676 17.8223 13.8672C17.8223 13.6523 17.7441 13.4668 17.5684 13.291L13.2422 8.92578C13.0957 8.76953 12.9004 8.67188 12.6953 8.67188C12.5 8.67188 12.3047 8.75977 12.1484 8.92578L7.82227 13.3105C7.68555 13.457 7.58789 13.6816 7.58789 13.8672C7.58789 14.2871 7.87109 14.5801 8.30078 14.5801C8.52539 14.5801 8.70117 14.5117 8.84766 14.3555L9.76562 13.3691L12.0801 10.8398L11.9629 13.1641L11.9629 19.2578C11.9629 19.6875 12.2559 19.9902 12.6953 19.9902ZM7.98828 7.63672L17.4316 7.63672C17.8516 7.63672 18.1445 7.32422 18.1445 6.91406C18.1445 6.48438 17.8516 6.18164 17.4316 6.18164L7.98828 6.18164C7.55859 6.18164 7.26562 6.48438 7.26562 6.91406C7.26562 7.32422 7.55859 7.63672 7.98828 7.63672Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowUpToLineCircle!!
+    }
+
+private var _sFArrowUpToLineCircle: ImageVector? = null

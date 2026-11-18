@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowUpRightAndArrowDownLeftSquare (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFArrowUpRightAndArrowDownLeftSquare: ImageVector
+    get() {
+        if (_sFArrowUpRightAndArrowDownLeftSquare != null) {
+            return _sFArrowUpRightAndArrowDownLeftSquare!!
+        }
+        _sFArrowUpRightAndArrowDownLeftSquare = sfIcon(
+            name = "Monochrome.SFArrowUpRightAndArrowDownLeftSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M16.9141 11.2207C17.3438 11.2207 17.6855 10.8789 17.6855 10.4492C17.6855 10.0293 17.3438 9.6875 16.9141 9.6875L16.1719 9.6875L14.1895 9.79492L17.7539 6.33789C18.0664 6.03516 18.0762 5.50781 17.7637 5.19531C17.4512 4.87305 16.9336 4.87305 16.6113 5.20508L13.1543 8.78906L13.252 6.71875L13.252 6.01562C13.252 5.58594 12.9102 5.24414 12.4902 5.24414C12.0703 5.24414 11.7188 5.58594 11.7188 6.01562L11.7188 10.332C11.7188 10.957 12.0605 11.2207 12.6074 11.2207ZM10.4785 17.6758C10.8984 17.6758 11.2402 17.334 11.2402 16.9141L11.2402 12.5879C11.2402 11.9629 10.9082 11.709 10.3613 11.709L6.04492 11.709C5.625 11.709 5.2832 12.0508 5.2832 12.4707C5.2832 12.9004 5.625 13.2422 6.04492 13.2422L6.79688 13.2324L8.76953 13.1348L5.21484 16.582C4.89258 16.8848 4.88281 17.4121 5.20508 17.7344C5.51758 18.0566 6.03516 18.0566 6.35742 17.7246L9.81445 14.1406L9.70703 16.2109L9.70703 16.9141C9.70703 17.334 10.0488 17.6758 10.4785 17.6758Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowUpRightAndArrowDownLeftSquare!!
+    }
+
+private var _sFArrowUpRightAndArrowDownLeftSquare: ImageVector? = null

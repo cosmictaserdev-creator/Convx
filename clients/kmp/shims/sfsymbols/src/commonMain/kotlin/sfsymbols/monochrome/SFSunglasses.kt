@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSunglasses (monochrome)
+ * Viewport: 38.6133 x 12.7832
+ */
+public val SfSymbols.Monochrome.SFSunglasses: ImageVector
+    get() {
+        if (_sFSunglasses != null) {
+            return _sFSunglasses!!
+        }
+        _sFSunglasses = sfIcon(
+            name = "Monochrome.SFSunglasses",
+            viewportWidth = 38.6133f,
+            viewportHeight = 12.7832f
+        ) {
+            addSfPath("M38.252 0.908203C38.252 1.60156 37.2754 2.16797 37.0508 3.75L36.8164 5.40039C36.1426 10.127 33.0859 12.7637 28.7402 12.7637C25.752 12.7637 23.0859 11.4062 21.6113 8.19336L20.2539 5.20508C20.0293 4.69727 19.6289 4.41406 19.1309 4.41406C18.6328 4.41406 18.2324 4.69727 17.998 5.20508L16.6406 8.19336C15.1758 11.4062 12.5 12.7637 9.52148 12.7637C5.16602 12.7637 2.10938 10.127 1.44531 5.40039L1.21094 3.75C0.976562 2.16797 0 1.60156 0 0.908203C0 0.351562 0.410156 0 1.18164 0C5.10742 0 8.64258 0.195312 10.752 0.517578C15.1855 1.17188 16.9434 2.31445 19.1309 2.31445C21.3086 2.31445 23.0664 1.17188 27.5 0.517578C29.6191 0.195312 33.1543 0 37.0703 0C37.8516 0 38.252 0.351562 38.252 0.908203ZM3.02734 4.16016C3.02734 8.25195 5.3418 11.1328 9.53125 11.1328C13.2422 11.1328 15.4297 8.51562 15.4297 5.26367C15.4297 3.10547 12.5879 1.97266 6.97266 1.97266C4.26758 1.97266 3.02734 2.66602 3.02734 4.16016ZM22.8223 5.26367C22.8223 8.51562 25.0098 11.1328 28.7207 11.1328C32.9199 11.1328 35.2344 8.25195 35.2344 4.16016C35.2344 2.66602 33.9844 1.97266 31.2891 1.97266C25.6738 1.97266 22.8223 3.10547 22.8223 5.26367Z", fillAlpha = 0.85f)
+        }
+        return _sFSunglasses!!
+    }
+
+private var _sFSunglasses: ImageVector? = null

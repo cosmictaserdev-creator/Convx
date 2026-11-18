@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPoweroutletTypeMSquare (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFPoweroutletTypeMSquare: ImageVector
+    get() {
+        if (_sFPoweroutletTypeMSquare != null) {
+            return _sFPoweroutletTypeMSquare!!
+        }
+        _sFPoweroutletTypeMSquare = sfIcon(
+            name = "Monochrome.SFPoweroutletTypeMSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M6.55273 17.334L16.4062 17.334C17.0508 17.334 17.5195 16.8555 17.5195 16.2109L17.5195 6.73828C17.5195 6.08398 17.0508 5.61523 16.4062 5.61523L6.55273 5.61523C5.9082 5.61523 5.42969 6.08398 5.42969 6.73828L5.42969 16.2109C5.42969 16.8555 5.9082 17.334 6.55273 17.334ZM11.4844 10.1855C10.8008 10.1855 10.2441 9.63867 10.2441 8.93555C10.2441 8.25195 10.8008 7.70508 11.4844 7.70508C12.1777 7.70508 12.7344 8.25195 12.7344 8.93555C12.7344 9.63867 12.1777 10.1855 11.4844 10.1855ZM8.7793 15.2344C8.08594 15.2344 7.5293 14.6875 7.5293 14.0039C7.5293 13.3105 8.08594 12.7539 8.7793 12.7539C9.46289 12.7539 10.0195 13.3105 10.0195 14.0039C10.0195 14.6875 9.46289 15.2344 8.7793 15.2344ZM14.1992 15.2344C13.5156 15.2344 12.959 14.6875 12.959 14.0039C12.959 13.3105 13.5156 12.7539 14.1992 12.7539C14.8828 12.7539 15.4492 13.3105 15.4492 14.0039C15.4492 14.6875 14.8828 15.2344 14.1992 15.2344Z", fillAlpha = 0.85f)
+        }
+        return _sFPoweroutletTypeMSquare!!
+    }
+
+private var _sFPoweroutletTypeMSquare: ImageVector? = null

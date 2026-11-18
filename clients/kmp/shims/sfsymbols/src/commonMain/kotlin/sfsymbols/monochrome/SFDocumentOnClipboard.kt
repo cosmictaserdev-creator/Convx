@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFDocumentOnClipboard (monochrome)
+ * Viewport: 25.9473 x 31.5137
+ */
+public val SfSymbols.Monochrome.SFDocumentOnClipboard: ImageVector
+    get() {
+        if (_sFDocumentOnClipboard != null) {
+            return _sFDocumentOnClipboard!!
+        }
+        _sFDocumentOnClipboard = sfIcon(
+            name = "Monochrome.SFDocumentOnClipboard",
+            viewportWidth = 25.9473f,
+            viewportHeight = 31.5137f
+        ) {
+            addSfPath("M25.5859 3.79883L25.5859 21.5039C25.5859 24.0234 24.3262 25.3027 21.8262 25.3027L19.4824 25.3027L19.4824 17.5977C19.4824 16.1426 19.3066 15.5078 18.3984 14.5898L11.1621 7.25586C10.3027 6.37695 9.59961 6.17188 8.30078 6.17188L6.10352 6.17187L6.10352 3.79883C6.10352 1.26953 7.37305 0 9.87305 0L21.8262 0C24.3262 0 25.5859 1.26953 25.5859 3.79883ZM12.8613 2.50977C12.3438 2.50977 12.0996 2.8418 12.0996 3.20312L12.0996 3.44727C12.0996 3.80859 12.3438 4.14062 12.8613 4.14062L18.8379 4.14062C19.3457 4.14062 19.5898 3.80859 19.5898 3.44727L19.5898 3.20312C19.5898 2.8418 19.3457 2.50977 18.8379 2.50977Z", fillAlpha = 0.85f)
+            addSfPath("M0 27.6758C0 30.2051 1.25977 31.4746 3.75977 31.4746L15.7227 31.4746C18.2227 31.4746 19.4824 30.1953 19.4824 27.6758L19.4824 17.5977C19.4824 16.1426 19.3066 15.5078 18.3984 14.5898L11.1621 7.25586C10.3027 6.37695 9.59961 6.17188 8.30078 6.17188L3.75977 6.17188C1.2793 6.17188 0 7.46094 0 9.9707ZM1.72852 27.6465L1.72852 10.0098C1.72852 8.67188 2.45117 7.90039 3.85742 7.90039L8.28125 7.90039L8.28125 15.3906C8.28125 16.8848 9.0332 17.5977 10.4883 17.5977L17.7539 17.5977L17.7539 27.6465C17.7539 29.0039 17.0312 29.7461 15.625 29.7461L3.84766 29.7461C2.45117 29.7461 1.72852 29.0039 1.72852 27.6465ZM10.6836 15.9668C10.127 15.9668 9.91211 15.752 9.91211 15.1953L9.91211 8.36914L17.4121 15.9668Z", fillAlpha = 0.85f)
+        }
+        return _sFDocumentOnClipboard!!
+    }
+
+private var _sFDocumentOnClipboard: ImageVector? = null

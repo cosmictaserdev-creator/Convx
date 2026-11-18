@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMappinAndEllipseCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFMappinAndEllipseCircle: ImageVector
+    get() {
+        if (_sFMappinAndEllipseCircle != null) {
+            return _sFMappinAndEllipseCircle!!
+        }
+        _sFMappinAndEllipseCircle = sfIcon(
+            name = "Monochrome.SFMappinAndEllipseCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M10.2051 7.38281C10.2051 8.54492 11.0059 9.53125 12.0801 9.82422L12.0801 14.7168C12.0801 16.4551 12.373 17.4219 12.7051 17.4219C13.0469 17.4219 13.3301 16.4746 13.3301 14.7168L13.3301 9.82422C14.4141 9.53125 15.2051 8.54492 15.2051 7.38281C15.2051 5.99609 14.1016 4.87305 12.7051 4.87305C11.3086 4.87305 10.2051 5.99609 10.2051 7.38281ZM11.9922 7.46094C11.5918 7.46094 11.2109 7.10938 11.2109 6.66992C11.2109 6.23047 11.582 5.88867 11.9922 5.88867C12.4414 5.88867 12.793 6.23047 12.793 6.66992C12.793 7.10938 12.4414 7.46094 11.9922 7.46094ZM12.7051 19.8145C16.7383 19.8145 19.2383 18.457 19.2383 16.8652C19.2383 15.0488 16.25 13.9746 14.2773 13.9844L14.2773 15.0391C15.7324 15.0293 17.8906 15.7422 17.8906 16.7383C17.8906 17.8906 15.7129 18.7109 12.7051 18.7109C9.6875 18.7109 7.51953 17.9004 7.51953 16.7383C7.51953 15.7422 9.6875 15.0293 11.1328 15.0391L11.1328 13.9844C9.16992 13.9746 6.18164 15.0488 6.18164 16.8652C6.18164 18.457 8.68164 19.8145 12.7051 19.8145Z", fillAlpha = 0.85f)
+        }
+        return _sFMappinAndEllipseCircle!!
+    }
+
+private var _sFMappinAndEllipseCircle: ImageVector? = null

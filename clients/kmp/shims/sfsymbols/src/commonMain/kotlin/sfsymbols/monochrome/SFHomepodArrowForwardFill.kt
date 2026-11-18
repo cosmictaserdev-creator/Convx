@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHomepodArrowForwardFill (monochrome)
+ * Viewport: 29.2188 x 25.5957
+ */
+public val SfSymbols.Monochrome.SFHomepodArrowForwardFill: ImageVector
+    get() {
+        if (_sFHomepodArrowForwardFill != null) {
+            return _sFHomepodArrowForwardFill!!
+        }
+        _sFHomepodArrowForwardFill = sfIcon(
+            name = "Monochrome.SFHomepodArrowForwardFill",
+            viewportWidth = 29.2188f,
+            viewportHeight = 25.5957f
+        ) {
+            addSfPath("M0.830078 15.1855C0.380859 15.1855 0 14.7949 0 14.3359C0 13.8672 0.380859 13.4766 0.830078 13.4766L11.6016 13.4863L13.1445 13.5449L12.373 12.793L10.4004 10.9473C10.2344 10.791 10.1465 10.5664 10.1465 10.3613C10.1465 9.91211 10.4688 9.58008 10.9082 9.58008C11.1328 9.58008 11.3086 9.66797 11.4648 9.83398L15.2344 13.7109C15.4395 13.9258 15.5273 14.1113 15.5273 14.3359C15.5273 14.5508 15.4395 14.7363 15.2344 14.9512L11.4648 18.8281C11.3086 18.9941 11.1328 19.082 10.9082 19.082C10.4688 19.082 10.1465 18.7402 10.1465 18.3008C10.1465 18.0859 10.2344 17.8613 10.4004 17.7148L12.373 15.8594L13.1348 15.127L11.6016 15.1855ZM14.4238 25.5859C21.3086 25.5859 24.4238 23.1738 24.4238 17.627L24.4238 8.04688C24.4238 5.61523 23.7402 4.04297 22.8906 3.02734C22.5977 2.67578 22.1484 2.66602 21.8066 2.96875C20.6543 4.0918 17.6465 4.91211 14.4238 4.91211C11.2109 4.91211 8.19336 4.0918 7.05078 2.96875C6.70898 2.66602 6.25977 2.67578 5.9668 3.02734C5.11719 4.04297 4.42383 5.61523 4.42383 8.04688L4.42383 17.627C4.42383 23.1738 7.54883 25.5859 14.4238 25.5859ZM14.4238 3.34961C17.8418 3.34961 20.3418 2.64648 20.3418 1.67969C20.3418 0.693359 17.8418 0 14.4238 0C11.0059 0 8.51562 0.693359 8.51562 1.67969C8.51562 2.64648 11.0059 3.34961 14.4238 3.34961Z", fillAlpha = 0.85f)
+        }
+        return _sFHomepodArrowForwardFill!!
+    }
+
+private var _sFHomepodArrowForwardFill: ImageVector? = null

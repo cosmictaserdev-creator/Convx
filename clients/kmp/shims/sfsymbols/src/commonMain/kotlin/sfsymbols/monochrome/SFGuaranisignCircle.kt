@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFGuaranisignCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFGuaranisignCircle: ImageVector
+    get() {
+        if (_sFGuaranisignCircle != null) {
+            return _sFGuaranisignCircle!!
+        }
+        _sFGuaranisignCircle = sfIcon(
+            name = "Monochrome.SFGuaranisignCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M12.8027 18.2129C15.4785 18.2129 17.1191 16.6016 17.1191 13.7598L17.1191 13.1836C17.1191 12.7637 16.8555 12.5 16.4648 12.5L13.0273 12.5L13.0273 13.5547L15.8594 13.5547L15.8594 14.043C15.8594 15.8398 14.7461 17.0801 12.8125 17.0801C10.4785 17.0801 9.31641 15.0781 9.31641 12.6465C9.31641 10.3613 10.3809 8.27148 12.793 8.27148C14.1699 8.27148 15.3809 9.07227 15.7129 10.2832C15.8301 10.6152 15.9863 10.7617 16.3477 10.7617C16.6895 10.7617 16.9238 10.5371 16.9238 10.1953C16.9238 10.0391 16.8945 9.84375 16.8066 9.63867C16.2109 7.96875 14.4531 7.12891 12.793 7.12891C9.63867 7.12891 7.96875 9.54102 7.96875 12.6562C7.96875 15.8691 9.7168 18.2129 12.8027 18.2129ZM12.7344 19.6875C12.959 19.6875 13.125 19.5215 13.125 19.3066L13.125 6.08398C13.125 5.84961 12.959 5.69336 12.7344 5.69336C12.5 5.69336 12.3438 5.84961 12.3438 6.08398L12.3438 19.3066C12.3438 19.5215 12.5 19.6875 12.7344 19.6875Z", fillAlpha = 0.85f)
+        }
+        return _sFGuaranisignCircle!!
+    }
+
+private var _sFGuaranisignCircle: ImageVector? = null

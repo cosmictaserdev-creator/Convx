@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFManatsignGaugeChartLefthalfRighthalf (dualtone)
+ * Viewport: 30.3809 x 24.9191
+ */
+public val SfSymbols.Dualtone.SFManatsignGaugeChartLefthalfRighthalf: ImageVector
+    get() {
+        if (_sFManatsignGaugeChartLefthalfRighthalf != null) {
+            return _sFManatsignGaugeChartLefthalfRighthalf!!
+        }
+        _sFManatsignGaugeChartLefthalfRighthalf = sfIcon(
+            name = "Dualtone.SFManatsignGaugeChartLefthalfRighthalf",
+            viewportWidth = 30.3809f,
+            viewportHeight = 24.9191f
+        ) {
+            addSfPath("M30.0195 14.9547C30.0195 7.09334 23.9746 0.648023 16.2988 0.00349172C15.8984-0.0355708 15.5859 0.257398 15.5859 0.667554L15.5859 4.66169C15.5859 4.99373 15.8301 5.2574 16.1719 5.28669C20.9863 5.87263 24.7266 9.97419 24.7266 14.9547C24.7266 17.2203 23.9551 19.3004 22.5879 21.0191C22.4023 21.2535 22.4121 21.5465 22.6172 21.7515L25.5176 24.6519C25.8105 24.9351 26.2305 24.9351 26.4844 24.6226C28.6914 22.0054 30.0195 18.6265 30.0195 14.9547Z", fillAlpha = 0.425f)
+            addSfPath("M0 14.9547C0 18.6363 1.32812 22.025 3.54492 24.6422C3.78906 24.9351 4.19922 24.9351 4.49219 24.6519L7.39258 21.7515C7.59766 21.5465 7.60742 21.2535 7.42188 21.0191C6.05469 19.3004 5.2832 17.2203 5.2832 14.9547C5.2832 9.97419 9.0332 5.87263 13.8379 5.28669C14.1895 5.2574 14.4238 4.99373 14.4238 4.66169L14.4238 0.667554C14.4238 0.257398 14.1211-0.0355708 13.7207 0.00349172C6.03516 0.648023 0 7.09334 0 14.9547Z", fillAlpha = 0.425f)
+            addSfPath("M11.3867 20.5308C11.7969 20.5308 12.0508 20.2769 12.0508 19.8668L12.0508 15.9898C12.0508 13.7144 12.8711 11.898 15.0098 11.898C17.207 11.898 17.9883 13.7437 17.9883 15.9898L17.9883 19.8668C17.9883 20.2769 18.2324 20.5308 18.6426 20.5308C19.043 20.5308 19.2969 20.2769 19.2969 19.8668L19.2969 15.9117C19.2969 12.9234 17.9102 10.7164 15.0098 10.7164C12.0996 10.7164 10.7422 12.9625 10.7422 15.9117L10.7422 19.8668C10.7422 20.2769 10.9863 20.5308 11.3867 20.5308ZM15 20.5308C15.2734 20.5308 15.459 20.3551 15.459 20.0621L15.459 9.2906C15.459 8.99763 15.2734 8.82185 15 8.82185C14.6973 8.82185 14.5215 8.99763 14.5215 9.2906L14.5215 20.0621C14.5215 20.3551 14.6973 20.5308 15 20.5308Z", fillAlpha = 0.85f)
+        }
+        return _sFManatsignGaugeChartLefthalfRighthalf!!
+    }
+
+private var _sFManatsignGaugeChartLefthalfRighthalf: ImageVector? = null

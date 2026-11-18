@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFLaptopcomputerAndArrowDown (monochrome)
+ * Viewport: 36.0449 x 28.9355
+ */
+public val SfSymbols.Monochrome.SFLaptopcomputerAndArrowDown: ImageVector
+    get() {
+        if (_sFLaptopcomputerAndArrowDown != null) {
+            return _sFLaptopcomputerAndArrowDown!!
+        }
+        _sFLaptopcomputerAndArrowDown = sfIcon(
+            name = "Monochrome.SFLaptopcomputerAndArrowDown",
+            viewportWidth = 36.0449f,
+            viewportHeight = 28.9355f
+        ) {
+            addSfPath("M31.6406 7.04102L31.6406 21.9238L34.4043 21.9238C35.1172 21.9238 35.6836 22.5 35.6836 23.2227C35.6836 23.9453 35.1172 24.5215 34.4043 24.5215L1.2793 24.5215C0.566406 24.5215 0 23.9453 0 23.2227C0 22.5 0.566406 21.9238 1.2793 21.9238L4.04297 21.9238L4.04297 7.04102C4.04297 5.32227 5.0293 4.43359 6.66992 4.43359L14.7852 4.43359L14.7852 6.16211L7.10938 6.16211C6.2207 6.16211 5.77148 6.60156 5.77148 7.5L5.77148 21.9238L29.9121 21.9238L29.9121 7.5C29.9121 6.60156 29.4629 6.16211 28.5742 6.16211L20.8984 6.16211L20.8984 4.43359L29.0137 4.43359C30.7324 4.43359 31.6406 5.32227 31.6406 7.04102Z", fillAlpha = 0.85f)
+            addSfPath("M13.5547 10.8984C13.1055 10.8984 12.7832 11.2207 12.7832 11.6602C12.7832 11.8848 12.8711 12.0605 13.0371 12.2168L17.2266 16.2891C17.4316 16.5039 17.627 16.5723 17.8418 16.5723C18.0566 16.5723 18.252 16.5039 18.4668 16.2891L22.6465 12.2168C22.8027 12.0605 22.9004 11.8848 22.9004 11.6602C22.9004 11.2207 22.5586 10.8984 22.1094 10.8984C21.9043 10.8984 21.6797 10.9863 21.5234 11.1523L19.4043 13.3887L17.8418 15.0293L16.2793 13.3887L14.1504 11.1523C14.0039 10.9863 13.7598 10.8984 13.5547 10.8984ZM17.8418 0C17.3828 0 16.9824 0.380859 16.9824 0.839844L16.9824 12.334L17.1094 15.459C17.1289 15.8594 17.4414 16.1914 17.8418 16.1914C18.2422 16.1914 18.5547 15.8594 18.5742 15.459L18.7012 12.334L18.7012 0.839844C18.7012 0.380859 18.3105 0 17.8418 0Z", fillAlpha = 0.85f)
+        }
+        return _sFLaptopcomputerAndArrowDown!!
+    }
+
+private var _sFLaptopcomputerAndArrowDown: ImageVector? = null

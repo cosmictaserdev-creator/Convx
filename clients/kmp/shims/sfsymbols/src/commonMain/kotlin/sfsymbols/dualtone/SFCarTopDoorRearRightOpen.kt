@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCarTopDoorRearRightOpen (dualtone)
+ * Viewport: 27.9639 x 31.7676
+ */
+public val SfSymbols.Dualtone.SFCarTopDoorRearRightOpen: ImageVector
+    get() {
+        if (_sFCarTopDoorRearRightOpen != null) {
+            return _sFCarTopDoorRearRightOpen!!
+        }
+        _sFCarTopDoorRearRightOpen = sfIcon(
+            name = "Dualtone.SFCarTopDoorRearRightOpen",
+            viewportWidth = 27.9639f,
+            viewportHeight = 31.7676f
+        ) {
+            addSfPath("M13.8013 31.748C19.856 31.748 22.5708 30.3613 22.5708 27.1484L22.5708 5.5957C22.5708 2.05078 19.3579 0 13.8013 0C8.24463 0 5.03174 2.05078 5.03174 5.5957L5.03174 27.1484C5.03174 30.3613 7.74658 31.748 13.8013 31.748ZM13.8013 29.9707C9.00635 29.9707 6.81885 29.082 6.81885 27.0703L6.81885 5.5957C6.81885 3.18359 9.37744 1.78711 13.8013 1.78711C18.2251 1.78711 20.7837 3.18359 20.7837 5.5957L20.7837 27.0703C20.7837 29.082 18.5962 29.9707 13.8013 29.9707ZM13.8013 13.2227C14.9048 13.2227 16.8774 13.3105 17.5122 13.3105C18.4497 13.3105 18.8696 12.9492 18.9478 11.9629L19.1528 9.70703C19.3091 7.91992 18.1567 7.1582 13.8013 7.1582C9.45557 7.1582 8.30322 7.91992 8.45947 9.70703L8.66455 11.9629C8.74268 12.9492 9.1626 13.3105 10.1001 13.3105C10.7349 13.3105 12.5806 13.2227 13.8013 13.2227ZM13.8013 26.6211C18.0396 26.6211 19.3188 26.0059 19.0747 24.1797L18.9282 23.0469C18.7427 21.5723 17.5024 21.0742 13.8013 21.0742C10.1099 21.0742 8.86963 21.5723 8.68408 23.0469L8.5376 24.1797C8.29346 26.0059 9.57275 26.6211 13.8013 26.6211ZM21.7798 18.1934L21.7798 20.7129L26.438 25.3418C26.7896 25.6934 27.356 25.6836 27.7075 25.3418C28.0493 24.9902 28.0493 24.4141 27.7075 24.0723Z", fillAlpha = 0.85f)
+        }
+        return _sFCarTopDoorRearRightOpen!!
+    }
+
+private var _sFCarTopDoorRearRightOpen: ImageVector? = null

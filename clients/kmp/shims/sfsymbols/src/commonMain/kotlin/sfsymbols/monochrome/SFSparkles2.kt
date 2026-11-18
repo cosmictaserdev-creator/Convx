@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSparkles2 (monochrome)
+ * Viewport: 27.0703 x 31.2012
+ */
+public val SfSymbols.Monochrome.SFSparkles2: ImageVector
+    get() {
+        if (_sFSparkles2 != null) {
+            return _sFSparkles2!!
+        }
+        _sFSparkles2 = sfIcon(
+            name = "Monochrome.SFSparkles2",
+            viewportWidth = 27.0703f,
+            viewportHeight = 31.2012f
+        ) {
+            addSfPath("M5.45898 20.3125C5.22461 20.3125 5.05859 20.459 5.0293 20.7031C4.52148 24.6094 4.39453 24.6484 0.429688 25.3223C0.15625 25.3613 0 25.5078 0 25.752C0 25.9961 0.15625 26.1328 0.380859 26.1719C4.375 26.9434 4.52148 26.9043 5.0293 30.7812C5.05859 31.0449 5.22461 31.2012 5.45898 31.2012C5.68359 31.2012 5.85938 31.0449 5.88867 30.791C6.41602 26.8555 6.52344 26.7969 10.5273 26.1719C10.752 26.1426 10.9082 25.9961 10.9082 25.752C10.9082 25.5176 10.752 25.3613 10.5273 25.3223C6.52344 24.5508 6.42578 24.5898 5.88867 20.6836C5.85938 20.459 5.68359 20.3125 5.45898 20.3125Z", fillAlpha = 0.85f)
+            addSfPath("M15.3223 4.12109C14.9707 4.12109 14.7168 4.36523 14.6777 4.7168C13.6035 12.9199 12.5879 13.8184 4.55078 14.8535C4.18945 14.8926 3.93555 15.1562 3.93555 15.498C3.93555 15.8496 4.18945 16.1133 4.55078 16.1523C12.6172 16.9824 13.6914 18.0762 14.6777 26.2793C14.7168 26.6309 14.9707 26.8848 15.3223 26.8848C15.6641 26.8848 15.9277 26.6309 15.9766 26.2793C16.9727 18.0762 18.0371 16.9824 26.0938 16.1523C26.4648 16.1133 26.709 15.8496 26.709 15.498C26.709 15.1562 26.4648 14.8926 26.0938 14.8535C18.0371 14.0137 16.9727 12.9199 15.9766 4.7168C15.9277 4.36523 15.6641 4.12109 15.3223 4.12109Z", fillAlpha = 0.85f)
+        }
+        return _sFSparkles2!!
+    }
+
+private var _sFSparkles2: ImageVector? = null

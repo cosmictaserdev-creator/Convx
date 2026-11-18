@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFYensignCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFYensignCircleFill: ImageVector
+    get() {
+        if (_sFYensignCircleFill != null) {
+            return _sFYensignCircleFill!!
+        }
+        _sFYensignCircleFill = sfIcon(
+            name = "Dualtone.SFYensignCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M12.7148 18.6719C12.3242 18.6719 12.0508 18.3887 12.0508 17.9883L12.0508 16.0156L9.53125 16.0156C9.30664 16.0156 9.13086 15.8398 9.13086 15.625C9.13086 15.3906 9.30664 15.2148 9.53125 15.2148L12.0508 15.2148L12.0508 13.8379L12.0508 13.8379L9.53125 13.8379C9.30664 13.8379 9.13086 13.6621 9.13086 13.4375C9.13086 13.2031 9.30664 13.0371 9.53125 13.0371L11.6309 13.0371L8.37891 7.83203C8.28125 7.67578 8.24219 7.51953 8.24219 7.38281C8.24219 7.01172 8.51562 6.76758 8.89648 6.76758C9.19922 6.76758 9.36523 6.9043 9.51172 7.1582L12.6953 12.4805L12.7441 12.4805L15.9375 7.1582C16.084 6.9043 16.2988 6.77734 16.543 6.77734C16.9141 6.77734 17.1973 7.02148 17.1973 7.38281C17.1973 7.56836 17.1582 7.65625 17.0703 7.8125L13.7988 13.0371L15.9668 13.0371C16.1914 13.0371 16.3574 13.2031 16.3574 13.4375C16.3574 13.6621 16.1914 13.8379 15.9668 13.8379L13.3789 13.8379L13.3789 13.8379L13.3789 15.2148L15.9668 15.2148C16.1914 15.2148 16.3574 15.3906 16.3574 15.625C16.3574 15.8398 16.1914 16.0156 15.9668 16.0156L13.3789 16.0156L13.3789 17.9883C13.3789 18.3887 13.1055 18.6719 12.7148 18.6719Z", fillAlpha = 0.85f)
+        }
+        return _sFYensignCircleFill!!
+    }
+
+private var _sFYensignCircleFill: ImageVector? = null

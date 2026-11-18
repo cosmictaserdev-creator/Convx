@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFStaroflifeCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFStaroflifeCircle: ImageVector
+    get() {
+        if (_sFStaroflifeCircle != null) {
+            return _sFStaroflifeCircle!!
+        }
+        _sFStaroflifeCircle = sfIcon(
+            name = "Monochrome.SFStaroflifeCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M6.95312 9.45312C6.57227 10.1953 6.66992 10.5469 7.35352 10.9082L10.5664 12.6562L7.34375 14.5312C6.65039 14.9316 6.5625 15.2734 6.96289 15.9961L7.00195 16.0449C7.40234 16.7871 7.75391 16.8848 8.45703 16.4551L11.5527 14.668L11.5527 18.252C11.5527 19.0723 11.8262 19.3262 12.6758 19.3262L12.7539 19.3262C13.584 19.3262 13.8574 19.0723 13.8574 18.252L13.8574 14.668L16.9531 16.4551C17.6855 16.9043 18.0273 16.7969 18.4082 16.0449L18.4473 15.9961C18.8184 15.2637 18.7305 14.9121 18.0664 14.5312L14.8438 12.6562L18.0566 10.9082C18.7402 10.5371 18.8379 10.1855 18.457 9.45312L18.4082 9.375C18.0469 8.62305 17.6953 8.51562 16.9336 8.96484L13.8574 10.752L13.8574 7.16797C13.8574 6.36719 13.584 6.11328 12.7539 6.11328L12.6758 6.11328C11.8262 6.11328 11.5527 6.36719 11.5527 7.16797L11.5527 10.752L8.47656 8.96484C7.72461 8.52539 7.37305 8.61328 7.00195 9.375Z", fillAlpha = 0.85f)
+        }
+        return _sFStaroflifeCircle!!
+    }
+
+private var _sFStaroflifeCircle: ImageVector? = null

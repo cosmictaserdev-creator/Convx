@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureGymnastics (dualtone)
+ * Viewport: 26.8895 x 22.7246
+ */
+public val SfSymbols.Dualtone.SFFigureGymnastics: ImageVector
+    get() {
+        if (_sFFigureGymnastics != null) {
+            return _sFFigureGymnastics!!
+        }
+        _sFFigureGymnastics = sfIcon(
+            name = "Dualtone.SFFigureGymnastics",
+            viewportWidth = 26.8895f,
+            viewportHeight = 22.7246f
+        ) {
+            addSfPath("M13.3324 5.41016C14.8168 5.41016 16.0277 4.19922 16.0277 2.69531C16.0277 1.21094 14.8168 0 13.3324 0C11.8285 0 10.6176 1.21094 10.6176 2.69531C10.6176 4.19922 11.8285 5.41016 13.3324 5.41016ZM1.80898 16.9043L8.02969 17.4316C9.14297 17.5293 9.36758 17.6074 10.4418 17.9004L18.0199 20.0293L24.8363 22.5195C25.4223 22.7344 26.223 22.5195 26.4672 21.7676C26.6625 21.1133 26.3695 20.3906 25.7152 20.1562L18.9086 17.6758C18.8012 17.6465 18.5766 17.5586 18.4984 17.5293L13.2055 15.6055C13.9086 14.2578 14.8656 12.0996 15.1098 9.74609C15.1391 9.47266 15.3148 9.32617 15.559 9.32617L24.6508 9.32617C25.3441 9.32617 25.9008 8.75977 25.9008 8.07617C25.9008 7.36328 25.3441 6.80664 24.6508 6.80664L14.6801 6.80664C13.0102 6.80664 12.8539 6.79688 11.0375 6.29883L1.60391 3.69141C0.930077 3.50586 0.246484 3.89648 0.0414055 4.57031C-0.134376 5.24414 0.266015 5.94727 0.930077 6.13281L9.72891 8.55469C9.94375 8.61328 10.1 8.78906 10.0707 9.05273C9.7875 11.2695 8.70351 13.418 8.13711 14.3848L3.16641 14.3848L3.16641 9.32617C3.16641 8.63281 2.58047 8.07617 1.89687 8.07617C1.21328 8.07617 0.637109 8.63281 0.637109 9.32617L0.637109 15.6348C0.637109 16.377 0.96914 16.8359 1.80898 16.9043Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureGymnastics!!
+    }
+
+private var _sFFigureGymnastics: ImageVector? = null

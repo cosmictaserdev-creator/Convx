@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureMindAndBodyCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFFigureMindAndBodyCircleFill: ImageVector
+    get() {
+        if (_sFFigureMindAndBodyCircleFill != null) {
+            return _sFFigureMindAndBodyCircleFill!!
+        }
+        _sFFigureMindAndBodyCircleFill = sfIcon(
+            name = "Dualtone.SFFigureMindAndBodyCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M5.38086 12.168C5.06836 11.8457 5.05859 11.3574 5.38086 11.0449C5.69336 10.7227 6.20117 10.7227 6.51367 11.0449L8.27148 12.8027L10.0684 10.6152C10.3711 10.2441 10.8105 10.0195 11.2988 10.0195L14.1211 10.0195C14.6094 10.0195 15.0586 10.2441 15.3418 10.6152L17.1484 12.8027L18.9062 11.0449C19.2188 10.7227 19.7266 10.7227 20.0293 11.0449C20.3613 11.3574 20.3516 11.8457 20.0293 12.168L17.6465 14.5605C17.3242 14.8828 16.7871 14.8828 16.4648 14.4922L14.9512 12.6465C14.8633 12.5391 14.707 12.5879 14.707 12.7344L14.707 15.8984L17.3926 15.5859C18.3301 15.4883 18.623 16.8457 17.7344 17.1289L14.6777 18.1445C14.8242 18.7793 14.2773 19.3262 13.6523 19.1309L12.7148 18.8086L11.7676 19.1309C11.1426 19.3262 10.5957 18.7793 10.7422 18.1445L7.68555 17.1289C6.79688 16.8457 7.09961 15.4883 8.02734 15.5859L10.7129 15.8984L10.7129 12.7344C10.7129 12.5879 10.5566 12.5391 10.459 12.6465L8.95508 14.4922C8.63281 14.8828 8.10547 14.8828 7.77344 14.5605ZM12.7148 9.23828C11.8457 9.23828 11.1426 8.53516 11.1426 7.66602C11.1426 6.81641 11.8457 6.11328 12.7148 6.11328C13.5645 6.11328 14.2676 6.81641 14.2676 7.66602C14.2676 8.53516 13.5645 9.23828 12.7148 9.23828Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureMindAndBodyCircleFill!!
+    }
+
+private var _sFFigureMindAndBodyCircleFill: ImageVector? = null

@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPlatterFilledBottomAndArrowDownIphone (dualtone)
+ * Viewport: 16.0254 x 26.2402
+ */
+public val SfSymbols.Dualtone.SFPlatterFilledBottomAndArrowDownIphone: ImageVector
+    get() {
+        if (_sFPlatterFilledBottomAndArrowDownIphone != null) {
+            return _sFPlatterFilledBottomAndArrowDownIphone!!
+        }
+        _sFPlatterFilledBottomAndArrowDownIphone = sfIcon(
+            name = "Dualtone.SFPlatterFilledBottomAndArrowDownIphone",
+            viewportWidth = 16.0254f,
+            viewportHeight = 26.2402f
+        ) {
+            addSfPath("M0 22.998C0 24.9707 1.28906 26.2207 3.33008 26.2207L12.3242 26.2207C14.3652 26.2207 15.6641 24.9707 15.6641 22.998L15.6641 3.22266C15.6641 1.25 14.3652 0 12.3242 0L3.33008 0C1.28906 0 0 1.25 0 3.22266ZM1.72852 22.7441L1.72852 3.47656C1.72852 2.33398 2.35352 1.72852 3.54492 1.72852L12.1191 1.72852C13.3008 1.72852 13.9258 2.33398 13.9258 3.47656L13.9258 22.7441C13.9258 23.8867 13.3008 24.4922 12.1191 24.4922L3.54492 24.4922C2.35352 24.4922 1.72852 23.8867 1.72852 22.7441Z", fillAlpha = 0.425f)
+            addSfPath("M4.46289 22.8809L11.1914 22.8809C11.875 22.8809 12.3242 22.4316 12.3242 21.7285L12.3242 20.293C12.3242 19.5898 11.875 19.1406 11.1914 19.1406L4.46289 19.1406C3.7793 19.1406 3.33984 19.5898 3.33984 20.293L3.33984 21.7285C3.33984 22.4316 3.7793 22.8809 4.46289 22.8809Z", fillAlpha = 0.85f)
+            addSfPath("M8.37891 16.6016L8.4375 14.7754L8.4375 10.8203C8.4375 10.459 8.18359 10.2051 7.83203 10.2051C7.4707 10.2051 7.22656 10.459 7.22656 10.8203L7.22656 14.7754L7.28516 16.6016C7.29492 16.9043 7.5293 17.1484 7.83203 17.1484C8.125 17.1484 8.36914 16.9043 8.37891 16.6016ZM5 14.043C4.6582 14.043 4.41406 14.2773 4.41406 14.6289C4.41406 14.7949 4.46289 14.9512 4.57031 15.0586L7.37305 17.8516C7.5 17.9785 7.66602 18.0469 7.83203 18.0469C7.98828 18.0469 8.1543 17.9785 8.28125 17.8516L11.084 15.0586C11.2012 14.9512 11.25 14.7949 11.25 14.6289C11.25 14.2773 11.0059 14.043 10.6641 14.043C10.4785 14.0332 10.3516 14.1113 10.2246 14.2383L9.08203 15.3711L7.83203 16.8945L6.58203 15.3711L5.42969 14.2383C5.30273 14.1113 5.17578 14.0332 5 14.043Z", fillAlpha = 0.85f)
+        }
+        return _sFPlatterFilledBottomAndArrowDownIphone!!
+    }
+
+private var _sFPlatterFilledBottomAndArrowDownIphone: ImageVector? = null

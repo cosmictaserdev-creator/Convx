@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCloudMoonBoltCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFCloudMoonBoltCircleFill: ImageVector
+    get() {
+        if (_sFCloudMoonBoltCircleFill != null) {
+            return _sFCloudMoonBoltCircleFill!!
+        }
+        _sFCloudMoonBoltCircleFill = sfIcon(
+            name = "Dualtone.SFCloudMoonBoltCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.459C19.7266 25.459 25.4395 19.7461 25.4395 12.7344C25.4395 5.73242 19.7266 0.0195312 12.7148 0.0195312C5.71289 0.0195312 0 5.73242 0 12.7344C0 19.7461 5.71289 25.459 12.7148 25.459Z", fillAlpha = 0.2125f)
+            addSfPath("M7.06055 15.8496C5.50781 15.8496 4.49219 14.8438 4.49219 13.5059C4.49219 12.373 5.20508 11.5234 6.20117 11.1914C6.42578 9.20898 8.0957 7.64648 10.0781 7.64648C11.6113 7.64648 12.8516 8.48633 13.5645 9.81445C15.3711 9.85352 16.7285 11.1328 16.7285 12.8125C16.7285 14.5215 15.3711 15.8496 13.623 15.8496ZM21.0059 9.53125C21.0059 10.5469 19.7949 12.2168 17.5586 12.4609C17.4023 10.6348 15.9766 9.22852 14.0527 9.00391C13.9453 8.84766 13.8379 8.69141 13.7109 8.54492C13.8867 6.78711 15.293 5.25391 16.6211 5.15625C16.8555 5.14648 17.002 5.25391 17.002 5.43945C17.002 5.73242 16.582 6.33789 16.582 7.14844C16.582 8.59375 17.5781 9.53125 19.1504 9.53125C19.9512 9.53125 20.4688 9.17969 20.7422 9.17969C20.9082 9.17969 21.0059 9.31641 21.0059 9.53125ZM8.93555 18.7695L9.80469 16.7773C9.87305 16.6309 9.95117 16.5723 10.1562 16.5723L11.3574 16.5723C11.5234 16.5723 11.5918 16.6992 11.5039 16.8652L10.8594 18.0957L12.0801 18.0957C12.2949 18.0957 12.3633 18.291 12.2168 18.457L9.59961 21.3086C9.46289 21.4648 9.22852 21.3574 9.30664 21.1621L10.1562 19.082L9.13086 19.082C8.94531 19.082 8.85742 18.9355 8.93555 18.7695Z", fillAlpha = 0.85f)
+        }
+        return _sFCloudMoonBoltCircleFill!!
+    }
+
+private var _sFCloudMoonBoltCircleFill: ImageVector? = null

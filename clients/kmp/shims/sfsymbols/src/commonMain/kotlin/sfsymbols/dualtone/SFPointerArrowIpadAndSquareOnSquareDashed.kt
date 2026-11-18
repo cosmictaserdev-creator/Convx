@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPointerArrowIpadAndSquareOnSquareDashed (dualtone)
+ * Viewport: 37.1033 x 34.1788
+ */
+public val SfSymbols.Dualtone.SFPointerArrowIpadAndSquareOnSquareDashed: ImageVector
+    get() {
+        if (_sFPointerArrowIpadAndSquareOnSquareDashed != null) {
+            return _sFPointerArrowIpadAndSquareOnSquareDashed!!
+        }
+        _sFPointerArrowIpadAndSquareOnSquareDashed = sfIcon(
+            name = "Dualtone.SFPointerArrowIpadAndSquareOnSquareDashed",
+            viewportWidth = 37.1033f,
+            viewportHeight = 34.1788f
+        ) {
+            addSfPath("M6.91103 20.5708C6.91103 21.9771 7.65322 22.6997 9.02041 22.6997L11.2958 22.6997L11.2958 24.4283L8.98135 24.4283C6.45205 24.4283 5.18252 23.1587 5.18252 20.6587L5.18252 18.7544L6.91103 18.7544ZM6.91103 17.1919L5.18252 17.1919L5.18252 11.4009L6.91103 11.4009ZM11.0126 5.89311L9.02041 5.89311C7.65322 5.89311 6.91103 6.61576 6.91103 8.02201L6.91103 9.83842L5.18252 9.83842L5.18252 7.92436C5.18252 5.43412 6.45205 4.16459 8.98135 4.16459L11.0126 4.16459ZM25.4462 7.92436L25.4462 9.77983L23.7079 9.77983L23.7079 8.02201C23.7079 6.61576 22.9462 5.89311 21.6083 5.89311L19.6161 5.89311L19.6161 4.16459L21.6376 4.16459C24.1669 4.16459 25.4462 5.44389 25.4462 7.92436ZM18.1513 5.89311L12.4677 5.89311L12.4677 4.16459L18.1513 4.16459Z", fillAlpha = 0.425f)
+            addSfPath("M31.5497 13.5494L31.5497 22.1101L29.8212 20.3838L29.8212 13.6372C29.8212 12.231 29.0595 11.5083 27.7216 11.5083L15.1337 11.5083C13.7665 11.5083 13.0243 12.231 13.0243 13.6372L13.0243 26.1861C13.0243 27.5923 13.7665 28.315 15.1337 28.315L24.538 28.315L24.538 30.0435L15.0946 30.0435C12.5653 30.0435 11.2958 28.774 11.2958 26.274L11.2958 13.5494C11.2958 11.0494 12.5653 9.77983 15.0946 9.77983L27.7509 9.77983C30.2704 9.77983 31.5497 11.0591 31.5497 13.5494Z", fillAlpha = 0.425f)
+            addSfPath("M30.4657 29.4185L34.6454 29.4185C35.5731 29.4185 35.9345 28.5689 35.3681 28.0025L27.5653 20.19C26.9501 19.5747 25.9931 19.9068 25.9931 20.8052L25.9931 31.8892C25.9931 32.6802 26.8524 33.0318 27.5067 32.3775Z", fillAlpha = 0.85f)
+        }
+        return _sFPointerArrowIpadAndSquareOnSquareDashed!!
+    }
+
+private var _sFPointerArrowIpadAndSquareOnSquareDashed: ImageVector? = null

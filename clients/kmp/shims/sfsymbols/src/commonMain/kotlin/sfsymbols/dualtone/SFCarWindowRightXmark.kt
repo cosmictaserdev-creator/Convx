@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCarWindowRightXmark (dualtone)
+ * Viewport: 44.4434 x 22.7441
+ */
+public val SfSymbols.Dualtone.SFCarWindowRightXmark: ImageVector
+    get() {
+        if (_sFCarWindowRightXmark != null) {
+            return _sFCarWindowRightXmark!!
+        }
+        _sFCarWindowRightXmark = sfIcon(
+            name = "Dualtone.SFCarWindowRightXmark",
+            viewportWidth = 44.4434f,
+            viewportHeight = 22.7441f
+        ) {
+            addSfPath("M3.80859 22.7441L22.1777 22.7441C24.7754 22.7441 25.9863 21.543 25.9863 18.9941L25.9863 3.61328C25.9863 1.25977 24.7559 0.0292969 22.373 0.0292969L16.1816 0.0292969C14.2578 0.0292969 13.0078 0.46875 11.4258 1.66016L1.79688 8.96484C0.478516 9.9707 0 10.8691 0 12.5586L0 18.9941C0 21.543 1.23047 22.7441 3.80859 22.7441ZM3.59375 11.2402C2.87109 11.2402 2.71484 10.4688 3.25195 10.0586L12.5879 2.91992C13.7109 2.03125 14.6289 1.75781 16.1816 1.75781L22.3438 1.75781C23.5547 1.75781 24.2578 2.45117 24.2578 3.70117L24.2578 9.30664C24.2578 10.5273 23.5352 11.2402 22.3438 11.2402Z", fillAlpha = 0.425f)
+            addSfPath("M31.4844 18.2324C31.8066 18.2324 32.0117 18.125 32.3242 17.8223L43.7109 6.37695C43.9746 6.09375 44.082 5.87891 44.082 5.57617C44.082 5.13672 43.6816 4.74609 43.2227 4.74609C42.9004 4.74609 42.6855 4.85352 42.373 5.15625L30.9961 16.5918C30.7227 16.875 30.625 17.0898 30.625 17.4023C30.625 17.8516 31.0156 18.2324 31.4844 18.2324ZM43.2227 18.2324C43.6816 18.2324 44.082 17.8516 44.082 17.4023C44.082 17.0898 43.9746 16.875 43.7109 16.5918L32.3242 5.15625C32.0117 4.85352 31.8066 4.74609 31.4844 4.74609C31.0156 4.74609 30.625 5.13672 30.625 5.57617C30.625 5.87891 30.7227 6.09375 30.9961 6.37695L42.373 17.8223C42.6855 18.125 42.9004 18.2324 43.2227 18.2324Z", fillAlpha = 0.85f)
+        }
+        return _sFCarWindowRightXmark!!
+    }
+
+private var _sFCarWindowRightXmark: ImageVector? = null

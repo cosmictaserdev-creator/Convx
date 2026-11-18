@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandPointUpLeftFill (dualtone)
+ * Viewport: 21.1625 x 23.225
+ */
+public val SfSymbols.Dualtone.SFHandPointUpLeftFill: ImageVector
+    get() {
+        if (_sFHandPointUpLeftFill != null) {
+            return _sFHandPointUpLeftFill!!
+        }
+        _sFHandPointUpLeftFill = sfIcon(
+            name = "Dualtone.SFHandPointUpLeftFill",
+            viewportWidth = 21.1625f,
+            viewportHeight = 23.225f
+        ) {
+            addSfPath("M15.2248 22.6428C20.303 20.7971 21.9924 16.6955 19.9807 11.1682L19.1897 9.0002C18.4377 6.92989 16.9826 6.04122 15.8401 6.45137C15.5862 6.53926 15.4983 6.73457 15.5862 6.96895L15.967 8.02364C16.1233 8.45332 15.9865 8.74629 15.7229 8.83418C15.4494 8.94161 15.1565 8.80489 14.9905 8.3752L14.7365 7.67207C14.2971 6.45137 13.2131 5.93379 12.1584 6.32442C11.6701 6.5002 11.5334 6.77364 11.6799 7.17403L12.1975 8.59004C12.3537 9.01973 12.2072 9.3127 11.9533 9.41036C11.6701 9.50801 11.3772 9.38106 11.2209 8.95137L10.7522 7.63301C10.2444 6.26582 9.2092 5.9045 8.17404 6.27559C7.72483 6.44161 7.55881 6.74434 7.70529 7.13497L8.70139 9.86934C8.84787 10.299 8.71115 10.592 8.45725 10.6799C8.17404 10.7873 7.88108 10.6408 7.71506 10.2209L4.50217 1.37325C4.1799 0.49434 3.41818 0.142778 2.676 0.40645C1.89475 0.689653 1.54318 1.45137 1.86545 2.33028L6.51389 15.0939C6.62131 15.3967 6.48459 15.6408 6.27951 15.7092C6.09397 15.7775 5.88889 15.7287 5.64475 15.465L2.43186 12.0471C1.94358 11.5295 1.45529 11.4221 0.937716 11.6076C0.136934 11.9104-0.156034 12.6428 0.0783407 13.3166C0.175997 13.5705 0.312716 13.7756 0.4592 13.9514L4.4924 19.0393C7.70529 23.0822 11.5334 23.9904 15.2248 22.6428Z", fillAlpha = 0.85f)
+        }
+        return _sFHandPointUpLeftFill!!
+    }
+
+private var _sFHandPointUpLeftFill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureSeatedSideRightSteeringwheel (monochrome)
+ * Viewport: 27.2657 x 26.5676
+ */
+public val SfSymbols.Monochrome.SFFigureSeatedSideRightSteeringwheel: ImageVector
+    get() {
+        if (_sFFigureSeatedSideRightSteeringwheel != null) {
+            return _sFFigureSeatedSideRightSteeringwheel!!
+        }
+        _sFFigureSeatedSideRightSteeringwheel = sfIcon(
+            name = "Monochrome.SFFigureSeatedSideRightSteeringwheel",
+            viewportWidth = 27.2657f,
+            viewportHeight = 26.5676f
+        ) {
+            addSfPath("M4.90237 7.4391C3.0469 7.4391 1.55276 5.89613 1.55276 4.09925C1.55276 2.22425 3.0469 0.700815 4.90237 0.700815C6.77737 0.700815 8.27151 2.22425 8.27151 4.09925C8.27151 5.96449 6.77737 7.4391 4.90237 7.4391ZM24.8926 25.1735C24.2578 25.8473 23.1543 25.7887 22.3633 24.9782L17.0215 19.4606C16.8457 19.275 16.7188 19.2262 16.4453 19.3336L12.2071 20.945C9.54104 21.9606 7.04104 21.0231 5.83987 18.8258L3.21292 14.0602C2.168 12.1461 2.50979 10.193 4.31643 9.23597C6.06448 8.26917 7.88089 8.99183 8.94534 10.9352L12.4219 17.2828L15.3809 16.2086C16.8457 15.6715 18.0664 15.8375 19.2383 17.0485L24.7852 22.7907C25.5567 23.5817 25.4785 24.5778 24.8926 25.1735Z", fillAlpha = 0.85f)
+            addSfPath("M22.3145 5.09535C22.4903 4.74378 22.3242 4.3141 21.9727 4.14808C21.6114 3.98206 21.1914 4.13831 21.0157 4.49964L18.0274 10.9254C17.8614 11.277 18.0176 11.7067 18.3692 11.8727C18.7305 12.0387 19.1602 11.8825 19.3262 11.5211L19.7266 10.6618L23.5449 10.8766L25.2637 11.6969C26.1621 12.1266 26.8653 11.775 27.1485 11.15C27.4317 10.5446 27.2071 9.80238 26.416 9.42152L24.3653 8.41566L21.9629 5.85706ZM18.2715 4.77308C18.7598 4.98792 19.1407 4.69496 19.0625 4.14808L18.5547 0.564096C18.4864 0.0465179 18.0078-0.15856 17.6074 0.134409L14.6192 2.21449C14.1602 2.53675 14.2578 3.02503 14.6973 3.22035ZM16.7285 8.12269L13.1543 6.56996C12.6758 6.36488 12.2754 6.62855 12.3535 7.19496L12.8711 10.7887C12.9395 11.2868 13.3985 11.5016 13.8086 11.2086L16.7969 9.13831C17.2559 8.80628 17.1875 8.32777 16.7285 8.12269Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureSeatedSideRightSteeringwheel!!
+    }
+
+private var _sFFigureSeatedSideRightSteeringwheel: ImageVector? = null

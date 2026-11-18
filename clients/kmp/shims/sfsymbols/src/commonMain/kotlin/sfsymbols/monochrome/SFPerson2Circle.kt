@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPerson2Circle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFPerson2Circle: ImageVector
+    get() {
+        if (_sFPerson2Circle != null) {
+            return _sFPerson2Circle!!
+        }
+        _sFPerson2Circle = sfIcon(
+            name = "Monochrome.SFPerson2Circle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7461 19.7363 25.4395 12.7148 25.4395C5.69336 25.4395 0 19.7461 0 12.7246C0 5.70312 5.69336 0 12.7148 0C19.7363 0 25.4395 5.70312 25.4395 12.7246ZM1.81641 12.7246C1.81641 18.75 6.68945 23.623 12.7148 23.623C18.7402 23.623 23.6133 18.75 23.6133 12.7246C23.6133 6.69922 18.7402 1.82617 12.7148 1.82617C6.68945 1.82617 1.81641 6.69922 1.81641 12.7246Z", fillAlpha = 0.85f)
+            addSfPath("M11.622 14.0117C10.6017 14.9017 10.0293 16.0338 10.0293 17.041C10.0293 17.3044 10.0823 17.5917 10.2284 17.8516L5.44922 17.8516C4.72656 17.8516 4.43359 17.5488 4.43359 17.002C4.43359 14.8828 6.62109 13.2422 8.94531 13.2422C9.91106 13.2422 10.8532 13.5254 11.622 14.0117ZM11.084 9.91211C11.084 11.2598 10.1172 12.2949 8.94531 12.2949C7.79297 12.2949 6.81641 11.2598 6.81641 9.92188C6.81641 8.63281 7.80273 7.61719 8.94531 7.61719C10.1074 7.61719 11.084 8.61328 11.084 9.91211Z", fillAlpha = 0.85f)
+            addSfPath("M12.1094 17.8516L20.0195 17.8516C20.9082 17.8516 21.25 17.5879 21.25 17.041C21.25 15.459 19.2578 13.2617 16.0742 13.2617C12.8711 13.2617 10.8691 15.459 10.8691 17.041C10.8691 17.5879 11.2207 17.8516 12.1094 17.8516ZM16.0742 12.168C17.4121 12.168 18.5156 10.9668 18.5156 9.42383C18.5156 7.92969 17.4023 6.78711 16.0742 6.78711C14.7363 6.78711 13.623 7.95898 13.623 9.43359C13.623 10.9668 14.7363 12.168 16.0742 12.168Z", fillAlpha = 0.85f)
+        }
+        return _sFPerson2Circle!!
+    }
+
+private var _sFPerson2Circle: ImageVector? = null

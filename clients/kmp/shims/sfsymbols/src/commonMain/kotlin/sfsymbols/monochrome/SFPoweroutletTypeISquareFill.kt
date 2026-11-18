@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPoweroutletTypeISquareFill (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFPoweroutletTypeISquareFill: ImageVector
+    get() {
+        if (_sFPoweroutletTypeISquareFill != null) {
+            return _sFPoweroutletTypeISquareFill!!
+        }
+        _sFPoweroutletTypeISquareFill = sfIcon(
+            name = "Monochrome.SFPoweroutletTypeISquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M22.959 3.76953L22.959 19.1992C22.959 21.6797 21.6797 22.959 19.1504 22.959L3.79883 22.959C1.2793 22.959 0 21.6992 0 19.1992L0 3.76953C0 1.26953 1.2793 0 3.79883 0L19.1504 0C21.6797 0 22.959 1.2793 22.959 3.76953ZM6.62109 5.47852C5.95703 5.47852 5.46875 5.95703 5.46875 6.62109L5.46875 16.3379C5.46875 17.002 5.95703 17.4902 6.62109 17.4902L16.4551 17.4902C17.1289 17.4902 17.6074 17.002 17.6074 16.3379L17.6074 6.62109C17.6074 5.95703 17.1289 5.47852 16.4551 5.47852ZM12.2949 12.7344L12.2949 15.0586C12.2949 15.332 12.1094 15.5078 11.8359 15.5078L11.2402 15.5078C10.9766 15.5078 10.7812 15.3223 10.7812 15.0586L10.7812 12.7344C10.7812 12.4609 10.9766 12.2656 11.2402 12.2656L11.8359 12.2656C12.0996 12.2656 12.2949 12.4609 12.2949 12.7344ZM9.89258 8.33984L10.3125 8.75977C10.5273 8.95508 10.5176 9.22852 10.3125 9.42383L8.49609 11.2207C8.30078 11.4258 8.04688 11.4258 7.86133 11.2207L7.43164 10.8008C7.23633 10.6055 7.24609 10.3613 7.43164 10.166L9.24805 8.34961C9.44336 8.1543 9.69727 8.1543 9.89258 8.33984ZM13.8379 8.34961L15.6445 10.166C15.8398 10.3613 15.8496 10.6055 15.6543 10.8008L15.2246 11.2207C15.0391 11.4258 14.7852 11.4258 14.5801 11.2207L12.7637 9.42383C12.5586 9.22852 12.5586 8.95508 12.7637 8.75977L13.1836 8.33008C13.3887 8.13477 13.6426 8.1543 13.8379 8.34961Z", fillAlpha = 0.85f)
+        }
+        return _sFPoweroutletTypeISquareFill!!
+    }
+
+private var _sFPoweroutletTypeISquareFill: ImageVector? = null

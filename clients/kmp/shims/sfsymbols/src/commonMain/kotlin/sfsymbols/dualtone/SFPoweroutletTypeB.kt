@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPoweroutletTypeB (dualtone)
+ * Viewport: 24.1406 x 22.9785
+ */
+public val SfSymbols.Dualtone.SFPoweroutletTypeB: ImageVector
+    get() {
+        if (_sFPoweroutletTypeB != null) {
+            return _sFPoweroutletTypeB!!
+        }
+        _sFPoweroutletTypeB = sfIcon(
+            name = "Dualtone.SFPoweroutletTypeB",
+            viewportWidth = 24.1406f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M3.79883 22.9785L19.9805 22.9785C22.5098 22.9785 23.7793 21.709 23.7793 19.2188L23.7793 3.78906C23.7793 1.29883 22.5098 0.0292969 19.9805 0.0292969L3.79883 0.0292969C1.2793 0.0292969 0 1.28906 0 3.78906L0 19.2188C0 21.7188 1.2793 22.9785 3.79883 22.9785ZM3.83789 21.25C2.4707 21.25 1.72852 20.5273 1.72852 19.1309L1.72852 3.87695C1.72852 2.48047 2.4707 1.75781 3.83789 1.75781L19.9512 1.75781C21.2891 1.75781 22.0508 2.48047 22.0508 3.87695L22.0508 19.1309C22.0508 20.5273 21.2891 21.25 19.9512 21.25Z", fillAlpha = 0.425f)
+            addSfPath("M7.5293 11.3379C8.08594 11.3379 8.52539 10.9082 8.52539 10.3516L8.52539 6.32812C8.52539 5.78125 8.08594 5.33203 7.5293 5.33203C6.98242 5.33203 6.5625 5.78125 6.5625 6.32812L6.5625 10.3516C6.5625 10.918 6.98242 11.3379 7.5293 11.3379ZM10.3613 18.5156L13.4277 18.5156C13.7793 18.5156 13.9648 18.3398 13.9648 17.998L13.9648 16.5137C13.9648 15.3613 13.0469 14.4336 11.8945 14.4336C10.7324 14.4336 9.83398 15.3613 9.83398 16.5137L9.83398 17.998C9.83398 18.3398 10.0098 18.5156 10.3613 18.5156ZM16.2207 11.3379C16.7773 11.3379 17.2168 10.9082 17.2168 10.3516L17.2168 6.32812C17.2168 5.78125 16.7773 5.33203 16.2207 5.33203C15.6738 5.33203 15.2539 5.78125 15.2539 6.32812L15.2539 10.3516C15.2539 10.918 15.6738 11.3379 16.2207 11.3379Z", fillAlpha = 0.85f)
+        }
+        return _sFPoweroutletTypeB!!
+    }
+
+private var _sFPoweroutletTypeB: ImageVector? = null

@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSuvSideArrowtriangleUpArrowtriangleDownFill (dualtone)
+ * Viewport: 44.3945 x 30.3882
+ */
+public val SfSymbols.Dualtone.SFSuvSideArrowtriangleUpArrowtriangleDownFill: ImageVector
+    get() {
+        if (_sFSuvSideArrowtriangleUpArrowtriangleDownFill != null) {
+            return _sFSuvSideArrowtriangleUpArrowtriangleDownFill!!
+        }
+        _sFSuvSideArrowtriangleUpArrowtriangleDownFill = sfIcon(
+            name = "Dualtone.SFSuvSideArrowtriangleUpArrowtriangleDownFill",
+            viewportWidth = 44.3945f,
+            viewportHeight = 30.3882f
+        ) {
+            addSfPath("M9.79492 24.8474C11.709 24.8474 13.2129 23.3435 13.2129 21.4295C13.2129 19.5252 11.6992 18.0115 9.79492 18.0115C7.89062 18.0115 6.37695 19.5252 6.37695 21.4295C6.37695 23.3337 7.89062 24.8474 9.79492 24.8474ZM34.9805 24.8474C36.8848 24.8474 38.3984 23.3337 38.3984 21.4295C38.3984 19.5252 36.8848 18.0115 34.9805 18.0115C33.0957 18.0115 31.5625 19.5349 31.5625 21.4295C31.5625 23.3337 33.0859 24.8474 34.9805 24.8474ZM42.5 8.85133L41.9336 8.03101C40.5566 6.0193 38.7793 5.16969 35.957 5.16969L26.2012 5.16969C21.0645 5.16969 19.043 5.65797 16.0059 7.56226L10.9473 10.7459L6.25 11.322C2.07031 11.8396 0 13.7439 0 17.0837L0 19.2224C0 21.1951 1.12305 22.3474 3.03711 22.3474L5.10742 22.3474C5.04883 22.0545 5.01953 21.7517 5.01953 21.4295C5.01953 18.783 7.14844 16.6541 9.79492 16.6541C12.4414 16.6541 14.5703 18.783 14.5703 21.4295C14.5703 21.7517 14.541 22.0545 14.4824 22.3474L30.293 22.3474C30.2344 22.0545 30.2051 21.7517 30.2051 21.4295C30.2051 18.7927 32.3438 16.6541 34.9805 16.6541C37.6367 16.6541 39.7656 18.783 39.7656 21.4295C39.7656 21.7517 39.7266 22.0545 39.668 22.3474L41.0059 22.3474C43.0762 22.3474 44.0332 21.2732 44.0332 18.9783L44.0332 13.5486C44.0332 11.9959 43.4766 10.2771 42.5 8.85133Z", fillAlpha = 0.2125f)
+            addSfPath("M19.5605 24.4763C18.9355 24.4763 18.6816 24.9841 19.0039 25.5115L21.7383 30.0037C22.0605 30.5212 22.6758 30.5115 22.9883 30.0037L25.7422 25.5115C26.0645 24.9841 25.8008 24.4763 25.1855 24.4763Z", fillAlpha = 0.85f)
+            addSfPath("M19.5605 19.0759C18.9355 19.0759 18.6816 18.5681 19.0039 18.0408L21.7383 13.5486C22.0605 13.031 22.6758 13.0408 22.9883 13.5486L25.7422 18.0408C26.0645 18.5681 25.8008 19.0759 25.1855 19.0759Z", fillAlpha = 0.85f)
+        }
+        return _sFSuvSideArrowtriangleUpArrowtriangleDownFill!!
+    }
+
+private var _sFSuvSideArrowtriangleUpArrowtriangleDownFill: ImageVector? = null

@@ -16,3 +16,17 @@ subprojects {
         }
     }
 }
+
+val kyantShimPaths = setOf(":kyant-shapes", ":kyant-capsule", ":kyant-backdrop", ":sfsymbols-shim")
+allprojects {
+    if (path !in kyantShimPaths) {
+        configurations.configureEach {
+            resolutionStrategy.dependencySubstitution {
+                substitute(module("io.github.kyant0:backdrop")).using(project(":kyant-backdrop"))
+                substitute(module("io.github.kyant0:shapes")).using(project(":kyant-shapes"))
+                substitute(module("zone.ien.capsule:capsule")).using(project(":kyant-capsule"))
+                substitute(module("com.github.cosmictaserdev-creator.Jetpack_SF_Symbols:sfsymbols")).using(project(":sfsymbols-shim"))
+            }
+        }
+    }
+}

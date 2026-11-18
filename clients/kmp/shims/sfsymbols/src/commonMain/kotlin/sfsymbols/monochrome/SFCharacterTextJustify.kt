@@ -1,0 +1,31 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCharacterTextJustify (monochrome)
+ * Viewport: 25.4785 x 27.4316
+ */
+public val SfSymbols.Monochrome.SFCharacterTextJustify: ImageVector
+    get() {
+        if (_sFCharacterTextJustify != null) {
+            return _sFCharacterTextJustify!!
+        }
+        _sFCharacterTextJustify = sfIcon(
+            name = "Monochrome.SFCharacterTextJustify",
+            viewportWidth = 25.4785f,
+            viewportHeight = 27.4316f
+        ) {
+            addSfPath("M0.869141 24.4629L24.2383 24.4629C24.7266 24.4629 25.1172 24.0918 25.1172 23.6035C25.1172 23.1055 24.7266 22.7344 24.2383 22.7344L0.869141 22.7344C0.371094 22.7344 0 23.1055 0 23.6035C0 24.0918 0.371094 24.4629 0.869141 24.4629Z", fillAlpha = 0.85f)
+            addSfPath("M0.869141 17.8711L24.2383 17.8711C24.7266 17.8711 25.1172 17.4902 25.1172 17.002C25.1172 16.5137 24.7266 16.1426 24.2383 16.1426L0.869141 16.1426C0.371094 16.1426 0 16.5137 0 17.002C0 17.4902 0.371094 17.8711 0.869141 17.8711Z", fillAlpha = 0.85f)
+            addSfPath("M15.6348 11.2793L24.2383 11.2793C24.7266 11.2793 25.1172 10.8984 25.1172 10.4102C25.1172 9.92188 24.7266 9.54102 24.2383 9.54102L15.6348 9.54102C15.1465 9.54102 14.7754 9.92188 14.7754 10.4102C14.7754 10.8984 15.1465 11.2793 15.6348 11.2793Z", fillAlpha = 0.85f)
+            addSfPath("M15.6348 4.67773L24.2383 4.67773C24.7266 4.67773 25.1172 4.30664 25.1172 3.81836C25.1172 3.33008 24.7266 2.94922 24.2383 2.94922L15.6348 2.94922C15.1465 2.94922 14.7754 3.33008 14.7754 3.81836C14.7754 4.30664 15.1465 4.67773 15.6348 4.67773Z", fillAlpha = 0.85f)
+            addSfPath("M2.17773 11.8652C2.57812 11.8652 2.8418 11.6797 3.00781 11.1621L4.01367 8.33008L8.61328 8.33008L9.61914 11.1621C9.78516 11.6699 10.0488 11.8652 10.459 11.8652C10.9375 11.8652 11.2598 11.5527 11.2598 11.1133C11.2598 10.9473 11.2207 10.8008 11.1426 10.5566L7.50977 0.839844C7.30469 0.283203 6.89453 0 6.30859 0C5.72266 0 5.32227 0.283203 5.11719 0.839844L1.48438 10.5566C1.40625 10.8008 1.36719 10.9473 1.36719 11.1133C1.36719 11.5625 1.68945 11.8652 2.17773 11.8652ZM4.46289 7.00195L6.25 1.91406L6.37695 1.91406L8.16406 7.00195Z", fillAlpha = 0.85f)
+        }
+        return _sFCharacterTextJustify!!
+    }
+
+private var _sFCharacterTextJustify: ImageVector? = null

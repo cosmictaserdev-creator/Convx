@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureBoxingCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFFigureBoxingCircleFill: ImageVector
+    get() {
+        if (_sFFigureBoxingCircleFill != null) {
+            return _sFFigureBoxingCircleFill!!
+        }
+        _sFFigureBoxingCircleFill = sfIcon(
+            name = "Dualtone.SFFigureBoxingCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M12.7539 6.91406C11.8848 6.91406 11.2012 6.2207 11.2012 5.36133C11.2012 4.50195 11.8848 3.81836 12.7539 3.81836C13.6035 3.81836 14.2871 4.50195 14.2871 5.36133C14.2871 6.2207 13.6035 6.91406 12.7539 6.91406ZM6.52344 19.4727L8.70117 16.9824L8.70117 13.252C8.70117 12.793 8.76953 12.3242 8.91602 11.8652L9.20898 11.0156L7.88086 11.0156C7.23633 11.0156 6.97266 10.2344 7.45117 9.76562L8.84766 8.33984C9.32617 7.87109 9.82422 7.69531 10.4199 7.69531L19.0039 7.69531C19.5996 7.69531 20.1074 8.20312 20.1074 8.79883C20.1074 9.42383 19.5996 9.91211 19.0039 9.91211C18.5156 9.91211 18.1055 9.60938 17.9492 9.16992L13.291 9.16992C13.1348 9.16992 13.0176 9.22852 12.959 9.4043L11.9043 12.5586L14.0723 15.7227C14.1699 15.8594 14.2285 15.9863 14.2285 16.1816L14.2285 20.0977C14.2285 20.498 13.8867 20.8398 13.4961 20.8398C13.0859 20.8398 12.7539 20.498 12.7539 20.0977L12.7539 16.4355L10.6934 14.0527C10.6348 13.9746 10.5176 14.0137 10.5078 14.1016L10.1855 17.2559C10.166 17.4512 10.0879 17.6172 9.95117 17.7832L7.62695 20.4395C7.34375 20.752 6.88477 20.7715 6.58203 20.5273C6.26953 20.2441 6.24023 19.7852 6.52344 19.4727Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureBoxingCircleFill!!
+    }
+
+private var _sFFigureBoxingCircleFill: ImageVector? = null

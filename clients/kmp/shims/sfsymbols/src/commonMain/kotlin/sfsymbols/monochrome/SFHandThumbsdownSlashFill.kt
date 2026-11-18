@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandThumbsdownSlashFill (monochrome)
+ * Viewport: 31.0303 x 32.7784
+ */
+public val SfSymbols.Monochrome.SFHandThumbsdownSlashFill: ImageVector
+    get() {
+        if (_sFHandThumbsdownSlashFill != null) {
+            return _sFHandThumbsdownSlashFill!!
+        }
+        _sFHandThumbsdownSlashFill = sfIcon(
+            name = "Monochrome.SFHandThumbsdownSlashFill",
+            viewportWidth = 31.0303f,
+            viewportHeight = 32.7784f
+        ) {
+            addSfPath("M17.5842 20.6751C16.0442 22.6735 14.3469 24.936 12.9956 27.5659C12.5269 28.4839 12.0972 29.0894 11.228 29.0894C10.2613 29.0894 9.5386 28.4253 9.5386 27.2827C9.5386 25.1245 11.5796 22.1167 11.5796 20.4761C11.5796 19.5777 10.857 19.0113 9.7632 19.0113L5.4468 19.0113C4.23586 19.0113 3.31789 18.0445 3.31789 16.8726C3.31789 16.1695 3.56203 15.6226 3.94289 15.3003C4.14797 15.1245 4.18703 14.9976 3.99172 14.8218C3.65969 14.5288 3.48391 13.9234 3.48391 13.357C3.48391 12.5562 3.86477 11.8628 4.41164 11.5503C4.63625 11.4234 4.66555 11.2671 4.51906 11.0816C4.25539 10.7398 4.08938 10.2515 4.08938 9.69484C4.08938 8.9791 4.43728 8.40787 4.92745 8.02923ZM27.3511 11.8433C27.3511 15.6128 25.2613 18.5523 22.5269 18.5523L21.6654 18.5523L21.1292 18.0163C22.045 16.6745 22.9627 14.6951 23.0054 11.9605C23.0445 9.18703 22.0288 6.76516 19.7925 5.18313L22.0777 5.18313C25.105 5.18313 27.3511 8.22024 27.3511 11.8433ZM12.2437 4.03078C17.9273 4.07961 21.5405 7.46828 21.482 11.9409C21.4533 14.0548 21.0303 15.5851 20.1842 17.0716L7.36185 4.25483C8.05161 4.1067 9.13786 4.01221 10.5738 4.02102Z", fillAlpha = 0.85f)
+            addSfPath("M2.78078 1.60891C2.45852 1.27688 1.92141 1.27688 1.60891 1.60891C1.28664 1.94094 1.27688 2.45852 1.60891 2.78078L24.3042 25.4761C24.6265 25.7984 25.1636 25.8081 25.4956 25.4761C25.8081 25.1538 25.8081 24.6167 25.4956 24.2945Z", fillAlpha = 0.85f)
+        }
+        return _sFHandThumbsdownSlashFill!!
+    }
+
+private var _sFHandThumbsdownSlashFill: ImageVector? = null

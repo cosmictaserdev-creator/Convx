@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SF4Lane (monochrome)
+ * Viewport: 23.3203 x 18.9746
+ */
+public val SfSymbols.Monochrome.SF4Lane: ImageVector
+    get() {
+        if (_sF4Lane != null) {
+            return _sF4Lane!!
+        }
+        _sF4Lane = sfIcon(
+            name = "Monochrome.SF4Lane",
+            viewportWidth = 23.3203f,
+            viewportHeight = 18.9746f
+        ) {
+            addSfPath("M0 18.1055C0 18.584 0.390625 18.9746 0.869141 18.9746C1.33789 18.9746 1.72852 18.584 1.72852 18.1055L1.72852 0.898438C1.72852 0.419922 1.33789 0.0292969 0.869141 0.0292969C0.390625 0.0292969 0 0.419922 0 0.898438ZM21.2305 18.1055C21.2305 18.584 21.6211 18.9746 22.0898 18.9746C22.5684 18.9746 22.959 18.584 22.959 18.1055L22.959 0.898438C22.959 0.419922 22.5684 0.0292969 22.0898 0.0292969C21.6211 0.0292969 21.2305 0.419922 21.2305 0.898438Z", fillAlpha = 0.85f)
+            addSfPath("M13.1152 15.293C13.5449 15.293 13.9258 15.0293 13.9258 14.4531L13.9258 12.9102L14.6387 12.9102C15.1172 12.9102 15.332 12.6074 15.332 12.2266C15.332 11.8164 15.0977 11.5234 14.6387 11.5234L13.9258 11.5234L13.9258 5.40039C13.9258 4.58984 13.3984 4.14062 12.5879 4.14062C11.7676 4.14062 11.3672 4.59961 10.9766 5.32227C10.0684 6.8457 8.67188 9.30664 7.91016 10.7715C7.74414 11.1719 7.59766 11.5527 7.59766 11.9922C7.59766 12.5391 7.99805 12.9102 8.57422 12.9102L12.3047 12.9102L12.3047 14.4531C12.3047 15.0293 12.6855 15.293 13.1152 15.293ZM12.334 11.5625L9.0918 11.5625L9.0918 11.4844C9.91211 9.74609 11.2109 7.43164 12.2754 5.64453L12.334 5.64453Z", fillAlpha = 0.85f)
+        }
+        return _sF4Lane!!
+    }
+
+private var _sF4Lane: ImageVector? = null

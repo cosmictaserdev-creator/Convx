@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRotate3dCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFRotate3dCircle: ImageVector
+    get() {
+        if (_sFRotate3dCircle != null) {
+            return _sFRotate3dCircle!!
+        }
+        _sFRotate3dCircle = sfIcon(
+            name = "Monochrome.SFRotate3dCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M10.0586 14.3066C10.0293 13.7988 10.0098 13.2715 10.0098 12.7246C10.0098 9.50195 10.5273 6.91406 11.3184 5.54688C7.97852 6.21094 5.41016 9.18945 5.41016 12.7051C5.41016 13.457 7.19727 14.0625 10.0586 14.3066ZM11.0742 14.3652C11.5918 14.3848 12.1484 14.4043 12.7148 14.4043C17.0605 14.4043 20.0098 13.6523 20.0293 12.7148C20.0293 8.7207 16.709 5.41016 12.7148 5.41016C11.7676 5.42969 11.0352 8.37891 11.0352 12.7246C11.0352 13.291 11.0449 13.8379 11.0742 14.3652ZM10.127 15.3027C8.10547 15.1074 6.51367 14.6777 5.53711 14.1113C6.11328 17.0117 8.42773 19.3262 11.3184 19.8926C10.752 18.9258 10.3223 17.3145 10.127 15.3027ZM11.1328 15.3711C11.3574 18.2324 11.9727 20.0293 12.7148 20.0293C16.25 20.0195 19.2285 17.4512 19.8926 14.1113C18.5254 14.9023 15.9277 15.4199 12.7148 15.4199C12.1582 15.4199 11.6309 15.4004 11.1328 15.3711Z", fillAlpha = 0.85f)
+        }
+        return _sFRotate3dCircle!!
+    }
+
+private var _sFRotate3dCircle: ImageVector? = null

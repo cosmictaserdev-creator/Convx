@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMetronome (monochrome)
+ * Viewport: 26.9873 x 24.0723
+ */
+public val SfSymbols.Monochrome.SFMetronome: ImageVector
+    get() {
+        if (_sFMetronome != null) {
+            return _sFMetronome!!
+        }
+        _sFMetronome = sfIcon(
+            name = "Monochrome.SFMetronome",
+            viewportWidth = 26.9873f,
+            viewportHeight = 24.0723f
+        ) {
+            addSfPath("M16.0913 1.62109L25.9644 18.8867C26.2866 19.4434 26.4527 20.0488 26.4527 20.6348C26.4527 22.4414 25.2222 23.8672 23.1909 23.8672L3.43508 23.8672C1.39406 23.8672 0.173358 22.4414 0.173358 20.6348C0.173358 20.0488 0.319842 19.4531 0.651874 18.8867L4.71265 11.7854L5.95489 13.0276L4.00585 16.4355L3.23976 16.4355L2.22414 18.1055L3.05122 18.1047L2.14601 19.6875C1.98 20 1.91164 20.332 1.91164 20.625C1.91164 21.4453 2.48781 22.1777 3.45461 22.1777L23.1616 22.1777C24.1284 22.1777 24.7144 21.4453 24.7144 20.625C24.7144 20.332 24.6362 20.0098 24.4605 19.6973L23.5408 18.0867L24.4214 18.0859L23.4058 16.4355L22.5979 16.4355L14.607 2.44141C14.314 1.92383 13.8062 1.71875 13.3081 1.71875C12.8101 1.71875 12.3023 1.92383 12.0093 2.44141L8.45039 8.66421L7.20756 7.42237L10.5249 1.62109C11.1499 0.537109 12.2241 0 13.3081 0C14.4019 0 15.4761 0.537109 16.0913 1.62109Z", fillAlpha = 0.85f)
+            addSfPath("M14.1675 6.00586L14.1675 14.3767L12.4585 12.6691L12.4585 6.00586C12.4585 5.47852 12.7808 5.11719 13.3081 5.11719C13.8452 5.11719 14.1675 5.47852 14.1675 6.00586Z", fillAlpha = 0.85f)
+            addSfPath("M24.4214 18.0859L2.22414 18.1055L3.23976 16.4355L11.5773 16.4355L12.898 17.7539L14.1089 16.5234L14.0209 16.4355L23.4058 16.4355Z", fillAlpha = 0.85f)
+            addSfPath("M12.898 17.7539L14.1089 16.5234L3.05422 5.47852C2.69289 5.10742 2.21437 5.10742 1.83351 5.46875C1.45265 5.84961 1.47219 6.34766 1.83351 6.70898Z", fillAlpha = 0.85f)
+        }
+        return _sFMetronome!!
+    }
+
+private var _sFMetronome: ImageVector? = null

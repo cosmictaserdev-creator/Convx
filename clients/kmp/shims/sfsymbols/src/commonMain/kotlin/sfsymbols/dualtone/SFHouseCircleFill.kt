@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHouseCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFHouseCircleFill: ImageVector
+    get() {
+        if (_sFHouseCircleFill != null) {
+            return _sFHouseCircleFill!!
+        }
+        _sFHouseCircleFill = sfIcon(
+            name = "Dualtone.SFHouseCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M6.80664 17.7148L6.80664 12.0996L12.3047 7.49023C12.5781 7.26562 12.8613 7.25586 13.1348 7.49023L18.6328 12.1094L18.6328 17.7148C18.6328 18.6035 18.0957 19.1309 17.1875 19.1309L8.26172 19.1309C7.35352 19.1309 6.80664 18.6035 6.80664 17.7148ZM4.74609 11.6113C4.74609 11.4551 4.81445 11.2891 4.95117 11.1719L11.7773 5.44922C12.3535 4.96094 13.1055 4.96094 13.6719 5.44922L17.0801 8.32031L17.0801 6.96289C17.0801 6.69922 17.2656 6.52344 17.5195 6.52344L18.2031 6.52344C18.457 6.52344 18.6328 6.69922 18.6328 6.96289L18.6328 9.61914L20.4883 11.1719C20.625 11.2891 20.6836 11.4355 20.6836 11.6309C20.6836 11.9336 20.4395 12.1484 20.1367 12.1484C19.9609 12.1484 19.834 12.041 19.6777 11.9336L13.0957 6.39648C12.8418 6.19141 12.6172 6.17188 12.3535 6.39648L5.75195 11.9336C5.61523 12.041 5.47852 12.1484 5.30273 12.1484C4.96094 12.1484 4.74609 11.8848 4.74609 11.6113ZM10.9961 17.9785L14.4531 17.9785L14.4531 13.8086C14.4531 13.5156 14.2676 13.3301 13.9648 13.3301L11.4844 13.3301C11.1914 13.3301 10.9961 13.5156 10.9961 13.8086Z", fillAlpha = 0.85f)
+        }
+        return _sFHouseCircleFill!!
+    }
+
+private var _sFHouseCircleFill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMountain2Circle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFMountain2Circle: ImageVector
+    get() {
+        if (_sFMountain2Circle != null) {
+            return _sFMountain2Circle!!
+        }
+        _sFMountain2Circle = sfIcon(
+            name = "Monochrome.SFMountain2Circle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M11.2988 10.8203C11.8164 10.9961 12.2461 11.4355 12.6562 11.4355C13.1641 11.4355 13.5938 10.6836 14.502 10.6836C15.4102 10.6836 15.8398 11.4355 16.3477 11.4355C16.748 11.4355 17.1777 11.0059 17.7051 10.8203L15.3613 7.74414C14.8828 7.10938 14.1406 7.08984 13.6523 7.74414ZM8.49609 16.8359L20.498 16.8359C21.3867 16.8359 21.6309 15.9863 21.1621 15.3809L18.2031 11.5039C17.793 11.377 17.168 12.1387 16.3477 12.1387C15.4004 12.1387 15.0488 11.3867 14.502 11.3867C13.9551 11.3867 13.6035 12.1387 12.6562 12.1387C11.8359 12.1387 11.2012 11.3672 10.791 11.5039L7.82227 15.3809C7.36328 15.9766 7.60742 16.8359 8.49609 16.8359ZM4.93164 16.8359L6.93359 16.8359C6.62109 16.2695 6.64062 15.4785 7.11914 14.8535L10.5176 10.4395L10.1953 10.0488C9.69727 9.44336 9.02344 9.44336 8.52539 10.0488L4.30664 15.3027C3.7793 15.9668 4.0332 16.8359 4.93164 16.8359Z", fillAlpha = 0.85f)
+        }
+        return _sFMountain2Circle!!
+    }
+
+private var _sFMountain2Circle: ImageVector? = null

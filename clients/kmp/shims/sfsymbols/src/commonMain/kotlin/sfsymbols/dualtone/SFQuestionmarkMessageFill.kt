@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFQuestionmarkMessageFill (dualtone)
+ * Viewport: 29.0234 x 25.8496
+ */
+public val SfSymbols.Dualtone.SFQuestionmarkMessageFill: ImageVector
+    get() {
+        if (_sFQuestionmarkMessageFill != null) {
+            return _sFQuestionmarkMessageFill!!
+        }
+        _sFQuestionmarkMessageFill = sfIcon(
+            name = "Dualtone.SFQuestionmarkMessageFill",
+            viewportWidth = 29.0234f,
+            viewportHeight = 25.8496f
+        ) {
+            addSfPath("M14.3262 23.8086C22.6465 23.8086 28.6621 18.7891 28.6621 11.9043C28.6621 4.99023 22.6367 0 14.3262 0C6.01562 0 0 4.99023 0 11.9043C0 16.8848 2.75391 18.2129 2.75391 20.4785C2.75391 21.4746 2.41211 22.1191 1.66016 22.793C1.17188 23.2324 1.41602 23.8086 2.13867 23.8086C3.82812 23.8086 5.60547 23.2031 6.875 22.2559C9.02344 23.2715 11.5625 23.8086 14.3262 23.8086Z", fillAlpha = 0.2125f)
+            addSfPath("M14.1992 14.6582C13.6328 14.6582 13.3105 14.3555 13.3105 13.7695C13.3105 13.6914 13.3105 13.6133 13.3105 13.5352C13.3105 12.3145 13.9355 11.6406 14.9023 10.9668C16.0645 10.1562 16.582 9.69727 16.582 8.81836C16.582 7.79297 15.7617 7.08984 14.4922 7.08984C13.4863 7.08984 12.7246 7.65625 12.3633 8.49609L12.1875 8.76953C12.002 9.05273 11.748 9.23828 11.3574 9.23828C10.9766 9.23828 10.5762 8.96484 10.5762 8.4668C10.5762 8.25195 10.6152 8.05664 10.6738 7.86133C10.9863 6.63086 12.3926 5.55664 14.5703 5.55664C16.7188 5.55664 18.5156 6.70898 18.5156 8.73047C18.5156 10.1953 17.7051 10.9473 16.4258 11.7969C15.498 12.4219 15.0879 12.8809 15.0879 13.6328C15.0879 13.7012 15.0879 13.7793 15.0879 13.8477C15.0879 14.3066 14.7559 14.6582 14.1992 14.6582ZM14.1699 18.4082C13.4863 18.4082 12.8906 17.8516 12.8906 17.1777C12.8906 16.4941 13.4766 15.9375 14.1699 15.9375C14.873 15.9375 15.4492 16.4844 15.4492 17.1777C15.4492 17.8613 14.8633 18.4082 14.1699 18.4082Z", fillAlpha = 0.85f)
+        }
+        return _sFQuestionmarkMessageFill!!
+    }
+
+private var _sFQuestionmarkMessageFill: ImageVector? = null

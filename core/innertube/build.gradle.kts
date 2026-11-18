@@ -13,6 +13,7 @@ kotlin {
 
     iosArm64()
     iosSimulatorArm64()
+    iosX64()
     jvm("desktop")
 
     sourceSets {
@@ -44,6 +45,7 @@ kotlin {
         getByName("androidMain").dependsOn(jvmMain)
         getByName("iosArm64Main").dependsOn(iosMain)
         getByName("iosSimulatorArm64Main").dependsOn(iosMain)
+        getByName("iosX64Main").dependsOn(iosMain)
 
         getByName("desktopMain") {
             dependsOn(jvmMain)

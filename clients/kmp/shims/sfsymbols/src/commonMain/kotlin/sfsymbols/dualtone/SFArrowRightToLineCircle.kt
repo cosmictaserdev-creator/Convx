@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowRightToLineCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFArrowRightToLineCircle: ImageVector
+    get() {
+        if (_sFArrowRightToLineCircle != null) {
+            return _sFArrowRightToLineCircle!!
+        }
+        _sFArrowRightToLineCircle = sfIcon(
+            name = "Dualtone.SFArrowRightToLineCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M5.06836 12.7246C5.06836 13.1641 5.37109 13.457 5.79102 13.457L11.8848 13.457L14.209 13.3398L11.6992 15.625L10.6934 16.582C10.5371 16.7188 10.4785 16.8945 10.4785 17.1191C10.4785 17.5488 10.7715 17.832 11.1816 17.832C11.3867 17.832 11.6113 17.7246 11.7676 17.5781L16.1328 13.2715C16.2988 13.1152 16.377 12.9199 16.377 12.7246C16.377 12.5293 16.2891 12.334 16.1328 12.1777L11.7383 7.83203C11.582 7.66602 11.3965 7.59766 11.1914 7.59766C10.791 7.59766 10.4785 7.88086 10.4785 8.30078C10.4785 8.50586 10.5371 8.70117 10.6934 8.85742L11.6895 9.81445L14.1992 12.1094L11.8848 12.002L5.79102 12.002C5.37109 12.002 5.06836 12.3047 5.06836 12.7246ZM18.1445 18.1543C18.5742 18.1543 18.877 17.8613 18.877 17.4316L18.877 7.99805C18.877 7.56836 18.5742 7.27539 18.1445 7.27539C17.7246 7.27539 17.4219 7.56836 17.4219 7.99805L17.4219 17.4316C17.4219 17.8613 17.7246 18.1543 18.1445 18.1543Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowRightToLineCircle!!
+    }
+
+private var _sFArrowRightToLineCircle: ImageVector? = null

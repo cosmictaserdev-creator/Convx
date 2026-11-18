@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFExternaldriveFillTrianglebadgeExclamationmark (dualtone)
+ * Viewport: 39.707 x 29.1113
+ */
+public val SfSymbols.Dualtone.SFExternaldriveFillTrianglebadgeExclamationmark: ImageVector
+    get() {
+        if (_sFExternaldriveFillTrianglebadgeExclamationmark != null) {
+            return _sFExternaldriveFillTrianglebadgeExclamationmark!!
+        }
+        _sFExternaldriveFillTrianglebadgeExclamationmark = sfIcon(
+            name = "Dualtone.SFExternaldriveFillTrianglebadgeExclamationmark",
+            viewportWidth = 39.707f,
+            viewportHeight = 29.1113f
+        ) {
+            addSfPath("M34.0723 20.0879C34.0723 22.9395 32.0215 24.9805 29.1504 24.9805L16.7325 24.9805C16.6649 24.7781 16.5753 24.5811 16.4648 24.3945L11.3171 15.1953L29.1504 15.1953C32.0215 15.1953 34.0723 17.2461 34.0723 20.0879ZM27.3926 20.1172C27.3926 21.0059 28.125 21.6895 28.9941 21.6895C29.834 21.6895 30.5566 20.9863 30.5566 20.1172C30.5566 19.2773 29.834 18.5449 28.9941 18.5449C28.125 18.5449 27.3926 19.2773 27.3926 20.1172ZM29.1016 6.93359L32.2852 14.3848C31.3672 13.9062 30.3125 13.6328 29.1504 13.6328L10.1855 13.6328C10.0374 13.6328 9.89088 13.6373 9.74612 13.6462C9.33914 13.4579 8.89566 13.3594 8.44727 13.3594C8.09093 13.3594 7.73765 13.4205 7.40351 13.5389L10.2344 6.93359C10.9863 5.11719 12.5391 4.15039 14.5996 4.15039L24.7363 4.15039C26.7969 4.15039 28.3398 5.11719 29.1016 6.93359Z", fillAlpha = 0.425f)
+            addSfPath("M9.84375 15.7227L15.1367 25.1465C15.2832 25.4199 15.3613 25.6836 15.3613 25.9473C15.3613 26.8555 14.7266 27.5781 13.7402 27.5781L3.16406 27.5781C2.17773 27.5781 1.55273 26.8555 1.55273 25.9473C1.55273 25.6836 1.62109 25.4199 1.76758 25.1562L7.05078 15.7227C7.35352 15.1855 7.91016 14.9023 8.45703 14.9023C8.99414 14.9023 9.54102 15.1855 9.84375 15.7227ZM7.46094 24.707C7.46094 25.2539 7.91016 25.6934 8.44727 25.6934C8.99414 25.6934 9.44336 25.2539 9.45312 24.707C9.45312 24.1699 9.00391 23.7207 8.44727 23.7207C7.91992 23.7207 7.46094 24.1699 7.46094 24.707ZM7.66602 18.6035L7.76367 22.1875C7.77344 22.5781 8.05664 22.8613 8.44727 22.8613C8.84766 22.8613 9.13086 22.5781 9.14062 22.1875L9.23828 18.6035C9.24805 18.1445 8.91602 17.8125 8.44727 17.8125C7.97852 17.8125 7.65625 18.1445 7.66602 18.6035Z", fillAlpha = 0.85f)
+        }
+        return _sFExternaldriveFillTrianglebadgeExclamationmark!!
+    }
+
+private var _sFExternaldriveFillTrianglebadgeExclamationmark: ImageVector? = null

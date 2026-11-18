@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTextRedaction (monochrome)
+ * Viewport: 25.4785 x 21.5527
+ */
+public val SfSymbols.Monochrome.SFTextRedaction: ImageVector
+    get() {
+        if (_sFTextRedaction != null) {
+            return _sFTextRedaction!!
+        }
+        _sFTextRedaction = sfIcon(
+            name = "Monochrome.SFTextRedaction",
+            viewportWidth = 25.4785f,
+            viewportHeight = 21.5527f
+        ) {
+            addSfPath("M0.869141 1.73828L24.2383 1.73828C24.7266 1.73828 25.1172 1.36719 25.1172 0.878906C25.1172 0.390625 24.7266 0.00976562 24.2383 0.00976562L0.869141 0.00976562C0.371094 0.00976562 0 0.390625 0 0.878906C0 1.36719 0.371094 1.73828 0.869141 1.73828ZM14.7949 14.9316L24.2383 14.9316C24.7266 14.9316 25.1172 14.5508 25.1172 14.0625C25.1172 13.5742 24.7266 13.2031 24.2383 13.2031L14.7949 13.2031C14.3066 13.2031 13.9258 13.5742 13.9258 14.0625C13.9258 14.5508 14.3066 14.9316 14.7949 14.9316ZM0.869141 21.5527L24.2383 21.5527C24.7266 21.5527 25.1172 21.1719 25.1172 20.6836C25.1172 20.1953 24.7266 19.8242 24.2383 19.8242L0.869141 19.8242C0.371094 19.8242 0 20.1953 0 20.6836C0 21.1719 0.371094 21.5527 0.869141 21.5527Z", fillAlpha = 0.85f)
+            addSfPath("M1.42578 9.35547L23.6816 9.35547C24.6289 9.35547 25.1172 8.87695 25.1172 7.92969L25.1172 7.00195C25.1172 6.07422 24.6289 5.5957 23.6816 5.5957L1.42578 5.5957C0.488281 5.5957 0 6.07422 0 7.00195L0 7.92969C0 8.87695 0.488281 9.35547 1.42578 9.35547ZM1.42578 15.9473L10.9375 15.9473C11.8848 15.9473 12.373 15.4688 12.373 14.5215L12.373 13.5938C12.373 12.666 11.8848 12.1875 10.9375 12.1875L1.42578 12.1875C0.488281 12.1875 0 12.666 0 13.5938L0 14.5215C0 15.4688 0.488281 15.9473 1.42578 15.9473Z", fillAlpha = 0.85f)
+        }
+        return _sFTextRedaction!!
+    }
+
+private var _sFTextRedaction: ImageVector? = null

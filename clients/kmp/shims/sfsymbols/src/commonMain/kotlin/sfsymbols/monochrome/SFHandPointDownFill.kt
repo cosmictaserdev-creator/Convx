@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandPointDownFill (monochrome)
+ * Viewport: 19.7852 x 25.3027
+ */
+public val SfSymbols.Monochrome.SFHandPointDownFill: ImageVector
+    get() {
+        if (_sFHandPointDownFill != null) {
+            return _sFHandPointDownFill!!
+        }
+        _sFHandPointDownFill = sfIcon(
+            name = "Monochrome.SFHandPointDownFill",
+            viewportWidth = 19.7852f,
+            viewportHeight = 25.3027f
+        ) {
+            addSfPath("M8.37891 0.117188C2.98828 0.117188 0 3.38867 0 9.26758L0 11.582C0 13.7793 1.06445 15.1172 2.26562 15.1172C2.53906 15.1172 2.68555 14.9805 2.68555 14.7168L2.68555 13.6035C2.68555 13.1445 2.91992 12.9199 3.19336 12.9199C3.48633 12.9199 3.7207 13.1445 3.7207 13.6035L3.7207 14.3457C3.7207 15.6543 4.56055 16.5039 5.68359 16.5039C6.20117 16.5039 6.42578 16.2988 6.42578 15.8594L6.42578 14.3555C6.42578 13.8965 6.66016 13.6719 6.93359 13.6719C7.23633 13.6719 7.46094 13.8965 7.46094 14.3555L7.46094 15.752C7.46094 17.2168 8.32031 17.9004 9.41406 17.9004C9.89258 17.9004 10.1465 17.6758 10.1465 17.2559L10.1465 14.3555C10.1465 13.8965 10.3809 13.6719 10.6641 13.6719C10.957 13.6719 11.1914 13.8965 11.1914 14.3555L11.1914 23.7695C11.1914 24.707 11.7871 25.3027 12.5781 25.3027C13.4082 25.3027 13.9941 24.707 13.9941 23.7695L13.9941 10.1855C13.9941 9.86328 14.1992 9.6875 14.4238 9.6875C14.6191 9.6875 14.7949 9.80469 14.9316 10.1367L16.7871 14.4434C17.0605 15.0977 17.4902 15.3711 18.0371 15.3711C18.8965 15.3711 19.4238 14.7754 19.4238 14.0625C19.4238 13.7891 19.3652 13.5449 19.2969 13.3398L17.2461 7.17773C15.6055 2.27539 12.3145 0.117188 8.37891 0.117188Z", fillAlpha = 0.85f)
+        }
+        return _sFHandPointDownFill!!
+    }
+
+private var _sFHandPointDownFill: ImageVector? = null

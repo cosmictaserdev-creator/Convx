@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SF4Calendar (monochrome)
+ * Viewport: 25.3809 x 22.9785
+ */
+public val SfSymbols.Monochrome.SF4Calendar: ImageVector
+    get() {
+        if (_sF4Calendar != null) {
+            return _sF4Calendar!!
+        }
+        _sF4Calendar = sfIcon(
+            name = "Monochrome.SF4Calendar",
+            viewportWidth = 25.3809f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M3.79883 22.9785L21.2109 22.9785C23.7402 22.9785 25.0195 21.709 25.0195 19.2188L25.0195 3.78906C25.0195 1.29883 23.7402 0.0292969 21.2109 0.0292969L3.79883 0.0292969C1.2793 0.0292969 0 1.28906 0 3.78906L0 19.2188C0 21.7188 1.2793 22.9785 3.79883 22.9785ZM3.66211 21.25C2.41211 21.25 1.72852 20.5859 1.72852 19.2969L1.72852 7.64648C1.72852 6.34766 2.41211 5.69336 3.66211 5.69336L21.3379 5.69336C22.5781 5.69336 23.2812 6.34766 23.2812 7.64648L23.2812 19.2969C23.2812 20.5859 22.5781 21.25 21.3379 21.25Z", fillAlpha = 0.85f)
+            addSfPath("M14.0332 19.043C14.5215 19.043 14.7949 18.7305 14.7949 18.2031L14.7949 16.543L15.8203 16.543C16.2305 16.543 16.5039 16.2695 16.5039 15.8691C16.5039 15.4785 16.2402 15.2051 15.8203 15.2051L14.7949 15.2051L14.7949 8.98438C14.7949 8.33984 14.3066 7.90039 13.5742 7.90039C12.8613 7.90039 12.4219 8.1543 12.002 8.7793C10.8203 10.5566 9.13086 13.0566 8.1543 14.6387C7.95898 14.9707 7.88086 15.2246 7.88086 15.5273C7.88086 16.1426 8.30078 16.543 8.96484 16.543L13.291 16.543L13.291 18.2031C13.291 18.7207 13.5742 19.043 14.0332 19.043ZM13.291 15.2051L9.4043 15.2051L9.4043 15.127C10.2637 13.6523 12.0703 10.9766 13.2129 9.25781L13.291 9.25781Z", fillAlpha = 0.85f)
+        }
+        return _sF4Calendar!!
+    }
+
+private var _sF4Calendar: ImageVector? = null

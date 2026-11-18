@@ -1,0 +1,31 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCloudHeavyrainFill (monochrome)
+ * Viewport: 29.5605 x 29.1311
+ */
+public val SfSymbols.Monochrome.SFCloudHeavyrainFill: ImageVector
+    get() {
+        if (_sFCloudHeavyrainFill != null) {
+            return _sFCloudHeavyrainFill!!
+        }
+        _sFCloudHeavyrainFill = sfIcon(
+            name = "Monochrome.SFCloudHeavyrainFill",
+            viewportWidth = 29.5605f,
+            viewportHeight = 29.1311f
+        ) {
+            addSfPath("M19.4922 28.7794L23.3008 22.1974C23.4961 21.8556 23.3984 21.465 23.0664 21.2892C22.7441 21.1134 22.3633 21.1915 22.168 21.5431L18.3789 28.1154C18.1836 28.4571 18.2715 28.8478 18.6035 29.0431C18.9062 29.2286 19.3164 29.1114 19.4922 28.7794Z", fillAlpha = 0.85f)
+            addSfPath("M14.502 28.7696L18.2812 22.2169C18.4961 21.8556 18.3887 21.4845 18.0566 21.2892C17.7246 21.0939 17.3535 21.1915 17.1387 21.5529L13.3496 28.1349C13.1641 28.4571 13.2422 28.8478 13.584 29.0431C13.916 29.2286 14.3066 29.1114 14.502 28.7696Z", fillAlpha = 0.85f)
+            addSfPath("M9.49219 28.7696L13.2715 22.2169C13.4766 21.8556 13.3691 21.4845 13.0469 21.2892C12.7148 21.0939 12.334 21.1915 12.1289 21.5529L8.33008 28.1349C8.1543 28.4571 8.23242 28.8478 8.57422 29.0431C8.90625 29.2286 9.29688 29.1114 9.49219 28.7696Z", fillAlpha = 0.85f)
+            addSfPath("M4.46289 28.7696L8.25195 22.2169C8.45703 21.8556 8.34961 21.4845 8.01758 21.2892C7.68555 21.0939 7.31445 21.1915 7.10938 21.5529L3.31055 28.1349C3.125 28.4571 3.21289 28.8478 3.54492 29.0431C3.87695 29.2286 4.26758 29.1114 4.46289 28.7696Z", fillAlpha = 0.85f)
+            addSfPath("M6.73828 19.2482L22.4316 19.2482C26.5039 19.2482 29.5605 16.1622 29.5605 12.3341C29.5605 8.37902 26.3184 5.4884 22.0996 5.4884C20.5176 2.34387 17.6465 0.312616 13.9551 0.312616C9.26758 0.312616 5.41016 4.03332 5 8.71105C2.69531 9.36535 0.927734 11.3087 0.927734 13.965C0.927734 16.8751 3.05664 19.2482 6.73828 19.2482Z", fillAlpha = 0.85f)
+        }
+        return _sFCloudHeavyrainFill!!
+    }
+
+private var _sFCloudHeavyrainFill: ImageVector? = null

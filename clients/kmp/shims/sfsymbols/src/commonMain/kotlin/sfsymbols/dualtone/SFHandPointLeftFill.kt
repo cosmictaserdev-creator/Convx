@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandPointLeftFill (dualtone)
+ * Viewport: 26.4844 x 20.5176
+ */
+public val SfSymbols.Dualtone.SFHandPointLeftFill: ImageVector
+    get() {
+        if (_sFHandPointLeftFill != null) {
+            return _sFHandPointLeftFill!!
+        }
+        _sFHandPointLeftFill = sfIcon(
+            name = "Dualtone.SFHandPointLeftFill",
+            viewportWidth = 26.4844f,
+            viewportHeight = 20.5176f
+        ) {
+            addSfPath("M26.4551 11.709C26.4551 7.57812 24.1797 4.12109 19.043 2.40234L12.5684 0.253906C12.3438 0.166016 12.0996 0.107422 11.8066 0.107422C11.0547 0.107422 10.4297 0.673828 10.4297 1.57227C10.4297 2.1582 10.7227 2.59766 11.4062 2.89062L15.9277 4.83398C16.2793 4.98047 16.3965 5.15625 16.3965 5.36133C16.3965 5.5957 16.2109 5.82031 15.8691 5.82031L1.60156 5.82031C0.625 5.82031 0 6.43555 0 7.30469C0 8.13477 0.625 8.76953 1.60156 8.76953L11.4941 8.76953C11.9727 8.76953 12.2168 9.01367 12.2168 9.32617C12.2168 9.60938 11.9727 9.85352 11.4941 9.85352L8.44727 9.85352C8.00781 9.85352 7.77344 10.1172 7.77344 10.625C7.77344 11.7676 8.49609 12.6758 10.0293 12.6758L11.4941 12.6758C11.9727 12.6758 12.2168 12.9199 12.2168 13.2227C12.2168 13.5156 11.9727 13.7598 11.4941 13.7598L9.92188 13.7598C9.46289 13.7598 9.23828 14.0039 9.23828 14.5312C9.23828 15.7227 10.1367 16.5918 11.5039 16.5918L12.2949 16.5918C12.7734 16.5918 12.998 16.8457 12.998 17.1484C12.998 17.4414 12.7734 17.6855 12.2949 17.6855L11.1133 17.6855C10.8398 17.6855 10.6934 17.8418 10.6934 18.1348C10.6934 19.3848 12.1094 20.5176 14.4141 20.5176L16.8262 20.5176C23.0078 20.5176 26.4551 17.373 26.4551 11.709Z", fillAlpha = 0.85f)
+        }
+        return _sFHandPointLeftFill!!
+    }
+
+private var _sFHandPointLeftFill: ImageVector? = null

@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTruckPickupSideArrowtriangleUpFill (monochrome)
+ * Viewport: 47.8516 x 20.0488
+ */
+public val SfSymbols.Monochrome.SFTruckPickupSideArrowtriangleUpFill: ImageVector
+    get() {
+        if (_sFTruckPickupSideArrowtriangleUpFill != null) {
+            return _sFTruckPickupSideArrowtriangleUpFill!!
+        }
+        _sFTruckPickupSideArrowtriangleUpFill = sfIcon(
+            name = "Monochrome.SFTruckPickupSideArrowtriangleUpFill",
+            viewportWidth = 47.8516f,
+            viewportHeight = 20.0488f
+        ) {
+            addSfPath("M12.793 16.2598C12.793 18.1738 11.2793 19.6777 9.36523 19.6777C7.4707 19.6777 5.94727 18.1641 5.94727 16.2598C5.94727 14.3555 7.4707 12.8418 9.36523 12.8418C11.2695 12.8418 12.793 14.3555 12.793 16.2598ZM39.2676 16.2598C39.2676 18.1641 37.7539 19.6777 35.8496 19.6777C33.9453 19.6777 32.4316 18.1641 32.4316 16.2598C32.4316 14.3652 33.9551 12.8418 35.8496 12.8418C37.7539 12.8418 39.2676 14.3555 39.2676 16.2598ZM33.6523 3.56445L33.9551 6.2207L44.4434 6.2207C46.3672 6.2207 47.4902 7.37305 47.4902 9.3457L47.4902 14.248C47.4902 16.2207 46.3672 17.373 44.4434 17.373L40.4883 17.373C40.5762 17.0117 40.6348 16.6504 40.6348 16.2598C40.6348 13.6133 38.5059 11.4844 35.8496 11.4844C33.2129 11.4844 31.0742 13.623 31.0742 16.2598C31.0742 16.6504 31.123 17.0117 31.2109 17.373L14.0234 17.373C14.1016 17.0215 14.1504 16.6504 14.1504 16.2598C14.1504 13.6133 12.0215 11.4844 9.36523 11.4844C6.71875 11.4844 4.58984 13.6133 4.58984 16.2598C4.58984 16.6504 4.63867 17.0117 4.72656 17.373L3.03711 17.373C1.12305 17.373 0 16.2207 0 14.248L0 11.416C0 8.4668 1.74805 6.81641 5.55664 6.25977L10.2539 5.57617L15.4395 2.30469C18.1836 0.585938 20.5273 0 24.6094 0L29.6973 0C32.0312 0 33.3789 1.21094 33.6523 3.56445ZM22.0508 8.37891L19.3262 12.8711C18.9941 13.3984 19.248 13.9062 19.873 13.9062L25.498 13.9062C26.1133 13.9062 26.3867 13.3984 26.0547 12.8711L23.3008 8.37891C22.9883 7.87109 22.373 7.86133 22.0508 8.37891Z", fillAlpha = 0.85f)
+        }
+        return _sFTruckPickupSideArrowtriangleUpFill!!
+    }
+
+private var _sFTruckPickupSideArrowtriangleUpFill: ImageVector? = null

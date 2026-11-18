@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFParkingsignRadiowavesRightAndSafetycone (monochrome)
+ * Viewport: 37.3145 x 26.3902
+ */
+public val SfSymbols.Monochrome.SFParkingsignRadiowavesRightAndSafetycone: ImageVector
+    get() {
+        if (_sFParkingsignRadiowavesRightAndSafetycone != null) {
+            return _sFParkingsignRadiowavesRightAndSafetycone!!
+        }
+        _sFParkingsignRadiowavesRightAndSafetycone = sfIcon(
+            name = "Monochrome.SFParkingsignRadiowavesRightAndSafetycone",
+            viewportWidth = 37.3145f,
+            viewportHeight = 26.3902f
+        ) {
+            addSfPath("M26.3379 24.0691L36.0156 24.0691L33.3008 11.0222C33.1152 10.1043 32.6172 9.68435 31.7383 9.68435L30.6055 9.68435C29.7168 9.68435 29.2188 10.1043 29.0234 11.0222ZM26.2012 25.1629L36.1328 25.1629C36.5918 25.1629 36.9531 24.8015 36.9531 24.3426C36.9531 23.8933 36.5918 23.532 36.1328 23.532L26.2012 23.532C25.7422 23.532 25.3809 23.8933 25.3809 24.3426C25.3809 24.8015 25.7422 25.1629 26.2012 25.1629Z", fillAlpha = 0.85f)
+            addSfPath("M21.6895 17.2234C22.0312 17.6238 22.6367 17.6238 23.0469 17.1648C25.127 14.948 26.3281 11.9793 26.3281 8.75662C26.3281 5.53396 25.127 2.56521 23.0469 0.348416C22.6367-0.100802 22.0312-0.110568 21.6895 0.289823C21.3477 0.680448 21.4551 1.17849 21.8457 1.61795C23.584 3.50271 24.5801 5.99295 24.5801 8.75662C24.5801 11.5203 23.584 14.0105 21.8457 15.8953C21.4551 16.3347 21.3477 16.8426 21.6895 17.2234Z", fillAlpha = 0.85f)
+            addSfPath("M18.2031 13.6687C18.5547 14.0691 19.1992 14.0789 19.5801 13.5906C20.6934 12.282 21.3281 10.5828 21.3281 8.75662C21.3281 6.93045 20.6934 5.24099 19.5801 3.92264C19.1992 3.44412 18.5547 3.44412 18.2031 3.84451C17.8613 4.23514 18.0078 4.71365 18.3496 5.17264C19.1699 6.1199 19.5801 7.38943 19.5801 8.75662C19.5801 10.1238 19.1699 11.3933 18.3496 12.3406C18.0078 12.7996 17.8613 13.2879 18.2031 13.6687Z", fillAlpha = 0.85f)
+            addSfPath("M1.28906 25.1629C2.07031 25.1629 2.57812 24.6258 2.57812 23.825L2.57812 16.1492L7.99805 16.1492C12.5586 16.1492 15.6543 13.1414 15.6543 8.74685C15.6543 4.34256 12.5684 1.35428 8.00781 1.35428L1.28906 1.35428C0.517578 1.35428 0 1.88162 0 2.6824L0 23.825C0 24.6355 0.517578 25.1629 1.28906 25.1629ZM2.57812 13.7664L2.57812 3.72732L7.54883 3.72732C10.9961 3.72732 13.0273 5.57303 13.0273 8.74685C13.0273 11.9109 10.9863 13.7664 7.54883 13.7664Z", fillAlpha = 0.85f)
+        }
+        return _sFParkingsignRadiowavesRightAndSafetycone!!
+    }
+
+private var _sFParkingsignRadiowavesRightAndSafetycone: ImageVector? = null

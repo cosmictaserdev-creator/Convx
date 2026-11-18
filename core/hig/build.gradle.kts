@@ -18,6 +18,7 @@ kotlin {
 
     iosArm64()
     iosSimulatorArm64()
+    iosX64()
     jvm("desktop")
 
     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {

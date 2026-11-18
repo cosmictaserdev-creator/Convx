@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSquareAndArrowUpOnSquareFill (monochrome)
+ * Viewport: 30.7812 x 35.4004
+ */
+public val SfSymbols.Monochrome.SFSquareAndArrowUpOnSquareFill: ImageVector
+    get() {
+        if (_sFSquareAndArrowUpOnSquareFill != null) {
+            return _sFSquareAndArrowUpOnSquareFill!!
+        }
+        _sFSquareAndArrowUpOnSquareFill = sfIcon(
+            name = "Monochrome.SFSquareAndArrowUpOnSquareFill",
+            viewportWidth = 30.7812f,
+            viewportHeight = 35.4004f
+        ) {
+            addSfPath("M28.8672 18.3301L28.8672 27.9688C28.8672 31.3086 27.0117 33.1738 23.6621 33.1738L11.9824 33.1738C9.18416 33.1738 7.42864 31.8721 6.93144 29.4922L18.4473 29.4922C22.6465 29.4922 25.2051 26.9336 25.2051 22.7344L25.2051 13.292C27.5781 13.7937 28.8672 15.5463 28.8672 18.3301Z", fillAlpha = 0.85f)
+            addSfPath("M8.31055 5.68359C7.87109 5.68359 7.53906 5.36133 7.53906 4.92188C7.53906 4.6875 7.63672 4.52148 7.79297 4.35547L11.9824 0.292969C12.1973 0.078125 12.3828 0 12.5977 0C12.8223 0 13.0078 0.078125 13.2227 0.292969L17.4023 4.35547C17.5684 4.52148 17.6562 4.6875 17.6562 4.92188C17.6562 5.36133 17.3145 5.68359 16.875 5.68359C16.6602 5.68359 16.4355 5.5957 16.2891 5.41992L14.1602 3.19336L12.5977 1.54297L11.0352 3.19336L8.91602 5.41992C8.75977 5.5957 8.52539 5.68359 8.31055 5.68359ZM12.5977 18.1836C12.1387 18.1836 11.748 17.8027 11.748 17.3438L11.748 4.23828L11.875 1.12305C11.8945 0.722656 12.207 0.390625 12.5977 0.390625C12.998 0.390625 13.3105 0.722656 13.3301 1.12305L13.457 4.23828L13.457 17.3438C13.457 17.8027 13.0664 18.1836 12.5977 18.1836ZM6.75781 27.9395L18.4473 27.9395C21.7871 27.9395 23.6426 26.0742 23.6426 22.7344L23.6426 13.0957C23.6426 9.75586 21.7871 7.89062 18.4473 7.89062L6.75781 7.89062C3.41797 7.89062 1.55273 9.75586 1.55273 13.0957L1.55273 22.7344C1.55273 26.0742 3.41797 27.9395 6.75781 27.9395Z", fillAlpha = 0.85f)
+        }
+        return _sFSquareAndArrowUpOnSquareFill!!
+    }
+
+private var _sFSquareAndArrowUpOnSquareFill: ImageVector? = null

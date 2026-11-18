@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMenubarDockRectangleBadgeRecord (monochrome)
+ * Viewport: 43.2715 x 30.9473
+ */
+public val SfSymbols.Monochrome.SFMenubarDockRectangleBadgeRecord: ImageVector
+    get() {
+        if (_sFMenubarDockRectangleBadgeRecord != null) {
+            return _sFMenubarDockRectangleBadgeRecord!!
+        }
+        _sFMenubarDockRectangleBadgeRecord = sfIcon(
+            name = "Monochrome.SFMenubarDockRectangleBadgeRecord",
+            viewportWidth = 43.2715f,
+            viewportHeight = 30.9473f
+        ) {
+            addSfPath("M36.25 9.08203L36.25 15.2549C35.9681 15.2211 35.6811 15.2051 35.3906 15.2051C35.0934 15.2051 34.7998 15.2219 34.5117 15.2583L34.5117 9.58984L8.38867 9.58984L8.38867 21.8555C8.38867 23.9746 9.63867 25.2246 11.7578 25.2246L27.8265 25.2246C27.9939 25.8367 28.24 26.4164 28.553 26.9531L11.748 26.9531C8.52539 26.9531 6.66016 25.0879 6.66016 21.875L6.66016 9.08203C6.66016 5.85938 8.52539 3.99414 11.748 3.99414L31.4062 3.99414C34.4629 3.99414 36.25 5.85938 36.25 9.08203ZM27.5195 23.0762L27.524 23.1641L13.0566 23.1641C12.3828 23.1641 11.9336 22.7246 11.9336 22.0703L11.9336 20.2539C11.9336 19.5996 12.3828 19.1602 13.0566 19.1602L28.5842 19.1602C27.9057 20.3134 27.5195 21.6534 27.5195 23.0762ZM11.7578 5.72266C10.0119 5.72266 8.85597 6.5711 8.505 8.05664L34.3962 8.05664C34.0476 6.5711 32.8982 5.72266 31.1523 5.72266Z", fillAlpha = 0.85f)
+            addSfPath("M35.3906 29.3945C38.8477 29.3945 41.709 26.5332 41.709 23.0762C41.709 19.6289 38.8379 16.7578 35.3809 16.7578C31.9336 16.7578 29.082 19.6289 29.082 23.0762C29.082 26.5332 31.9434 29.3945 35.3906 29.3945ZM35.3906 28.0664C32.6367 28.0664 30.4102 25.8398 30.4102 23.0762C30.4102 20.3223 32.6367 18.0859 35.3809 18.0859C38.1445 18.0859 40.3809 20.3223 40.3809 23.0762C40.3809 25.8398 38.1445 28.0664 35.3906 28.0664ZM35.3809 26.9922C37.5293 26.9922 39.2969 25.2148 39.2969 23.0859C39.2969 20.9375 37.5195 19.1699 35.3809 19.1699C33.252 19.1699 31.4844 20.9375 31.4844 23.0859C31.4844 25.2148 33.2617 26.9922 35.3809 26.9922Z", fillAlpha = 0.85f)
+        }
+        return _sFMenubarDockRectangleBadgeRecord!!
+    }
+
+private var _sFMenubarDockRectangleBadgeRecord: ImageVector? = null

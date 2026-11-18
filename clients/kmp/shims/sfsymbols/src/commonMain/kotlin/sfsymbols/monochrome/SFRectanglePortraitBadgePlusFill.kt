@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRectanglePortraitBadgePlusFill (monochrome)
+ * Viewport: 37.0801 x 34.8535
+ */
+public val SfSymbols.Monochrome.SFRectanglePortraitBadgePlusFill: ImageVector
+    get() {
+        if (_sFRectanglePortraitBadgePlusFill != null) {
+            return _sFRectanglePortraitBadgePlusFill!!
+        }
+        _sFRectanglePortraitBadgePlusFill = sfIcon(
+            name = "Monochrome.SFRectanglePortraitBadgePlusFill",
+            viewportWidth = 37.0801f,
+            viewportHeight = 34.8535f
+        ) {
+            addSfPath("M28.8379 7.77344L28.8379 27.0898C28.8379 29.6094 27.5781 30.8887 25.0781 30.8887L14.6739 30.8887C15.3541 29.7357 15.7422 28.3983 15.7422 26.9824C15.7422 22.6562 12.1973 19.1016 7.87109 19.1016L7.87109 7.77344C7.87109 5.25391 9.13086 3.97461 11.6309 3.97461L25.0781 3.97461C27.5781 3.97461 28.8379 5.25391 28.8379 7.77344Z", fillAlpha = 0.85f)
+            addSfPath("M14.1895 26.9824C14.1895 30.4297 11.2988 33.291 7.87109 33.291C4.41406 33.291 1.55273 30.459 1.55273 26.9824C1.55273 23.5156 4.41406 20.6641 7.87109 20.6641C11.3379 20.6641 14.1895 23.5156 14.1895 26.9824ZM7.1582 23.7109L7.1582 26.2695L4.58984 26.2695C4.17969 26.2695 3.88672 26.543 3.88672 26.9824C3.88672 27.4121 4.17969 27.6855 4.58984 27.6855L7.1582 27.6855L7.1582 30.2539C7.1582 30.6738 7.44141 30.9668 7.87109 30.9668C8.31055 30.9668 8.58398 30.6738 8.58398 30.2539L8.58398 27.6855L11.1426 27.6855C11.5625 27.6855 11.8555 27.4121 11.8555 26.9824C11.8555 26.543 11.5625 26.2695 11.1426 26.2695L8.58398 26.2695L8.58398 23.7109C8.58398 23.291 8.31055 22.998 7.87109 22.998C7.44141 22.998 7.1582 23.291 7.1582 23.7109Z", fillAlpha = 0.85f)
+        }
+        return _sFRectanglePortraitBadgePlusFill!!
+    }
+
+private var _sFRectanglePortraitBadgePlusFill: ImageVector? = null

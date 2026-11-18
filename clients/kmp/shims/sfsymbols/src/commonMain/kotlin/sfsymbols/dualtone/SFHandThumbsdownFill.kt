@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandThumbsdownFill (dualtone)
+ * Viewport: 24.3945 x 25.4004
+ */
+public val SfSymbols.Dualtone.SFHandThumbsdownFill: ImageVector
+    get() {
+        if (_sFHandThumbsdownFill != null) {
+            return _sFHandThumbsdownFill!!
+        }
+        _sFHandThumbsdownFill = sfIcon(
+            name = "Dualtone.SFHandThumbsdownFill",
+            viewportWidth = 24.3945f,
+            viewportHeight = 25.4004f
+        ) {
+            addSfPath("M24.0332 8.1543C24.0332 4.53125 21.7871 1.49414 18.7598 1.49414L16.4746 1.49414C18.7109 3.07617 19.7266 5.49805 19.6875 8.27148C19.6387 11.3965 18.4473 13.5352 17.4219 14.8633L19.209 14.8633C21.9434 14.8633 24.0332 11.9238 24.0332 8.1543ZM18.1641 8.25195C18.2227 3.7793 14.6094 0.390625 8.92578 0.341797L7.25586 0.332031C5.67383 0.322266 4.50195 0.439453 3.82812 0.615234C2.89062 0.859375 1.95312 1.43555 1.95312 2.59766C1.95312 3.06641 2.08008 3.4082 2.23633 3.67188C2.32422 3.82812 2.31445 3.95508 2.16797 4.01367C1.40625 4.33594 0.771484 5.03906 0.771484 6.00586C0.771484 6.5625 0.9375 7.05078 1.21094 7.39258C1.34766 7.57812 1.31836 7.73438 1.09375 7.86133C0.546875 8.17383 0.166016 8.86719 0.166016 9.66797C0.166016 10.2344 0.341797 10.8398 0.673828 11.1328C0.869141 11.3086 0.830078 11.4355 0.625 11.6113C0.244141 11.9336 0 12.4805 0 13.1836C0 14.3555 0.917969 15.3223 2.12891 15.3223L6.44531 15.3223C7.53906 15.3223 8.26172 15.8887 8.26172 16.7871C8.26172 18.4277 6.2207 21.4355 6.2207 23.5938C6.2207 24.7363 6.94336 25.4004 7.91016 25.4004C8.7793 25.4004 9.20898 24.7949 9.67773 23.877C11.5039 20.3418 13.9355 17.4707 15.7812 15.0098C17.3535 12.9297 18.125 11.1328 18.1641 8.25195Z", fillAlpha = 0.85f)
+        }
+        return _sFHandThumbsdownFill!!
+    }
+
+private var _sFHandThumbsdownFill: ImageVector? = null

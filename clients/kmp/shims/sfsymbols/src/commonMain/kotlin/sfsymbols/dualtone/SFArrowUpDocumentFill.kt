@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowUpDocumentFill (dualtone)
+ * Viewport: 21.3281 x 26.9238
+ */
+public val SfSymbols.Dualtone.SFArrowUpDocumentFill: ImageVector
+    get() {
+        if (_sFArrowUpDocumentFill != null) {
+            return _sFArrowUpDocumentFill!!
+        }
+        _sFArrowUpDocumentFill = sfIcon(
+            name = "Dualtone.SFArrowUpDocumentFill",
+            viewportWidth = 21.3281f,
+            viewportHeight = 26.9238f
+        ) {
+            addSfPath("M3.75977 26.9238L17.207 26.9238C19.707 26.9238 20.9668 25.6348 20.9668 23.125L20.9668 11.4062L11.9141 11.4062C10.3906 11.4062 9.66797 10.6738 9.66797 9.15039L9.66797 0.00976562L3.75977 0.00976562C1.2793 0.00976562 0 1.28906 0 3.80859L0 23.125C0 25.6445 1.25977 26.9238 3.75977 26.9238ZM11.9727 9.84375L20.8105 9.84375C20.7324 9.38477 20.4004 8.94531 19.8828 8.42773L12.6465 1.09375C12.1484 0.576172 11.6797 0.234375 11.2305 0.15625L11.2305 9.10156C11.2305 9.59961 11.4746 9.84375 11.9727 9.84375Z", fillAlpha = 0.2125f)
+            addSfPath("M6.62109 18.8184C6.83594 18.8184 7.06055 18.7207 7.2168 18.5645L8.29102 17.4609L10.3906 15.3125L10.6445 15.3125L12.7441 17.4609L13.8184 18.5645C13.9746 18.7207 14.1895 18.8184 14.4141 18.8184C14.8633 18.8184 15.2148 18.4961 15.2148 18.0371C15.2148 17.7539 15.0879 17.5684 14.9023 17.4023L11.1426 13.877C10.9082 13.6719 10.752 13.5938 10.5176 13.5938C10.2832 13.5938 10.127 13.6719 9.89258 13.877L6.13281 17.4023C5.94727 17.5684 5.82031 17.7539 5.82031 18.0371C5.82031 18.4961 6.15234 18.8184 6.62109 18.8184ZM10.5176 24.1504C10.9766 24.1504 11.377 23.7793 11.377 23.3203L11.377 18.2324L11.25 15.0977C11.2109 14.1406 9.82422 14.1406 9.78516 15.0977L9.6582 18.2324L9.6582 23.3203C9.6582 23.7793 10.0488 24.1504 10.5176 24.1504Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowUpDocumentFill!!
+    }
+
+private var _sFArrowUpDocumentFill: ImageVector? = null

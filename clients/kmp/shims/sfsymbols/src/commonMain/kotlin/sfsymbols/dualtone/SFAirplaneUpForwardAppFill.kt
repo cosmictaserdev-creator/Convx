@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFAirplaneUpForwardAppFill (dualtone)
+ * Viewport: 23.2715 x 22.9004
+ */
+public val SfSymbols.Dualtone.SFAirplaneUpForwardAppFill: ImageVector
+    get() {
+        if (_sFAirplaneUpForwardAppFill != null) {
+            return _sFAirplaneUpForwardAppFill!!
+        }
+        _sFAirplaneUpForwardAppFill = sfIcon(
+            name = "Dualtone.SFAirplaneUpForwardAppFill",
+            viewportWidth = 23.2715f,
+            viewportHeight = 22.9004f
+        ) {
+            addSfPath("M6.81641 22.9004L16.0938 22.9004C18.3105 22.9004 20.0293 22.2754 21.1523 21.1523C22.3047 20.0098 22.9102 18.291 22.9102 16.084L22.9102 6.81641C22.9102 4.60938 22.3145 2.90039 21.1523 1.74805C20.0195 0.605469 18.3105 0 16.0938 0L6.81641 0C4.59961 0 2.88086 0.625 1.75781 1.74805C0.605469 2.89062 0 4.60938 0 6.81641L0 16.084C0 18.291 0.595703 20 1.75781 21.1523C2.89062 22.2852 4.59961 22.9004 6.81641 22.9004Z", fillAlpha = 0.2125f)
+            addSfPath("M18.0664 4.93164C18.6621 5.52734 18.3203 6.76758 17.3535 7.73438L15.3906 9.69727C15.1465 9.94141 15.1074 10.0488 15.1172 10.3613L15.4102 17.0898C15.4199 17.3242 15.3418 17.5488 15.1953 17.6953L14.6289 18.252C14.4531 18.4375 14.1895 18.3691 14.082 18.1152L12.1289 12.9297L9.54102 15L10.2344 17.3926C10.293 17.6172 10.2441 17.8027 10.0586 17.9785L9.84375 18.2031C9.67773 18.3594 9.46289 18.3691 9.29688 18.2031L4.80469 13.7012C4.63867 13.5352 4.63867 13.3203 4.80469 13.1543L5.01953 12.9395C5.19531 12.7539 5.38086 12.7051 5.60547 12.7637L7.99805 13.457L10.0781 10.8691L4.89258 8.91602C4.62891 8.80859 4.57031 8.54492 4.74609 8.36914L5.30273 7.8125C5.45898 7.65625 5.67383 7.57812 5.9082 7.58789L12.6367 7.88086C12.9492 7.89062 13.0664 7.85156 13.3008 7.61719L15.2637 5.64453C16.2402 4.67773 17.4707 4.3457 18.0664 4.93164Z", fillAlpha = 0.85f)
+        }
+        return _sFAirplaneUpForwardAppFill!!
+    }
+
+private var _sFAirplaneUpForwardAppFill: ImageVector? = null

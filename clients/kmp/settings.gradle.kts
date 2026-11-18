@@ -73,3 +73,10 @@ project(":design-system").projectDir = file("../../core/design-system")
 project(":hig").projectDir = file("../../core/hig")
 include(":listen-together-core")
 project(":listen-together-core").projectDir = file("../../feature/listen-together/domain")
+
+// Intel-simulator stand-ins compiled from the upstream sources (kyant backdrop/capsule/shapes publish no iosX64).
+include(":kyant-shapes", ":kyant-capsule", ":kyant-backdrop", ":sfsymbols-shim")
+project(":sfsymbols-shim").projectDir = file("shims/sfsymbols")
+project(":kyant-shapes").projectDir = file("shims/shapes")
+project(":kyant-capsule").projectDir = file("shims/capsule")
+project(":kyant-backdrop").projectDir = file("shims/backdrop")

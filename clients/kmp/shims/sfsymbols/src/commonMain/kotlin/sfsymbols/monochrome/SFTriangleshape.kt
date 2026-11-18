@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTriangleshape (monochrome)
+ * Viewport: 27.7344 x 24.5801
+ */
+public val SfSymbols.Monochrome.SFTriangleshape: ImageVector
+    get() {
+        if (_sFTriangleshape != null) {
+            return _sFTriangleshape!!
+        }
+        _sFTriangleshape = sfIcon(
+            name = "Monochrome.SFTriangleshape",
+            viewportWidth = 27.7344f,
+            viewportHeight = 24.5801f
+        ) {
+            addSfPath("M1.62109 23.9746L25.752 23.9746C26.8848 23.9746 27.373 23.3691 27.373 22.6562C27.373 22.3535 27.2852 22.0215 27.0996 21.709L14.9805 0.703125C14.7168 0.224609 14.209 0 13.6914 0C13.1641 0 12.666 0.224609 12.3926 0.703125L0.273438 21.709C0.0976562 22.0215 0 22.3535 0 22.6562C0 23.3691 0.498047 23.9746 1.62109 23.9746ZM2.5 22.2754C2.26562 22.2754 2.13867 22.168 2.13867 21.9922C2.13867 21.9238 2.1582 21.8457 2.20703 21.7578L13.418 2.31445C13.4961 2.19727 13.584 2.13867 13.6914 2.13867C13.7988 2.13867 13.8867 2.19727 13.9648 2.31445L25.166 21.7578C25.2246 21.8457 25.2441 21.9238 25.2441 21.9922C25.2441 22.168 25.1074 22.2754 24.8828 22.2754Z", fillAlpha = 0.85f)
+        }
+        return _sFTriangleshape!!
+    }
+
+private var _sFTriangleshape: ImageVector? = null

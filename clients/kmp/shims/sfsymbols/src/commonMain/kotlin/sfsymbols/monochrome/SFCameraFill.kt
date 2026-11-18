@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCameraFill (monochrome)
+ * Viewport: 30.9766 x 24.541
+ */
+public val SfSymbols.Monochrome.SFCameraFill: ImageVector
+    get() {
+        if (_sFCameraFill != null) {
+            return _sFCameraFill!!
+        }
+        _sFCameraFill = sfIcon(
+            name = "Monochrome.SFCameraFill",
+            viewportWidth = 30.9766f,
+            viewportHeight = 24.541f
+        ) {
+            addSfPath("M25.8105 9.4043C24.9707 9.4043 24.2871 8.7207 24.2871 7.87109C24.2871 7.03125 24.9707 6.34766 25.8105 6.34766C26.6504 6.34766 27.3438 7.03125 27.3438 7.87109C27.3438 8.7207 26.6504 9.4043 25.8105 9.4043ZM3.79883 23.7598L26.8164 23.7598C29.3359 23.7598 30.6152 22.4902 30.6152 20L30.6152 6.77734C30.6152 4.29688 29.3359 3.01758 26.8164 3.01758L23.1543 3.01758C22.1484 3.01758 21.8652 2.86133 21.2695 2.19727L20.2344 1.03516C19.5898 0.332031 18.9844 0 17.7148 0L12.7539 0C11.4844 0 10.8789 0.332031 10.2344 1.03516L9.19922 2.19727C8.62305 2.8418 8.31055 3.01758 7.31445 3.01758L3.79883 3.01758C1.2793 3.01758 0 4.29688 0 6.77734L0 20C0 22.4902 1.2793 23.7598 3.79883 23.7598ZM15.3125 20.1855C11.4844 20.1855 8.4082 17.1191 8.4082 13.2715C8.4082 9.41406 11.4844 6.34766 15.3125 6.34766C19.1504 6.34766 22.2168 9.41406 22.2168 13.2715C22.2168 17.1191 19.1406 20.1855 15.3125 20.1855ZM15.3125 18.5352C18.2129 18.5352 20.5664 16.1914 20.5664 13.2715C20.5664 10.3418 18.2129 7.99805 15.3125 7.99805C12.4023 7.99805 10.0488 10.3418 10.0488 13.2715C10.0488 16.1914 12.4121 18.5352 15.3125 18.5352Z", fillAlpha = 0.85f)
+        }
+        return _sFCameraFill!!
+    }
+
+private var _sFCameraFill: ImageVector? = null

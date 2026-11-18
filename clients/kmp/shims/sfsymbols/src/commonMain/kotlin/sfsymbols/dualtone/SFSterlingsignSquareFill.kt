@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSterlingsignSquareFill (dualtone)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Dualtone.SFSterlingsignSquareFill: ImageVector
+    get() {
+        if (_sFSterlingsignSquareFill != null) {
+            return _sFSterlingsignSquareFill!!
+        }
+        _sFSterlingsignSquareFill = sfIcon(
+            name = "Dualtone.SFSterlingsignSquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959Z", fillAlpha = 0.2125f)
+            addSfPath("M7.39258 17.0801C7.05078 17.0801 6.79688 16.8262 6.79688 16.4844C6.79688 16.1523 7.02148 15.9473 7.33398 15.8301C8.51562 15.4297 9.19922 14.4922 9.19922 13.2422C9.19922 12.8125 9.12109 12.3828 8.99414 11.9238L7.34375 11.9238C7.05078 11.9238 6.83594 11.7188 6.83594 11.4551C6.83594 11.1914 7.05078 10.9863 7.34375 10.9863L8.75 10.9863C8.55469 10.3809 8.47656 9.87305 8.47656 9.33594C8.47656 7.08984 10.1074 5.76172 12.5293 5.76172C13.3691 5.76172 13.9258 5.83984 14.5996 6.10352C14.9023 6.2207 15.1172 6.39648 15.1172 6.70898C15.1172 7.02148 14.9316 7.20703 14.6094 7.20703C14.4629 7.20703 14.2578 7.16797 14.0527 7.10938C13.6719 7.00195 13.252 6.91406 12.666 6.91406C10.9375 6.91406 9.85352 7.83203 9.85352 9.29688C9.85352 9.83398 9.92188 10.2734 10.1074 10.9863L13.7402 10.9863C14.0234 10.9863 14.2578 11.1816 14.2578 11.4551C14.2578 11.7188 14.0332 11.9238 13.7402 11.9238L10.3711 11.9238C10.4688 12.2852 10.5176 12.7051 10.5176 13.1836C10.5176 14.3066 10.0098 15.5176 8.96484 15.8789L8.96484 15.9375L15.0488 15.9375C15.3906 15.9375 15.6641 16.1816 15.6641 16.5039C15.6641 16.8457 15.3906 17.0801 15.0488 17.0801Z", fillAlpha = 0.85f)
+        }
+        return _sFSterlingsignSquareFill!!
+    }
+
+private var _sFSterlingsignSquareFill: ImageVector? = null

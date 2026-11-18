@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRectangleStackBadgeMinus (dualtone)
+ * Viewport: 40.752 x 34.4434
+ */
+public val SfSymbols.Dualtone.SFRectangleStackBadgeMinus: ImageVector
+    get() {
+        if (_sFRectangleStackBadgeMinus != null) {
+            return _sFRectangleStackBadgeMinus!!
+        }
+        _sFRectangleStackBadgeMinus = sfIcon(
+            name = "Dualtone.SFRectangleStackBadgeMinus",
+            viewportWidth = 40.752f,
+            viewportHeight = 34.4434f
+        ) {
+            addSfPath("M28.1577 4.90234L12.2426 4.90234C12.3052 4.01755 12.8797 3.50586 13.8184 3.50586L26.5723 3.50586C27.511 3.50586 28.0941 4.01755 28.1577 4.90234Z", fillAlpha = 0.425f)
+            addSfPath("M30.678 8.32015C30.3279 8.26665 29.9571 8.24219 29.5703 8.24219L10.8203 8.24219C10.4334 8.24219 10.0626 8.26643 9.71267 8.31954C9.84549 7.28116 10.561 6.69922 11.709 6.69922L28.6816 6.69922C29.8299 6.69922 30.5454 7.28139 30.678 8.32015Z", fillAlpha = 0.425f)
+            addSfPath("M33.3691 14.1211L33.3691 27.1387C33.3691 29.6289 32.0898 30.9082 29.5703 30.9082L14.4233 30.9082C14.7831 30.3754 15.0776 29.7963 15.2893 29.1797L29.541 29.1797C30.8789 29.1797 31.6406 28.457 31.6406 27.0508L31.6406 14.209C31.6406 12.8125 30.8789 12.0898 29.541 12.0898L10.8496 12.0898C9.49219 12.0898 8.75 12.8125 8.75 14.209L8.75 18.7529C8.46504 18.7176 8.17471 18.7012 7.88086 18.7012C7.59044 18.7012 7.30342 18.7173 7.02148 18.7513L7.02148 14.1211C7.02148 11.6211 8.29102 10.3613 10.8203 10.3613L29.5703 10.3613C32.0898 10.3613 33.3691 11.6309 33.3691 14.1211Z", fillAlpha = 0.425f)
+            addSfPath("M14.1895 26.5723C14.1895 30.0293 11.3086 32.8906 7.88086 32.8906C4.41406 32.8906 1.5625 30.0488 1.5625 26.5723C1.5625 23.1152 4.41406 20.2637 7.88086 20.2637C11.3379 20.2637 14.1895 23.1055 14.1895 26.5723ZM4.58984 25.8691C4.20898 25.8691 3.88672 26.2012 3.88672 26.5723C3.88672 26.9531 4.20898 27.2852 4.58984 27.2852L11.1523 27.2852C11.543 27.2852 11.8652 26.9531 11.8652 26.5723C11.8652 26.2012 11.543 25.8691 11.1523 25.8691Z", fillAlpha = 0.85f)
+        }
+        return _sFRectangleStackBadgeMinus!!
+    }
+
+private var _sFRectangleStackBadgeMinus: ImageVector? = null

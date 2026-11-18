@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFKeyShieldFill (dualtone)
+ * Viewport: 20.7324 x 25.3418
+ */
+public val SfSymbols.Dualtone.SFKeyShieldFill: ImageVector
+    get() {
+        if (_sFKeyShieldFill != null) {
+            return _sFKeyShieldFill!!
+        }
+        _sFKeyShieldFill = sfIcon(
+            name = "Dualtone.SFKeyShieldFill",
+            viewportWidth = 20.7324f,
+            viewportHeight = 25.3418f
+        ) {
+            addSfPath("M10.1855 25.3418C10.4102 25.3418 10.7129 25.2441 11.0156 25.0879C18.1152 21.2402 20.3711 19.502 20.3711 15.1367L20.3711 5.63477C20.3711 4.31641 19.8535 3.88672 18.7402 3.42773C17.0703 2.76367 12.8613 1.20117 11.1914 0.634766C10.8594 0.527344 10.5273 0.449219 10.1855 0.449219C9.84375 0.449219 9.51172 0.537109 9.17969 0.634766C7.50977 1.20117 3.30078 2.77344 1.63086 3.42773C0.517578 3.86719 0 4.31641 0 5.63477L0 15.1367C0 19.502 2.37305 21.0449 9.35547 25.0879C9.64844 25.2539 9.96094 25.3418 10.1855 25.3418Z", fillAlpha = 0.2125f)
+            addSfPath("M10.1953 4.56055C12.5293 4.56055 14.375 6.43555 14.375 8.74023C14.375 10.5566 13.2324 12.0508 11.1914 12.8516L12.9785 14.6777C13.1152 14.7949 13.1152 14.9902 12.998 15.0977L11.1914 16.8945L12.5098 18.2031C12.6172 18.3203 12.627 18.5059 12.5098 18.623L10.4102 20.7031C10.2832 20.8496 10.0781 20.8203 9.9707 20.7031L8.86719 19.6191C8.75 19.4824 8.71094 19.3652 8.71094 19.2188L8.71094 12.6758C7.05078 12.0508 6.00586 10.5078 6.00586 8.74023C6.00586 6.42578 7.87109 4.56055 10.1953 4.56055ZM10.1953 8.60352C10.8594 8.60352 11.377 8.06641 11.377 7.41211C11.377 6.74805 10.8594 6.23047 10.1953 6.23047C9.53125 6.23047 9.00391 6.74805 9.00391 7.41211C9.00391 8.06641 9.53125 8.60352 10.1953 8.60352Z", fillAlpha = 0.85f)
+        }
+        return _sFKeyShieldFill!!
+    }
+
+private var _sFKeyShieldFill: ImageVector? = null

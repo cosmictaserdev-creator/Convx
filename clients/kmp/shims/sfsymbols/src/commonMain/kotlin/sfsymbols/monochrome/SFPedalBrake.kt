@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPedalBrake (monochrome)
+ * Viewport: 25.2051 x 21.9824
+ */
+public val SfSymbols.Monochrome.SFPedalBrake: ImageVector
+    get() {
+        if (_sFPedalBrake != null) {
+            return _sFPedalBrake!!
+        }
+        _sFPedalBrake = sfIcon(
+            name = "Monochrome.SFPedalBrake",
+            viewportWidth = 25.2051f,
+            viewportHeight = 21.9824f
+        ) {
+            addSfPath("M3.80859 21.9824L18.5938 21.9824C22.7246 21.9824 24.1113 19.9902 24.6191 15.6543C24.9414 12.8906 24.9414 10.166 24.502 6.43555C23.9844 1.81641 21.5137-0.0195312 16.582 0.517578L4.375 1.89453C1.50391 2.2168 0 3.81836 0 6.49414L0 18.2031C0 20.5859 1.39648 21.9824 3.80859 21.9824ZM3.81836 20.2637C2.5293 20.2637 1.70898 19.4824 1.70898 18.1934L1.70898 6.49414C1.70898 4.80469 2.69531 3.81836 4.55078 3.61328L16.7773 2.23633C20.5566 1.81641 22.4121 3.11523 22.793 6.46484C23.2324 10.1758 23.2324 12.8809 22.9102 15.625C22.4902 19.209 21.8555 20.2637 18.5938 20.2637Z", fillAlpha = 0.85f)
+            addSfPath("M5.72266 8.4375L18.9844 8.4375C19.3848 8.4375 19.707 8.11523 19.707 7.71484C19.707 7.32422 19.3848 7.00195 18.9844 7.00195L5.72266 7.00195C5.32227 7.00195 5 7.32422 5 7.71484C5 8.11523 5.32227 8.4375 5.72266 8.4375ZM5.72266 12.6172L18.9844 12.6172C19.3848 12.6172 19.707 12.2949 19.707 11.9043C19.707 11.5039 19.3848 11.1816 18.9844 11.1816L5.72266 11.1816C5.32227 11.1816 5 11.5039 5 11.9043C5 12.2949 5.32227 12.6172 5.72266 12.6172ZM5.72266 16.7969L18.9844 16.7969C19.3848 16.7969 19.707 16.4746 19.707 16.084C19.707 15.6836 19.3848 15.3613 18.9844 15.3613L5.72266 15.3613C5.32227 15.3613 5 15.6836 5 16.084C5 16.4746 5.32227 16.7969 5.72266 16.7969Z", fillAlpha = 0.85f)
+        }
+        return _sFPedalBrake!!
+    }
+
+private var _sFPedalBrake: ImageVector? = null

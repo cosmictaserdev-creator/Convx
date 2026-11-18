@@ -1,0 +1,32 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTextAppend (dualtone)
+ * Viewport: 25.4785 x 21.5332
+ */
+public val SfSymbols.Dualtone.SFTextAppend: ImageVector
+    get() {
+        if (_sFTextAppend != null) {
+            return _sFTextAppend!!
+        }
+        _sFTextAppend = sfIcon(
+            name = "Dualtone.SFTextAppend",
+            viewportWidth = 25.4785f,
+            viewportHeight = 21.5332f
+        ) {
+            addSfPath("M25.1172 20.6543C25.1172 21.1426 24.7266 21.5137 24.2383 21.5137L15.6348 21.5137C15.1465 21.5137 14.7754 21.1426 14.7754 20.6543C14.7754 20.1562 15.1465 19.7852 15.6348 19.7852L24.2383 19.7852C24.7266 19.7852 25.1172 20.1562 25.1172 20.6543Z", fillAlpha = 0.425f)
+            addSfPath("M25.1172 14.0527C25.1172 14.541 24.7266 14.9219 24.2383 14.9219L15.6348 14.9219C15.1465 14.9219 14.7754 14.541 14.7754 14.0527C14.7754 13.5645 15.1465 13.1934 15.6348 13.1934L24.2383 13.1934C24.7266 13.1934 25.1172 13.5645 25.1172 14.0527Z", fillAlpha = 0.425f)
+            addSfPath("M25.1172 7.46094C25.1172 7.94922 24.7266 8.33008 24.2383 8.33008L0.869141 8.33008C0.371094 8.33008 0 7.94922 0 7.46094C0 6.97266 0.371094 6.5918 0.869141 6.5918L24.2383 6.5918C24.7266 6.5918 25.1172 6.97266 25.1172 7.46094Z", fillAlpha = 0.425f)
+            addSfPath("M25.1172 0.869141C25.1172 1.35742 24.7266 1.72852 24.2383 1.72852L0.869141 1.72852C0.371094 1.72852 0 1.35742 0 0.869141C0 0.380859 0.371094 0 0.869141 0L24.2383 0C24.7266 0 25.1172 0.380859 25.1172 0.869141Z", fillAlpha = 0.425f)
+            addSfPath("M2.33398 13.3008L2.33398 15.7031C2.33398 16.0352 2.50977 16.2207 2.8418 16.2207L6.65039 16.2207L6.65039 18.3691L2.70508 18.3691C1.08398 18.3691 0.175781 17.5098 0.175781 15.9668L0.175781 13.3008C0.175781 12.6953 0.654297 12.2266 1.25 12.2266C1.85547 12.2266 2.33398 12.6953 2.33398 13.3008Z", fillAlpha = 0.85f)
+            addSfPath("M6.65039 20.0781C6.65039 20.8594 7.35352 21.25 8.03711 20.7324L11.6699 17.9492C12.1387 17.5879 12.1387 16.9336 11.6699 16.5723L8.03711 13.7891C7.35352 13.2715 6.65039 13.6621 6.65039 14.4434Z", fillAlpha = 0.85f)
+        }
+        return _sFTextAppend!!
+    }
+
+private var _sFTextAppend: ImageVector? = null

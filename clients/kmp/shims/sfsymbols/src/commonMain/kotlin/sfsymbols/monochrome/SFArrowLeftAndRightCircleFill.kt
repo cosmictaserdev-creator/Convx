@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowLeftAndRightCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFArrowLeftAndRightCircleFill: ImageVector
+    get() {
+        if (_sFArrowLeftAndRightCircleFill != null) {
+            return _sFArrowLeftAndRightCircleFill!!
+        }
+        _sFArrowLeftAndRightCircleFill = sfIcon(
+            name = "Monochrome.SFArrowLeftAndRightCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7266 19.7266 25.4395 12.7148 25.4395C5.71289 25.4395 0 19.7266 0 12.7246C0 5.71289 5.71289 0 12.7148 0C19.7266 0 25.4395 5.71289 25.4395 12.7246ZM15.0977 8.87695C15.0977 9.13086 15.1855 9.31641 15.3418 9.48242L16.4648 10.5859L18.0749 11.9526L15.5273 11.875L9.95117 11.875L7.39739 11.9526L9.01367 10.5859L10.127 9.48242C10.293 9.31641 10.3809 9.13086 10.3809 8.87695C10.3809 8.41797 10.0391 8.06641 9.58008 8.06641C9.3457 8.06641 9.13086 8.16406 8.99414 8.30078L5.23438 12.0703C5.0293 12.2656 4.92188 12.4805 4.92188 12.7246C4.92188 12.959 5.0293 13.1836 5.23438 13.3691L8.99414 17.1387C9.14062 17.2949 9.3457 17.3828 9.58008 17.3828C10.0391 17.3828 10.3809 17.0215 10.3809 16.5625C10.3809 16.3184 10.293 16.123 10.127 15.9668L9.01367 14.8633L7.38541 13.4865L9.95117 13.5645L15.5273 13.5645L18.0868 13.4865L16.4648 14.8633L15.3418 15.9668C15.1855 16.123 15.0977 16.3184 15.0977 16.5625C15.0977 17.0215 15.4395 17.3828 15.8887 17.3828C16.1328 17.3828 16.3379 17.2949 16.4746 17.1387L20.2344 13.3691C20.4395 13.1836 20.5566 12.959 20.5566 12.7246C20.5566 12.4805 20.4395 12.2656 20.2344 12.0703L16.4746 8.30078C16.3477 8.16406 16.1328 8.06641 15.8887 8.06641C15.4395 8.06641 15.0977 8.41797 15.0977 8.87695Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowLeftAndRightCircleFill!!
+    }
+
+private var _sFArrowLeftAndRightCircleFill: ImageVector? = null

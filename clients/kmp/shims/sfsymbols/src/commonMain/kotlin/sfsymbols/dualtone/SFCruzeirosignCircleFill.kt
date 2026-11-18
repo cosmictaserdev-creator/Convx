@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCruzeirosignCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFCruzeirosignCircleFill: ImageVector
+    get() {
+        if (_sFCruzeirosignCircleFill != null) {
+            return _sFCruzeirosignCircleFill!!
+        }
+        _sFCruzeirosignCircleFill = sfIcon(
+            name = "Dualtone.SFCruzeirosignCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M12.8223 18.4473C9.53125 18.4473 7.85156 15.8984 7.85156 12.7344C7.85156 9.46289 9.6582 7.06055 12.8223 7.06055C14.7363 7.06055 16.416 8.10547 16.9824 9.78516C17.0508 9.96094 17.0801 10.1562 17.0801 10.2832C17.0801 10.6445 16.8164 10.8789 16.4551 10.8789C16.1133 10.8789 15.9375 10.6836 15.8301 10.3516C15.459 9.0918 14.248 8.25195 12.832 8.25195C10.4199 8.25195 9.26758 10.3223 9.26758 12.7344C9.26758 14.9121 10.1758 16.8555 12.1582 17.207L12.1582 12.7441C12.1582 12.4902 12.3145 12.3242 12.5586 12.3242C12.793 12.3242 12.9395 12.4902 12.9395 12.7441L12.9395 13.7793L12.9688 13.7793C13.2324 12.9688 14.0039 12.3047 15.0391 12.3047C15.2832 12.3047 15.6055 12.3535 15.7812 12.4609C15.918 12.5488 16.0059 12.6953 16.0059 12.8418C16.0059 13.1152 15.8496 13.2324 15.6055 13.2324C15.4883 13.2324 15.3125 13.1738 15.0586 13.1738C13.7988 13.1738 12.959 14.0527 12.959 15.3223L12.959 17.2754C14.3164 17.2363 15.5078 16.5234 15.8984 15.2051C15.9961 14.873 16.1914 14.6777 16.5527 14.6777C16.9238 14.6777 17.1582 14.8926 17.1582 15.2539C17.1582 15.4297 17.1484 15.5859 17.0703 15.7715C16.5332 17.4707 14.7852 18.4473 12.8223 18.4473Z", fillAlpha = 0.85f)
+        }
+        return _sFCruzeirosignCircleFill!!
+    }
+
+private var _sFCruzeirosignCircleFill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneGen1SlashCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFIphoneGen1SlashCircleFill: ImageVector
+    get() {
+        if (_sFIphoneGen1SlashCircleFill != null) {
+            return _sFIphoneGen1SlashCircleFill!!
+        }
+        _sFIphoneGen1SlashCircleFill = sfIcon(
+            name = "Dualtone.SFIphoneGen1SlashCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.459C19.7266 25.459 25.4395 19.7461 25.4395 12.7344C25.4395 5.73242 19.7266 0.0195312 12.7148 0.0195312C5.71289 0.0195312 0 5.73242 0 12.7344C0 19.7461 5.71289 25.459 12.7148 25.459Z", fillAlpha = 0.2125f)
+            addSfPath("M8.95508 10.9375L8.95508 18.3594L16.377 18.3594L17.535 19.5174C17.314 20.4169 16.5794 20.957 15.498 20.957L9.93164 20.957C8.63281 20.957 7.82227 20.166 7.82227 18.9062L7.82227 9.80469ZM12.0801 19.5215C12.0801 19.8828 12.373 20.166 12.7246 20.166C13.0762 20.166 13.3496 19.8828 13.3496 19.5215C13.3496 19.1797 13.0762 18.8867 12.7246 18.8867C12.373 18.8867 12.0801 19.1797 12.0801 19.5215ZM7.04102 6.29883L19.1602 18.418C19.3652 18.623 19.3652 18.9453 19.1602 19.1699C18.9551 19.375 18.6035 19.375 18.4082 19.1699L6.2793 7.05078C6.08398 6.85547 6.07422 6.51367 6.2793 6.29883C6.50391 6.08398 6.83594 6.08398 7.04102 6.29883ZM17.6074 6.57227L17.6074 15.6526L16.4746 14.5188L16.4746 7.12891L9.09064 7.12891L7.90059 5.9379C8.13106 5.05251 8.86746 4.52148 9.93164 4.52148L15.498 4.52148C16.8066 4.52148 17.6074 5.3125 17.6074 6.57227ZM11.582 5.55664C11.416 5.55664 11.2695 5.68359 11.2695 5.87891C11.2695 6.04492 11.416 6.19141 11.582 6.19141L13.8477 6.19141C14.0234 6.19141 14.1602 6.04492 14.1602 5.87891C14.1602 5.68359 14.0234 5.55664 13.8477 5.55664Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneGen1SlashCircleFill!!
+    }
+
+private var _sFIphoneGen1SlashCircleFill: ImageVector? = null

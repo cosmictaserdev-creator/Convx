@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandThumbsupFill (dualtone)
+ * Viewport: 24.4336 x 26.0254
+ */
+public val SfSymbols.Dualtone.SFHandThumbsupFill: ImageVector
+    get() {
+        if (_sFHandThumbsupFill != null) {
+            return _sFHandThumbsupFill!!
+        }
+        _sFHandThumbsupFill = sfIcon(
+            name = "Dualtone.SFHandThumbsupFill",
+            viewportWidth = 24.4336f,
+            viewportHeight = 26.0254f
+        ) {
+            addSfPath("M0 17.2461C0 20.8691 2.24609 23.9062 5.27344 23.9062L7.56836 23.9062C5.32227 22.3242 4.36523 19.9023 4.375 17.1289C4.39453 14.0039 5.58594 11.8652 6.61133 10.5371L4.82422 10.5371C2.08984 10.5371 0 13.4766 0 17.2461ZM5.94727 17.1484C5.94727 21.6211 9.45312 25.0781 15.1465 25.0781L16.8066 25.0781C18.3984 25.0781 19.5703 24.9609 20.2344 24.7852C21.1816 24.541 22.1191 23.9648 22.1191 22.8027C22.1191 22.334 21.9922 21.9922 21.8359 21.7285C21.7383 21.5723 21.7578 21.4453 21.9043 21.3867C22.666 21.0645 23.3008 20.3613 23.3008 19.3945C23.3008 18.8379 23.1348 18.3496 22.8613 18.0078C22.7246 17.8223 22.7441 17.666 22.9785 17.5391C23.5156 17.2266 23.9062 16.5332 23.9062 15.7324C23.9062 15.166 23.7207 14.5605 23.3984 14.2676C23.2031 14.0918 23.2422 13.9648 23.4473 13.7891C23.8281 13.4668 24.0723 12.9199 24.0723 12.2168C24.0723 11.0449 23.1543 10.0781 21.9336 10.0781L17.627 10.0781C16.543 10.0781 15.8008 9.51172 15.8008 8.61328C15.8008 6.97266 17.8516 3.96484 17.8516 1.80664C17.8516 0.664062 17.1191 0 16.1621 0C15.2832 0 14.8633 0.605469 14.3945 1.52344C12.5684 5.05859 10.1367 7.92969 8.29102 10.3906C6.70898 12.4707 5.94727 14.2676 5.94727 17.1484Z", fillAlpha = 0.85f)
+        }
+        return _sFHandThumbsupFill!!
+    }
+
+private var _sFHandThumbsupFill: ImageVector? = null

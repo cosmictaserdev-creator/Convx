@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFXmarkBinFill (monochrome)
+ * Viewport: 30.332 x 22.9785
+ */
+public val SfSymbols.Monochrome.SFXmarkBinFill: ImageVector
+    get() {
+        if (_sFXmarkBinFill != null) {
+            return _sFXmarkBinFill!!
+        }
+        _sFXmarkBinFill = sfIcon(
+            name = "Monochrome.SFXmarkBinFill",
+            viewportWidth = 30.332f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M25.2832 19.3359C24.9316 21.6992 23.9355 22.9785 21.543 22.9785L8.42773 22.9785C6.02539 22.9785 5.04883 21.7188 4.6875 19.3359L2.86133 7.25586L27.0996 7.25586ZM18.2129 10.3809L14.9854 13.6001L11.7578 10.3809C11.5918 10.2246 11.4062 10.127 11.1719 10.127C10.7129 10.127 10.3125 10.5078 10.3125 10.9668C10.3125 11.2109 10.4199 11.4062 10.5762 11.5625L13.796 14.7865L10.5762 17.998C10.4199 18.1641 10.3125 18.3398 10.3125 18.5938C10.3125 19.0527 10.7031 19.4629 11.1621 19.4629C11.416 19.4629 11.6113 19.3457 11.7676 19.1992L14.9854 15.9773L18.2031 19.1992C18.3594 19.3457 18.5547 19.4629 18.8086 19.4629C19.2676 19.4629 19.6582 19.0527 19.6582 18.5938C19.6582 18.3398 19.5508 18.1641 19.3945 17.998L16.1747 14.7865L19.3945 11.5625C19.5508 11.4062 19.6582 11.2109 19.6582 10.9668C19.6582 10.5078 19.2676 10.127 18.7988 10.127C18.5645 10.127 18.3887 10.2246 18.2129 10.3809ZM29.9707 2.17773L29.9707 3.55469C29.9707 4.88281 29.2676 5.70312 27.9199 5.70312L2.04102 5.70312C0.703125 5.70312 0 4.88281 0 3.55469L0 2.17773C0 0.839844 0.761719 0.0292969 2.04102 0.0292969L27.9199 0.0292969C29.2676 0.0292969 29.9707 0.839844 29.9707 2.17773Z", fillAlpha = 0.85f)
+        }
+        return _sFXmarkBinFill!!
+    }
+
+private var _sFXmarkBinFill: ImageVector? = null

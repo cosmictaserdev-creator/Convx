@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonBustCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFPersonBustCircleFill: ImageVector
+    get() {
+        if (_sFPersonBustCircleFill != null) {
+            return _sFPersonBustCircleFill!!
+        }
+        _sFPersonBustCircleFill = sfIcon(
+            name = "Monochrome.SFPersonBustCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7266 19.7266 25.4395 12.7148 25.4395C5.71289 25.4395 0 19.7266 0 12.7246C0 5.71289 5.71289 0 12.7148 0C19.7266 0 25.4395 5.71289 25.4395 12.7246ZM8.37891 15.9766C7.66602 15.9766 7.34375 16.3477 7.34375 17.0117L7.34375 18.8672L7.22656 18.8672C6.92383 18.8672 6.68945 19.1113 6.68945 19.4043C6.68945 19.6973 6.92383 19.9316 7.22656 19.9316L18.2031 19.9316C18.4961 19.9316 18.7305 19.6973 18.7305 19.4043C18.7305 19.1113 18.4961 18.8672 18.2031 18.8672L18.0859 18.8672L18.0859 17.0117C18.0859 16.3477 17.7637 15.9766 17.041 15.9766ZM14.668 17.9785C14.668 18.1934 14.4824 18.3789 14.2578 18.3789L11.1621 18.3789C10.9277 18.3789 10.7715 18.1934 10.7715 17.9785C10.7715 17.7539 10.9277 17.5879 11.1621 17.5879L14.2578 17.5879C14.4824 17.5879 14.668 17.7539 14.668 17.9785ZM7.69531 14.4043C7.69531 14.8047 7.96875 15.0781 8.41797 15.0781L16.9824 15.0781C17.4414 15.0781 17.7148 14.8047 17.7148 14.4043C17.7148 13.1445 15.9766 10.6934 12.7051 10.6934C9.43359 10.6934 7.69531 13.1445 7.69531 14.4043ZM10.2734 7.11914C10.2734 8.63281 11.3574 9.78516 12.7051 9.78516C14.0625 9.79492 15.127 8.63281 15.127 7.11914C15.127 5.69336 14.0527 4.50195 12.7051 4.50195C11.3672 4.50195 10.2734 5.69336 10.2734 7.11914Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonBustCircleFill!!
+    }
+
+private var _sFPersonBustCircleFill: ImageVector? = null

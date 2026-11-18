@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFAirplaneCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFAirplaneCircle: ImageVector
+    get() {
+        if (_sFAirplaneCircle != null) {
+            return _sFAirplaneCircle!!
+        }
+        _sFAirplaneCircle = sfIcon(
+            name = "Dualtone.SFAirplaneCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M20.9082 12.7246C20.9082 11.9043 19.834 11.2891 18.4863 11.2891L15.7812 11.2891C15.4492 11.2891 15.3418 11.2402 15.127 11.0059L10.6934 6.17188C10.5371 5.99609 10.3418 5.9082 10.1172 5.9082L9.35547 5.9082C9.11133 5.9082 8.96484 6.13281 9.07227 6.37695L11.2988 11.3086L8.07617 11.6602L6.91406 9.53125C6.79688 9.3457 6.64062 9.24805 6.37695 9.24805L6.08398 9.24805C5.85938 9.24805 5.70312 9.39453 5.70312 9.62891L5.70312 15.8301C5.70312 16.0547 5.85938 16.2012 6.08398 16.2012L6.37695 16.2012C6.64062 16.2012 6.79688 16.1035 6.91406 15.918L8.07617 13.7891L11.2988 14.1406L9.07227 19.0723C8.96484 19.3164 9.11133 19.541 9.35547 19.541L10.1172 19.541C10.3418 19.541 10.5371 19.4531 10.6934 19.2773L15.127 14.4434C15.3418 14.209 15.4492 14.1602 15.7812 14.1602L18.4863 14.1602C19.834 14.1602 20.9082 13.5449 20.9082 12.7246Z", fillAlpha = 0.85f)
+        }
+        return _sFAirplaneCircle!!
+    }
+
+private var _sFAirplaneCircle: ImageVector? = null

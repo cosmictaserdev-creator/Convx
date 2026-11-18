@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPointBottomleftForwardToPointToprightScurvepathFill (dualtone)
+ * Viewport: 22.3926 x 27.627
+ */
+public val SfSymbols.Dualtone.SFPointBottomleftForwardToPointToprightScurvepathFill: ImageVector
+    get() {
+        if (_sFPointBottomleftForwardToPointToprightScurvepathFill != null) {
+            return _sFPointBottomleftForwardToPointToprightScurvepathFill!!
+        }
+        _sFPointBottomleftForwardToPointToprightScurvepathFill = sfIcon(
+            name = "Dualtone.SFPointBottomleftForwardToPointToprightScurvepathFill",
+            viewportWidth = 22.3926f,
+            viewportHeight = 27.627f
+        ) {
+            addSfPath("M14.2576 3.20872C14.2378 3.3053 14.223 3.40368 14.2128 3.50344C14.2097 3.52282 14.2078 3.54257 14.2077 3.56282C14.195 3.68199 14.1895 3.80323 14.1895 3.92578C14.1895 4.05009 14.1953 4.17307 14.208 4.29404C14.208 4.30988 14.2096 4.32531 14.2119 4.34049C14.2224 4.44259 14.2375 4.54336 14.2579 4.64223C14.2634 4.68784 14.2724 4.73224 14.2847 4.77539L6.49414 4.77539C3.56445 4.77539 1.72852 6.16211 1.72852 8.36914C1.72852 10.5859 3.71094 12.1094 7.45117 12.5L14.8438 13.2715C19.5312 13.75 22.0312 15.9473 22.0312 19.2578C22.0312 22.5195 19.5215 24.5801 15.5371 24.5801L7.73946 24.5801C7.75501 24.5277 7.76619 24.4737 7.77333 24.4183C7.79322 24.3217 7.80804 24.2233 7.81832 24.1235C7.82141 24.1041 7.82338 24.0844 7.82346 24.0641C7.83618 23.945 7.8418 23.8237 7.8418 23.7012C7.8418 23.5769 7.83596 23.4539 7.82312 23.3329C7.82311 23.3171 7.82157 23.3016 7.81922 23.2865C7.80864 23.1843 7.79351 23.0836 7.77298 22.9847C7.76752 22.9391 7.75844 22.8947 7.74611 22.8516L15.5371 22.8516C18.4668 22.8516 20.3027 21.4648 20.3027 19.2578C20.3027 17.041 18.3203 15.5176 14.5801 15.127L7.14844 14.3555C2.5 13.8867 0 11.6797 0 8.36914C0 5.10742 2.50977 3.04688 6.49414 3.04688L14.2913 3.04688C14.2758 3.09923 14.2647 3.15328 14.2576 3.20872Z", fillAlpha = 0.425f)
+            addSfPath("M18.1152 7.8418C20.2734 7.8418 22.0312 6.08398 22.0312 3.92578C22.0312 1.75781 20.2734 0 18.1152 0C15.9375 0 14.1895 1.75781 14.1895 3.92578C14.1895 6.08398 15.9375 7.8418 18.1152 7.8418ZM3.91602 27.627C6.08398 27.627 7.8418 25.8691 7.8418 23.7012C7.8418 21.543 6.08398 19.7852 3.91602 19.7852C1.75781 19.7852 0 21.543 0 23.7012C0 25.8691 1.75781 27.627 3.91602 27.627Z", fillAlpha = 0.85f)
+        }
+        return _sFPointBottomleftForwardToPointToprightScurvepathFill!!
+    }
+
+private var _sFPointBottomleftForwardToPointToprightScurvepathFill: ImageVector? = null

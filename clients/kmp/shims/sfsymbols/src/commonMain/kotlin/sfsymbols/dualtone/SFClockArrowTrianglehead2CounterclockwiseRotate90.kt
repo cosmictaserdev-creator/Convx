@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFClockArrowTrianglehead2CounterclockwiseRotate90 (dualtone)
+ * Viewport: 30.6563 x 25.459
+ */
+public val SfSymbols.Dualtone.SFClockArrowTrianglehead2CounterclockwiseRotate90: ImageVector
+    get() {
+        if (_sFClockArrowTrianglehead2CounterclockwiseRotate90 != null) {
+            return _sFClockArrowTrianglehead2CounterclockwiseRotate90!!
+        }
+        _sFClockArrowTrianglehead2CounterclockwiseRotate90 = sfIcon(
+            name = "Dualtone.SFClockArrowTrianglehead2CounterclockwiseRotate90",
+            viewportWidth = 30.6563f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M6.48537 10.3613L0.801772 10.3613C0.000990731 10.3613-0.223619 10.9082 0.235366 11.543L3.0088 15.4883C3.3799 16.0254 3.91701 16.0156 4.27833 15.4883L7.05177 11.5332C7.49123 10.9082 7.27638 10.3613 6.48537 10.3613ZM15.1475 0C8.17482 0 2.43263 5.76172 2.43263 12.7344C2.43263 13.2422 2.84279 13.6523 3.34083 13.6523C3.84865 13.6523 4.2588 13.2422 4.2588 12.7344C4.2588 6.76758 9.18068 1.83594 15.1475 1.83594C18.8877 1.83594 22.1592 3.71094 24.1123 6.5625C24.4346 7.00195 24.9424 7.13867 25.3916 6.875C25.8213 6.61133 25.9483 6.02539 25.5869 5.54688C23.2627 2.20703 19.4444 0 15.1475 0ZM23.8096 15.0781L29.4932 15.0781C30.294 15.0781 30.5088 14.5312 30.0596 13.8965L27.2861 9.95117C26.9151 9.42383 26.3779 9.43359 26.0166 9.95117L23.2432 13.9062C22.794 14.5312 23.0186 15.0781 23.8096 15.0781ZM15.1475 25.4395C22.1201 25.4395 27.8623 19.6777 27.8623 12.7051C27.8623 12.207 27.4522 11.7871 26.9541 11.7871C26.4463 11.7871 26.0361 12.207 26.0361 12.7051C26.0361 18.6719 21.1143 23.6133 15.1475 23.6133C11.4072 23.6133 8.13576 21.7383 6.18263 18.877C5.86037 18.4375 5.34279 18.3008 4.90333 18.5742C4.47365 18.8281 4.34669 19.4141 4.70802 19.8926C7.03224 23.2324 10.8408 25.4395 15.1475 25.4395Z", fillAlpha = 0.425f)
+            addSfPath("M15.1475 5.46875C14.6299 5.46875 14.2295 5.86914 14.2295 6.38672L14.2295 13.4863C14.2295 13.7891 14.3076 14.0137 14.5127 14.2773L17.5596 18.3008C17.96 18.8184 18.5166 18.8867 18.9658 18.5547C19.376 18.2617 19.4346 17.7148 19.0733 17.2363L15.1182 11.8652L16.0654 14.7852L16.0654 6.38672C16.0654 5.86914 15.6553 5.46875 15.1475 5.46875Z", fillAlpha = 0.85f)
+        }
+        return _sFClockArrowTrianglehead2CounterclockwiseRotate90!!
+    }
+
+private var _sFClockArrowTrianglehead2CounterclockwiseRotate90: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonCropSquareOnSquareAngled (dualtone)
+ * Viewport: 28.0303 x 27.7637
+ */
+public val SfSymbols.Dualtone.SFPersonCropSquareOnSquareAngled: ImageVector
+    get() {
+        if (_sFPersonCropSquareOnSquareAngled != null) {
+            return _sFPersonCropSquareOnSquareAngled!!
+        }
+        _sFPersonCropSquareOnSquareAngled = sfIcon(
+            name = "Dualtone.SFPersonCropSquareOnSquareAngled",
+            viewportWidth = 28.0303f,
+            viewportHeight = 27.7637f
+        ) {
+            addSfPath("M20.4898 3.14453L21.1758 7.04102L19.5203 7.04102L18.898 3.50586C18.7027 2.39258 17.8433 1.81641 16.7593 2.00195L3.19485 4.39453C2.09133 4.58984 1.50539 5.42969 1.71047 6.54297L4.10305 20.0781C4.29836 21.1914 5.12844 21.7676 6.23196 21.582L6.95461 21.4545L6.95461 23.109L6.4761 23.1934C4.23 23.584 2.90188 22.666 2.51125 20.4395L0.0893782 6.73828C-0.311012 4.51172 0.636253 3.18359 2.88235 2.7832L16.5054 0.380859C18.7613-0.00976562 20.0991 0.927734 20.4898 3.14453Z", fillAlpha = 0.425f)
+            addSfPath("M10.3921 27.7637L24.23 27.7637C26.5152 27.7637 27.6675 26.6016 27.6675 24.3555L27.6675 10.4492C27.6675 8.20312 26.5152 7.04102 24.23 7.04102L10.3921 7.04102C8.11672 7.04102 6.95461 8.18359 6.95461 10.4492L6.95461 24.3555C6.95461 26.6113 8.11672 27.7637 10.3921 27.7637ZM10.4214 26.1328C9.30813 26.1328 8.58547 25.4004 8.58547 24.2773L8.58547 10.5371C8.58547 9.4043 9.30813 8.68164 10.4214 8.68164L24.1909 8.68164C25.2945 8.68164 26.0366 9.4043 26.0366 10.5371L26.0366 24.2773C26.0366 25.4004 25.2945 26.1328 24.1909 26.1328ZM17.3062 19.2383C19.4741 19.2383 21.1929 17.4121 21.1929 14.9902C21.1929 12.7051 19.4741 10.8301 17.3062 10.8301C15.148 10.8301 13.4292 12.7051 13.4292 14.9902C13.4292 17.4121 15.148 19.2383 17.3062 19.2383ZM9.44485 26.7383L25.187 26.7383C24.6109 23.5645 21.3198 21.0938 17.3159 21.0938C13.312 21.0938 10.021 23.5645 9.44485 26.7383Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonCropSquareOnSquareAngled!!
+    }
+
+private var _sFPersonCropSquareOnSquareAngled: ImageVector? = null

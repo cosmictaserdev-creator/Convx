@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCameraMacroSlash (dualtone)
+ * Viewport: 30.293 x 32.0728
+ */
+public val SfSymbols.Dualtone.SFCameraMacroSlash: ImageVector
+    get() {
+        if (_sFCameraMacroSlash != null) {
+            return _sFCameraMacroSlash!!
+        }
+        _sFCameraMacroSlash = sfIcon(
+            name = "Dualtone.SFCameraMacroSlash",
+            viewportWidth = 30.293f,
+            viewportHeight = 32.0728f
+        ) {
+            addSfPath("M15.8398 20.7799L15.8398 26.9682C16.4215 25.586 17.2431 24.3125 18.2718 23.2092L22.612 27.5444C20.353 28.8236 17.7229 29.5569 14.9805 29.5569C14.4922 29.5569 14.1113 29.2347 14.1113 28.7366L14.1113 19.0534ZM12.5586 24.4007L12.5586 28.7366C12.5586 28.9515 12.5879 29.1761 12.6367 29.3616C7.14844 28.5706 2.49023 24.8694 0.820312 19.9769C0.595703 19.3226 0.839844 18.9124 1.5332 18.9124C6.30859 18.9124 10.2148 21.1097 12.5586 24.4007ZM29.1113 19.9769C28.4922 21.7774 27.4664 23.4154 26.14 24.8037L21.8204 20.4907C23.7165 19.4879 25.9379 18.9124 28.3984 18.9124C29.082 18.9124 29.3359 19.3226 29.1113 19.9769ZM15.5859 2.95537L18.0859 6.20732L21.0254 3.21904C21.4355 2.78935 22.041 2.86748 22.2656 3.37529C22.8711 4.77177 23.1641 6.17802 23.1641 7.54521C23.1641 11.5014 20.745 14.7654 16.8979 15.5756L6.98037 5.67309C7.12328 4.90972 7.3589 4.14104 7.68555 3.37529C7.91992 2.86748 8.51562 2.78935 8.93555 3.21904L11.875 6.20732L14.375 2.95537C14.6973 2.53545 15.2539 2.53545 15.5859 2.95537Z", fillAlpha = 0.425f)
+            addSfPath("M1.62109 4.63506L27.4805 30.4554C27.8125 30.7776 28.3398 30.7776 28.6621 30.4554C28.9844 30.1233 28.9844 29.6058 28.6621 29.2737L2.80273 3.45342C2.48047 3.13115 1.95312 3.12138 1.62109 3.45342C1.29883 3.76592 1.29883 4.31279 1.62109 4.63506Z", fillAlpha = 0.85f)
+        }
+        return _sFCameraMacroSlash!!
+    }
+
+private var _sFCameraMacroSlash: ImageVector? = null

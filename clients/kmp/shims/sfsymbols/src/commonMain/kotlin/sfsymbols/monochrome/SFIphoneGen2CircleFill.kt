@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneGen2CircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFIphoneGen2CircleFill: ImageVector
+    get() {
+        if (_sFIphoneGen2CircleFill != null) {
+            return _sFIphoneGen2CircleFill!!
+        }
+        _sFIphoneGen2CircleFill = sfIcon(
+            name = "Monochrome.SFIphoneGen2CircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7344C25.4395 19.7461 19.7266 25.459 12.7148 25.459C5.71289 25.459 0 19.7461 0 12.7344C0 5.73242 5.71289 0.0195312 12.7148 0.0195312C19.7266 0.0195312 25.4395 5.73242 25.4395 12.7344ZM9.93164 4.51172C8.64258 4.51172 7.82227 5.3125 7.82227 6.58203L7.82227 18.8965C7.82227 20.166 8.64258 20.957 9.93164 20.957L15.4883 20.957C16.7773 20.957 17.6074 20.166 17.6074 18.8965L17.6074 6.58203C17.6074 5.3125 16.7773 4.51172 15.4883 4.51172ZM11.1426 5.79102L11.1426 5.94727C11.1426 6.2793 11.3574 6.49414 11.6699 6.49414L13.75 6.49414C14.0625 6.49414 14.2871 6.2793 14.2871 5.94727L14.2871 5.79102C14.2871 5.69336 14.3262 5.6543 14.4238 5.6543L15.3516 5.6543C16.1035 5.6543 16.4844 6.02539 16.4844 6.72852L16.4844 18.75C16.4844 19.4531 16.1035 19.8242 15.3516 19.8242L10.0684 19.8242C9.31641 19.8242 8.94531 19.4531 8.94531 18.75L8.94531 6.72852C8.94531 6.02539 9.31641 5.6543 10.0684 5.6543L10.9961 5.6543C11.1035 5.6543 11.1426 5.69336 11.1426 5.79102ZM11.0938 18.5449C10.8887 18.5449 10.7324 18.7012 10.7324 18.9258C10.7324 19.1309 10.8887 19.2773 11.0938 19.2773L14.3359 19.2773C14.541 19.2773 14.6973 19.1309 14.6973 18.9258C14.6973 18.7012 14.541 18.5449 14.3359 18.5449Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneGen2CircleFill!!
+    }
+
+private var _sFIphoneGen2CircleFill: ImageVector? = null

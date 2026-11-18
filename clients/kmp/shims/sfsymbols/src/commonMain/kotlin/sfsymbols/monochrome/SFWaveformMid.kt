@@ -1,0 +1,32 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFWaveformMid (monochrome)
+ * Viewport: 22.8711 x 19.834
+ */
+public val SfSymbols.Monochrome.SFWaveformMid: ImageVector
+    get() {
+        if (_sFWaveformMid != null) {
+            return _sFWaveformMid!!
+        }
+        _sFWaveformMid = sfIcon(
+            name = "Monochrome.SFWaveformMid",
+            viewportWidth = 22.8711f,
+            viewportHeight = 19.834f
+        ) {
+            addSfPath("M21.6504 12.2168C22.1387 12.2168 22.5098 11.8262 22.5098 11.3477L22.5098 8.68164C22.5098 8.20312 22.1387 7.80273 21.6504 7.80273C21.1523 7.80273 20.7812 8.20312 20.7812 8.68164L20.7812 11.3477C20.7812 11.8262 21.1523 12.2168 21.6504 12.2168Z", fillAlpha = 0.85f)
+            addSfPath("M17.4902 17.002C17.9785 17.002 18.3594 16.6113 18.3594 16.1328L18.3594 3.70117C18.3594 3.22266 17.9785 2.82227 17.4902 2.82227C16.9922 2.82227 16.6309 3.22266 16.6309 3.70117L16.6309 16.1328C16.6309 16.6113 16.9922 17.002 17.4902 17.002Z", fillAlpha = 0.85f)
+            addSfPath("M13.3301 13.4961C13.8281 13.4961 14.1992 13.1152 14.1992 12.6367L14.1992 7.1875C14.1992 6.70898 13.8281 6.32812 13.3301 6.32812C12.832 6.32812 12.4707 6.70898 12.4707 7.1875L12.4707 12.6367C12.4707 13.1152 12.832 13.4961 13.3301 13.4961Z", fillAlpha = 0.85f)
+            addSfPath("M9.16992 19.834C9.66797 19.834 10.0391 19.4434 10.0391 18.9648L10.0391 0.869141C10.0391 0.390625 9.66797 0 9.16992 0C8.68164 0 8.31055 0.390625 8.31055 0.869141L8.31055 18.9648C8.31055 19.4434 8.68164 19.834 9.16992 19.834Z", fillAlpha = 0.85f)
+            addSfPath("M5.00977 15.1172C5.50781 15.1172 5.88867 14.7266 5.88867 14.248L5.88867 5.58594C5.88867 5.10742 5.50781 4.70703 5.00977 4.70703C4.52148 4.70703 4.16016 5.10742 4.16016 5.58594L4.16016 14.248C4.16016 14.7266 4.52148 15.1172 5.00977 15.1172Z", fillAlpha = 0.85f)
+            addSfPath("M0.859375 12.3535C1.35742 12.3535 1.72852 11.9629 1.72852 11.4844L1.72852 8.34961C1.72852 7.87109 1.35742 7.4707 0.859375 7.4707C0.361328 7.4707 0 7.87109 0 8.34961L0 11.4844C0 11.9629 0.361328 12.3535 0.859375 12.3535Z", fillAlpha = 0.85f)
+        }
+        return _sFWaveformMid!!
+    }
+
+private var _sFWaveformMid: ImageVector? = null

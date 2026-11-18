@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHandRaisedSquareFill (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFHandRaisedSquareFill: ImageVector
+    get() {
+        if (_sFHandRaisedSquareFill != null) {
+            return _sFHandRaisedSquareFill!!
+        }
+        _sFHandRaisedSquareFill = sfIcon(
+            name = "Monochrome.SFHandRaisedSquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M22.959 3.76953L22.959 19.1992C22.959 21.6797 21.6797 22.959 19.1504 22.959L3.79883 22.959C1.2793 22.959 0 21.6992 0 19.1992L0 3.76953C0 1.26953 1.2793 0 3.79883 0L19.1504 0C21.6797 0 22.959 1.2793 22.959 3.76953ZM10.8203 3.82812L10.8203 10.293C10.5762 10.3125 10.332 10.3418 10.0879 10.3906L10.0879 4.54102C10.0879 4.10156 9.7168 3.74023 9.27734 3.74023C8.84766 3.74023 8.47656 4.10156 8.47656 4.54102L8.47656 10.9082C8.21289 11.0156 7.99805 11.1523 7.79297 11.2891L7.79297 6.91406C7.79297 6.47461 7.43164 6.11328 6.99219 6.11328C6.55273 6.11328 6.18164 6.47461 6.18164 6.91406L6.18164 13.9355C6.18164 17.3047 8.36914 19.2773 11.3867 19.2773C13.7207 19.2773 15.3809 18.2617 16.3965 15.8789C16.9336 14.7168 17.3535 13.3984 17.793 11.9043C17.959 11.3477 18.1836 10.7129 18.1836 10.4102C18.1836 10 17.8711 9.72656 17.4512 9.72656C17.0117 9.72656 16.7285 9.99023 16.4258 10.625L15.3809 12.9199C15.2734 13.1934 15.1367 13.2812 15 13.2812C14.8242 13.2812 14.707 13.1641 14.707 12.8809L14.707 5.01953C14.707 4.58984 14.3359 4.22852 13.9062 4.22852C13.4668 4.22852 13.1055 4.58984 13.1055 5.01953L13.1055 10.5859C12.8906 10.5176 12.666 10.4395 12.4316 10.3809L12.4316 3.82812C12.4316 3.39844 12.0703 3.02734 11.6309 3.02734C11.1816 3.02734 10.8203 3.39844 10.8203 3.82812Z", fillAlpha = 0.85f)
+        }
+        return _sFHandRaisedSquareFill!!
+    }
+
+private var _sFHandRaisedSquareFill: ImageVector? = null

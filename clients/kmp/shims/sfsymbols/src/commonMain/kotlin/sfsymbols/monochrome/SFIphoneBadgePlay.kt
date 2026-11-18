@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneBadgePlay (monochrome)
+ * Viewport: 29.3457 x 32.7051
+ */
+public val SfSymbols.Monochrome.SFIphoneBadgePlay: ImageVector
+    get() {
+        if (_sFIphoneBadgePlay != null) {
+            return _sFIphoneBadgePlay!!
+        }
+        _sFIphoneBadgePlay = sfIcon(
+            name = "Monochrome.SFIphoneBadgePlay",
+            viewportWidth = 29.3457f,
+            viewportHeight = 32.7051f
+        ) {
+            addSfPath("M22.3242 6.45508L22.3242 17.0113C22.0455 16.9786 21.7618 16.9629 21.4746 16.9629C21.174 16.9629 20.877 16.9801 20.5859 17.0176L20.5859 6.70898C20.5859 5.56641 19.9609 4.96094 18.7793 4.96094L10.2051 4.96094C9.01367 4.96094 8.38867 5.56641 8.38867 6.70898L8.38867 25.9766C8.38867 27.1191 9.01367 27.7246 10.2051 27.7246L14.163 27.7246C14.4034 28.3466 14.7264 28.9274 15.1206 29.4531L9.99023 29.4531C7.94922 29.4531 6.66016 28.2031 6.66016 26.2305L6.66016 6.45508C6.66016 4.48242 7.94922 3.23242 9.99023 3.23242L18.9844 3.23242C21.0254 3.23242 22.3242 4.48242 22.3242 6.45508ZM16.7871 6.60156C16.7871 7.06055 16.4355 7.41211 15.9863 7.41211L13.0078 7.41211C12.5488 7.41211 12.1973 7.06055 12.1973 6.60156C12.1973 6.16211 12.5488 5.81055 13.0078 5.81055L15.9863 5.81055C16.4355 5.81055 16.7871 6.16211 16.7871 6.60156Z", fillAlpha = 0.85f)
+            addSfPath("M27.793 24.834C27.793 28.291 24.9023 31.1523 21.4746 31.1523C18.0176 31.1523 15.1562 28.3105 15.1562 24.834C15.1562 21.377 18.0176 18.5156 21.4746 18.5156C24.9414 18.5156 27.793 21.3672 27.793 24.834ZM19.4141 22.1777L19.4141 27.4805C19.4141 27.959 19.8926 28.1543 20.3125 27.9004L24.6387 25.3418C25.0488 25.0977 25.0195 24.5703 24.5801 24.2969L20.3125 21.748C19.9023 21.5039 19.4141 21.709 19.4141 22.1777Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneBadgePlay!!
+    }
+
+private var _sFIphoneBadgePlay: ImageVector? = null

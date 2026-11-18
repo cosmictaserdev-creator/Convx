@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRectangleStackFillBadgePlus (dualtone)
+ * Viewport: 42.4707 x 34.4434
+ */
+public val SfSymbols.Dualtone.SFRectangleStackFillBadgePlus: ImageVector
+    get() {
+        if (_sFRectangleStackFillBadgePlus != null) {
+            return _sFRectangleStackFillBadgePlus!!
+        }
+        _sFRectangleStackFillBadgePlus = sfIcon(
+            name = "Dualtone.SFRectangleStackFillBadgePlus",
+            viewportWidth = 42.4707f,
+            viewportHeight = 34.4434f
+        ) {
+            addSfPath("M29.017 4.90234L13.102 4.90234C13.1646 4.01755 13.739 3.50586 14.6777 3.50586L27.4316 3.50586C28.3703 3.50586 28.9535 4.01755 29.017 4.90234Z", fillAlpha = 0.425f)
+            addSfPath("M31.5374 8.32015C31.1873 8.26665 30.8165 8.24219 30.4297 8.24219L11.6797 8.24219C11.2928 8.24219 10.922 8.26643 10.572 8.31954C10.7049 7.28116 11.4203 6.69922 12.5684 6.69922L29.541 6.69922C30.6892 6.69922 31.4048 7.28139 31.5374 8.32015Z", fillAlpha = 0.425f)
+            addSfPath("M34.2285 14.1211L34.2285 27.1387C34.2285 29.6289 32.9492 30.9082 30.4297 30.9082L14.4233 30.9082C15.2614 29.6613 15.752 28.1677 15.752 26.5723C15.752 22.2559 12.1973 18.7012 7.88086 18.7012L7.88086 14.1211C7.88086 11.6211 9.15039 10.3613 11.6797 10.3613L30.4297 10.3613C32.9492 10.3613 34.2285 11.6309 34.2285 14.1211Z", fillAlpha = 0.425f)
+            addSfPath("M14.1895 26.5723C14.1895 30.0293 11.3086 32.8906 7.88086 32.8906C4.41406 32.8906 1.5625 30.0488 1.5625 26.5723C1.5625 23.1152 4.41406 20.2637 7.88086 20.2637C11.3477 20.2637 14.1895 23.1055 14.1895 26.5723ZM7.16797 23.3008L7.16797 25.8691L4.59961 25.8691C4.18945 25.8691 3.88672 26.1426 3.88672 26.5723C3.88672 27.0117 4.18945 27.2852 4.59961 27.2852L7.16797 27.2852L7.16797 29.8535C7.16797 30.2734 7.44141 30.5664 7.88086 30.5664C8.31055 30.5664 8.58398 30.2734 8.58398 29.8535L8.58398 27.2852L11.1523 27.2852C11.5723 27.2852 11.8555 27.0117 11.8555 26.5723C11.8555 26.1426 11.5723 25.8691 11.1523 25.8691L8.58398 25.8691L8.58398 23.3008C8.58398 22.8906 8.31055 22.5977 7.88086 22.5977C7.44141 22.5977 7.16797 22.8906 7.16797 23.3008Z", fillAlpha = 0.85f)
+        }
+        return _sFRectangleStackFillBadgePlus!!
+    }
+
+private var _sFRectangleStackFillBadgePlus: ImageVector? = null

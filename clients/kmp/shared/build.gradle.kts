@@ -18,7 +18,7 @@ kotlin {
         minSdk = 26
     }
 
-    val iosTargets = listOf(iosArm64(), iosSimulatorArm64())
+    val iosTargets = listOf(iosArm64(), iosSimulatorArm64(), iosX64())
     jvm("desktop")
 
     iosTargets.forEach { target ->

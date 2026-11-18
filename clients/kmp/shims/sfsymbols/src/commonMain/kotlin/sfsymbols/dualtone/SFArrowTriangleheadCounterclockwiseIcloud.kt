@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowTriangleheadCounterclockwiseIcloud (dualtone)
+ * Viewport: 31.5625 x 23.3496
+ */
+public val SfSymbols.Dualtone.SFArrowTriangleheadCounterclockwiseIcloud: ImageVector
+    get() {
+        if (_sFArrowTriangleheadCounterclockwiseIcloud != null) {
+            return _sFArrowTriangleheadCounterclockwiseIcloud!!
+        }
+        _sFArrowTriangleheadCounterclockwiseIcloud = sfIcon(
+            name = "Dualtone.SFArrowTriangleheadCounterclockwiseIcloud",
+            viewportWidth = 31.5625f,
+            viewportHeight = 23.3496f
+        ) {
+            addSfPath("M24.5801 21.4746C28.3008 21.4746 31.2012 18.7891 31.2012 15.4102C31.2012 12.8223 29.7363 10.5566 27.2559 9.58008C27.3242 4.0332 23.3594 0 18.3008 0C14.873 0 12.4805 1.85547 11.0352 4.0918C7.98828 3.10547 4.62891 5.44922 4.58984 8.94531C1.78711 9.33594 0 11.7871 0 14.8242C0 18.4668 3.16406 21.4648 7.37305 21.4648ZM24.5703 19.7461L7.36328 19.7363C4.13086 19.7363 1.72852 17.5 1.72852 14.8242C1.72852 12.2852 3.26172 10.293 5.9375 10.293C6.09375 10.293 6.16211 10.2051 6.16211 10.0488C6.16211 6.2793 8.96484 4.96094 11.582 5.87891C11.7285 5.92773 11.8164 5.89844 11.8945 5.76172C13.125 3.57422 15.0195 1.72852 18.3008 1.72852C22.4219 1.72852 25.3418 5 25.5762 8.85742C25.6152 9.39453 25.5762 10.0293 25.5371 10.5957C25.5273 10.7422 25.5859 10.8398 25.7227 10.8691C28.0078 11.4062 29.4727 13.125 29.4727 15.4102C29.4727 17.8418 27.334 19.7461 24.5703 19.7461Z", fillAlpha = 0.425f)
+            addSfPath("M17.002 6.32812C17.002 5.83984 16.4844 5.67383 16.123 5.9668L13.7305 7.96875C13.3887 8.25195 13.3789 8.69141 13.7305 8.99414L16.123 11.0156C16.4844 11.3281 17.002 11.1523 17.002 10.6641ZM16.1133 17.5879C18.8867 17.5879 21.1035 15.3613 21.1035 12.5488C21.1035 9.73633 18.8867 7.50977 16.1133 7.50977C15.7422 7.50977 15.4395 7.82227 15.4395 8.19336C15.4395 8.56445 15.7422 8.86719 16.1133 8.86719C18.1348 8.86719 19.7461 10.498 19.7461 12.5488C19.7461 14.6094 18.1348 16.2402 16.1133 16.2402C14.0918 16.2402 12.4805 14.6094 12.4805 12.5781C12.4805 12.2168 12.1777 11.9141 11.8066 11.9141C11.4355 11.9141 11.123 12.2168 11.123 12.5781C11.123 15.3613 13.3398 17.5879 16.1133 17.5879Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowTriangleheadCounterclockwiseIcloud!!
+    }
+
+private var _sFArrowTriangleheadCounterclockwiseIcloud: ImageVector? = null

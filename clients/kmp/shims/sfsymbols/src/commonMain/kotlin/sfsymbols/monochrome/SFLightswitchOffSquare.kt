@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFLightswitchOffSquare (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFLightswitchOffSquare: ImageVector
+    get() {
+        if (_sFLightswitchOffSquare != null) {
+            return _sFLightswitchOffSquare!!
+        }
+        _sFLightswitchOffSquare = sfIcon(
+            name = "Monochrome.SFLightswitchOffSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M8.125 4.99023C7.61719 4.99023 7.25586 5.3418 7.25586 5.85938L7.25586 17.1094C7.25586 17.6172 7.61719 17.9883 8.125 17.9883L14.8242 17.9883C15.332 17.9883 15.7031 17.6172 15.7031 17.1094L15.7031 5.85938C15.7031 5.3418 15.332 4.99023 14.8242 4.99023ZM8.96484 12.6367L13.9844 12.6367C14.2285 12.6367 14.3848 12.8027 14.3848 13.0469L14.3848 16.2598C14.3848 16.5039 14.2285 16.6699 13.9844 16.6699L8.96484 16.6699C8.74023 16.6699 8.57422 16.5039 8.57422 16.2598L8.57422 13.0469C8.57422 12.8027 8.74023 12.6367 8.96484 12.6367Z", fillAlpha = 0.85f)
+        }
+        return _sFLightswitchOffSquare!!
+    }
+
+private var _sFLightswitchOffSquare: ImageVector? = null

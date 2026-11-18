@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFEnvelopeCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFEnvelopeCircle: ImageVector
+    get() {
+        if (_sFEnvelopeCircle != null) {
+            return _sFEnvelopeCircle!!
+        }
+        _sFEnvelopeCircle = sfIcon(
+            name = "Monochrome.SFEnvelopeCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M12.7148 13.4375C12.9102 13.4375 13.1055 13.3691 13.3105 13.1836L19.5215 7.69531C19.1895 7.49023 18.8184 7.39258 18.3203 7.39258L7.10938 7.39258C6.61133 7.39258 6.24023 7.48047 5.92773 7.68555L12.1191 13.1836C12.3242 13.3691 12.5293 13.4375 12.7148 13.4375ZM5.40039 17.1094L10.0293 12.4805L5.38086 8.36914C5.29297 8.51562 5.22461 8.84766 5.22461 9.25781L5.22461 16.1914C5.22461 16.582 5.2832 16.8652 5.40039 17.1094ZM6.96289 18.0566L18.4668 18.0566C18.916 18.0566 19.248 17.9395 19.4824 17.7832L14.7461 13.0566L13.8477 13.8672C13.4766 14.1895 13.0957 14.3359 12.7148 14.3359C12.334 14.3359 11.9531 14.1895 11.6016 13.8672L10.6836 13.0566L5.94727 17.7832C6.18164 17.9492 6.51367 18.0566 6.96289 18.0566ZM20.0391 17.0996C20.1465 16.8652 20.2051 16.5723 20.2051 16.1914L20.2051 9.25781C20.2051 8.84766 20.1367 8.53516 20.0488 8.36914L15.4004 12.4805Z", fillAlpha = 0.85f)
+        }
+        return _sFEnvelopeCircle!!
+    }
+
+private var _sFEnvelopeCircle: ImageVector? = null

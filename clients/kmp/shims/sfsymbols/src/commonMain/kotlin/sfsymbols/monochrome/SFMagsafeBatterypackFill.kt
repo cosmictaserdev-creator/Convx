@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMagsafeBatterypackFill (monochrome)
+ * Viewport: 18.0176 x 25.5371
+ */
+public val SfSymbols.Monochrome.SFMagsafeBatterypackFill: ImageVector
+    get() {
+        if (_sFMagsafeBatterypackFill != null) {
+            return _sFMagsafeBatterypackFill!!
+        }
+        _sFMagsafeBatterypackFill = sfIcon(
+            name = "Monochrome.SFMagsafeBatterypackFill",
+            viewportWidth = 18.0176f,
+            viewportHeight = 25.5371f
+        ) {
+            addSfPath("M3.45703 25.5176L14.1992 25.5176C16.2793 25.5176 17.6562 24.209 17.6562 22.2559L17.6562 3.27148C17.6562 1.30859 16.2793 0 14.1992 0L3.45703 0C1.37695 0 0 1.30859 0 3.27148L0 22.2559C0 24.209 1.37695 25.5176 3.45703 25.5176ZM8.83789 21.0938C8.44727 21.0938 8.11523 20.7715 8.11523 20.3809L8.11523 17.9297C8.11523 17.5391 8.44727 17.2168 8.83789 17.2168C9.22852 17.2168 9.55078 17.5391 9.55078 17.9297L9.55078 20.3809C9.55078 20.7715 9.22852 21.0938 8.83789 21.0938ZM8.83789 15.0195C5.21484 15.0195 2.25586 12.0703 2.25586 8.44727C2.25586 4.81445 5.21484 1.86523 8.83789 1.86523C12.4609 1.86523 15.4102 4.81445 15.4102 8.44727C15.4102 12.0703 12.4609 15.0195 8.83789 15.0195ZM8.83789 13.6328C11.6992 13.6328 14.0234 11.2988 14.0234 8.44727C14.0234 5.58594 11.6992 3.25195 8.83789 3.25195C5.9668 3.25195 3.64258 5.57617 3.64258 8.44727C3.64258 11.3086 5.9668 13.6328 8.83789 13.6328Z", fillAlpha = 0.85f)
+        }
+        return _sFMagsafeBatterypackFill!!
+    }
+
+private var _sFMagsafeBatterypackFill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTaillightFogFill (dualtone)
+ * Viewport: 32.6758 x 21.9712
+ */
+public val SfSymbols.Dualtone.SFTaillightFogFill: ImageVector
+    get() {
+        if (_sFTaillightFogFill != null) {
+            return _sFTaillightFogFill!!
+        }
+        _sFTaillightFogFill = sfIcon(
+            name = "Dualtone.SFTaillightFogFill",
+            viewportWidth = 32.6758f,
+            viewportHeight = 21.9712f
+        ) {
+            addSfPath("M20.7617 10.9807C20.7812 8.4807 20.5762 6.18578 19.9219 3.87133C19.1797 1.37133 17.6855 0.443592 14.7656 0.443592L14.1113 0.443592C6.75781 0.443592 0 5.30687 0 10.9807C0 16.6545 6.75781 21.4983 14.1113 21.4983L14.7656 21.4983C17.6953 21.4983 19.1895 20.5803 19.9219 18.0803C20.5762 15.7659 20.7812 13.4709 20.7617 10.9807Z", fillAlpha = 0.85f)
+            addSfPath("M31.4453 5.34594L21.8555 5.34594C21.9629 5.92211 22.041 6.51781 22.1191 7.09398L31.4453 7.08422C31.9043 7.08422 32.3145 6.69359 32.3145 6.21508C32.3145 5.74633 31.9141 5.34594 31.4453 5.34594ZM31.4453 10.1116L22.3047 10.1116C22.3145 10.4534 22.3145 11.508 22.3047 11.8401L31.4453 11.8401C31.9141 11.8401 32.3145 11.4592 32.3145 10.9905C32.3145 10.5217 31.9141 10.1116 31.4453 10.1116ZM31.4453 14.8772L22.1191 14.887C22.041 15.4534 21.9629 16.0295 21.8555 16.6155L31.4453 16.6057C31.9141 16.6057 32.3145 16.2151 32.3145 15.7463C32.3145 15.2776 31.9141 14.8772 31.4453 14.8772ZM25.2148 20.4436C24.3262 21.3323 25.498 22.5139 26.416 21.6545C28.7598 19.3303 29.209 15.1018 27.6367 11.1077L27.4121 10.5315C26.0352 7.00609 26.2402 3.41234 28.0469 1.50805C28.9453 0.629139 27.7637-0.562267 26.8359 0.297108C24.4824 2.63109 24.0527 6.84984 25.625 10.844L25.8496 11.4202C27.2461 14.9553 27.0215 18.5393 25.2148 20.4436Z", fillAlpha = 0.425f)
+        }
+        return _sFTaillightFogFill!!
+    }
+
+private var _sFTaillightFogFill: ImageVector? = null

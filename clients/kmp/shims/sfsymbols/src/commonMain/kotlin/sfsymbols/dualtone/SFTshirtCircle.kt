@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTshirtCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFTshirtCircle: ImageVector
+    get() {
+        if (_sFTshirtCircle != null) {
+            return _sFTshirtCircle!!
+        }
+        _sFTshirtCircle = sfIcon(
+            name = "Dualtone.SFTshirtCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M9.58984 19.4336L15.791 19.4336C16.875 19.4336 17.4121 18.916 17.4219 17.8418L17.5 11.7578L19.082 12.0996C19.5996 12.2168 19.9414 12.0117 20.0879 11.4648L20.6445 9.36523C20.7812 8.81836 20.5664 8.4375 20.0488 8.21289L15.7324 6.32812C15.498 6.23047 15.3027 6.23047 15.0879 6.33789C14.3262 6.70898 13.5938 6.92383 12.6855 6.92383C11.7871 6.92383 11.0449 6.70898 10.2832 6.33789C10.0781 6.23047 9.87305 6.23047 9.63867 6.32812L5.32227 8.21289C4.80469 8.4375 4.59961 8.81836 4.73633 9.36523L5.30273 11.4648C5.42969 12.0117 5.77148 12.2168 6.28906 12.0996L7.87109 11.7578L7.94922 17.8418C7.96875 18.916 8.49609 19.4336 9.58984 19.4336ZM12.6855 8.67188C11.748 8.67188 10.9863 8.23242 10.7129 7.44141C11.3281 7.65625 12.0215 7.76367 12.6855 7.76367C13.3496 7.76367 14.043 7.65625 14.6582 7.44141C14.3848 8.22266 13.6426 8.67188 12.6855 8.67188Z", fillAlpha = 0.85f)
+        }
+        return _sFTshirtCircle!!
+    }
+
+private var _sFTshirtCircle: ImageVector? = null

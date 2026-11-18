@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCircleBadgeCheckmark (dualtone)
+ * Viewport: 37.666 x 28.8574
+ */
+public val SfSymbols.Dualtone.SFCircleBadgeCheckmark: ImageVector
+    get() {
+        if (_sFCircleBadgeCheckmark != null) {
+            return _sFCircleBadgeCheckmark!!
+        }
+        _sFCircleBadgeCheckmark = sfIcon(
+            name = "Dualtone.SFCircleBadgeCheckmark",
+            viewportWidth = 37.666f,
+            viewportHeight = 28.8574f
+        ) {
+            addSfPath("M31.3185 13.2677C30.8255 13.1668 30.3158 13.1152 29.7949 13.1152C29.6846 13.1152 29.5747 13.1176 29.4677 13.132C28.8363 7.71578 24.2398 3.52539 18.6523 3.52539C12.627 3.52539 7.75391 8.39844 7.75391 14.4238C7.75391 20.4492 12.627 25.3223 18.6523 25.3223C20.1096 25.3223 21.4994 25.0372 22.7665 24.5145C23.04 25.0705 23.3838 25.5859 23.7839 26.0522C22.2168 26.7533 20.4792 27.1387 18.6523 27.1387C11.6309 27.1387 5.9375 21.4453 5.9375 14.4238C5.9375 7.40234 11.6309 1.69922 18.6523 1.69922C25.2836 1.69922 30.7389 6.78597 31.3185 13.2677Z", fillAlpha = 0.425f)
+            addSfPath("M36.1035 20.9863C36.1035 24.4434 33.2227 27.3047 29.7949 27.3047C26.3281 27.3047 23.4766 24.4629 23.4766 20.9863C23.4766 17.5293 26.3281 14.668 29.7949 14.668C33.252 14.668 36.1035 17.5195 36.1035 20.9863ZM32.0605 18.2324L28.9941 22.4805L27.4219 20.791C27.2949 20.6543 27.1191 20.5371 26.8652 20.5371C26.4648 20.5371 26.1426 20.8496 26.1426 21.2598C26.1426 21.4258 26.2012 21.6309 26.3379 21.7871L28.4375 24.0918C28.5938 24.2578 28.8281 24.3457 29.0234 24.3457C29.2773 24.3457 29.502 24.2383 29.6289 24.0625L33.2324 19.0625C33.3398 18.916 33.3984 18.7598 33.3984 18.623C33.3984 18.2227 33.0566 17.9102 32.6758 17.9102C32.4121 17.9102 32.1973 18.0371 32.0605 18.2324Z", fillAlpha = 0.85f)
+        }
+        return _sFCircleBadgeCheckmark!!
+    }
+
+private var _sFCircleBadgeCheckmark: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SF9AltCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SF9AltCircle: ImageVector
+    get() {
+        if (_sF9AltCircle != null) {
+            return _sF9AltCircle!!
+        }
+        _sF9AltCircle = sfIcon(
+            name = "Dualtone.SF9AltCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M8.47656 10.7129C8.47656 12.8125 10.0684 14.3359 12.2559 14.3359C13.1152 14.3359 14.0137 14.0332 14.4727 13.5645L14.6191 13.5742C14.4922 13.7891 14.3066 14.0527 14.0234 14.4141C13.3789 15.2246 12.5586 16.2402 11.6504 17.3633C11.4746 17.5684 11.377 17.7734 11.377 17.9883C11.377 18.3105 11.6504 18.623 12.0898 18.623C12.5195 18.623 12.6953 18.3691 13.0078 17.9688C13.6816 17.1387 14.7266 15.791 15.3418 14.9707C16.5137 13.3984 17.0703 12.1387 17.0703 10.8008C17.0703 8.41797 15.3125 6.78711 12.7734 6.78711C10.2344 6.78711 8.47656 8.4082 8.47656 10.7129ZM10.0098 10.6445C10.0098 9.22852 11.1816 8.17383 12.7637 8.17383C14.3359 8.17383 15.5371 9.23828 15.5371 10.6641C15.5371 12.0801 14.3652 13.0957 12.7832 13.0957C11.1816 13.0957 10.0098 12.0703 10.0098 10.6445Z", fillAlpha = 0.85f)
+        }
+        return _sF9AltCircle!!
+    }
+
+private var _sF9AltCircle: ImageVector? = null

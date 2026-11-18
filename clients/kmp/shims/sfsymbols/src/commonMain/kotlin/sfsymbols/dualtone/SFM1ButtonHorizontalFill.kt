@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFM1ButtonHorizontalFill (dualtone)
+ * Viewport: 29.6387 x 22.2949
+ */
+public val SfSymbols.Dualtone.SFM1ButtonHorizontalFill: ImageVector
+    get() {
+        if (_sFM1ButtonHorizontalFill != null) {
+            return _sFM1ButtonHorizontalFill!!
+        }
+        _sFM1ButtonHorizontalFill = sfIcon(
+            name = "Dualtone.SFM1ButtonHorizontalFill",
+            viewportWidth = 29.6387f,
+            viewportHeight = 22.2949f
+        ) {
+            addSfPath("M9.59961 22.2754L19.6777 22.2754C26.8164 22.2754 29.2773 19.6094 29.2773 13.0371L29.2773 9.23828C29.2773 2.66602 26.8164 0 19.6777 0L9.59961 0C2.46094 0 0 2.66602 0 9.23828L0 13.0371C0 19.6094 2.46094 22.2754 9.59961 22.2754Z", fillAlpha = 0.2125f)
+            addSfPath("M8.03711 16.543C7.58789 16.543 7.29492 16.2305 7.29492 15.752L7.29492 6.95312C7.29492 6.2207 7.74414 5.78125 8.4668 5.78125C9.0918 5.78125 9.48242 6.10352 9.63867 6.75781L11.5918 14.1895L11.6504 14.1895L13.5742 6.75781C13.7305 6.10352 14.1016 5.78125 14.7559 5.78125C15.4883 5.78125 15.9375 6.19141 15.9375 6.95312L15.9375 15.752C15.9375 16.2305 15.6738 16.543 15.1953 16.543C14.7266 16.543 14.4531 16.2402 14.4531 15.752L14.4531 8.37891L14.3848 8.37891L12.4707 15.5664C12.3535 16.0449 12.1094 16.3672 11.6211 16.3672C11.1523 16.3672 10.8789 16.0352 10.752 15.5762L8.85742 8.37891L8.7793 8.37891L8.7793 15.752C8.7793 16.2305 8.48633 16.543 8.03711 16.543ZM20.5664 16.4941C20.0977 16.4941 19.7266 16.123 19.7266 15.6543L19.7266 7.5293L18.4473 8.55469C18.3203 8.65234 18.2129 8.71094 18.0273 8.71094C17.6758 8.71094 17.4414 8.45703 17.4414 8.0957C17.4414 7.80273 17.5977 7.58789 17.8027 7.43164L19.3066 6.23047C19.5801 6.02539 19.9609 5.76172 20.4297 5.76172C21.0156 5.76172 21.377 6.11328 21.377 6.68945L21.377 15.6543C21.377 16.123 21.0059 16.4941 20.5664 16.4941Z", fillAlpha = 0.85f)
+        }
+        return _sFM1ButtonHorizontalFill!!
+    }
+
+private var _sFM1ButtonHorizontalFill: ImageVector? = null

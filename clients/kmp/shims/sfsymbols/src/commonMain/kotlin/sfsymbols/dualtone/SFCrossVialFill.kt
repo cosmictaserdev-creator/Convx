@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCrossVialFill (dualtone)
+ * Viewport: 17.3535 x 29.7168
+ */
+public val SfSymbols.Dualtone.SFCrossVialFill: ImageVector
+    get() {
+        if (_sFCrossVialFill != null) {
+            return _sFCrossVialFill!!
+        }
+        _sFCrossVialFill = sfIcon(
+            name = "Dualtone.SFCrossVialFill",
+            viewportWidth = 17.3535f,
+            viewportHeight = 29.7168f
+        ) {
+            addSfPath("M4.21875 5.56641L12.7734 5.56641C14.043 5.56641 14.8145 4.76562 14.8145 3.4668L14.8145 2.09961C14.8145 0.800781 14.043 0 12.7734 0L4.21875 0C2.94922 0 2.17773 0.800781 2.17773 2.09961L2.17773 3.4668C2.17773 4.76562 2.94922 5.56641 4.21875 5.56641ZM4.46289 7.82227L12.5293 7.82227L12.5293 4.93164L4.46289 4.93164ZM3.92578 29.6875L13.0664 29.6875C15.459 29.6875 16.9922 28.125 16.9922 25.6934L16.9922 11.3965C16.9922 8.95508 15.459 7.40234 13.0664 7.40234L3.92578 7.40234C1.5332 7.40234 0 8.95508 0 11.3965L0 25.6934C0 28.125 1.5332 29.6875 3.92578 29.6875Z", fillAlpha = 0.2125f)
+            addSfPath("M3.71094 19.4336L3.71094 17.6465C3.71094 17.0996 4.07227 16.7578 4.59961 16.7578L6.70898 16.7578L6.70898 14.6484C6.70898 14.1211 7.05078 13.7598 7.59766 13.7598L9.39453 13.7598C9.93164 13.7598 10.2832 14.1211 10.2832 14.6484L10.2832 16.7578L12.3926 16.7578C12.9102 16.7578 13.291 17.0996 13.291 17.6465L13.291 19.4336C13.291 19.9805 12.9102 20.3223 12.3926 20.3223L10.2832 20.3223L10.2832 22.4219C10.2832 22.959 9.93164 23.3203 9.39453 23.3203L7.59766 23.3203C7.05078 23.3203 6.70898 22.959 6.70898 22.4219L6.70898 20.3223L4.59961 20.3223C4.07227 20.3223 3.71094 19.9805 3.71094 19.4336Z", fillAlpha = 0.85f)
+        }
+        return _sFCrossVialFill!!
+    }
+
+private var _sFCrossVialFill: ImageVector? = null

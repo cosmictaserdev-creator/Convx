@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTengesignBankBuildingFill (dualtone)
+ * Viewport: 27.9395 x 26.5527
+ */
+public val SfSymbols.Dualtone.SFTengesignBankBuildingFill: ImageVector
+    get() {
+        if (_sFTengesignBankBuildingFill != null) {
+            return _sFTengesignBankBuildingFill!!
+        }
+        _sFTengesignBankBuildingFill = sfIcon(
+            name = "Dualtone.SFTengesignBankBuildingFill",
+            viewportWidth = 27.9395f,
+            viewportHeight = 26.5527f
+        ) {
+            addSfPath("M1.5332 25.3223L26.0449 25.3223L26.0449 23.9258C26.0449 23.5059 25.791 23.252 25.3613 23.252L24.5605 23.252L24.5605 8.33984L25.6934 8.33984C26.2891 8.33984 26.6211 7.91992 26.6211 7.48047C26.6211 7.1582 26.4453 6.875 26.0547 6.65039L15.2637 0.419922C14.7852 0.146484 14.2773 0 13.7891 0C13.3008 0 12.7832 0.146484 12.3145 0.419922L1.52344 6.65039C1.12305 6.875 0.957031 7.1582 0.957031 7.48047C0.957031 7.91992 1.28906 8.33984 1.88477 8.33984L3.02734 8.33984L3.02734 23.252L2.22656 23.252C1.78711 23.252 1.5332 23.5059 1.5332 23.9258ZM0.869141 26.5332L26.709 26.5332C27.1875 26.5332 27.5781 26.1426 27.5781 25.6738C27.5781 25.1953 27.1875 24.8047 26.709 24.8047L0.869141 24.8047C0.390625 24.8047 0 25.1953 0 25.6738C0 26.1426 0.390625 26.5332 0.869141 26.5332Z", fillAlpha = 0.2125f)
+            addSfPath("M13.8086 20.293C13.4277 20.293 13.1348 20 13.1348 19.5996L13.1348 11.9727L9.9707 11.9727C9.6582 11.9727 9.43359 11.7383 9.43359 11.4453C9.43359 11.1426 9.6582 10.918 9.9707 10.918L17.627 10.918C17.9395 10.918 18.1641 11.1426 18.1641 11.4453C18.1641 11.7383 17.9395 11.9727 17.627 11.9727L14.4727 11.9727L14.4727 19.5996C14.4727 20 14.1895 20.293 13.8086 20.293ZM9.39453 9.01367C9.39453 8.79883 9.58008 8.62305 9.79492 8.62305L17.7637 8.62305C17.9883 8.62305 18.1641 8.79883 18.1641 9.01367C18.1641 9.22852 17.9883 9.4043 17.7637 9.4043L9.79492 9.4043C9.58008 9.4043 9.39453 9.23828 9.39453 9.01367Z", fillAlpha = 0.85f)
+        }
+        return _sFTengesignBankBuildingFill!!
+    }
+
+private var _sFTengesignBankBuildingFill: ImageVector? = null

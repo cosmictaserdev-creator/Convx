@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTextBelowPhotoFill (dualtone)
+ * Viewport: 26.2402 x 31.9238
+ */
+public val SfSymbols.Dualtone.SFTextBelowPhotoFill: ImageVector
+    get() {
+        if (_sFTextBelowPhotoFill != null) {
+            return _sFTextBelowPhotoFill!!
+        }
+        _sFTextBelowPhotoFill = sfIcon(
+            name = "Dualtone.SFTextBelowPhotoFill",
+            viewportWidth = 26.2402f,
+            viewportHeight = 31.9238f
+        ) {
+            addSfPath("M0.820312 31.9238L16.6797 31.9238C17.1387 31.9238 17.5 31.5723 17.5 31.1133C17.5 30.6543 17.1387 30.293 16.6797 30.293L0.820312 30.293C0.351562 30.293 0 30.6543 0 31.1133C0 31.5723 0.351562 31.9238 0.820312 31.9238Z", fillAlpha = 0.85f)
+            addSfPath("M0.820312 26.0352L25.0586 26.0352C25.5176 26.0352 25.8789 25.6836 25.8789 25.2246C25.8789 24.7656 25.5176 24.4043 25.0586 24.4043L0.820312 24.4043C0.351562 24.4043 0 24.7656 0 25.2246C0 25.6836 0.351562 26.0352 0.820312 26.0352Z", fillAlpha = 0.85f)
+            addSfPath("M3.36914 20.1367L22.5098 20.1367C24.7461 20.1367 25.8789 19.0137 25.8789 16.8066L25.8789 3.36914C25.8789 1.16211 24.7461 0.0195312 22.5098 0.0195312L3.36914 0.0195312C1.14258 0.0195312 0 1.17188 0 3.36914L0 16.8066C0 19.0137 1.14258 20.1367 3.36914 20.1367ZM3.45703 18.5059C2.31445 18.5059 1.64062 17.832 1.64062 16.6895L1.64062 16.1816L5.07812 13.0762C5.57617 12.6367 6.11328 12.4121 6.5918 12.4121C7.13867 12.4121 7.69531 12.6465 8.18359 13.0957L10.2734 14.9902L15.5664 10.3223C16.123 9.83398 16.748 9.59961 17.373 9.59961C17.9785 9.59961 18.6426 9.84375 19.1699 10.332L24.2871 15.1465L24.2871 16.709C24.2871 17.832 23.6035 18.5059 22.4805 18.5059ZM8.06641 10.3125C6.58203 10.3125 5.37109 9.0918 5.37109 7.60742C5.37109 6.13281 6.58203 4.91211 8.06641 4.91211C9.54102 4.91211 10.752 6.13281 10.752 7.60742C10.752 9.0918 9.54102 10.3125 8.06641 10.3125Z", fillAlpha = 0.85f)
+        }
+        return _sFTextBelowPhotoFill!!
+    }
+
+private var _sFTextBelowPhotoFill: ImageVector? = null

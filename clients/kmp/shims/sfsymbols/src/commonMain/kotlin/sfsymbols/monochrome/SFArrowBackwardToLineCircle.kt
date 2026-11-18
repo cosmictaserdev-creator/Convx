@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowBackwardToLineCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFArrowBackwardToLineCircle: ImageVector
+    get() {
+        if (_sFArrowBackwardToLineCircle != null) {
+            return _sFArrowBackwardToLineCircle!!
+        }
+        _sFArrowBackwardToLineCircle = sfIcon(
+            name = "Monochrome.SFArrowBackwardToLineCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M7.37305 18.1543C7.79297 18.1543 8.0957 17.8613 8.0957 17.4316L8.0957 7.99805C8.0957 7.56836 7.79297 7.27539 7.37305 7.27539C6.94336 7.27539 6.64062 7.56836 6.64062 7.99805L6.64062 17.4316C6.64062 17.8613 6.94336 18.1543 7.37305 18.1543ZM20.4492 12.7246C20.4492 12.3047 20.1465 12.002 19.7266 12.002L13.6328 12.002L11.3184 12.1094L13.8379 9.81445L14.8242 8.85742C14.9805 8.70117 15.0488 8.50586 15.0488 8.30078C15.0488 7.88086 14.7266 7.59766 14.3262 7.59766C14.1309 7.59766 13.9355 7.66602 13.7793 7.83203L9.39453 12.1777C9.22852 12.334 9.14062 12.5293 9.14062 12.7246C9.14062 12.9199 9.21875 13.1152 9.39453 13.2715L13.75 17.5781C13.9062 17.7246 14.1309 17.832 14.3359 17.832C14.7461 17.832 15.0488 17.5488 15.0488 17.1191C15.0488 16.8945 14.9805 16.7188 14.8242 16.582L13.8184 15.625L11.3086 13.3398L13.6328 13.457L19.7266 13.457C20.1465 13.457 20.4492 13.1641 20.4492 12.7246Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowBackwardToLineCircle!!
+    }
+
+private var _sFArrowBackwardToLineCircle: ImageVector? = null

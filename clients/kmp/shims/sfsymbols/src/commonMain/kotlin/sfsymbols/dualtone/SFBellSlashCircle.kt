@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBellSlashCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFBellSlashCircle: ImageVector
+    get() {
+        if (_sFBellSlashCircle != null) {
+            return _sFBellSlashCircle!!
+        }
+        _sFBellSlashCircle = sfIcon(
+            name = "Dualtone.SFBellSlashCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7461 19.7363 25.4395 12.7148 25.4395C5.69336 25.4395 0 19.7461 0 12.7246C0 5.70312 5.69336 0 12.7148 0C19.7363 0 25.4395 5.70312 25.4395 12.7246ZM1.81641 12.7246C1.81641 18.75 6.68945 23.623 12.7148 23.623C18.7402 23.623 23.6133 18.75 23.6133 12.7246C23.6133 6.69922 18.7402 1.82617 12.7148 1.82617C6.68945 1.82617 1.81641 6.69922 1.81641 12.7246Z", fillAlpha = 0.425f)
+            addSfPath("M12.7148 20.1074C11.5625 20.1074 10.7422 19.3066 10.6348 18.2812L14.7949 18.2812C14.6973 19.3066 13.8672 20.1074 12.7148 20.1074ZM15.3613 17.2754L7.05078 17.2754C6.50391 17.2754 6.18164 16.9824 6.18164 16.543C6.18164 15.8398 6.875 15.2441 7.46094 14.6094C7.98828 14.0234 8.05664 12.8516 8.1543 11.8555C8.17718 11.2765 8.23385 10.7378 8.33204 10.2461ZM14.668 7.03125C16.4648 7.64648 17.1875 9.38477 17.2852 11.8555C17.373 12.8516 17.4219 14.0234 17.9688 14.6094C18.5742 15.2344 19.2578 15.8398 19.2578 16.543C19.2578 16.7718 19.1678 16.9609 19.0036 17.089L9.61707 7.69476C9.93877 7.40775 10.3211 7.18461 10.7715 7.03125C11.0156 6.10352 11.7285 5.40039 12.7148 5.40039C13.7012 5.40039 14.4141 6.10352 14.668 7.03125Z", fillAlpha = 0.85f)
+            addSfPath("M18.2812 18.9941C18.4766 19.1992 18.8086 19.1992 19.0137 18.9941C19.2188 18.7891 19.2188 18.4766 19.0137 18.2617L7.1875 6.43555C6.98242 6.23047 6.65039 6.23047 6.44531 6.43555C6.24023 6.64062 6.25 6.97266 6.44531 7.16797Z", fillAlpha = 0.85f)
+        }
+        return _sFBellSlashCircle!!
+    }
+
+private var _sFBellSlashCircle: ImageVector? = null

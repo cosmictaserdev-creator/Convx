@@ -1,0 +1,31 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFEllipsisCircleBadge (monochrome)
+ * Viewport: 33.5449 x 27.9785
+ */
+public val SfSymbols.Monochrome.SFEllipsisCircleBadge: ImageVector
+    get() {
+        if (_sFEllipsisCircleBadge != null) {
+            return _sFEllipsisCircleBadge!!
+        }
+        _sFEllipsisCircleBadge = sfIcon(
+            name = "Monochrome.SFEllipsisCircleBadge",
+            viewportWidth = 33.5449f,
+            viewportHeight = 27.9785f
+        ) {
+            addSfPath("M22.7668 2.86514C22.4492 3.38761 22.2176 3.96607 22.0866 4.58044C20.4788 3.62685 18.5993 3.08594 16.5918 3.08594C10.5664 3.08594 5.69336 7.95898 5.69336 13.9844C5.69336 20.0098 10.5664 24.8828 16.5918 24.8828C22.6172 24.8828 27.4902 20.0098 27.4902 13.9844C27.4902 13.1512 27.3971 12.3401 27.2121 11.5642C27.3902 11.5832 27.5711 11.5918 27.7539 11.5918C28.2026 11.5918 28.6405 11.5394 29.0597 11.435C29.2282 12.2586 29.3164 13.1113 29.3164 13.9844C29.3164 21.0059 23.6133 26.6992 16.5918 26.6992C9.57031 26.6992 3.87695 21.0059 3.87695 13.9844C3.87695 6.96289 9.57031 1.25977 16.5918 1.25977C18.833 1.25977 20.94 1.84084 22.7668 2.86514Z", fillAlpha = 0.85f)
+            addSfPath("M24.1602 13.9648C24.1602 14.9316 23.3789 15.7129 22.4219 15.7129C21.4551 15.7129 20.6738 14.9316 20.6738 13.9648C20.6738 13.0078 21.4551 12.2266 22.4219 12.2266C23.3789 12.2266 24.1602 13.0078 24.1602 13.9648Z", fillAlpha = 0.85f)
+            addSfPath("M18.3301 13.9648C18.3301 14.9316 17.5488 15.7129 16.582 15.7129C15.625 15.7129 14.8438 14.9316 14.8438 13.9648C14.8438 13.0078 15.625 12.2266 16.582 12.2266C17.5488 12.2266 18.3301 13.0078 18.3301 13.9648Z", fillAlpha = 0.85f)
+            addSfPath("M12.4902 13.9648C12.4902 14.9316 11.709 15.7129 10.752 15.7129C9.78516 15.7129 9.00391 14.9316 9.00391 13.9648C9.00391 13.0078 9.78516 12.2266 10.752 12.2266C11.6992 12.2266 12.4902 13.0078 12.4902 13.9648Z", fillAlpha = 0.85f)
+            addSfPath("M27.7539 10.0488C30.0684 10.0488 31.9824 8.13477 31.9824 5.81055C31.9824 3.48633 30.0684 1.57227 27.7539 1.57227C25.4199 1.57227 23.5156 3.48633 23.5156 5.81055C23.5156 8.13477 25.4199 10.0488 27.7539 10.0488Z", fillAlpha = 0.85f)
+        }
+        return _sFEllipsisCircleBadge!!
+    }
+
+private var _sFEllipsisCircleBadge: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureSeatedSideLeftAirDistributionMiddleAndLower (monochrome)
+ * Viewport: 33.0029 x 25.166
+ */
+public val SfSymbols.Monochrome.SFFigureSeatedSideLeftAirDistributionMiddleAndLower: ImageVector
+    get() {
+        if (_sFFigureSeatedSideLeftAirDistributionMiddleAndLower != null) {
+            return _sFFigureSeatedSideLeftAirDistributionMiddleAndLower!!
+        }
+        _sFFigureSeatedSideLeftAirDistributionMiddleAndLower = sfIcon(
+            name = "Monochrome.SFFigureSeatedSideLeftAirDistributionMiddleAndLower",
+            viewportWidth = 33.0029f,
+            viewportHeight = 25.166f
+        ) {
+            addSfPath("M24.8706 6.73828C26.726 6.73828 28.2104 5.19531 28.2104 3.39844C28.2104 1.52344 26.726 0 24.8706 0C22.9956 0 21.5014 1.52344 21.5014 3.39844C21.5014 5.26367 22.9956 6.73828 24.8706 6.73828ZM4.87057 24.4727C5.51511 25.1465 6.61862 25.0879 7.40964 24.2773L12.7514 18.7598C12.9272 18.5742 13.0542 18.5254 13.3276 18.6328L17.5659 20.2441C20.2319 21.2598 22.7221 20.3223 23.9331 18.125L26.5503 13.3594C27.5952 11.4453 27.2632 9.49219 25.4565 8.53516C23.6987 7.56836 21.8823 8.29102 20.8276 10.2344L17.351 16.582L14.3921 15.5078C12.9174 14.9707 11.6967 15.1367 10.5346 16.3477L4.98776 22.0898C4.21628 22.8809 4.28464 23.877 4.87057 24.4727Z", fillAlpha = 0.85f)
+            addSfPath("M12.1264 4.94141L12.1264 10.5371C12.1264 11.3086 12.937 11.6602 13.5132 11.1328L16.7065 8.34961C17.1167 7.98828 17.1167 7.49023 16.7065 7.12891L13.5132 4.3457C12.9565 3.84766 12.1264 4.13086 12.1264 4.94141ZM7.1655 8.53516L14.1382 8.53516C14.5874 8.53516 14.9487 8.18359 14.9487 7.72461C14.9487 7.29492 14.5874 6.94336 14.1382 6.94336L7.1655 6.94336C6.70651 6.94336 6.35495 7.29492 6.35495 7.72461C6.35495 8.18359 6.70651 8.53516 7.1655 8.53516ZM6.44284 14.4824L0.847137 14.4824C0.0756527 14.4824-0.27591 15.293 0.251434 15.8691L3.03464 19.0625C3.39597 19.4727 3.89401 19.4727 4.25534 19.0625L7.03854 15.8691C7.53659 15.3125 7.25339 14.4824 6.44284 14.4824ZM2.84909 9.7168L2.84909 16.4941C2.84909 16.9434 3.20065 17.2949 3.65964 17.2949C4.08932 17.2949 4.44089 16.9434 4.44089 16.4941L4.44089 9.7168C4.44089 9.26758 4.08932 8.90625 3.65964 8.90625C3.20065 8.90625 2.84909 9.26758 2.84909 9.7168Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureSeatedSideLeftAirDistributionMiddleAndLower!!
+    }
+
+private var _sFFigureSeatedSideLeftAirDistributionMiddleAndLower: ImageVector? = null

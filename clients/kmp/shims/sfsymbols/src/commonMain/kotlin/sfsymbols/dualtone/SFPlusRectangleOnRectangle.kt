@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPlusRectangleOnRectangle (dualtone)
+ * Viewport: 31.4258 x 25.0879
+ */
+public val SfSymbols.Dualtone.SFPlusRectangleOnRectangle: ImageVector
+    get() {
+        if (_sFPlusRectangleOnRectangle != null) {
+            return _sFPlusRectangleOnRectangle!!
+        }
+        _sFPlusRectangleOnRectangle = sfIcon(
+            name = "Dualtone.SFPlusRectangleOnRectangle",
+            viewportWidth = 31.4258f,
+            viewportHeight = 25.0879f
+        ) {
+            addSfPath("M25 3.75977L25 5.61523L23.2715 5.61523L23.2715 3.85742C23.2715 2.45117 22.5 1.72852 21.1621 1.72852L3.83789 1.72852C2.4707 1.72852 1.72852 2.45117 1.72852 3.85742L1.72852 15.6152C1.72852 17.0215 2.4707 17.7441 3.83789 17.7441L6.06445 17.7441L6.06445 19.4727L3.79883 19.4727C1.26953 19.4727 0 18.2129 0 15.7129L0 3.75977C0 1.26953 1.26953 0 3.79883 0L21.2012 0C23.7109 0 25 1.2793 25 3.75977Z", fillAlpha = 0.425f)
+            addSfPath("M9.86328 25.0879L27.2559 25.0879C29.7754 25.0879 31.0645 23.8086 31.0645 21.3281L31.0645 9.375C31.0645 6.89453 29.7754 5.61523 27.2559 5.61523L9.86328 5.61523C7.33398 5.61523 6.06445 6.88477 6.06445 9.375L6.06445 21.3281C6.06445 23.8281 7.33398 25.0879 9.86328 25.0879ZM9.89258 23.3594C8.53516 23.3594 7.79297 22.6367 7.79297 21.2402L7.79297 9.47266C7.79297 8.06641 8.53516 7.34375 9.89258 7.34375L27.2266 7.34375C28.5645 7.34375 29.3262 8.06641 29.3262 9.47266L29.3262 21.2402C29.3262 22.6367 28.5645 23.3594 27.2266 23.3594Z", fillAlpha = 0.85f)
+            addSfPath("M19.4727 20.1953L19.4727 10.4883C19.4727 9.94141 19.0918 9.57031 18.5547 9.57031C18.0371 9.57031 17.666 9.94141 17.666 10.4883L17.666 20.1953C17.666 20.7227 18.0371 21.1035 18.5547 21.1035C19.0918 21.1035 19.4727 20.7324 19.4727 20.1953ZM13.7207 16.2305L23.4277 16.2305C23.9551 16.2305 24.3359 15.8691 24.3359 15.3516C24.3359 14.8145 23.9648 14.4336 23.4277 14.4336L13.7207 14.4336C13.1738 14.4336 12.8027 14.8145 12.8027 15.3516C12.8027 15.8691 13.1738 16.2305 13.7207 16.2305Z", fillAlpha = 0.85f)
+        }
+        return _sFPlusRectangleOnRectangle!!
+    }
+
+private var _sFPlusRectangleOnRectangle: ImageVector? = null

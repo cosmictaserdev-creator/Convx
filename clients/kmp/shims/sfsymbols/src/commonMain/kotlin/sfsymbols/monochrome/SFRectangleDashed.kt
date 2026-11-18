@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRectangleDashed (monochrome)
+ * Viewport: 29.9512 x 22.9785
+ */
+public val SfSymbols.Monochrome.SFRectangleDashed: ImageVector
+    get() {
+        if (_sFRectangleDashed != null) {
+            return _sFRectangleDashed!!
+        }
+        _sFRectangleDashed = sfIcon(
+            name = "Monochrome.SFRectangleDashed",
+            viewportWidth = 29.9512f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M0 6.64062L1.72852 6.64062L1.72852 3.87695C1.72852 2.48047 2.4707 1.75781 3.83789 1.75781L6.58203 1.75781L6.58203 0.0292969L3.79883 0.0292969C1.2793 0.0292969 0 1.28906 0 3.78906ZM0 14.8047L1.72852 14.8047L1.72852 8.20312L0 8.20312ZM3.79883 22.9785L6.58203 22.9785L6.58203 21.25L3.83789 21.25C2.4707 21.25 1.72852 20.5273 1.72852 19.1309L1.72852 16.3672L0 16.3672L0 19.2188C0 21.7188 1.2793 22.9785 3.79883 22.9785ZM8.13477 22.9785L14.0137 22.9785L14.0137 21.25L8.13477 21.25ZM15.5762 22.9785L21.4453 22.9785L21.4453 21.25L15.5762 21.25ZM25.7812 22.9785C28.3008 22.9785 29.5898 21.7188 29.5898 19.2188L29.5898 16.3672L27.8516 16.3672L27.8516 19.1309C27.8516 20.5273 27.1094 21.25 25.752 21.25L23.0078 21.25L23.0078 22.9785ZM29.5898 6.64062L29.5898 3.78906C29.5898 1.28906 28.3008 0.0292969 25.7812 0.0292969L23.0078 0.0292969L23.0078 1.75781L25.752 1.75781C27.1094 1.75781 27.8516 2.48047 27.8516 3.87695L27.8516 6.64062ZM29.5898 14.8047L29.5898 8.20312L27.8516 8.20312L27.8516 14.8047ZM8.13477 1.75781L14.0137 1.75781L14.0137 0.0292969L8.13477 0.0292969ZM15.5762 1.75781L21.4453 1.75781L21.4453 0.0292969L15.5762 0.0292969Z", fillAlpha = 0.85f)
+        }
+        return _sFRectangleDashed!!
+    }
+
+private var _sFRectangleDashed: ImageVector? = null

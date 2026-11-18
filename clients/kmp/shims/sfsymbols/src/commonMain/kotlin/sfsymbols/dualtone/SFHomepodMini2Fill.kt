@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHomepodMini2Fill (dualtone)
+ * Viewport: 35.2539 x 30.3027
+ */
+public val SfSymbols.Dualtone.SFHomepodMini2Fill: ImageVector
+    get() {
+        if (_sFHomepodMini2Fill != null) {
+            return _sFHomepodMini2Fill!!
+        }
+        _sFHomepodMini2Fill = sfIcon(
+            name = "Dualtone.SFHomepodMini2Fill",
+            viewportWidth = 35.2539f,
+            viewportHeight = 30.3027f
+        ) {
+            addSfPath("M5.3418 4.05273C6.75781 5.35156 8.63281 6.08398 12.4414 6.08398C12.7396 6.08398 13.0255 6.07936 13.2959 6.0688C12.4152 6.66824 11.6355 7.39512 10.9082 8.24219C8.76953 10.5273 7.4707 13.7402 7.4707 17.207C7.4707 18.799 7.73392 20.3529 8.23706 21.8072C6.75948 21.4925 5.81291 20.932 4.88281 20.0586C2.57812 17.9395 1.19141 14.873 1.19141 11.5918C1.19141 8.75977 2.20703 6.20117 4.15039 4.20898C4.54102 3.75 4.96094 3.73047 5.3418 4.05273Z", fillAlpha = 0.425f)
+            addSfPath("M17.8711 3.11523C17.8711 4.00391 15.6641 4.62891 12.4414 4.62891C9.22852 4.62891 7.02148 4.00391 7.02148 3.11523C7.02148 2.23633 9.22852 1.61133 12.4414 1.61133C15.6641 1.61133 17.8711 2.23633 17.8711 3.11523Z", fillAlpha = 0.85f)
+            addSfPath("M21.3574 28.75C26.0449 28.75 27.8906 28.1348 29.6484 26.4941C32.1875 24.1699 33.6914 20.8105 33.6914 17.207C33.6914 14.1992 32.6562 11.3574 30.459 9.11133C30.0293 8.62305 29.5703 8.60352 29.1602 8.94531C27.6074 10.3711 25.3418 11.123 21.3574 11.123C17.373 11.123 15.1074 10.3711 13.5645 8.94531C13.1543 8.60352 12.6953 8.62305 12.2656 9.11133C10.0586 11.3574 9.02344 14.1992 9.02344 17.207C9.02344 20.8105 10.5273 24.1699 13.0664 26.4941C14.8242 28.1348 16.6797 28.75 21.3574 28.75Z", fillAlpha = 0.425f)
+            addSfPath("M21.3574 9.56055C24.9512 9.56055 27.373 8.86719 27.373 7.91016C27.373 6.93359 24.9512 6.25 21.3574 6.25C17.7637 6.25 15.3516 6.93359 15.3516 7.91016C15.3516 8.86719 17.7637 9.56055 21.3574 9.56055Z", fillAlpha = 0.85f)
+        }
+        return _sFHomepodMini2Fill!!
+    }
+
+private var _sFHomepodMini2Fill: ImageVector? = null

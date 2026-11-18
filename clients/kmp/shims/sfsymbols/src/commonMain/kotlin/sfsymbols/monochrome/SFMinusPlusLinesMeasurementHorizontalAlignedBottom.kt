@@ -1,0 +1,33 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMinusPlusLinesMeasurementHorizontalAlignedBottom (monochrome)
+ * Viewport: 25.2734 x 22.9785
+ */
+public val SfSymbols.Monochrome.SFMinusPlusLinesMeasurementHorizontalAlignedBottom: ImageVector
+    get() {
+        if (_sFMinusPlusLinesMeasurementHorizontalAlignedBottom != null) {
+            return _sFMinusPlusLinesMeasurementHorizontalAlignedBottom!!
+        }
+        _sFMinusPlusLinesMeasurementHorizontalAlignedBottom = sfIcon(
+            name = "Monochrome.SFMinusPlusLinesMeasurementHorizontalAlignedBottom",
+            viewportWidth = 25.2734f,
+            viewportHeight = 22.9785f
+        ) {
+            addSfPath("M24.0137 21.5039C24.5215 21.5039 24.9121 21.123 24.9121 20.6152L24.9121 9.56055C24.9121 9.0625 24.5215 8.66211 24.0137 8.66211C23.4863 8.66211 23.1055 9.0625 23.1055 9.56055L23.1055 20.6152C23.1055 21.123 23.4863 21.5039 24.0137 21.5039Z", fillAlpha = 0.85f)
+            addSfPath("M18.2422 21.5039C18.75 21.5039 19.1309 21.1133 19.1309 20.6055L19.1309 14.8047C19.1309 14.2871 18.75 13.8867 18.2422 13.8867C17.7246 13.8867 17.3242 14.2871 17.3242 14.8047L17.3242 20.6055C17.3242 21.1133 17.7246 21.5039 18.2422 21.5039Z", fillAlpha = 0.85f)
+            addSfPath("M12.4609 21.5039C12.9688 21.5039 13.3594 21.123 13.3594 20.6152L13.3594 9.56055C13.3594 9.0625 12.9688 8.66211 12.4609 8.66211C11.9336 8.66211 11.5527 9.0625 11.5527 9.56055L11.5527 20.6152C11.5527 21.123 11.9336 21.5039 12.4609 21.5039Z", fillAlpha = 0.85f)
+            addSfPath("M6.68945 21.5039C7.19727 21.5039 7.57812 21.1133 7.57812 20.6055L7.57812 14.8047C7.57812 14.2871 7.19727 13.8867 6.68945 13.8867C6.17188 13.8867 5.77148 14.2871 5.77148 14.8047L5.77148 20.6055C5.77148 21.1133 6.17188 21.5039 6.68945 21.5039Z", fillAlpha = 0.85f)
+            addSfPath("M0.908203 21.5039C1.41602 21.5039 1.80664 21.123 1.80664 20.6152L1.80664 9.56055C1.80664 9.0625 1.41602 8.66211 0.908203 8.66211C0.380859 8.66211 0 9.0625 0 9.56055L0 20.6152C0 21.123 0.380859 21.5039 0.908203 21.5039Z", fillAlpha = 0.85f)
+            addSfPath("M18.2422 7.37305C18.6816 7.37305 19.0332 7.02148 19.0332 6.57227L19.0332 4.48242L21.1328 4.48242C21.5723 4.48242 21.9238 4.13086 21.9238 3.69141C21.9238 3.24219 21.5723 2.89062 21.1328 2.89062L19.0332 2.89062L19.0332 0.791016C19.0332 0.351562 18.6816 0 18.2422 0C17.793 0 17.4414 0.351562 17.4414 0.791016L17.4414 2.89062L15.3418 2.89062C14.8926 2.89062 14.5508 3.24219 14.5508 3.69141C14.5508 4.13086 14.9023 4.48242 15.3418 4.48242L17.4414 4.48242L17.4414 6.57227C17.4414 7.02148 17.793 7.37305 18.2422 7.37305Z", fillAlpha = 0.85f)
+            addSfPath("M3.7793 4.48242L9.16992 4.48242C9.60938 4.48242 9.96094 4.13086 9.96094 3.69141C9.96094 3.24219 9.60938 2.89062 9.16992 2.89062L3.7793 2.89062C3.33984 2.89062 2.98828 3.24219 2.98828 3.69141C2.98828 4.13086 3.33984 4.48242 3.7793 4.48242Z", fillAlpha = 0.85f)
+        }
+        return _sFMinusPlusLinesMeasurementHorizontalAlignedBottom!!
+    }
+
+private var _sFMinusPlusLinesMeasurementHorizontalAlignedBottom: ImageVector? = null

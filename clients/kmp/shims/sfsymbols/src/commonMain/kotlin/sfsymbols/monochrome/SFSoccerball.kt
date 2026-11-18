@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSoccerball (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFSoccerball: ImageVector
+    get() {
+        if (_sFSoccerball != null) {
+            return _sFSoccerball!!
+        }
+        _sFSoccerball = sfIcon(
+            name = "Monochrome.SFSoccerball",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 7.67578L7.8125 11.4551L9.77539 17.5L15.6641 17.5L17.6172 11.4551ZM17.1387 1.88477L12.7051 0.488281L8.26172 1.88477L12.7051 5.46875ZM12.0996 0.9375L12.0996 9.12109L13.3398 9.12109L13.3398 0.9375ZM21.5137 5.06836L19.8633 10.5176L24.834 13.3008L23.9355 8.13477ZM24.2773 9.38477L23.8086 8.25195L16.2207 11.3184L16.6895 12.4609ZM15.6152 24.209L19.834 22.3926L22.7832 18.7402L16.9043 18.6621ZM20.166 21.8555L15.1367 15.4004L14.1406 16.1523L19.1895 22.5977ZM9.80469 24.1699L8.51562 18.623L2.63672 18.7012L5.5957 22.3535ZM5.25391 21.8164L6.24023 22.5586L11.2793 16.1133L10.2832 15.3613ZM3.91602 5.06836L1.50391 8.13477L0.605469 13.3008L5.57617 10.5176ZM1.15234 9.38477L8.74023 12.4609L9.20898 11.3184L1.62109 8.25195ZM12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.9551C6.51367 23.9551 1.48438 18.9258 1.48438 12.7246C1.48438 6.51367 6.51367 1.48438 12.7148 1.48438C18.9258 1.48438 23.9551 6.51367 23.9551 12.7246C23.9551 18.9258 18.9258 23.9551 12.7148 23.9551Z", fillAlpha = 0.85f)
+        }
+        return _sFSoccerball!!
+    }
+
+private var _sFSoccerball: ImageVector? = null

@@ -1,0 +1,31 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFContextualmenuAndPointerArrow (dualtone)
+ * Viewport: 32.4124 x 37.0808
+ */
+public val SfSymbols.Dualtone.SFContextualmenuAndPointerArrow: ImageVector
+    get() {
+        if (_sFContextualmenuAndPointerArrow != null) {
+            return _sFContextualmenuAndPointerArrow!!
+        }
+        _sFContextualmenuAndPointerArrow = sfIcon(
+            name = "Dualtone.SFContextualmenuAndPointerArrow",
+            viewportWidth = 32.4124f,
+            viewportHeight = 37.0808f
+        ) {
+            addSfPath("M26.504 10.8793L26.504 26.2308C26.504 28.7601 25.2443 30.0297 22.7443 30.0297L9.29701 30.0297C6.79701 30.0297 5.53725 28.7601 5.53725 26.2308L5.53725 16.7612C6.01437 17.1591 6.63076 17.3714 7.26576 17.3483L7.26576 26.2015C7.26576 27.559 7.98842 28.3012 9.39467 28.3012L22.6564 28.3012C24.0529 28.3012 24.7755 27.559 24.7755 26.2015L24.7755 10.9086C24.7755 9.55116 24.0529 8.80897 22.6466 8.80897L10.9065 8.80897C10.834 8.4682 10.6625 8.13508 10.381 7.84217L9.65325 7.08045L22.7443 7.08045C25.2443 7.08045 26.504 8.34998 26.504 10.8793Z", fillAlpha = 0.425f)
+            addSfPath("M21.2404 13.4672C21.2404 13.848 20.9474 14.1508 20.5568 14.1508L11.2794 14.1508C10.879 14.1508 10.5861 13.848 10.5861 13.4672C10.5861 13.0863 10.879 12.7933 11.2794 12.7933L20.5568 12.7933C20.9474 12.7933 21.2404 13.0863 21.2404 13.4672Z", fillAlpha = 0.425f)
+            addSfPath("M21.2404 18.5453C21.2404 18.9262 20.9474 19.2289 20.5568 19.2289L11.2794 19.2289C10.879 19.2289 10.5861 18.9262 10.5861 18.5453C10.5861 18.1742 10.879 17.8812 11.2794 17.8812L20.5568 17.8812C20.9474 17.8812 21.2404 18.1742 21.2404 18.5453Z", fillAlpha = 0.425f)
+            addSfPath("M21.2404 23.643C21.2404 24.014 20.9474 24.307 20.5568 24.307L11.2794 24.307C10.879 24.307 10.5861 24.014 10.5861 23.643C10.5861 23.2621 10.879 22.9594 11.2794 22.9594L20.5568 22.9594C20.9474 22.9594 21.2404 23.2621 21.2404 23.643Z", fillAlpha = 0.425f)
+            addSfPath("M7.57826 15.7133C8.08608 15.5082 8.33022 14.932 8.11537 14.4144L6.11342 9.75623L8.91616 9.69764C9.34584 9.67811 9.56069 9.24842 9.24819 8.92616L2.36342 1.70936C2.07045 1.40662 1.61147 1.58241 1.6017 2.01209L1.56264 12.0902C1.55287 12.5394 2.08022 12.6859 2.36342 12.393L4.31655 10.4301L6.25014 15.1859C6.45522 15.684 7.05092 15.9281 7.57826 15.7133Z", fillAlpha = 0.85f)
+        }
+        return _sFContextualmenuAndPointerArrow!!
+    }
+
+private var _sFContextualmenuAndPointerArrow: ImageVector? = null

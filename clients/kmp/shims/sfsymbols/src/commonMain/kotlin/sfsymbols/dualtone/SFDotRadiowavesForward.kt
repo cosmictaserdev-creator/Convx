@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFDotRadiowavesForward (dualtone)
+ * Viewport: 20.4688 x 24.2433
+ */
+public val SfSymbols.Dualtone.SFDotRadiowavesForward: ImageVector
+    get() {
+        if (_sFDotRadiowavesForward != null) {
+            return _sFDotRadiowavesForward!!
+        }
+        _sFDotRadiowavesForward = sfIcon(
+            name = "Dualtone.SFDotRadiowavesForward",
+            viewportWidth = 20.4688f,
+            viewportHeight = 24.2433f
+        ) {
+            addSfPath("M14.0723 23.9527C14.4043 24.3238 14.9805 24.3628 15.3906 23.9332C18.3691 20.8472 20.1074 16.7066 20.1074 12.1656C20.1074 7.61479 18.4082 3.42534 15.3906 0.388228C14.9805-0.0414593 14.4043 0.00736885 14.0723 0.368697C13.7402 0.739791 13.8086 1.26713 14.1992 1.67729C16.8848 4.3726 18.3594 8.08354 18.3594 12.1656C18.3594 16.2378 16.8457 19.8999 14.1992 22.6441C13.8086 23.0542 13.7402 23.5914 14.0723 23.9527Z", fillAlpha = 0.425f)
+            addSfPath("M10.4688 20.6324C10.8203 21.0328 11.416 21.0328 11.8262 20.5835C13.9062 18.357 15.1074 15.3882 15.1074 12.1656C15.1074 8.93315 13.9355 5.94487 11.8262 3.7476C11.416 3.29838 10.8105 3.29838 10.4688 3.69878C10.127 4.07963 10.2344 4.58745 10.625 5.01713C12.3926 6.88237 13.3594 9.4019 13.3594 12.1656C13.3594 14.9195 12.3633 17.4097 10.625 19.3042C10.2344 19.7339 10.127 20.2417 10.4688 20.6324Z", fillAlpha = 0.425f)
+            addSfPath("M6.98242 17.0777C7.33398 17.4781 7.97852 17.4878 8.35938 17.0093C9.47266 15.691 10.1074 13.9917 10.1074 12.1656C10.1074 10.3394 9.47266 8.63042 8.35938 7.32182C7.97852 6.83354 7.33398 6.84331 6.98242 7.25346C6.64062 7.63432 6.78711 8.11284 7.12891 8.57182C7.92969 9.53862 8.35938 10.7886 8.35938 12.1656C8.35938 13.5328 7.94922 14.8023 7.12891 15.7496C6.78711 16.1988 6.64062 16.6871 6.98242 17.0777Z", fillAlpha = 0.425f)
+            addSfPath("M0 12.146C0 13.3277 1.03516 14.3335 2.25586 14.3335C3.47656 14.3335 4.48242 13.3277 4.48242 12.1167C4.48242 10.8765 3.48633 9.87065 2.25586 9.87065C1.02539 9.87065 0 10.9156 0 12.146Z", fillAlpha = 0.85f)
+        }
+        return _sFDotRadiowavesForward!!
+    }
+
+private var _sFDotRadiowavesForward: ImageVector? = null

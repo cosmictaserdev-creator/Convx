@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFAirplaneUpRightAppFill (monochrome)
+ * Viewport: 23.2715 x 22.9004
+ */
+public val SfSymbols.Monochrome.SFAirplaneUpRightAppFill: ImageVector
+    get() {
+        if (_sFAirplaneUpRightAppFill != null) {
+            return _sFAirplaneUpRightAppFill!!
+        }
+        _sFAirplaneUpRightAppFill = sfIcon(
+            name = "Monochrome.SFAirplaneUpRightAppFill",
+            viewportWidth = 23.2715f,
+            viewportHeight = 22.9004f
+        ) {
+            addSfPath("M21.1523 1.74805C22.3145 2.90039 22.9102 4.60938 22.9102 6.81641L22.9102 16.084C22.9102 18.291 22.3047 20.0098 21.1523 21.1523C20.0293 22.2754 18.3105 22.9004 16.0938 22.9004L6.81641 22.9004C4.59961 22.9004 2.89062 22.2852 1.75781 21.1523C0.595703 20 0 18.291 0 16.084L0 6.81641C0 4.60938 0.605469 2.89062 1.75781 1.74805C2.88086 0.625 4.59961 0 6.81641 0L16.0938 0C18.3105 0 20.0195 0.605469 21.1523 1.74805ZM15.2637 5.64453L13.3008 7.61719C13.0664 7.85156 12.9492 7.89062 12.6367 7.88086L5.9082 7.58789C5.67383 7.57812 5.45898 7.65625 5.30273 7.8125L4.74609 8.36914C4.57031 8.54492 4.62891 8.80859 4.89258 8.91602L10.0781 10.8691L7.99805 13.457L5.60547 12.7637C5.38086 12.7051 5.19531 12.7539 5.01953 12.9395L4.80469 13.1543C4.63867 13.3203 4.63867 13.5352 4.80469 13.7012L9.29688 18.2031C9.46289 18.3691 9.67773 18.3594 9.84375 18.2031L10.0586 17.9785C10.2441 17.8027 10.293 17.6172 10.2344 17.3926L9.54102 15L12.1289 12.9297L14.082 18.1152C14.1895 18.3691 14.4531 18.4375 14.6289 18.252L15.1953 17.6953C15.3418 17.5488 15.4199 17.3242 15.4102 17.0898L15.1172 10.3613C15.1074 10.0488 15.1465 9.94141 15.3906 9.69727L17.3535 7.73438C18.3203 6.76758 18.6621 5.52734 18.0664 4.93164C17.4707 4.3457 16.2402 4.67773 15.2637 5.64453Z", fillAlpha = 0.85f)
+        }
+        return _sFAirplaneUpRightAppFill!!
+    }
+
+private var _sFAirplaneUpRightAppFill: ImageVector? = null

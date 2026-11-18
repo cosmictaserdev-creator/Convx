@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSuitcaseRollingCircle (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFSuitcaseRollingCircle: ImageVector
+    get() {
+        if (_sFSuitcaseRollingCircle != null) {
+            return _sFSuitcaseRollingCircle!!
+        }
+        _sFSuitcaseRollingCircle = sfIcon(
+            name = "Dualtone.SFSuitcaseRollingCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.425f)
+            addSfPath("M7.93945 16.3672L17.5 16.3672L17.5 9.38477C17.5 8.39844 16.8164 7.70508 15.8398 7.70508L15.4395 7.70508L15.4395 5.83008C15.4395 4.88281 14.873 4.31641 13.916 4.31641L11.5332 4.31641C10.5762 4.31641 10.0098 4.88281 10.0098 5.83008L10.0098 7.70508L9.60938 7.70508C8.62305 7.70508 7.93945 8.39844 7.93945 9.38477ZM11.0938 7.70508L11.0938 5.9375C11.0938 5.60547 11.2891 5.40039 11.6309 5.40039L13.7988 5.40039C14.1504 5.40039 14.3555 5.60547 14.3555 5.9375L14.3555 7.70508ZM7.93945 17.3242L7.93945 18.0469C7.93945 18.9062 8.42773 19.5605 9.20898 19.6875L9.45312 19.7168L9.45312 20.127C9.45312 20.4395 9.64844 20.6348 9.96094 20.6348L10.3223 20.6348C10.6348 20.6348 10.8398 20.4395 10.8398 20.127L10.8398 19.7461L14.5996 19.7461L14.5996 20.127C14.5996 20.4395 14.8047 20.6348 15.1172 20.6348L15.4785 20.6348C15.7812 20.6348 15.9863 20.4395 15.9863 20.127L15.9863 19.7168L16.2305 19.6875C17.0117 19.5605 17.5 18.9062 17.5 18.0469L17.5 17.3242Z", fillAlpha = 0.85f)
+        }
+        return _sFSuitcaseRollingCircle!!
+    }
+
+private var _sFSuitcaseRollingCircle: ImageVector? = null

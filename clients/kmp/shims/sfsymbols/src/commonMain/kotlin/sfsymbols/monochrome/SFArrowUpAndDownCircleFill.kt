@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowUpAndDownCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFArrowUpAndDownCircleFill: ImageVector
+    get() {
+        if (_sFArrowUpAndDownCircleFill != null) {
+            return _sFArrowUpAndDownCircleFill!!
+        }
+        _sFArrowUpAndDownCircleFill = sfIcon(
+            name = "Monochrome.SFArrowUpAndDownCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7266 19.7266 25.4395 12.7148 25.4395C5.71289 25.4395 0 19.7266 0 12.7246C0 5.71289 5.71289 0 12.7148 0C19.7266 0 25.4395 5.71289 25.4395 12.7246ZM12.0898 5.21484L8.32031 8.98438C8.17383 9.11133 8.07617 9.32617 8.07617 9.57031C8.07617 10.0195 8.4375 10.3613 8.89648 10.3613C9.14062 10.3613 9.33594 10.2734 9.49219 10.1172L10.5957 8.99414L11.9725 7.37214L11.8945 9.93164L11.8945 15.5078L11.9727 18.0738L10.5957 16.4453L9.49219 15.332C9.33594 15.166 9.14062 15.0781 8.89648 15.0781C8.4375 15.0781 8.07617 15.4199 8.07617 15.8789C8.07617 16.1133 8.17383 16.3281 8.32031 16.4648L12.0898 20.2246C12.2754 20.4297 12.4902 20.5371 12.7344 20.5371C12.9785 20.5371 13.1934 20.4297 13.3887 20.2246L17.1484 16.4648C17.3047 16.3184 17.3926 16.1133 17.3926 15.8789C17.3926 15.4199 17.041 15.0781 16.582 15.0781C16.3281 15.0781 16.1328 15.166 15.9766 15.332L14.873 16.4453L13.496 18.0738L13.5742 15.5078L13.5742 9.93164L13.4962 7.37214L14.873 8.99414L15.9766 10.1172C16.1328 10.2734 16.3281 10.3613 16.582 10.3613C17.041 10.3613 17.3926 10.0195 17.3926 9.57031C17.3926 9.32617 17.3047 9.12109 17.1484 8.98438L13.3887 5.21484C13.1934 5.01953 12.9785 4.90234 12.7344 4.90234C12.4902 4.90234 12.2754 5.01953 12.0898 5.21484Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowUpAndDownCircleFill!!
+    }
+
+private var _sFArrowUpAndDownCircleFill: ImageVector? = null

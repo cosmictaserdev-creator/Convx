@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFGlobeDeskFill (dualtone)
+ * Viewport: 24.5605 x 27.998
+ */
+public val SfSymbols.Dualtone.SFGlobeDeskFill: ImageVector
+    get() {
+        if (_sFGlobeDeskFill != null) {
+            return _sFGlobeDeskFill!!
+        }
+        _sFGlobeDeskFill = sfIcon(
+            name = "Dualtone.SFGlobeDeskFill",
+            viewportWidth = 24.5605f,
+            viewportHeight = 27.998f
+        ) {
+            addSfPath("M6.19141 5.46875L7.41211 4.23828L3.44727 0.273438C3.10547-0.0585938 2.55859-0.0585938 2.22656 0.273438C1.88477 0.615234 1.88477 1.17188 2.22656 1.50391ZM22.1582 20.1953L20.9668 18.9746C18.9355 21.0254 16.123 22.2559 12.9688 22.2559C6.67969 22.2559 1.72852 17.3145 1.72852 11.0254C1.72852 7.88086 2.97852 5.05859 4.99023 3.04688L3.75 1.86523C1.42578 4.19922 0 7.43164 0 11.0254C0 18.2324 5.75195 23.9844 12.9688 23.9844C16.582 23.9844 19.8145 22.5488 22.1582 20.1953ZM19.6582 16.4844L18.3691 17.6562L22.7246 22.0117C23.0664 22.3438 23.6133 22.3438 23.9453 22.0117C24.2871 21.6699 24.2871 21.123 23.9453 20.7812ZM12.0996 23.5449L12.0996 26.8652L13.8281 26.8652L13.8281 23.5449ZM8.62305 27.998L17.3633 27.998C17.8418 27.998 18.2324 27.6074 18.2324 27.1387C18.2324 26.6602 17.8418 26.2695 17.3633 26.2695L8.62305 26.2695C8.14453 26.2695 7.75391 26.6602 7.75391 27.1387C7.75391 27.6074 8.14453 27.998 8.62305 27.998ZM12.9688 20.2637C18.0762 20.2637 22.2168 16.1328 22.2168 11.0254C22.2168 5.9082 18.0762 1.77734 12.9688 1.77734C7.86133 1.77734 3.7207 5.9082 3.7207 11.0254C3.7207 16.1328 7.86133 20.2637 12.9688 20.2637Z", fillAlpha = 0.85f)
+        }
+        return _sFGlobeDeskFill!!
+    }
+
+private var _sFGlobeDeskFill: ImageVector? = null

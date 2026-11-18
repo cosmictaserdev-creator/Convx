@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFWindowCeilingClosed (dualtone)
+ * Viewport: 27.444 x 24.4629
+ */
+public val SfSymbols.Dualtone.SFWindowCeilingClosed: ImageVector
+    get() {
+        if (_sFWindowCeilingClosed != null) {
+            return _sFWindowCeilingClosed!!
+        }
+        _sFWindowCeilingClosed = sfIcon(
+            name = "Dualtone.SFWindowCeilingClosed",
+            viewportWidth = 27.444f,
+            viewportHeight = 24.4629f
+        ) {
+            addSfPath("M1.84702 21.8555L4.36655 12.959L12.4427 12.959L9.66929 22.7246L2.54038 22.7246C1.94468 22.7246 1.69077 22.4121 1.84702 21.8555ZM4.84507 11.25L7.25718 2.69531C7.43296 2.08984 7.78452 1.75781 8.38023 1.75781L15.597 1.75781L12.9115 11.25ZM11.4466 22.7246L14.2103 12.959L22.306 12.959L19.8158 21.7871C19.6498 22.3828 19.2982 22.7246 18.7025 22.7246ZM14.6791 11.25L17.3841 1.75781L24.5326 1.75781C25.1283 1.75781 25.3919 2.06055 25.2259 2.62695L22.7845 11.25Z", fillAlpha = 0.2125f)
+            addSfPath("M2.25718 24.4629L19.0443 24.4629C20.2552 24.4629 21.0365 23.7891 21.3587 22.666L26.9447 2.80273C27.4232 1.11328 26.5834 0.0195312 24.8255 0.0195312L8.03843 0.0195312C6.82749 0.0195312 6.04624 0.693359 5.72398 1.81641L0.128272 21.6699C-0.340478 23.3594 0.499366 24.4629 2.25718 24.4629ZM1.84702 21.8555L4.36655 12.959L12.4427 12.959L9.66929 22.7246L2.54038 22.7246C1.94468 22.7246 1.69077 22.4121 1.84702 21.8555ZM4.84507 11.25L7.25718 2.69531C7.43296 2.08984 7.78452 1.75781 8.38023 1.75781L15.597 1.75781L12.9115 11.25ZM11.4466 22.7246L14.2103 12.959L22.306 12.959L19.8158 21.7871C19.6498 22.3828 19.2982 22.7246 18.7025 22.7246ZM14.6791 11.25L17.3841 1.75781L24.5326 1.75781C25.1283 1.75781 25.3919 2.06055 25.2259 2.62695L22.7845 11.25Z", fillAlpha = 0.85f)
+        }
+        return _sFWindowCeilingClosed!!
+    }
+
+private var _sFWindowCeilingClosed: ImageVector? = null

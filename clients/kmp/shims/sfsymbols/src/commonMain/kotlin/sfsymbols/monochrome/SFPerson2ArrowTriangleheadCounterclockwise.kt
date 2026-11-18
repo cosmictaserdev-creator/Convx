@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPerson2ArrowTriangleheadCounterclockwise (monochrome)
+ * Viewport: 25.8008 x 30.311
+ */
+public val SfSymbols.Monochrome.SFPerson2ArrowTriangleheadCounterclockwise: ImageVector
+    get() {
+        if (_sFPerson2ArrowTriangleheadCounterclockwise != null) {
+            return _sFPerson2ArrowTriangleheadCounterclockwise!!
+        }
+        _sFPerson2ArrowTriangleheadCounterclockwise = sfIcon(
+            name = "Monochrome.SFPerson2ArrowTriangleheadCounterclockwise",
+            viewportWidth = 25.8008f,
+            viewportHeight = 30.311f
+        ) {
+            addSfPath("M15.0781 0.795162L15.0781 2.65756C20.9836 3.76674 25.4395 8.93897 25.4395 15.1506C25.4395 22.1721 19.7363 27.8655 12.7148 27.8655C5.69336 27.8655 0 22.1721 0 15.1506C0 10.7854 2.1875 6.98657 5.51758 4.69165C5.99609 4.34008 6.61133 4.46704 6.86523 4.89672C7.13867 5.34594 7.00195 5.85376 6.5625 6.18579C3.71094 8.11938 1.81641 11.4104 1.81641 15.1506C1.81641 21.176 6.68945 26.0491 12.7148 26.0491C18.7402 26.0491 23.6133 21.176 23.6133 15.1506C23.6133 9.93789 19.9661 5.58762 15.0781 4.51572L15.0781 6.48852C15.0781 7.27954 14.5312 7.49438 13.9062 7.05493L9.95117 4.28149C9.42383 3.92016 9.41406 3.38305 9.95117 3.00219L13.8965 0.228756C14.5312-0.220463 15.0781 0.00414614 15.0781 0.795162Z", fillAlpha = 0.85f)
+            addSfPath("M11.6318 16.4377C10.6115 17.3277 10.0391 18.4598 10.0391 19.467C10.0391 19.7304 10.0921 20.0177 10.2382 20.2776L5.45898 20.2776C4.73633 20.2776 4.44336 19.9748 4.44336 19.428C4.44336 17.3088 6.63086 15.6682 8.95508 15.6682C9.92083 15.6682 10.863 15.9515 11.6318 16.4377ZM11.0938 12.3381C11.0938 13.6858 10.127 14.7209 8.95508 14.7209C7.80273 14.7209 6.82617 13.6858 6.82617 12.3479C6.82617 11.0588 7.8125 10.0432 8.95508 10.0432C10.1172 10.0432 11.0938 11.0393 11.0938 12.3381Z", fillAlpha = 0.85f)
+            addSfPath("M12.1191 20.2776L20.0293 20.2776C20.918 20.2776 21.2598 20.0139 21.2598 19.467C21.2598 17.885 19.2676 15.6877 16.084 15.6877C12.8809 15.6877 10.8789 17.885 10.8789 19.467C10.8789 20.0139 11.2305 20.2776 12.1191 20.2776ZM16.084 14.594C17.4219 14.594 18.5254 13.3928 18.5254 11.8498C18.5254 10.3557 17.4121 9.21313 16.084 9.21313C14.7559 9.21313 13.6328 10.385 13.6328 11.8596C13.6328 13.3928 14.7461 14.594 16.084 14.594Z", fillAlpha = 0.85f)
+        }
+        return _sFPerson2ArrowTriangleheadCounterclockwise!!
+    }
+
+private var _sFPerson2ArrowTriangleheadCounterclockwise: ImageVector? = null

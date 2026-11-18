@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBookCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFBookCircleFill: ImageVector
+    get() {
+        if (_sFBookCircleFill != null) {
+            return _sFBookCircleFill!!
+        }
+        _sFBookCircleFill = sfIcon(
+            name = "Dualtone.SFBookCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.459C19.7266 25.459 25.4395 19.7461 25.4395 12.7344C25.4395 5.73242 19.7266 0.0195312 12.7148 0.0195312C5.71289 0.0195312 0 5.73242 0 12.7344C0 19.7461 5.71289 25.459 12.7148 25.459Z", fillAlpha = 0.2125f)
+            addSfPath("M9.21875 7.1875C10.4492 7.1875 11.5527 7.68555 12.207 8.53516C12.3145 8.68164 12.3145 8.7207 12.3145 8.87695L12.3145 17.9102C12.3145 18.0469 12.2266 18.1445 12.0898 18.1445C12.0117 18.1445 11.9531 18.1152 11.8848 18.0566C11.1621 17.4512 10.293 17.1387 9.375 17.1387C8.27148 17.1387 7.24609 17.5098 6.51367 18.1641C6.39648 18.2617 6.2793 18.3008 6.13281 18.3008C5.88867 18.3008 5.72266 18.1445 5.72266 17.9102L5.72266 9.25781C5.72266 9.04297 5.73242 8.98438 5.80078 8.85742C6.42578 7.79297 7.86133 7.1875 9.21875 7.1875ZM16.2305 7.1875C17.5781 7.1875 19.0137 7.79297 19.6484 8.85742C19.7168 8.97461 19.7266 9.04297 19.7266 9.25781L19.7266 17.9102C19.7266 18.1445 19.5605 18.3008 19.3066 18.3008C19.1602 18.3008 19.043 18.2617 18.9355 18.1641C18.2129 17.5098 17.1875 17.1387 16.0645 17.1387C15.166 17.1387 14.2871 17.4512 13.5645 18.0566C13.4961 18.1152 13.4375 18.1445 13.3594 18.1445C13.2227 18.1445 13.125 18.0469 13.125 17.9102L13.125 8.87695C13.125 8.7207 13.1348 8.68164 13.2422 8.53516C13.8965 7.68555 15 7.1875 16.2305 7.1875Z", fillAlpha = 0.85f)
+        }
+        return _sFBookCircleFill!!
+    }
+
+private var _sFBookCircleFill: ImageVector? = null

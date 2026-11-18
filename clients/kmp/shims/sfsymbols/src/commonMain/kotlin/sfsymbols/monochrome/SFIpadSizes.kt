@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIpadSizes (monochrome)
+ * Viewport: 28.6133 x 30.7129
+ */
+public val SfSymbols.Monochrome.SFIpadSizes: ImageVector
+    get() {
+        if (_sFIpadSizes != null) {
+            return _sFIpadSizes!!
+        }
+        _sFIpadSizes = sfIcon(
+            name = "Monochrome.SFIpadSizes",
+            viewportWidth = 28.6133f,
+            viewportHeight = 30.7129f
+        ) {
+            addSfPath("M22.7612 3.91602L20.8637 3.91602C20.5659 3.37685 19.9915 3.08594 19.1895 3.08594L5.76172 3.08594C4.54102 3.08594 3.84766 3.75977 3.84766 4.95117L3.84766 25.7617C3.84766 26.9434 4.54102 27.6172 5.76172 27.6172L8.39151 27.6172C8.55789 28.2943 8.87413 28.8822 9.31222 29.3555L5.54688 29.3555C3.45703 29.3555 2.10938 28.0566 2.10938 26.0352L2.10938 4.67773C2.10938 2.65625 3.45703 1.35742 5.54688 1.35742L19.3945 1.35742C21.208 1.35742 22.4626 2.33546 22.7612 3.91602Z", fillAlpha = 0.85f)
+            addSfPath("M9.59961 26.416C9.59961 28.2031 10.791 29.3555 12.627 29.3555L24.2188 29.3555C26.0645 29.3555 27.2559 28.2031 27.2559 26.416L27.2559 8.21289C27.2559 6.42578 26.0645 5.27344 24.2188 5.27344L12.627 5.27344C10.791 5.27344 9.59961 6.42578 9.59961 8.21289ZM11.3379 26.0059L11.3379 8.62305C11.3379 7.61719 11.9434 7.00195 12.9883 7.00195L23.8672 7.00195C24.9023 7.00195 25.5176 7.61719 25.5176 8.62305L25.5176 26.0059C25.5176 27.0117 24.9023 27.6172 23.8672 27.6172L12.9883 27.6172C11.9434 27.6172 11.3379 27.0117 11.3379 26.0059Z", fillAlpha = 0.85f)
+        }
+        return _sFIpadSizes!!
+    }
+
+private var _sFIpadSizes: ImageVector? = null

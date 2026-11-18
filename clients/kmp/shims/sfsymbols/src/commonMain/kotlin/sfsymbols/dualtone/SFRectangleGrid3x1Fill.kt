@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFRectangleGrid3x1Fill (dualtone)
+ * Viewport: 25.0488 x 24.0527
+ */
+public val SfSymbols.Dualtone.SFRectangleGrid3x1Fill: ImageVector
+    get() {
+        if (_sFRectangleGrid3x1Fill != null) {
+            return _sFRectangleGrid3x1Fill!!
+        }
+        _sFRectangleGrid3x1Fill = sfIcon(
+            name = "Dualtone.SFRectangleGrid3x1Fill",
+            viewportWidth = 25.0488f,
+            viewportHeight = 24.0527f
+        ) {
+            addSfPath("M2.07031 24.0332L4.98047 24.0332C6.28906 24.0332 7.04102 23.291 7.04102 21.9238L7.04102 19.0918C7.04102 17.7246 6.28906 16.9824 4.98047 16.9824L2.07031 16.9824C0.761719 16.9824 0 17.7246 0 19.0918L0 21.9238C0 23.291 0.761719 24.0332 2.07031 24.0332ZM10.8789 24.0332L13.7988 24.0332C15.1074 24.0332 15.8594 23.291 15.8594 21.9238L15.8594 19.0918C15.8594 17.7246 15.1074 16.9824 13.7988 16.9824L10.8789 16.9824C9.57031 16.9824 8.81836 17.7246 8.81836 19.0918L8.81836 21.9238C8.81836 23.291 9.57031 24.0332 10.8789 24.0332ZM19.707 24.0332L22.6172 24.0332C23.9258 24.0332 24.6875 23.291 24.6875 21.9238L24.6875 19.0918C24.6875 17.7246 23.9258 16.9824 22.6172 16.9824L19.707 16.9824C18.3984 16.9824 17.6367 17.7246 17.6367 19.0918L17.6367 21.9238C17.6367 23.291 18.3984 24.0332 19.707 24.0332Z", fillAlpha = 0.85f)
+            addSfPath("M3.79883 15.5371L20.8789 15.5371C23.4082 15.5371 24.6875 14.2578 24.6875 11.7676L24.6875 3.76953C24.6875 1.2793 23.4082 0 20.8789 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 11.7676C0 14.2676 1.2793 15.5371 3.79883 15.5371Z", fillAlpha = 0.85f)
+        }
+        return _sFRectangleGrid3x1Fill!!
+    }
+
+private var _sFRectangleGrid3x1Fill: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowRightSquare (dualtone)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Dualtone.SFArrowRightSquare: ImageVector
+    get() {
+        if (_sFArrowRightSquare != null) {
+            return _sFArrowRightSquare!!
+        }
+        _sFArrowRightSquare = sfIcon(
+            name = "Dualtone.SFArrowRightSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.425f)
+            addSfPath("M6.05469 12.3145L13.9746 12.3145L15.9668 12.2461C16.3867 12.2266 16.7383 11.8848 16.7383 11.4648C16.7383 11.0352 16.3867 10.7031 15.9668 10.6836L13.9746 10.6152L6.05469 10.6055C5.5957 10.6055 5.21484 10.9961 5.21484 11.4648C5.21484 11.9238 5.5957 12.3145 6.05469 12.3145ZM12.9102 16.5234C13.1348 16.5234 13.3105 16.4355 13.4766 16.2695L17.5391 12.0801C17.7539 11.8652 17.8223 11.6797 17.8223 11.4648C17.8223 11.2402 17.7539 11.0547 17.5391 10.8398L13.4766 6.66016C13.3105 6.49414 13.1348 6.40625 12.9102 6.40625C12.4707 6.40625 12.1484 6.74805 12.1484 7.1875C12.1484 7.40234 12.2363 7.62695 12.4121 7.77344L14.5898 9.85352L16.2793 11.4648L16.2793 11.4648L14.5898 13.0762L12.4121 15.1562C12.2363 15.3027 12.1484 15.5371 12.1484 15.752C12.1484 16.1914 12.4707 16.5234 12.9102 16.5234Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowRightSquare!!
+    }
+
+private var _sFArrowRightSquare: ImageVector? = null

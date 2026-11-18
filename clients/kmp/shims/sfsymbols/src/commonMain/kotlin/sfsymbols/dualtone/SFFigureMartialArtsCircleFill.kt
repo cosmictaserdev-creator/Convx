@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFigureMartialArtsCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFFigureMartialArtsCircleFill: ImageVector
+    get() {
+        if (_sFFigureMartialArtsCircleFill != null) {
+            return _sFFigureMartialArtsCircleFill!!
+        }
+        _sFFigureMartialArtsCircleFill = sfIcon(
+            name = "Dualtone.SFFigureMartialArtsCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7266 25.4395 25.4395 19.7266 25.4395 12.7246C25.4395 5.71289 19.7266 0 12.7148 0C5.71289 0 0 5.71289 0 12.7246C0 19.7266 5.71289 25.4395 12.7148 25.4395Z", fillAlpha = 0.2125f)
+            addSfPath("M12.6562 7.02148C11.7871 7.02148 11.0938 6.30859 11.0938 5.44922C11.0938 4.60938 11.7871 3.89648 12.6562 3.89648C13.5059 3.89648 14.209 4.60938 14.209 5.44922C14.209 6.30859 13.5059 7.02148 12.6562 7.02148ZM15.918 20.9082C15.5176 20.9082 15.1855 20.5762 15.1855 20.166L15.1855 16.6016L11.7871 14.7754C11.1914 14.4629 10.8203 13.8379 10.8203 13.1738L10.8203 12.1582L8.73047 12.1582C8.125 12.1582 7.76367 11.3574 8.22266 10.8008L10.127 8.47656C10.4688 8.04688 10.8496 7.80273 11.5234 7.80273L19.5605 7.80273C19.9707 7.80273 20.2832 8.13477 20.2832 8.52539C20.2832 8.91602 19.9707 9.24805 19.5605 9.24805L13.9062 9.24805C13.8086 9.24805 13.7305 9.32617 13.7305 9.43359L13.7305 13.8379L16.3281 15.5566C16.5527 15.7031 16.6504 15.957 16.6504 16.1328L16.6504 20.166C16.6504 20.5762 16.3281 20.9082 15.918 20.9082ZM10.0879 10.7617L10.8691 10.7617L10.8691 9.78516ZM7.73438 20.6543C7.46094 20.3613 7.5 19.8828 7.79297 19.6191L10.5469 17.2168L11.1523 15.0684C11.1914 15.1074 11.3184 15.1953 11.5039 15.293L12.666 15.9277L11.8652 17.8906C11.8164 18.0371 11.7676 18.0957 11.6211 18.2227L8.76953 20.7031C8.45703 20.9863 8.00781 20.957 7.73438 20.6543Z", fillAlpha = 0.85f)
+        }
+        return _sFFigureMartialArtsCircleFill!!
+    }
+
+private var _sFFigureMartialArtsCircleFill: ImageVector? = null

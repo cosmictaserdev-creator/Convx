@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHomepod2Fill (monochrome)
+ * Viewport: 32.2852 x 32.1973
+ */
+public val SfSymbols.Monochrome.SFHomepod2Fill: ImageVector
+    get() {
+        if (_sFHomepod2Fill != null) {
+            return _sFHomepod2Fill!!
+        }
+        _sFHomepod2Fill = sfIcon(
+            name = "Monochrome.SFHomepod2Fill",
+            viewportWidth = 32.2852f,
+            viewportHeight = 32.1973f
+        ) {
+            addSfPath("M3.58398 4.15039C4.64844 5.12695 7.35352 5.89844 10.2637 5.89844C10.9275 5.89844 11.5832 5.8568 12.2112 5.78012C11.7873 6.13512 11.4052 6.53029 11.0645 6.96289C9.80469 8.54492 9.16992 10.5469 9.16992 13.0957L9.16992 22.6855C9.16992 23.3819 9.21467 24.038 9.31335 24.6463C3.73361 24.4302 1.19141 22.2157 1.19141 17.4414L1.19141 8.75C1.19141 6.55273 1.80664 5.11719 2.58789 4.19922C2.86133 3.88672 3.27148 3.85742 3.58398 4.15039Z", fillAlpha = 0.85f)
+            addSfPath("M15.6152 2.98828C15.6152 3.86719 13.3594 4.50195 10.2539 4.50195C7.1582 4.50195 4.89258 3.86719 4.89258 2.98828C4.89258 2.08984 7.1582 1.46484 10.2539 1.46484C13.3594 1.46484 15.6152 2.08984 15.6152 2.98828Z", fillAlpha = 0.85f)
+            addSfPath("M20.7227 30.6348C27.6074 30.6348 30.7227 28.2227 30.7227 22.6855L30.7227 13.0957C30.7227 10.6738 30.0391 9.10156 29.1895 8.07617C28.8965 7.72461 28.4473 7.71484 28.1055 8.01758C26.9531 9.14062 23.9355 9.96094 20.7227 9.96094C17.5098 9.96094 14.4922 9.14062 13.3496 8.01758C13.0078 7.71484 12.5488 7.72461 12.2559 8.07617C11.4062 9.10156 10.7227 10.6738 10.7227 13.0957L10.7227 22.6855C10.7227 28.2227 13.8477 30.6348 20.7227 30.6348Z", fillAlpha = 0.85f)
+            addSfPath("M20.7227 8.39844C23.9551 8.39844 26.6406 7.70508 26.6406 6.72852C26.6406 5.74219 23.9551 5.04883 20.7227 5.04883C17.4902 5.04883 14.8145 5.74219 14.8145 6.72852C14.8145 7.70508 17.4902 8.39844 20.7227 8.39844Z", fillAlpha = 0.85f)
+        }
+        return _sFHomepod2Fill!!
+    }
+
+private var _sFHomepod2Fill: ImageVector? = null

@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSealFill (dualtone)
+ * Viewport: 28.6939 x 28.3521
+ */
+public val SfSymbols.Dualtone.SFSealFill: ImageVector
+    get() {
+        if (_sFSealFill != null) {
+            return _sFSealFill!!
+        }
+        _sFSealFill = sfIcon(
+            name = "Dualtone.SFSealFill",
+            viewportWidth = 28.6939f,
+            viewportHeight = 28.3521f
+        ) {
+            addSfPath("M6.46607 24.9329L9.31763 24.9329C9.59107 24.9329 9.78638 25.0012 9.98169 25.2063L12.0129 27.2083C13.4973 28.7122 14.8352 28.7024 16.3196 27.2083L18.3508 25.2063C18.5559 25.0012 18.7512 24.9329 19.0149 24.9329L21.8665 24.9329C23.9758 24.9329 24.9329 23.9856 24.9329 21.8665L24.9329 19.0247C24.9329 18.7512 25.0012 18.5559 25.1965 18.3508L27.2083 16.3293C28.7122 14.8352 28.7024 13.4973 27.2083 12.0129L25.1965 9.98169C25.0012 9.78638 24.9329 9.59107 24.9329 9.31763L24.9329 6.46607C24.9329 4.36646 23.9856 3.40943 21.8665 3.40943L19.0149 3.40943C18.7512 3.40943 18.5559 3.3313 18.3508 3.13599L16.3196 1.12427C14.8352-0.379636 13.4973-0.36987 12.0032 1.12427L9.98169 3.13599C9.78638 3.3313 9.59107 3.40943 9.31763 3.40943L6.46607 3.40943C4.35669 3.40943 3.40943 4.34693 3.40943 6.46607L3.40943 9.31763C3.40943 9.59107 3.3313 9.78638 3.13599 9.98169L1.12427 12.0129C-0.379636 13.4973-0.36987 14.8352 1.12427 16.3293L3.13599 18.3508C3.3313 18.5559 3.40943 18.7512 3.40943 19.0247L3.40943 21.8665C3.40943 23.9758 4.35669 24.9329 6.46607 24.9329Z", fillAlpha = 0.85f)
+        }
+        return _sFSealFill!!
+    }
+
+private var _sFSealFill: ImageVector? = null

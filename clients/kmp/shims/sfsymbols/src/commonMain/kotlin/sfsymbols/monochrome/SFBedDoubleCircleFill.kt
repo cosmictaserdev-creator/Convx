@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBedDoubleCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFBedDoubleCircleFill: ImageVector
+    get() {
+        if (_sFBedDoubleCircleFill != null) {
+            return _sFBedDoubleCircleFill!!
+        }
+        _sFBedDoubleCircleFill = sfIcon(
+            name = "Monochrome.SFBedDoubleCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7344C25.4395 19.7461 19.7266 25.459 12.7148 25.459C5.71289 25.459 0 19.7461 0 12.7344C0 5.73242 5.71289 0.0195312 12.7148 0.0195312C19.7266 0.0195312 25.4395 5.73242 25.4395 12.7344ZM6.60156 11.8457C5.51758 11.8457 4.90234 12.4609 4.90234 13.5449L4.90234 17.3535C4.90234 17.666 5.09766 17.8613 5.40039 17.8613L5.73242 17.8613C6.04492 17.8613 6.24023 17.666 6.24023 17.3535L6.24023 16.4062C6.30859 16.4258 6.47461 16.4258 6.61133 16.4258L18.8281 16.4258C18.9551 16.4258 19.1211 16.4258 19.1895 16.4062L19.1895 17.3535C19.1895 17.666 19.3945 17.8613 19.6973 17.8613L20.0293 17.8613C20.3418 17.8613 20.5371 17.666 20.5371 17.3535L20.5371 13.5449C20.5371 12.4609 19.9121 11.8457 18.8281 11.8457ZM8.03711 7.61719C7.00195 7.61719 6.40625 8.17383 6.40625 9.28711L6.40625 11.0449L7.91992 11.0449L7.91992 10.2051C7.91992 9.62891 8.23242 9.30664 8.81836 9.30664L11.2012 9.30664C11.7676 9.30664 12.0801 9.62891 12.0801 10.2051L12.0801 11.0449L13.4863 11.0449L13.4863 10.2051C13.4863 9.62891 13.8086 9.30664 14.4336 9.30664L16.5527 9.30664C17.1973 9.30664 17.5195 9.62891 17.5195 10.2051L17.5195 11.0449L19.0332 11.0449L19.0332 9.28711C19.0332 8.17383 18.4375 7.61719 17.3926 7.61719Z", fillAlpha = 0.85f)
+        }
+        return _sFBedDoubleCircleFill!!
+    }
+
+private var _sFBedDoubleCircleFill: ImageVector? = null

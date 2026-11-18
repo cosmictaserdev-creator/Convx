@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBeatsSolobudsLeft (monochrome)
+ * Viewport: 20.3613 x 20.3613
+ */
+public val SfSymbols.Monochrome.SFBeatsSolobudsLeft: ImageVector
+    get() {
+        if (_sFBeatsSolobudsLeft != null) {
+            return _sFBeatsSolobudsLeft!!
+        }
+        _sFBeatsSolobudsLeft = sfIcon(
+            name = "Monochrome.SFBeatsSolobudsLeft",
+            viewportWidth = 20.3613f,
+            viewportHeight = 20.3613f
+        ) {
+            addSfPath("M2.94922 11.4941C2.94922 11.0254 2.99805 10.5566 3.06641 10.0879C1.2207 10.9766 0 12.8418 0 14.9609C0 17.8809 2.35352 20.3613 5.41016 20.3613C6.70898 20.3613 7.91016 19.8926 8.83789 19.1309C5.41016 18.0078 2.94922 15.1367 2.94922 11.4941Z", fillAlpha = 0.85f)
+            addSfPath("M16.6895 7.72461C17.9785 5.48828 17.2168 2.70508 14.9805 1.41602C12.7734 0.146484 9.95117 0.888672 8.67188 3.11523L6.46484 6.95312C5.18555 9.16992 5.9375 11.9824 8.1543 13.2617C10.3809 14.5508 13.1934 13.8086 14.4922 11.5625ZM10.2441 11.7773C8.95508 11.7773 7.94922 10.7617 7.94922 9.47266C7.94922 8.19336 8.96484 7.16797 10.2441 7.16797C11.5332 7.16797 12.5586 8.19336 12.5586 9.47266C12.5586 10.7617 11.5332 11.7773 10.2441 11.7773ZM10.2441 10.8789C11.0547 10.8789 11.6504 10.2637 11.6504 9.47266C11.6504 8.70117 11.0547 8.06641 10.2441 8.06641C9.45312 8.06641 8.84766 8.70117 8.84766 9.47266C8.84766 10.2637 9.45312 10.8789 10.2441 10.8789ZM12.0605 18.4668C16.3672 18.4668 20 15.5078 20 10.9473C20 8.98438 19.3945 7.71484 18.418 6.2207C18.3203 6.92383 18.0859 7.62695 17.7051 8.29102L15.498 12.1484C13.9062 14.9414 10.3516 15.8691 7.57812 14.2578C5.51758 13.0762 4.45312 10.8203 4.7168 8.60352C4.32617 9.56055 4.12109 10.5273 4.12109 11.5039C4.12109 15.5762 7.72461 18.4668 12.0605 18.4668Z", fillAlpha = 0.85f)
+        }
+        return _sFBeatsSolobudsLeft!!
+    }
+
+private var _sFBeatsSolobudsLeft: ImageVector? = null

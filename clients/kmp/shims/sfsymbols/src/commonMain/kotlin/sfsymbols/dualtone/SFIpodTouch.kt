@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIpodTouch (dualtone)
+ * Viewport: 16.0254 x 26.2402
+ */
+public val SfSymbols.Dualtone.SFIpodTouch: ImageVector
+    get() {
+        if (_sFIpodTouch != null) {
+            return _sFIpodTouch!!
+        }
+        _sFIpodTouch = sfIcon(
+            name = "Dualtone.SFIpodTouch",
+            viewportWidth = 16.0254f,
+            viewportHeight = 26.2402f
+        ) {
+            addSfPath("M1.72852 22.1289L1.72852 4.10156L13.9258 4.10156L13.9258 22.1289ZM7.8418 25.0293C7.26562 25.0293 6.79688 24.5508 6.79688 23.9746C6.79688 23.3984 7.26562 22.9395 7.8418 22.9395C8.41797 22.9395 8.88672 23.3984 8.88672 23.9746C8.88672 24.5508 8.41797 25.0293 7.8418 25.0293ZM7.8418 2.76367C7.45117 2.76367 7.12891 2.44141 7.12891 2.04102C7.12891 1.65039 7.45117 1.33789 7.8418 1.33789C8.23242 1.33789 8.55469 1.65039 8.55469 2.04102C8.55469 2.44141 8.23242 2.76367 7.8418 2.76367Z", fillAlpha = 0.2125f)
+            addSfPath("M0 23.0078C0 24.9805 1.28906 26.2305 3.33008 26.2305L12.3242 26.2305C14.3652 26.2305 15.6641 24.9805 15.6641 23.0078L15.6641 3.22266C15.6641 1.25 14.3652 0 12.3242 0L3.33008 0C1.28906 0 0 1.25 0 3.22266ZM1.72852 22.1289L1.72852 4.10156L13.9258 4.10156L13.9258 22.1289ZM7.8418 25.0293C7.26562 25.0293 6.79688 24.5508 6.79688 23.9746C6.79688 23.3984 7.26562 22.9395 7.8418 22.9395C8.41797 22.9395 8.88672 23.3984 8.88672 23.9746C8.88672 24.5508 8.41797 25.0293 7.8418 25.0293ZM7.8418 2.76367C7.45117 2.76367 7.12891 2.44141 7.12891 2.04102C7.12891 1.65039 7.45117 1.33789 7.8418 1.33789C8.23242 1.33789 8.55469 1.65039 8.55469 2.04102C8.55469 2.44141 8.23242 2.76367 7.8418 2.76367Z", fillAlpha = 0.85f)
+        }
+        return _sFIpodTouch!!
+    }
+
+private var _sFIpodTouch: ImageVector? = null

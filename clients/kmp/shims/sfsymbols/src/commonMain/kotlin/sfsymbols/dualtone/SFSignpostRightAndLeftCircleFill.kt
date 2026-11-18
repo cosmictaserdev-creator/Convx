@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFSignpostRightAndLeftCircleFill (dualtone)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Dualtone.SFSignpostRightAndLeftCircleFill: ImageVector
+    get() {
+        if (_sFSignpostRightAndLeftCircleFill != null) {
+            return _sFSignpostRightAndLeftCircleFill!!
+        }
+        _sFSignpostRightAndLeftCircleFill = sfIcon(
+            name = "Dualtone.SFSignpostRightAndLeftCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.459C19.7266 25.459 25.4395 19.7461 25.4395 12.7344C25.4395 5.73242 19.7266 0.0195312 12.7148 0.0195312C5.71289 0.0195312 0 5.73242 0 12.7344C0 19.7461 5.71289 25.459 12.7148 25.459Z", fillAlpha = 0.2125f)
+            addSfPath("M10.4883 11.0156C9.91211 11.0156 9.56055 10.6836 9.56055 10.1074L9.56055 7.48047C9.56055 6.89453 9.91211 6.57227 10.4883 6.57227L12.0703 6.57227L12.0703 5.36133C12.0703 5.01953 12.3438 4.7168 12.7051 4.7168C13.0566 4.7168 13.3398 5.00977 13.3398 5.36133L13.3398 6.57227L16.7188 6.57227C17.0996 6.57227 17.3535 6.66992 17.5781 6.88477L18.8477 8.10547C19.3457 8.57422 19.3457 9.0332 18.8672 9.47266L17.5781 10.6836C17.3535 10.918 17.0898 11.0156 16.7188 11.0156L13.3398 11.0156L13.3398 12.1387L14.9121 12.1387C15.4883 12.1387 15.8398 12.4707 15.8398 13.0469L15.8398 15.6738C15.8398 16.25 15.4883 16.582 14.9121 16.582L13.3398 16.582L13.3398 19.0039L15.127 19.0039C15.4785 19.0039 15.7617 19.2871 15.7617 19.6387C15.7617 19.9902 15.4785 20.2832 15.127 20.2832L10.2637 20.2832C9.92188 20.2832 9.63867 19.9902 9.63867 19.6387C9.63867 19.2871 9.92188 19.0039 10.2637 19.0039L12.0703 19.0039L12.0703 16.582L8.67188 16.582C8.31055 16.582 8.04688 16.4941 7.8125 16.25L6.5332 15.0488C6.04492 14.5898 6.05469 14.1309 6.54297 13.6816L7.8125 12.4609C8.04688 12.2363 8.30078 12.1387 8.67188 12.1387L12.0703 12.1387L12.0703 11.0156Z", fillAlpha = 0.85f)
+        }
+        return _sFSignpostRightAndLeftCircleFill!!
+    }
+
+private var _sFSignpostRightAndLeftCircleFill: ImageVector? = null

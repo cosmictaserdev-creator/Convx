@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFShekelsignCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFShekelsignCircle: ImageVector
+    get() {
+        if (_sFShekelsignCircle != null) {
+            return _sFShekelsignCircle!!
+        }
+        _sFShekelsignCircle = sfIcon(
+            name = "Monochrome.SFShekelsignCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M8.11523 18.2812C8.4375 18.2812 8.65234 18.0664 8.65234 17.7051L8.65234 8.49609L11.543 8.49609C13.0078 8.49609 13.6914 8.90625 13.6914 10.5566L13.6914 14.4434C13.6914 14.8047 13.8965 15.0391 14.248 15.0391C14.5801 15.0391 14.7949 14.8047 14.7949 14.4434L14.7949 10.3223C14.7949 8.33008 13.9648 7.28516 11.9141 7.28516L8.37891 7.28516C7.86133 7.28516 7.54883 7.59766 7.54883 8.11523L7.54883 17.7051C7.54883 18.0664 7.76367 18.2812 8.11523 18.2812ZM11.416 18.1836L15.0391 18.1836C17.168 18.1836 17.8711 17.0508 17.8711 14.9316L17.8711 7.77344C17.8711 7.40234 17.6562 7.16797 17.3145 7.16797C16.9727 7.16797 16.748 7.40234 16.748 7.77344L16.748 14.8828C16.748 16.5234 16.3672 16.9629 14.7363 16.9629L11.7285 16.9629L11.7285 10.9961C11.7285 10.6348 11.5137 10.4199 11.1816 10.4199C10.8398 10.4199 10.6152 10.6348 10.6152 10.9961L10.6152 17.3828C10.6152 17.8906 10.9473 18.1836 11.416 18.1836Z", fillAlpha = 0.85f)
+        }
+        return _sFShekelsignCircle!!
+    }
+
+private var _sFShekelsignCircle: ImageVector? = null

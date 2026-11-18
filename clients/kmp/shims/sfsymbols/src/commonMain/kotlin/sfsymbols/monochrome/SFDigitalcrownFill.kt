@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFDigitalcrownFill (monochrome)
+ * Viewport: 18.1641 x 25.0488
+ */
+public val SfSymbols.Monochrome.SFDigitalcrownFill: ImageVector
+    get() {
+        if (_sFDigitalcrownFill != null) {
+            return _sFDigitalcrownFill!!
+        }
+        _sFDigitalcrownFill = sfIcon(
+            name = "Monochrome.SFDigitalcrownFill",
+            viewportWidth = 18.1641f,
+            viewportHeight = 25.0488f
+        ) {
+            addSfPath("M6.66016 12.5195C6.66016 19.834 8.91602 24.707 12.2266 24.707C15.5371 24.707 17.8027 19.834 17.8027 12.5195C17.8027 5.20508 15.5371 0.322266 12.2266 0.322266C8.91602 0.322266 6.66016 5.20508 6.66016 12.5195ZM0 12.5195C0 20.2539 2.16797 25.0293 7.30469 25.0293L8.97461 25.0293C7.92969 24.1602 7.07031 22.8418 6.43555 21.1523L4.60938 21.1523C4.20898 21.1523 3.88672 20.8301 3.88672 20.4395C3.88672 20.0488 4.20898 19.7266 4.60938 19.7266L5.9668 19.7266C5.73242 18.916 5.55664 18.0078 5.43945 17.2949L3.7207 17.2949C3.33008 17.2949 3.00781 16.9727 3.00781 16.582C3.00781 16.1816 3.33008 15.8594 3.7207 15.8594L5.26367 15.8594C5.16602 14.9609 5.10742 13.8965 5.09766 13.1152L3.39844 13.1152C3.00781 13.1152 2.68555 12.793 2.68555 12.4023C2.68555 12.002 3.00781 11.6797 3.39844 11.6797L5.10742 11.6797C5.11719 10.8008 5.17578 9.83398 5.2832 8.93555L3.7207 8.93555C3.33008 8.93555 3.00781 8.61328 3.00781 8.21289C3.00781 7.82227 3.33008 7.5 3.7207 7.5L5.47852 7.5C5.625 6.66016 5.80078 5.83984 6.03516 5.06836L4.60938 5.06836C4.20898 5.06836 3.88672 4.74609 3.88672 4.35547C3.88672 3.96484 4.20898 3.64258 4.60938 3.64258L6.52344 3.64258C7.14844 2.06055 7.97852 0.830078 8.97461 0L7.30469 0C2.16797 0 0 4.78516 0 12.5195Z", fillAlpha = 0.85f)
+        }
+        return _sFDigitalcrownFill!!
+    }
+
+private var _sFDigitalcrownFill: ImageVector? = null

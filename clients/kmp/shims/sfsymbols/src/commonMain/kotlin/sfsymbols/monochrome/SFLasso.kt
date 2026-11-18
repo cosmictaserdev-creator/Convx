@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFLasso (monochrome)
+ * Viewport: 25.9668 x 28.1934
+ */
+public val SfSymbols.Monochrome.SFLasso: ImageVector
+    get() {
+        if (_sFLasso != null) {
+            return _sFLasso!!
+        }
+        _sFLasso = sfIcon(
+            name = "Monochrome.SFLasso",
+            viewportWidth = 25.9668f,
+            viewportHeight = 28.1934f
+        ) {
+            addSfPath("M0 14.0918C0 19.7949 4.87305 22.9004 10.9375 22.9004C11.5234 22.9004 12.1094 22.8809 12.6465 22.832C13.5254 22.7441 13.3984 21.1523 12.2949 21.2402C11.875 21.2793 11.4355 21.2891 11.0059 21.2891C5.86914 21.2891 1.63086 18.9258 1.63086 14.1016C1.63086 8.56445 7.97852 4.66797 14.0625 4.66797C19.4043 4.66797 23.9844 7.97852 23.9844 13.0273C23.9844 17.6367 18.9941 21.6211 14.2773 21.6211C13.3398 21.6211 12.627 21.25 12.627 20.5859C12.627 19.4629 14.248 18.7109 16.0156 18.7109C18.2324 18.7109 19.9219 20.3418 19.9219 22.5684C19.9219 24.1602 19.0039 25.7129 17.4805 26.6211C17.168 26.8359 16.9434 27.0605 16.9434 27.4512C16.9434 27.8418 17.2559 28.1934 17.7734 28.1934C17.998 28.1934 18.1543 28.1348 18.3594 27.998C20.3125 26.7871 21.543 24.6875 21.543 22.5195C21.543 19.4141 19.082 17.0703 15.8984 17.0703C13.2031 17.0703 10.9863 18.5156 10.9863 20.6348C10.9863 22.2363 12.3242 23.2422 14.2773 23.2422C19.8633 23.2422 25.6055 18.5938 25.6055 13.0176C25.6055 7.11914 20.332 3.02734 14.0527 3.02734C7.14844 3.02734 0 7.54883 0 14.0918Z", fillAlpha = 0.85f)
+        }
+        return _sFLasso!!
+    }
+
+private var _sFLasso: ImageVector? = null

@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFLbCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFLbCircleFill: ImageVector
+    get() {
+        if (_sFLbCircleFill != null) {
+            return _sFLbCircleFill!!
+        }
+        _sFLbCircleFill = sfIcon(
+            name = "Monochrome.SFLbCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7246C25.4395 19.7266 19.7266 25.4395 12.7148 25.4395C5.71289 25.4395 0 19.7266 0 12.7246C0 5.71289 5.71289 0 12.7148 0C19.7266 0 25.4395 5.71289 25.4395 12.7246ZM13.9746 7.7832C13.4766 7.7832 13.2031 8.13477 13.2031 8.60352L13.2031 16.8848C13.2031 17.373 13.4863 17.7051 13.9746 17.7051L16.5332 17.7051C18.2422 17.7051 19.248 16.5625 19.248 14.9316C19.248 13.7207 18.5352 12.627 17.3633 12.5L17.3633 12.4414C18.2812 12.2754 18.916 11.2305 18.916 10.2441C18.916 8.71094 17.9004 7.7832 16.4551 7.7832ZM6.89453 8.4082L6.89453 16.875C6.89453 17.3828 7.17773 17.6953 7.66602 17.6953L11.2402 17.6953C11.6016 17.6953 11.9043 17.3926 11.9043 17.0312C11.9043 16.6699 11.6016 16.3672 11.2402 16.3672L8.4668 16.3672L8.4668 8.4082C8.4668 7.97852 8.0957 7.62695 7.68555 7.62695C7.25586 7.62695 6.89453 7.97852 6.89453 8.4082ZM17.6562 14.8047C17.6562 15.8594 17.1191 16.4941 16.0742 16.4941L14.7461 16.4941L14.7461 13.1445L16.0156 13.1445C17.002 13.1445 17.6562 13.6816 17.6562 14.8047ZM17.4023 10.4785C17.4023 11.4453 16.8457 12.041 15.8789 12.041L14.7461 12.041L14.7461 9.00391L16.0254 9.00391C16.9824 9.00391 17.4023 9.61914 17.4023 10.4785Z", fillAlpha = 0.85f)
+        }
+        return _sFLbCircleFill!!
+    }
+
+private var _sFLbCircleFill: ImageVector? = null

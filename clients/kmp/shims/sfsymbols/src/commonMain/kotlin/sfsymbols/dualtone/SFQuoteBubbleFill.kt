@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFQuoteBubbleFill (dualtone)
+ * Viewport: 27.8711 x 27.3926
+ */
+public val SfSymbols.Dualtone.SFQuoteBubbleFill: ImageVector
+    get() {
+        if (_sFQuoteBubbleFill != null) {
+            return _sFQuoteBubbleFill!!
+        }
+        _sFQuoteBubbleFill = sfIcon(
+            name = "Dualtone.SFQuoteBubbleFill",
+            viewportWidth = 27.8711f,
+            viewportHeight = 27.3926f
+        ) {
+            addSfPath("M7.2168 27.3926C7.64648 27.3926 7.96875 27.168 8.4668 26.709L13.0273 22.5977L22.002 22.5977C25.5371 22.5977 27.5098 20.5859 27.5098 17.1094L27.5098 7.14844C27.5098 3.66211 25.5371 1.64062 22.002 1.64062L5.50781 1.64062C1.96289 1.64062 0 3.65234 0 7.14844L0 17.1094C0 20.6055 1.96289 22.5977 5.50781 22.5977L6.23047 22.5977L6.23047 26.2598C6.23047 26.9434 6.5918 27.3926 7.2168 27.3926Z", fillAlpha = 0.2125f)
+            addSfPath("M7.50977 10.791C7.50977 9.27734 8.67188 8.18359 10.2051 8.18359C11.8359 8.18359 13.0078 9.49219 13.0078 11.2695C13.0078 14.5312 10.3516 16.0352 9.12109 16.0352C8.76953 16.0352 8.51562 15.791 8.51562 15.4688C8.51562 15.1758 8.64258 14.9805 9.11133 14.8633C9.90234 14.6484 10.9766 13.9355 11.4453 12.8125L11.3379 12.8125C10.9863 13.2422 10.4492 13.3691 9.89258 13.3691C8.4375 13.3691 7.50977 12.2461 7.50977 10.791ZM14.5215 10.791C14.5215 9.27734 15.6738 8.18359 17.207 8.18359C18.8281 8.18359 20.0098 9.49219 20.0098 11.2695C20.0098 14.5312 17.3633 16.0352 16.1328 16.0352C15.7812 16.0352 15.5273 15.791 15.5273 15.4688C15.5273 15.1758 15.6641 14.9805 16.1133 14.8633C16.9141 14.6484 17.9883 13.9355 18.457 12.8125L18.3496 12.8125C17.998 13.2422 17.4609 13.3691 16.8945 13.3691C15.4492 13.3691 14.5215 12.2461 14.5215 10.791Z", fillAlpha = 0.85f)
+        }
+        return _sFQuoteBubbleFill!!
+    }
+
+private var _sFQuoteBubbleFill: ImageVector? = null

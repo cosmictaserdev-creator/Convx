@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFEarbudsBoneConduction (dualtone)
+ * Viewport: 42.5586 x 22.1973
+ */
+public val SfSymbols.Dualtone.SFEarbudsBoneConduction: ImageVector
+    get() {
+        if (_sFEarbudsBoneConduction != null) {
+            return _sFEarbudsBoneConduction!!
+        }
+        _sFEarbudsBoneConduction = sfIcon(
+            name = "Dualtone.SFEarbudsBoneConduction",
+            viewportWidth = 42.5586f,
+            viewportHeight = 22.1973f
+        ) {
+            addSfPath("M11.0742 22.1973C11.7285 22.1973 12.2461 21.6699 12.2461 21.0156C12.2461 20.3613 11.7285 19.834 11.0742 19.834C6.19141 19.834 2.35352 15.9961 2.35352 11.1035C2.35352 6.21094 6.19141 2.37305 11.0742 2.37305C13.8477 2.37305 14.8438 5.14648 12.373 6.68945L9.48242 8.49609C7.69531 9.59961 6.98242 10.9961 6.98242 12.2949C6.98242 14.3359 8.75977 16.1133 11.0254 16.1133C11.875 16.1133 12.793 15.8594 13.7012 15.293L17.1582 13.125C19.2676 11.7969 20.1953 9.93164 20.1953 7.99805C20.1953 3.32031 16.4453 0.0195312 11.0742 0.0195312C4.86328 0.0195312 0 4.90234 0 11.1035C0 17.3145 4.86328 22.1973 11.0742 22.1973ZM31.123 22.1973C37.334 22.1973 42.1973 17.3145 42.1973 11.1035C42.1973 4.90234 37.334 0.0195312 31.123 0.0195312C25.752 0.0195312 22.002 3.32031 22.002 7.99805C22.002 9.93164 22.9297 11.7969 25.0293 13.125L28.4863 15.293C29.4043 15.8594 30.3223 16.1133 31.1719 16.1133C33.4375 16.1133 35.2148 14.3359 35.2148 12.2949C35.2148 10.9961 34.502 9.59961 32.7148 8.49609L29.8145 6.68945C27.3535 5.14648 28.3496 2.37305 31.123 2.37305C36.0059 2.37305 39.834 6.21094 39.834 11.1035C39.834 15.9961 36.0059 19.834 31.123 19.834C30.4688 19.834 29.9414 20.3613 29.9414 21.0156C29.9414 21.6699 30.4688 22.1973 31.123 22.1973Z", fillAlpha = 0.85f)
+        }
+        return _sFEarbudsBoneConduction!!
+    }
+
+private var _sFEarbudsBoneConduction: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBahtsignSquareFill (dualtone)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Dualtone.SFBahtsignSquareFill: ImageVector
+    get() {
+        if (_sFBahtsignSquareFill != null) {
+            return _sFBahtsignSquareFill!!
+        }
+        _sFBahtsignSquareFill = sfIcon(
+            name = "Dualtone.SFBahtsignSquareFill",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959Z", fillAlpha = 0.2125f)
+            addSfPath("M8.91602 17.0996C8.38867 17.0996 8.06641 16.748 8.06641 16.2695L8.06641 6.66016C8.06641 6.15234 8.37891 5.80078 8.91602 5.80078L11.0742 5.80078L11.0742 4.62891C11.0742 4.39453 11.2305 4.22852 11.4746 4.22852C11.709 4.22852 11.8652 4.39453 11.8652 4.62891L11.8652 5.80078L12.0801 5.80078C13.8086 5.80078 15.3906 6.71875 15.3906 8.60352C15.3906 9.81445 14.5117 10.9277 13.3203 11.1035L13.3203 11.1816C14.8535 11.3672 15.9668 12.4023 15.9668 13.9746C15.9668 16.1133 14.2578 17.0996 12.0996 17.0996L11.8652 17.0996L11.8652 18.1836C11.8652 18.4277 11.7188 18.5938 11.4746 18.5938C11.2305 18.5938 11.0742 18.4277 11.0742 18.1836L11.0742 17.0996ZM9.4043 15.9766L11.0742 15.9766L11.0742 11.8359L9.4043 11.8359ZM9.4043 10.7324L11.0742 10.7324L11.0742 6.94336L9.4043 6.94336ZM11.8652 15.9766L12.0117 15.9766C13.4668 15.9766 14.5996 15.3711 14.5996 13.8965C14.5996 12.4219 13.4082 11.8457 11.9434 11.8457L11.8652 11.8457ZM11.8652 10.7031C13.1152 10.6152 14.0625 10.0293 14.0625 8.76953C14.0625 7.53906 13.1348 6.99219 11.8652 6.94336Z", fillAlpha = 0.85f)
+        }
+        return _sFBahtsignSquareFill!!
+    }
+
+private var _sFBahtsignSquareFill: ImageVector? = null

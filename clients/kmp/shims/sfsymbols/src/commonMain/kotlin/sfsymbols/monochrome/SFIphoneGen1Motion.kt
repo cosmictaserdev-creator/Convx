@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneGen1Motion (monochrome)
+ * Viewport: 24.5508 x 26.6895
+ */
+public val SfSymbols.Monochrome.SFIphoneGen1Motion: ImageVector
+    get() {
+        if (_sFIphoneGen1Motion != null) {
+            return _sFIphoneGen1Motion!!
+        }
+        _sFIphoneGen1Motion = sfIcon(
+            name = "Monochrome.SFIphoneGen1Motion",
+            viewportWidth = 24.5508f,
+            viewportHeight = 26.6895f
+        ) {
+            addSfPath("M1.49414 3.27148L1.49414 23.3984C1.49414 24.836 2.19859 25.9838 3.3446 26.4453L3.33008 26.4453C1.28906 26.4453 0 25.1953 0 23.2227L0 3.44727C0 1.47461 1.28906 0.224609 3.33008 0.224609L3.3446 0.224609C2.19859 0.686126 1.49414 1.83394 1.49414 3.27148Z", fillAlpha = 0.85f)
+            addSfPath("M5.71289 3.27148L5.71289 23.3984C5.71289 24.836 6.41734 25.9838 7.559 26.4453L7.54883 26.4453C5.50781 26.4453 4.21875 25.1953 4.21875 23.2227L4.21875 3.44727C4.21875 1.47461 5.50781 0.224609 7.54883 0.224609L7.559 0.224609C6.41734 0.686126 5.71289 1.83394 5.71289 3.27148Z", fillAlpha = 0.85f)
+            addSfPath("M8.53516 23.2324C8.53516 25.2051 9.82422 26.4551 11.8652 26.4551L20.8594 26.4551C22.9004 26.4551 24.1895 25.2051 24.1895 23.2324L24.1895 3.44727C24.1895 1.47461 22.9004 0.224609 20.8594 0.224609L11.8652 0.224609C9.82422 0.224609 8.53516 1.47461 8.53516 3.44727ZM10.2637 22.3535L10.2637 4.32617L22.4609 4.32617L22.4609 22.3535ZM16.377 25.2539C15.791 25.2539 15.3223 24.7754 15.3223 24.1992C15.3223 23.623 15.791 23.1641 16.377 23.1641C16.9434 23.1641 17.4121 23.623 17.4121 24.1992C17.4121 24.7754 16.9434 25.2539 16.377 25.2539ZM14.1211 2.34375C14.1211 2.08008 14.3066 1.9043 14.5605 1.9043L18.1641 1.9043C18.4277 1.9043 18.6133 2.08008 18.6133 2.34375C18.6133 2.60742 18.4277 2.7832 18.1641 2.7832L14.5605 2.7832C14.3066 2.7832 14.1211 2.60742 14.1211 2.34375Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneGen1Motion!!
+    }
+
+private var _sFIphoneGen1Motion: ImageVector? = null

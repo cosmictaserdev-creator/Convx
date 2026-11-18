@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFTextformatSize (monochrome)
+ * Viewport: 28.7891 x 18.623
+ */
+public val SfSymbols.Monochrome.SFTextformatSize: ImageVector
+    get() {
+        if (_sFTextformatSize != null) {
+            return _sFTextformatSize!!
+        }
+        _sFTextformatSize = sfIcon(
+            name = "Monochrome.SFTextformatSize",
+            viewportWidth = 28.7891f,
+            viewportHeight = 18.623f
+        ) {
+            addSfPath("M14.1406 18.5938C14.6973 18.5938 14.9707 18.3789 15.1855 17.793L20.7812 2.42188L20.8496 2.42188L26.4648 17.793C26.6699 18.3789 26.9434 18.5938 27.5 18.5938C28.0566 18.5938 28.4277 18.2617 28.4277 17.7148C28.4277 17.5391 28.3887 17.3633 28.3105 17.1387L22.168 0.976562C21.9238 0.332031 21.4941 0 20.8203 0C20.166 0 19.7266 0.322266 19.4922 0.966797L13.3594 17.1484C13.2715 17.373 13.2422 17.5488 13.2422 17.7246C13.2422 18.2715 13.584 18.5938 14.1406 18.5938ZM16.7676 12.9395L24.8926 12.9395C25.3418 12.9395 25.6934 12.5879 25.6934 12.1387C25.6934 11.6895 25.3418 11.3379 24.8926 11.3379L16.7676 11.3379C16.3184 11.3379 15.9668 11.6895 15.9668 12.1387C15.9668 12.5879 16.3184 12.9395 16.7676 12.9395Z", fillAlpha = 0.85f)
+            addSfPath("M0.888672 18.5938C1.33789 18.5938 1.63086 18.3691 1.79688 17.8516L2.99805 14.4434L8.08594 14.4434L9.28711 17.8516C9.47266 18.3887 9.74609 18.5938 10.2148 18.5938C10.7422 18.5938 11.1035 18.2715 11.1035 17.7734C11.1035 17.5684 11.0547 17.3633 10.9668 17.1289L6.85547 6.2793C6.61133 5.64453 6.16211 5.3125 5.53711 5.3125C4.92188 5.3125 4.48242 5.625 4.24805 6.2793L0.117188 17.1289C0.0390625 17.3438 0 17.5586 0 17.7734C0 18.2812 0.351562 18.5938 0.888672 18.5938ZM3.49609 13.0273L5.41992 7.46094L5.66406 7.46094L7.60742 13.0273Z", fillAlpha = 0.85f)
+        }
+        return _sFTextformatSize!!
+    }
+
+private var _sFTextformatSize: ImageVector? = null

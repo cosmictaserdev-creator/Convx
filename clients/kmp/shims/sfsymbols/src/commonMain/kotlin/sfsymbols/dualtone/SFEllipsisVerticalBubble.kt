@@ -1,0 +1,30 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFEllipsisVerticalBubble (dualtone)
+ * Viewport: 27.8711 x 27.2754
+ */
+public val SfSymbols.Dualtone.SFEllipsisVerticalBubble: ImageVector
+    get() {
+        if (_sFEllipsisVerticalBubble != null) {
+            return _sFEllipsisVerticalBubble!!
+        }
+        _sFEllipsisVerticalBubble = sfIcon(
+            name = "Dualtone.SFEllipsisVerticalBubble",
+            viewportWidth = 27.8711f,
+            viewportHeight = 27.2754f
+        ) {
+            addSfPath("M7.42188 27.2754C7.95898 27.2754 8.33008 26.9922 8.96484 26.4258L13.3691 22.5488L22.002 22.5488C25.5371 22.5488 27.5098 20.5273 27.5098 17.0508L27.5098 7.08984C27.5098 3.60352 25.5371 1.58203 22.002 1.58203L5.50781 1.58203C1.96289 1.58203 0 3.59375 0 7.08984L0 17.0508C0 20.5469 1.96289 22.5488 5.50781 22.5488L6.24023 22.5488L6.24023 25.9082C6.24023 26.7383 6.66992 27.2754 7.42188 27.2754ZM7.85156 25.3125L7.85156 21.6406C7.85156 21.0449 7.62695 20.8203 7.04102 20.8203L5.51758 20.8203C2.99805 20.8203 1.72852 19.4727 1.72852 17.0312L1.72852 7.09961C1.72852 4.6582 2.99805 3.31055 5.51758 3.31055L21.9922 3.31055C24.4824 3.31055 25.7812 4.6582 25.7812 7.09961L25.7812 17.0312C25.7812 19.4727 24.4824 20.8203 21.9922 20.8203L13.3301 20.8203C12.7148 20.8203 12.3926 20.918 11.9629 21.3574Z", fillAlpha = 0.425f)
+            addSfPath("M13.7695 8.47656C14.6777 8.47656 15.4102 7.74414 15.4102 6.83594C15.4102 5.92773 14.6777 5.18555 13.7695 5.18555C12.8516 5.18555 12.1191 5.92773 12.1191 6.83594C12.1191 7.74414 12.8516 8.47656 13.7695 8.47656Z", fillAlpha = 0.85f)
+            addSfPath("M13.7695 13.7109C14.6777 13.7109 15.4102 12.9785 15.4102 12.0703C15.4102 11.1523 14.6777 10.4199 13.7695 10.4199C12.8516 10.4199 12.1191 11.1523 12.1191 12.0703C12.1191 12.9785 12.8516 13.7109 13.7695 13.7109Z", fillAlpha = 0.85f)
+            addSfPath("M13.7695 18.9453C14.6777 18.9453 15.4102 18.2031 15.4102 17.2949C15.4102 16.3867 14.6777 15.6445 13.7695 15.6445C12.8516 15.6445 12.1191 16.3867 12.1191 17.2949C12.1191 18.2031 12.8516 18.9453 13.7695 18.9453Z", fillAlpha = 0.85f)
+        }
+        return _sFEllipsisVerticalBubble!!
+    }
+
+private var _sFEllipsisVerticalBubble: ImageVector? = null

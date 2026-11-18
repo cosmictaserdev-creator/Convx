@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFChevronUpChevronDownSquare (monochrome)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Monochrome.SFChevronUpChevronDownSquare: ImageVector
+    get() {
+        if (_sFChevronUpChevronDownSquare != null) {
+            return _sFChevronUpChevronDownSquare!!
+        }
+        _sFChevronUpChevronDownSquare = sfIcon(
+            name = "Monochrome.SFChevronUpChevronDownSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.85f)
+            addSfPath("M11.6602 4.07227C11.4551 4.07227 11.25 4.17969 11.084 4.33594L6.36719 8.88672C6.23047 9.01367 6.14258 9.19922 6.14258 9.43359C6.14258 9.85352 6.47461 10.1855 6.9043 10.1855C7.06055 10.1855 7.28516 10.1367 7.45117 9.9707L11.6602 5.83984L15.8789 9.9707C16.0449 10.127 16.25 10.1855 16.4355 10.1855C16.8555 10.1855 17.1875 9.85352 17.1875 9.43359C17.1875 9.19922 17.0898 9.01367 16.9531 8.88672L12.2461 4.33594C12.0801 4.17969 11.875 4.07227 11.6602 4.07227ZM11.6602 18.8672C11.875 18.8672 12.0898 18.7598 12.2461 18.6133L16.9531 14.0625C17.0898 13.9355 17.1875 13.7402 17.1875 13.5059C17.1875 13.0957 16.8555 12.7539 16.4355 12.7539C16.25 12.7539 16.0449 12.8223 15.8789 12.9785L11.6602 17.0996L7.45117 12.9785C7.28516 12.8125 7.06055 12.7539 6.9043 12.7539C6.47461 12.7539 6.14258 13.0957 6.14258 13.5059C6.14258 13.7402 6.23047 13.9355 6.36719 14.0625L11.084 18.6133C11.2402 18.7598 11.4551 18.8672 11.6602 18.8672Z", fillAlpha = 0.85f)
+        }
+        return _sFChevronUpChevronDownSquare!!
+    }
+
+private var _sFChevronUpChevronDownSquare: ImageVector? = null

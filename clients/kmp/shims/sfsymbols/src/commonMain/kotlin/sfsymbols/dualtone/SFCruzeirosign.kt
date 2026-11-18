@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFCruzeirosign (dualtone)
+ * Viewport: 18.4863 x 22.373
+ */
+public val SfSymbols.Dualtone.SFCruzeirosign: ImageVector
+    get() {
+        if (_sFCruzeirosign != null) {
+            return _sFCruzeirosign!!
+        }
+        _sFCruzeirosign = sfIcon(
+            name = "Dualtone.SFCruzeirosign",
+            viewportWidth = 18.4863f,
+            viewportHeight = 22.373f
+        ) {
+            addSfPath("M9.6582 22.373C13.5352 22.373 16.9336 20.4492 17.9883 16.8457C18.0859 16.5918 18.125 16.2891 18.125 16.0449C18.125 15.4297 17.7246 15.0684 17.1289 15.0684C16.5625 15.0684 16.2695 15.4004 16.0742 15.9668C15.3516 18.8086 12.7734 20.4297 9.66797 20.4297C4.61914 20.4297 2.24609 16.1914 2.24609 11.123C2.24609 6.00586 4.72656 1.95312 9.6582 1.95312C12.7441 1.95312 15.2734 3.86719 15.9375 6.5332C16.123 7.10938 16.3672 7.42188 16.9727 7.42188C17.5879 7.42188 17.9883 7.03125 17.9883 6.43555C17.9883 6.16211 17.9492 5.9375 17.8418 5.6543C16.8262 2.16797 13.457 0 9.6582 0C3.39844 0 0 4.75586 0 11.123C0 17.5195 3.32031 22.373 9.6582 22.373ZM8.4082 21.4746L9.89258 21.4746L9.89258 16.416C9.89258 15.0977 10.2734 14.0137 11.0352 13.1641C11.8066 12.3242 12.832 11.8945 14.082 11.8945C14.8242 11.8945 14.9414 12.0703 15.3125 12.0703C15.8008 12.0703 16.0547 11.8164 16.0547 11.3477C16.0547 11.0059 15.8691 10.7617 15.5957 10.6152C15.2051 10.3906 14.5996 10.3125 14.0723 10.3125C11.8848 10.3125 10.4199 11.6504 9.89258 13.3887L9.85352 13.3887L9.85352 11.1523C9.85352 10.6836 9.56055 10.3711 9.14062 10.3711C8.71094 10.3711 8.4082 10.6836 8.4082 11.1523Z", fillAlpha = 0.85f)
+        }
+        return _sFCruzeirosign!!
+    }
+
+private var _sFCruzeirosign: ImageVector? = null

@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFLockOpenTrianglebadgeExclamationmarkFill (dualtone)
+ * Viewport: 43.3691 x 31.8066
+ */
+public val SfSymbols.Dualtone.SFLockOpenTrianglebadgeExclamationmarkFill: ImageVector
+    get() {
+        if (_sFLockOpenTrianglebadgeExclamationmarkFill != null) {
+            return _sFLockOpenTrianglebadgeExclamationmarkFill!!
+        }
+        _sFLockOpenTrianglebadgeExclamationmarkFill = sfIcon(
+            name = "Dualtone.SFLockOpenTrianglebadgeExclamationmarkFill",
+            viewportWidth = 43.3691f,
+            viewportHeight = 31.8066f
+        ) {
+            addSfPath("M34.5508 10.2344L34.5508 12.8223C34.5508 13.4766 34.1602 13.7695 33.7012 13.7695C33.2227 13.7695 32.8418 13.4473 32.8418 12.8223L32.8418 10.0391C32.8418 6.78711 30.7715 4.94141 28.2129 4.94141C25.6641 4.94141 23.5938 6.78711 23.5938 10.0391L23.5937 13.2656C24.877 13.5197 25.5859 14.4846 25.5859 16.0742L25.5859 24.9609C25.5859 26.8359 24.5996 27.8418 22.8516 27.8418L16.7901 27.8418C16.7171 27.5814 16.6103 27.3272 16.4746 27.0898L11.1914 17.666C10.6152 16.6406 9.54102 16.0547 8.45703 16.0547C8.45398 16.0547 8.45093 16.0547 8.44791 16.055C8.45415 14.1921 9.43002 13.1934 11.1816 13.1934L21.8848 13.1934L21.8848 10.2344C21.8848 5.69336 24.8438 3.31055 28.2129 3.31055C31.5918 3.31055 34.5508 5.69336 34.5508 10.2344Z", fillAlpha = 0.425f)
+            addSfPath("M9.85352 18.4082L15.1367 27.8418C15.2832 28.1152 15.3613 28.3691 15.3613 28.6426C15.3613 29.541 14.7266 30.2734 13.7402 30.2734L3.17383 30.2734C2.1875 30.2734 1.55273 29.541 1.55273 28.6426C1.55273 28.3691 1.63086 28.1152 1.76758 27.8516L7.05078 18.4082C7.35352 17.8809 7.91016 17.5977 8.45703 17.5977C8.99414 17.5977 9.54102 17.8809 9.85352 18.4082ZM7.46094 27.4023C7.46094 27.9492 7.91016 28.3887 8.45703 28.3887C8.99414 28.3887 9.44336 27.9492 9.45312 27.4023C9.46289 26.8652 9.00391 26.416 8.45703 26.416C7.91992 26.416 7.46094 26.8652 7.46094 27.4023ZM7.66602 21.2988L7.76367 24.8828C7.77344 25.2734 8.06641 25.5566 8.45703 25.5566C8.84766 25.5566 9.13086 25.2734 9.14062 24.8828L9.23828 21.2988C9.24805 20.8398 8.92578 20.5078 8.45703 20.5078C7.98828 20.5078 7.65625 20.8398 7.66602 21.2988Z", fillAlpha = 0.85f)
+        }
+        return _sFLockOpenTrianglebadgeExclamationmarkFill!!
+    }
+
+private var _sFLockOpenTrianglebadgeExclamationmarkFill: ImageVector? = null

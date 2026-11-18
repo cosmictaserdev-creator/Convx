@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFArrowCounterclockwiseCircle (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFArrowCounterclockwiseCircle: ImageVector
+    get() {
+        if (_sFArrowCounterclockwiseCircle != null) {
+            return _sFArrowCounterclockwiseCircle!!
+        }
+        _sFArrowCounterclockwiseCircle = sfIcon(
+            name = "Monochrome.SFArrowCounterclockwiseCircle",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M12.7148 25.4395C19.7363 25.4395 25.4395 19.7461 25.4395 12.7246C25.4395 5.70312 19.7363 0 12.7148 0C5.69336 0 0 5.70312 0 12.7246C0 19.7461 5.69336 25.4395 12.7148 25.4395ZM12.7148 23.623C6.68945 23.623 1.81641 18.75 1.81641 12.7246C1.81641 6.69922 6.68945 1.82617 12.7148 1.82617C18.7402 1.82617 23.6133 6.69922 23.6133 12.7246C23.6133 18.75 18.7402 23.623 12.7148 23.623Z", fillAlpha = 0.85f)
+            addSfPath("M12.7051 18.8965C15.7812 18.8965 18.252 16.416 18.252 13.3008C18.252 10.2344 15.752 7.83203 12.8906 7.83203C12.4023 7.83203 11.9043 7.8418 11.3281 7.91016C10.9082 7.92969 10.6055 8.25195 10.6055 8.64258C10.6055 9.05273 10.9375 9.39453 11.3867 9.36523C11.748 9.32617 12.207 9.29688 12.7051 9.29688C14.9609 9.29688 16.748 11.084 16.748 13.3301C16.748 15.5859 14.9609 17.3926 12.7051 17.3926C10.459 17.3926 8.67188 15.5859 8.67188 13.3301C8.67188 12.9297 8.33008 12.5879 7.91016 12.5879C7.50977 12.5879 7.16797 12.9297 7.16797 13.3301C7.16797 16.416 9.61914 18.8965 12.7051 18.8965ZM9.78516 8.76953C9.78516 8.95508 9.85352 9.15039 10 9.27734L12.5 11.8066C12.6172 11.9238 12.8027 12.0117 12.9883 12.0117C13.3789 12.0117 13.6816 11.709 13.6816 11.3184C13.6816 11.1133 13.6133 10.9375 13.4668 10.791L11.3965 8.76953L13.4668 6.74805C13.6133 6.5918 13.6816 6.41602 13.6816 6.21094C13.6816 5.83008 13.3789 5.51758 12.9883 5.51758C12.8027 5.51758 12.6074 5.625 12.5 5.72266L10 8.25195C9.85352 8.38867 9.78516 8.57422 9.78516 8.76953Z", fillAlpha = 0.85f)
+        }
+        return _sFArrowCounterclockwiseCircle!!
+    }
+
+private var _sFArrowCounterclockwiseCircle: ImageVector? = null

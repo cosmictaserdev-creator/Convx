@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFFrancsignSquare (dualtone)
+ * Viewport: 23.3203 x 22.959
+ */
+public val SfSymbols.Dualtone.SFFrancsignSquare: ImageVector
+    get() {
+        if (_sFFrancsignSquare != null) {
+            return _sFFrancsignSquare!!
+        }
+        _sFFrancsignSquare = sfIcon(
+            name = "Dualtone.SFFrancsignSquare",
+            viewportWidth = 23.3203f,
+            viewportHeight = 22.959f
+        ) {
+            addSfPath("M3.79883 22.959L19.1504 22.959C21.6797 22.959 22.959 21.6797 22.959 19.1992L22.959 3.76953C22.959 1.2793 21.6797 0 19.1504 0L3.79883 0C1.2793 0 0 1.26953 0 3.76953L0 19.1992C0 21.6992 1.2793 22.959 3.79883 22.959ZM3.83789 21.2305C2.4707 21.2305 1.72852 20.5078 1.72852 19.1016L1.72852 3.85742C1.72852 2.46094 2.4707 1.72852 3.83789 1.72852L19.1211 1.72852C20.459 1.72852 21.2305 2.46094 21.2305 3.85742L21.2305 19.1016C21.2305 20.5078 20.459 21.2305 19.1211 21.2305Z", fillAlpha = 0.425f)
+            addSfPath("M9.4043 17.2656C9.78516 17.2656 10.0684 16.9824 10.0684 16.5918L10.0684 15.1562L12.8418 15.1562C13.0566 15.1562 13.2129 14.9902 13.2129 14.7754C13.2129 14.5605 13.0566 14.3945 12.8418 14.3945L10.0684 14.3945L10.0684 12.041L14.3262 12.041C14.668 12.041 14.9219 11.7969 14.9219 11.4746C14.9219 11.1523 14.668 10.9082 14.3262 10.9082L10.0684 10.9082L10.0684 7.13867L14.7656 7.13867C15.1172 7.13867 15.3711 6.89453 15.3711 6.57227C15.3711 6.23047 15.1172 5.98633 14.7656 5.98633L9.41406 5.98633C8.99414 5.98633 8.74023 6.24023 8.74023 6.66992L8.74023 14.3945L7.53906 14.3945C7.31445 14.3945 7.1582 14.5605 7.1582 14.7754C7.1582 14.9902 7.31445 15.1562 7.53906 15.1562L8.74023 15.1562L8.74023 16.5918C8.74023 16.9824 9.01367 17.2656 9.4043 17.2656Z", fillAlpha = 0.85f)
+        }
+        return _sFFrancsignSquare!!
+    }
+
+private var _sFFrancsignSquare: ImageVector? = null

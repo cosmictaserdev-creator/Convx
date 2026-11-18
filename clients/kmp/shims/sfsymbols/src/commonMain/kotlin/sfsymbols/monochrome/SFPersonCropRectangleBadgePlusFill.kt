@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFPersonCropRectangleBadgePlusFill (monochrome)
+ * Viewport: 45.6738 x 30.8887
+ */
+public val SfSymbols.Monochrome.SFPersonCropRectangleBadgePlusFill: ImageVector
+    get() {
+        if (_sFPersonCropRectangleBadgePlusFill != null) {
+            return _sFPersonCropRectangleBadgePlusFill!!
+        }
+        _sFPersonCropRectangleBadgePlusFill = sfIcon(
+            name = "Monochrome.SFPersonCropRectangleBadgePlusFill",
+            viewportWidth = 45.6738f,
+            viewportHeight = 30.8887f
+        ) {
+            addSfPath("M37.4512 7.73438L37.4512 23.1641C37.4512 25.6445 36.1719 26.9238 33.6426 26.9238L14.6739 26.9238C14.9768 26.4184 15.2181 25.874 15.3936 25.3027L31.2207 25.3027C30.4004 22.0605 26.8848 19.5508 22.666 19.5508C19.8235 19.5508 17.3032 20.6849 15.7115 22.4161C15.4079 18.3666 11.9943 15.1465 7.87109 15.1465C7.8678 15.1465 7.86451 15.1465 7.86133 15.147L7.86133 7.73438C7.86133 5.23438 9.14062 3.96484 11.6602 3.96484L33.6426 3.96484C36.1719 3.96484 37.4512 5.24414 37.4512 7.73438ZM18.3789 12.7734C18.3887 15.4492 20.2734 17.4414 22.666 17.4609C25.0488 17.4805 26.9434 15.4492 26.9434 12.7734C26.9434 10.2539 25.0488 8.18359 22.666 8.18359C20.2734 8.18359 18.3691 10.2539 18.3789 12.7734Z", fillAlpha = 0.85f)
+            addSfPath("M14.1895 23.0176C14.1895 26.4746 11.2988 29.3262 7.87109 29.3262C4.41406 29.3262 1.55273 26.4941 1.55273 23.0176C1.55273 19.5605 4.41406 16.6992 7.87109 16.6992C11.3379 16.6992 14.1895 19.5508 14.1895 23.0176ZM7.1582 19.7461L7.1582 22.3047L4.58984 22.3047C4.17969 22.3047 3.88672 22.5781 3.88672 23.0176C3.88672 23.4473 4.17969 23.7207 4.58984 23.7207L7.1582 23.7207L7.1582 26.2891C7.1582 26.7188 7.44141 27.002 7.87109 27.002C8.31055 27.002 8.58398 26.7188 8.58398 26.2891L8.58398 23.7207L11.1426 23.7207C11.5625 23.7207 11.8555 23.4473 11.8555 23.0176C11.8555 22.5781 11.5625 22.3047 11.1426 22.3047L8.58398 22.3047L8.58398 19.7461C8.58398 19.3262 8.31055 19.0332 7.87109 19.0332C7.44141 19.0332 7.1582 19.3262 7.1582 19.7461Z", fillAlpha = 0.85f)
+        }
+        return _sFPersonCropRectangleBadgePlusFill!!
+    }
+
+private var _sFPersonCropRectangleBadgePlusFill: ImageVector? = null

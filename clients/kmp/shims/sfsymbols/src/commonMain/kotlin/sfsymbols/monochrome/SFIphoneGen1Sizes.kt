@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneGen1Sizes (monochrome)
+ * Viewport: 23.3008 x 28.916
+ */
+public val SfSymbols.Monochrome.SFIphoneGen1Sizes: ImageVector
+    get() {
+        if (_sFIphoneGen1Sizes != null) {
+            return _sFIphoneGen1Sizes!!
+        }
+        _sFIphoneGen1Sizes = sfIcon(
+            name = "Monochrome.SFIphoneGen1Sizes",
+            viewportWidth = 23.3008f,
+            viewportHeight = 28.916f
+        ) {
+            addSfPath("M16.6602 4.56055L16.6602 4.81445L12.1582 4.81445C11.2408 4.81445 10.4283 5.03585 9.76779 5.43945L2.73438 5.43945L2.73438 23.4668L7.91016 23.4668L7.91016 24.7656C7.91016 25.8988 8.26806 26.86 8.89859 27.5684L4.33594 27.5684C2.29492 27.5684 0.996094 26.3184 0.996094 24.3457L0.996094 4.56055C0.996094 2.58789 2.29492 1.33789 4.33594 1.33789L13.3301 1.33789C15.3711 1.33789 16.6602 2.58789 16.6602 4.56055ZM7.03125 3.01758C6.77734 3.01758 6.5918 3.19336 6.5918 3.45703C6.5918 3.7207 6.77734 3.89648 7.03125 3.89648L10.6348 3.89648C10.8984 3.89648 11.0742 3.7207 11.0742 3.45703C11.0742 3.19336 10.8984 3.01758 10.6348 3.01758Z", fillAlpha = 0.85f)
+            addSfPath("M12.1582 27.5586L19.0527 27.5586C20.8301 27.5586 21.9336 26.4844 21.9336 24.7656L21.9336 8.96484C21.9336 7.24609 20.8301 6.17188 19.0527 6.17188L12.1582 6.17188C10.3809 6.17188 9.26758 7.24609 9.26758 8.96484L9.26758 24.7656C9.26758 26.4844 10.3809 27.5586 12.1582 27.5586ZM13.7891 8.03711C13.7891 7.8125 13.9551 7.66602 14.1699 7.66602L17.0605 7.66602C17.2852 7.66602 17.4316 7.8125 17.4316 8.03711C17.4316 8.26172 17.2852 8.4082 17.0605 8.4082L14.1699 8.4082C13.9551 8.4082 13.7891 8.26172 13.7891 8.03711ZM10.6934 24.2285L10.6934 9.62891L20.5273 9.62891L20.5273 24.2285Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneGen1Sizes!!
+    }
+
+private var _sFIphoneGen1Sizes: ImageVector? = null

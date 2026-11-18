@@ -1,0 +1,28 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBoltBadgeAutomaticFill (dualtone)
+ * Viewport: 31.4258 x 31.3184
+ */
+public val SfSymbols.Dualtone.SFBoltBadgeAutomaticFill: ImageVector
+    get() {
+        if (_sFBoltBadgeAutomaticFill != null) {
+            return _sFBoltBadgeAutomaticFill!!
+        }
+        _sFBoltBadgeAutomaticFill = sfIcon(
+            name = "Dualtone.SFBoltBadgeAutomaticFill",
+            viewportWidth = 31.4258f,
+            viewportHeight = 31.3184f
+        ) {
+            addSfPath("M20.0391 2.96875L16.2402 13.2422L23.4082 13.2422C23.8672 13.2422 24.1699 13.5645 24.1699 13.9648C24.1699 14.2188 24.0625 14.4434 23.877 14.6875L23.1582 15.5867C19.0208 15.7874 15.6738 19.2548 15.6738 23.4375C15.6738 23.9002 15.7143 24.3538 15.7998 24.7926L12.4805 28.9453C11.7383 29.8633 10.5762 29.2773 11.0059 28.1445L14.7949 17.8613L7.63672 17.8613C7.17773 17.8613 6.86523 17.5488 6.86523 17.1484C6.86523 16.8945 6.98242 16.6699 7.16797 16.4258L18.5645 2.16797C19.3066 1.24023 20.4688 1.82617 20.0391 2.96875Z", fillAlpha = 0.425f)
+            addSfPath("M29.8633 23.4375C29.8633 26.8945 26.9824 29.7559 23.5547 29.7559C20.0977 29.7559 17.2363 26.9141 17.2363 23.4375C17.2363 19.9805 20.0977 17.1289 23.5547 17.1289C27.0215 17.1289 29.8633 19.9707 29.8633 23.4375ZM22.6758 19.9707L20.3809 26.1328C20.332 26.2695 20.3125 26.377 20.3125 26.5234C20.3125 26.875 20.5762 27.1289 20.9473 27.1289C21.2695 27.1289 21.4844 26.9629 21.6113 26.6016L22.1973 24.8926L24.9414 24.8926L25.5371 26.6016C25.6543 26.9629 25.8691 27.1289 26.1816 27.1289C26.5625 27.1289 26.8262 26.8652 26.8262 26.5234C26.8262 26.377 26.8066 26.2695 26.7578 26.1328L24.4629 19.9707C24.3066 19.5605 23.9746 19.3555 23.5645 19.3555C23.1445 19.3555 22.832 19.5605 22.6758 19.9707ZM24.5605 23.7891L22.5781 23.7891L23.5645 20.9668Z", fillAlpha = 0.85f)
+        }
+        return _sFBoltBadgeAutomaticFill!!
+    }
+
+private var _sFBoltBadgeAutomaticFill: ImageVector? = null

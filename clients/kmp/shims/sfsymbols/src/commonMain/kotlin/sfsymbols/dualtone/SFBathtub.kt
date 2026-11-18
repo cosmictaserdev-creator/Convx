@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.dualtone
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFBathtub (dualtone)
+ * Viewport: 32.8906 x 19.4238
+ */
+public val SfSymbols.Dualtone.SFBathtub: ImageVector
+    get() {
+        if (_sFBathtub != null) {
+            return _sFBathtub!!
+        }
+        _sFBathtub = sfIcon(
+            name = "Dualtone.SFBathtub",
+            viewportWidth = 32.8906f,
+            viewportHeight = 19.4238f
+        ) {
+            addSfPath("M0 2.34375C0 3.68164 1.01562 4.67773 2.33398 4.67773L30.1953 4.67773C31.5137 4.67773 32.5293 3.68164 32.5293 2.34375C32.5293 1.00586 31.5137 0 30.1953 0L2.33398 0C1.01562 0 0 1.00586 0 2.34375ZM1.70898 2.34375C1.70898 1.96289 2.00195 1.68945 2.41211 1.68945L30.1172 1.68945C30.5273 1.68945 30.8203 1.96289 30.8203 2.34375C30.8203 2.72461 30.5273 2.99805 30.1172 2.99805L2.41211 2.99805C2.00195 2.99805 1.70898 2.72461 1.70898 2.34375ZM9.07227 16.5039L23.457 16.5039C28.0859 16.5039 30.459 14.2578 30.459 9.87305L30.459 3.86719L28.7305 3.86719L28.7305 9.87305C28.7305 13.1152 26.9434 14.7754 23.457 14.7754L9.07227 14.7754C5.58594 14.7754 3.79883 13.1152 3.79883 9.87305L3.79883 3.86719L2.07031 3.86719L2.07031 9.87305C2.07031 14.2578 4.44336 16.5039 9.07227 16.5039ZM5.6543 19.2285C6.10352 19.3945 6.61133 19.1504 6.76758 18.7109L7.8125 15.8301L6.19141 15.2441L5.14648 18.1152C4.99023 18.5645 5.21484 19.0723 5.6543 19.2285ZM26.8652 19.2285C27.3145 19.0723 27.5391 18.5645 27.3828 18.1152L26.3379 15.2441L24.7168 15.8301L25.752 18.7109C25.918 19.1504 26.4258 19.3945 26.8652 19.2285Z", fillAlpha = 0.85f)
+        }
+        return _sFBathtub!!
+    }
+
+private var _sFBathtub: ImageVector? = null

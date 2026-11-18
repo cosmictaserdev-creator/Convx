@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFMacstudioFill (monochrome)
+ * Viewport: 30.9863 x 16.3965
+ */
+public val SfSymbols.Monochrome.SFMacstudioFill: ImageVector
+    get() {
+        if (_sFMacstudioFill != null) {
+            return _sFMacstudioFill!!
+        }
+        _sFMacstudioFill = sfIcon(
+            name = "Monochrome.SFMacstudioFill",
+            viewportWidth = 30.9863f,
+            viewportHeight = 16.3965f
+        ) {
+            addSfPath("M3.79883 16.2891L26.8262 16.2891C29.3457 16.2891 30.625 15.0098 30.625 12.5195L30.625 3.75977C30.625 1.26953 29.3457 0 26.8262 0L3.79883 0C1.26953 0 0 1.25977 0 3.75977L0 12.5195C0 15.0195 1.26953 16.2891 3.79883 16.2891ZM4.38477 12.5586C3.95508 12.5488 3.63281 12.2266 3.63281 11.8066L3.63281 9.59961C3.63281 9.16992 3.97461 8.84766 4.38477 8.85742C4.78516 8.84766 5.11719 9.16992 5.11719 9.59961L5.11719 11.8164C5.11719 12.2168 4.79492 12.5488 4.38477 12.5586ZM7.37305 12.5586C6.94336 12.5488 6.62109 12.2266 6.62109 11.8066L6.62109 9.59961C6.62109 9.16992 6.95312 8.84766 7.37305 8.85742C7.77344 8.84766 8.10547 9.16992 8.10547 9.59961L8.10547 11.8164C8.10547 12.2168 7.7832 12.5488 7.37305 12.5586ZM10.6445 11.4453C10.2344 11.4453 9.90234 11.1133 9.90234 10.7031C9.90234 10.3027 10.2344 9.9707 10.6445 9.9707L15.8887 9.9707C16.2891 9.9707 16.6211 10.3027 16.6211 10.7031C16.6211 11.1133 16.2891 11.4453 15.8887 11.4453ZM25.625 12.1973C24.8242 12.207 24.1406 11.5137 24.1406 10.7227C24.1406 9.91211 24.8242 9.22852 25.625 9.22852C26.4062 9.22852 27.0801 9.91211 27.0801 10.7227C27.0801 11.5137 26.4062 12.1777 25.625 12.1973Z", fillAlpha = 0.85f)
+        }
+        return _sFMacstudioFill!!
+    }
+
+private var _sFMacstudioFill: ImageVector? = null

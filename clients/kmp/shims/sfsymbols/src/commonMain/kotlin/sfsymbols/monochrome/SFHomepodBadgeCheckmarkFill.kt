@@ -1,0 +1,29 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFHomepodBadgeCheckmarkFill (monochrome)
+ * Viewport: 35.3906 x 31.8066
+ */
+public val SfSymbols.Monochrome.SFHomepodBadgeCheckmarkFill: ImageVector
+    get() {
+        if (_sFHomepodBadgeCheckmarkFill != null) {
+            return _sFHomepodBadgeCheckmarkFill!!
+        }
+        _sFHomepodBadgeCheckmarkFill = sfIcon(
+            name = "Monochrome.SFHomepodBadgeCheckmarkFill",
+            viewportWidth = 35.3906f,
+            viewportHeight = 31.8066f
+        ) {
+            addSfPath("M25.9766 6.13281C26.8262 7.14844 27.5098 8.7207 27.5098 11.1523L27.5098 16.0552C23.1977 16.0601 19.6387 19.6127 19.6387 23.9258C19.6387 25.5928 20.1641 27.1429 21.0605 28.4167C20.0145 28.6023 18.8314 28.6914 17.5098 28.6914C10.625 28.6914 7.50977 26.2793 7.50977 20.7324L7.50977 11.1523C7.50977 8.7207 8.19336 7.14844 9.04297 6.13281C9.33594 5.78125 9.78516 5.77148 10.127 6.07422C11.2793 7.19727 14.2969 8.01758 17.5098 8.01758C20.7227 8.01758 23.7402 7.19727 24.8828 6.07422C25.2344 5.77148 25.6836 5.78125 25.9766 6.13281Z", fillAlpha = 0.85f)
+            addSfPath("M23.418 4.78516C23.418 5.75195 20.9277 6.45508 17.5098 6.45508C14.0918 6.45508 11.6016 5.75195 11.6016 4.78516C11.6016 3.79883 14.0918 3.10547 17.5098 3.10547C20.9277 3.10547 23.418 3.79883 23.418 4.78516Z", fillAlpha = 0.85f)
+            addSfPath("M33.8281 23.9258C33.8281 27.3828 30.9473 30.2441 27.5195 30.2441C24.0527 30.2441 21.2012 27.4023 21.2012 23.9258C21.2012 20.4688 24.0527 17.6172 27.5195 17.6172C30.9766 17.6172 33.8281 20.4688 33.8281 23.9258ZM29.7852 21.1719L26.7188 25.4297L25.1465 23.7402C25.0195 23.6035 24.8438 23.4766 24.5898 23.4766C24.1895 23.4766 23.8672 23.7891 23.8672 24.1992C23.8672 24.375 23.9258 24.5801 24.0625 24.7266L26.1719 27.041C26.3184 27.207 26.5527 27.2852 26.748 27.2852C27.002 27.2852 27.2266 27.1777 27.3535 27.0117L30.957 22.0117C31.0645 21.8652 31.123 21.709 31.123 21.5723C31.123 21.1621 30.7812 20.8496 30.4004 20.8496C30.1367 20.8496 29.9219 20.9863 29.7852 21.1719Z", fillAlpha = 0.85f)
+        }
+        return _sFHomepodBadgeCheckmarkFill!!
+    }
+
+private var _sFHomepodBadgeCheckmarkFill: ImageVector? = null

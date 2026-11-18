@@ -1,6 +1,7 @@
 package com.convx.music.client.ios
 
 import androidx.room.Room
+import platform.Foundation.NSLog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -83,6 +84,10 @@ private fun iosDatabasePath(fileName: String): String {
     return "$directory/$fileName"
 }
 
+internal fun dbg(message: String) {
+    message.lineSequence().take(60).forEach { NSLog(it.replace("%", "%%")) }
+}
+
 private fun iosLibraryDatabasePath() = iosDatabasePath("client-library.db")
 
 private fun iosPlaybackSettingsDatabasePath() = iosDatabasePath("client-playback-settings.db")
@@ -93,15 +98,23 @@ fun iosMusicControllerWithKeychainProbe() = iosMusicController(runKeychainProbe 
 
 private fun iosMusicController(runKeychainProbe: Boolean) = ComposeUIViewController {
     val moduleEnvironment = remember { ModuleEnvironment(IosModuleStore()) }
+    dbg("CONVXDBG moduleEnvironment ok")
     val webPoTokenProvider = remember { IosWebPoTokenProvider() }
+    dbg("CONVXDBG webPoTokenProvider ok")
     val libraryDatabase = remember {
-        buildMusicLibraryDatabase(Room.databaseBuilder<MusicLibraryDatabase>(iosLibraryDatabasePath()))
+        try {
+            buildMusicLibraryDatabase(Room.databaseBuilder<MusicLibraryDatabase>(iosLibraryDatabasePath()))
+        } catch (t: Throwable) { dbg("CONVXDBG libraryDatabase FAILED: ${t.stackTraceToString()}"); throw t }
     }
+    dbg("CONVXDBG libraryDatabase ok")
     val playbackSettingsDatabase = remember {
-        buildPlaybackSettingsDatabase(
+        try {
+            buildPlaybackSettingsDatabase(
             Room.databaseBuilder<PlaybackSettingsDatabase>(iosPlaybackSettingsDatabasePath()),
         )
+        } catch (t: Throwable) { dbg("CONVXDBG playbackSettingsDatabase FAILED: ${t.stackTraceToString()}"); throw t }
     }
+    dbg("CONVXDBG playbackSettingsDatabase ok")
     DisposableEffect(libraryDatabase, playbackSettingsDatabase) {
         onDispose {
             libraryDatabase.close()
@@ -109,6 +122,7 @@ private fun iosMusicController(runKeychainProbe: Boolean) = ComposeUIViewControl
         }
     }
     KoinApplication(application = {
+        dbg("CONVXDBG koin application block")
         modules(
             libraryDataModule(libraryDatabase),
             playbackDataModule(playbackSettingsDatabase),
@@ -123,7 +137,9 @@ private fun iosMusicController(runKeychainProbe: Boolean) = ComposeUIViewControl
             com.convx.music.client.watch.watchCompanionModule(),
         )
     }) {
+        dbg("CONVXDBG koin content start")
         val playbackController = koinInject<PlaybackController>()
+        dbg("CONVXDBG playbackController ok")
         val watch = koinInject<com.convx.music.client.watch.WatchCompanion>()
         DisposableEffect(watch) {
             val connection = IosWatchCompanion(watch)
@@ -133,6 +149,7 @@ private fun iosMusicController(runKeychainProbe: Boolean) = ComposeUIViewControl
         val sleepTimer = remember(playbackController) { requireNotNull(playbackController.sleepTimer) }
         val sleepTimerState by sleepTimer.state.collectAsState()
         val accountHolder = koinInject<MusicAccountStateHolder>()
+        dbg("CONVXDBG accountHolder ok")
         val account by accountHolder.state.collectAsState()
         var showSignIn by remember { mutableStateOf(false) }
         var showModules by remember { mutableStateOf(false) }
@@ -175,6 +192,7 @@ private fun iosMusicController(runKeychainProbe: Boolean) = ComposeUIViewControl
             is MusicAccountState.ChoosingChannel -> "Cancel"
             is MusicAccountState.SignedIn -> "Sign out"
         }
+        dbg("CONVXDBG before shell")
         ConvxMusicClientShell(
             onModulesAction = { showModules = !showModules },
             accountSubtitle = accountSubtitle,

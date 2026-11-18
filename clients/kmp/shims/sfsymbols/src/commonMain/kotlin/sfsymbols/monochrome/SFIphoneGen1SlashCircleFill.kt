@@ -1,0 +1,27 @@
+package com.composables.sfsymbols.monochrome
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.composables.sfsymbols.SfSymbols
+import com.composables.sfsymbols.addSfPath
+import com.composables.sfsymbols.sfIcon
+
+/**
+ * SF Symbol: SFIphoneGen1SlashCircleFill (monochrome)
+ * Viewport: 25.8008 x 25.459
+ */
+public val SfSymbols.Monochrome.SFIphoneGen1SlashCircleFill: ImageVector
+    get() {
+        if (_sFIphoneGen1SlashCircleFill != null) {
+            return _sFIphoneGen1SlashCircleFill!!
+        }
+        _sFIphoneGen1SlashCircleFill = sfIcon(
+            name = "Monochrome.SFIphoneGen1SlashCircleFill",
+            viewportWidth = 25.8008f,
+            viewportHeight = 25.459f
+        ) {
+            addSfPath("M25.4395 12.7344C25.4395 19.7461 19.7266 25.459 12.7148 25.459C5.71289 25.459 0 19.7461 0 12.7344C0 5.73242 5.71289 0.0195312 12.7148 0.0195312C19.7266 0.0195312 25.4395 5.73242 25.4395 12.7344ZM7.82227 18.9062C7.82227 20.166 8.63281 20.957 9.93164 20.957L15.498 20.957C16.5794 20.957 17.314 20.4169 17.535 19.5174L16.377 18.3594L8.95508 18.3594L8.95508 10.9375L7.82227 9.80469ZM13.3496 19.5215C13.3496 19.8828 13.0762 20.166 12.7246 20.166C12.373 20.166 12.0801 19.8828 12.0801 19.5215C12.0801 19.1797 12.373 18.8867 12.7246 18.8867C13.0762 18.8867 13.3496 19.1797 13.3496 19.5215ZM6.2793 6.29883C6.07422 6.51367 6.08398 6.85547 6.2793 7.05078L18.4082 19.1699C18.6035 19.375 18.9551 19.375 19.1602 19.1699C19.3652 18.9453 19.3652 18.623 19.1602 18.418L7.04102 6.29883C6.83594 6.08398 6.50391 6.08398 6.2793 6.29883ZM9.93164 4.52148C8.86746 4.52148 8.13106 5.05251 7.90059 5.9379L9.09064 7.12891L16.4746 7.12891L16.4746 14.5188L17.6074 15.6526L17.6074 6.57227C17.6074 5.3125 16.8066 4.52148 15.498 4.52148ZM14.1602 5.87891C14.1602 6.04492 14.0234 6.19141 13.8477 6.19141L11.582 6.19141C11.416 6.19141 11.2695 6.04492 11.2695 5.87891C11.2695 5.68359 11.416 5.55664 11.582 5.55664L13.8477 5.55664C14.0234 5.55664 14.1602 5.68359 14.1602 5.87891Z", fillAlpha = 0.85f)
+        }
+        return _sFIphoneGen1SlashCircleFill!!
+    }
+
+private var _sFIphoneGen1SlashCircleFill: ImageVector? = null
