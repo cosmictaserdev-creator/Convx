@@ -43,7 +43,19 @@ data class NetworkEntry(val path: String, val name: String, val directory: Boole
 
 data class NetworkLibrary(val tracks: List<NetworkTrack>, val truncated: Boolean = false)
 
-data class NetworkTrack(val id: String, val title: String, val artist: String?, val album: String?, val artwork: String?, val size: Long)
+data class NetworkTrack(
+    val id: String,
+    val title: String,
+    val artist: String?,
+    val album: String?,
+    val artwork: String?,
+    val size: Long,
+    val albumArtist: String? = null,
+    val trackNumber: Int? = null,
+    val discNumber: Int? = null,
+    val year: Int? = null,
+    val durationSeconds: Int = 0,
+)
 
 object NetworkMedia {
     private val audioExtensions = setOf("mp3", "m4a", "flac", "ogg", "opus", "aac", "wav", "wma", "aif", "aiff", "webm")
@@ -51,12 +63,29 @@ object NetworkMedia {
     fun isAudio(name: String): Boolean = name.substringAfterLast('.', "").lowercase() in audioExtensions
     fun isImage(name: String): Boolean = name.substringAfterLast('.', "").lowercase() in imageExtensions
 
+    private val numberPrefix = Regex("""^(?:(\d{1,2})[-.])?(\d{1,3})(\s*[-.]\s*|\s+)""")
+    private val discFolder = Regex("""(?:cd|disc|disk)\s*([0-9]+)""", RegexOption.IGNORE_CASE)
+
     fun track(serverId: String, entry: NetworkEntry, images: List<NetworkEntry>): NetworkTrack {
         val stem = entry.name.substringBeforeLast('.').trim()
+        val prefix = numberPrefix.find(stem)?.takeIf { match ->
+            val (disc, track, separator) = match.destructured
+            val hasNumberedPrefix = disc.isNotEmpty() || track.startsWith('0') || separator.isNotBlank()
+            hasNumberedPrefix && track.toInt() > 0 && stem.substring(match.range.last + 1).isNotBlank()
+        }
         val parts = stem.split(" - ", limit = 2)
-        val artist = parts.first().trim().takeIf { parts.size == 2 && it.isNotBlank() && it.toIntOrNull() == null }
-        val title = if (parts.size == 2) parts[1].trim().ifBlank { stem } else stem
+        val artist = parts.first().trim().takeIf {
+            prefix == null && parts.size == 2 && it.isNotBlank() && it.toIntOrNull() == null
+        }
+        val title = when {
+            prefix != null -> stem.substring(prefix.range.last + 1).trim()
+            parts.size == 2 -> parts[1].trim().ifBlank { stem }
+            else -> stem
+        }
         val parent = RemotePath.parent(entry.path)
+        val folderDiscNumber = discFolder.matchEntire(RemotePath.name(parent))
+            ?.groupValues?.get(1)?.toIntOrNull()?.takeIf { it > 0 }
+        val albumFolder = if (folderDiscNumber == null) parent else RemotePath.parent(parent)
         val artwork = images.filter { RemotePath.parent(it.path) == parent }.minByOrNull {
             when (it.name.substringBeforeLast('.').lowercase()) {
                 stem.lowercase() -> 0
@@ -67,6 +96,15 @@ object NetworkMedia {
                 else -> 5
             }
         }?.let { NetworkMediaUri.create(serverId, it.path) }
-        return NetworkTrack(NetworkMediaUri.create(serverId, entry.path), title, artist, parent.substringAfterLast('/').takeIf(String::isNotBlank), artwork, entry.size)
+        return NetworkTrack(
+            id = NetworkMediaUri.create(serverId, entry.path),
+            title = title,
+            artist = artist,
+            album = RemotePath.name(albumFolder).takeIf(String::isNotBlank),
+            artwork = artwork,
+            size = entry.size,
+            trackNumber = prefix?.groupValues?.get(2)?.toIntOrNull(),
+            discNumber = prefix?.groupValues?.get(1)?.toIntOrNull()?.takeIf { it > 0 } ?: folderDiscNumber,
+        )
     }
 }
