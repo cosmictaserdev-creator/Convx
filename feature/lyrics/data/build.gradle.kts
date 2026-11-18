@@ -26,4 +26,5 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     testImplementation(libs.junit)
     testImplementation(kotlin("test-junit"))
+    testImplementation(libs.kotlinx.coroutines.test)
 }
