@@ -182,7 +182,7 @@ class WelcomeActivity : ComponentActivity() {
     }
 
     private fun finishOnboarding() {
-        startActivity(Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_PLAY_INTRO, true))
+        startActivity(Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_SHOW_INTRO, true))
         finish()
         // The intro picks up from the black splash; a window slide would break the handoff.
         @Suppress("DEPRECATION")

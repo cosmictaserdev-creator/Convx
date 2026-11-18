@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Convx</string>
+    <string name="connecting">Connecting to your phone…</string>
+    <string name="phone_unavailable">Open Convx on your paired phone. Install matching GMS phone and watch builds.</string>
+    <string name="disconnected">Phone disconnected</string>
+    <string name="nothing_playing">Nothing playing</string>
+    <string name="open_phone">Choose music in Convx on your phone.</string>
+    <string name="retry">Reconnect</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="previous">Previous track</string>
+    <string name="next">Next track</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="repeat">Repeat</string>
+    <string name="repeat_off">Off</string>
+    <string name="repeat_all">All</string>
+    <string name="repeat_one">One</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="volume_down">Lower volume</string>
+    <string name="volume_up">Raise volume</string>
+    <string name="volume">Volume %1$d%%</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="player">Player</string>
+    <string name="no_lyrics">No lyrics available yet. Check the lyrics providers on your phone.</string>
+    <string name="playback_position">Playback position</string>
+    <string name="room_controls_locked">Playback is controlled by the room host.</string>
+    <string-array name="android_wear_capabilities"><item>convx_watch</item></string-array>
+</resources>
