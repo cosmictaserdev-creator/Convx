@@ -23,6 +23,7 @@ internal fun PlayerHost(
     anchor: BackdropAnchor,
     modifier: Modifier = Modifier,
     lyricsVisible: Boolean = false,
+    showCanvasFeedback: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val track = controller.trackState.collectAsStateWithLifecycle()
@@ -39,7 +40,7 @@ internal fun PlayerHost(
         if (lyricsVisible) PlayerLyricsHeaderBand(Modifier.align(Alignment.TopCenter))
         val toggle = controller.canvasToggle
         val session = controller.session
-        if (toggle != null && session.track == track.value) {
+        if (showCanvasFeedback && toggle != null && session.track == track.value) {
             CanvasFeedback(
                 phase = session.phase,
                 mode = controller.canvasMode,

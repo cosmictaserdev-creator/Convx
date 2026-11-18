@@ -1606,7 +1606,8 @@ fun BottomSheetPlayer(
                 else -> com.convx.music.ui.player.backdrop.BackdropAnchor.TOP
             },
             modifier = Modifier.fillMaxSize(),
-            lyricsVisible = classicPages.value == PlayerInternalState.LYRICS,
+            lyricsVisible = classicPages.showing && classicPages.value == PlayerInternalState.LYRICS,
+            showCanvasFeedback = !classicPages.showing,
         ) {
         PlayerAuxiliaryPages(
             pages = classicPages,

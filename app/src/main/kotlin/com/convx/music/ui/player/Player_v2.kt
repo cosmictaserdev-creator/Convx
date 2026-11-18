@@ -850,6 +850,7 @@ private fun PlayerV2Content(
                 },
                 modifier = paneModifier.fillMaxSize(),
                 lyricsVisible = playerState == PlayerInternalState.LYRICS,
+                showCanvasFeedback = playerState == PlayerInternalState.COVER,
             ) {
             val paneVideoStream = videoStream.takeIf { watchVideo }
             if (paneVideoStream != null) {
