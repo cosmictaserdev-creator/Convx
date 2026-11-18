@@ -1,13 +1,11 @@
 package com.convx.music.canvas
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
+import io.ktor.client.request.prepareGet
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
@@ -22,6 +20,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -56,7 +55,7 @@ object TidalCanvasProvider {
                 gzip()
                 deflate()
             }
-            install(HttpCache)
+            followRedirects = false
             expectSuccess = false
         }
     }
@@ -125,16 +124,16 @@ object TidalCanvasProvider {
         albumValidation: String? = null
     ): CanvasArtwork? {
         try {
-            val response = client.get("${BASE_URL}search") {
+            val root = client.prepareGet("${BASE_URL}search") {
                 header("X-Tidal-Token", TIDAL_TOKEN)
                 parameter("query", query)
                 parameter("limit", "10")
                 parameter("types", types)
                 parameter("countryCode", countryCode)
-            }
-            if (response.status != HttpStatusCode.OK) return null
-
-            val root = response.body<JsonObject>()
+            }.execute { response ->
+                if (response.status != HttpStatusCode.OK) return@execute null
+                json.decodeFromString<JsonObject>(response.readCanvasResponseText())
+            } ?: return null
             val key = types.lowercase(Locale.ROOT) // "tracks" or "albums"
             val section = findSearchSection(root, key) ?: return null
             val items = section.jsonObject["items"]?.jsonArray ?: return null
@@ -182,6 +181,8 @@ object TidalCanvasProvider {
                     }
                 }
             }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (_: Exception) {
             // Tidal artwork is optional; request and response failures return no artwork.
         }

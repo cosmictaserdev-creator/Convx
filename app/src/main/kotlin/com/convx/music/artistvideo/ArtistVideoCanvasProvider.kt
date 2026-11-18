@@ -1,13 +1,13 @@
 package com.convx.music.artistvideo
 
+import com.convx.music.canvas.readCanvasResponseText
+
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
+import io.ktor.client.request.prepareGet
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -40,7 +41,7 @@ object ArtistVideoCanvasProvider {
                 gzip()
                 deflate()
             }
-            install(HttpCache)
+            followRedirects = false
             expectSuccess = false
         }
     }
@@ -69,21 +70,26 @@ object ArtistVideoCanvasProvider {
             cache.remove(key)
         }
 
-        val response =
-            runCatching {
-                client.get(BASE_URL) {
-                    parameter("s", song)
-                    parameter("a", artist)
-                    if (album != null) parameter("al", album)
-                    if (duration != null && duration > 0) parameter("d", duration)
-                }
-            }.getOrNull()
-
-        val value =
-            when (response?.status) {
-                HttpStatusCode.OK -> runCatching { response.body<ArtistVideoResponse>() }.getOrNull()
-                else -> null
+        val value = try {
+            client.prepareGet(BASE_URL) {
+                parameter("s", song)
+                parameter("a", artist)
+                if (album != null) parameter("al", album)
+                if (duration != null && duration > 0) parameter("d", duration)
+            }.execute { response ->
+                if (response.status != HttpStatusCode.OK) return@execute null
+                val artwork = json.decodeFromString<ArtistVideoResponse>(response.readCanvasResponseText())
+                artwork.copy(
+                    static = artwork.static?.takeIf { it.startsWith("https://", ignoreCase = true) },
+                    animated = artwork.animated?.takeIf { it.startsWith("https://", ignoreCase = true) },
+                    videoUrl = artwork.videoUrl?.takeIf { it.startsWith("https://", ignoreCase = true) },
+                )
             }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
+        }
 
         cache[key] =
             CacheEntry(
