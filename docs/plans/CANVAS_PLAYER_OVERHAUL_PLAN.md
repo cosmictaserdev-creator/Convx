@@ -3,6 +3,38 @@
 Plan and session handoff. Written for the engineer (or agent) who executes it. Follow
 [`AGENT_CONTRIBUTION_GUIDE.md`](../../AGENT_CONTRIBUTION_GUIDE.md) for every change; section 8 lists the rules that matter most here.
 
+## Implementation status · 2026-11-18
+
+The working branch is `port/kmp-work-to-android`. Its base is the Android-only
+integration commit `de452e6f`. [Draft PR #196](https://github.com/cosmictaserdev-creator/Convx/pull/196)
+contains the lyrics compiler fixes, expanded library CI coverage, and the NAS
+disc-folder fix through `6846a269`. Build PR, the Universal GMS debug build and
+the Unit Tests job passed on that commit. The earlier `:lyrics-data` run passed
+18 tests and the network-storage run passed after the disc fix.
+
+The entries below distinguish the submitted port from work present in the local implementation checkout.
+
+| Area | Implementation so far | Remaining |
+|---|---|---|
+| Android module port | Local commit `2c64ebfe` contains the playback domain work, album disc index, Fisheye renderer, lyric stickers, onboarding screen and animated mesh. | Submit the local commit with the app port and verify that combined revision. |
+| Android app port | Wired NAS tag reading, batch imports and embedded artwork through scan and folder browsing. Connected first-run onboarding and the web login sheet to the existing sign-in flow. | Verify album rescans, tag timeout and cancellation, and onboarding, login and back behavior. |
+| Canvas identity | Playback now advances a media generation on each transition. The resolver, texture binding, first-frame callbacks and look samples carry or check the generation. V2 and Classic cover paths read the shared controller. | Finish the cache and fallbacks audit. Exercise rapid skips and repeated IDs across providers. |
+| Decoder and inline video | Added a visual decoder arbiter, tuned buffers, loop caps, drift correction, retry URL re-resolution, conservative letterbox detection and a 16:9 inline frame. Removed the fullscreen polling log. Artist, album and Home visual playback use the arbiter. | Verify decoder handoff, foreground and fullscreen lifecycle, PiP, stall behavior and retry. The physical decoder release order remains unmeasured. |
+| Extended backdrop | A frame-callback renderer uses ten-frame Apple history, a single-frame extension for other loops, and reflection for official video. CPU, API 33+ AGSL and colour-only paths are present, with adaptive tier policy. The shared host mounts the renderer in the player. | Verify anchor geometry, low-end behavior, tier recovery and frame latency. The API 33 shader is a candidate pending device measurement. |
+| Gestures and motion | Shared motion specs shorten existing sheet, corner, landing and pill timings. Axis-lock arbitration and origin-cancellation tests are written. | Wire arbitration through both styles. Reproduce the cover swipe/menu bug and verify queue, cancel and interrupted transitions. |
+| Lyrics | Timed inline preview, an Android Fisheye adapter and a Cupertino line picker are present. The snapshot versions of `LyricsV2.kt` and `MetroLyrics.kt` differ only in line endings. | Finish player preview and lyrics-panel wiring, then check progressive blur and the fallback scrim. |
+| Canvas settings and persistence | Added Auto, Ask and Off settings, Extended video and Colour only settings, a Canvas feedback pill, V2 menu hooks, and per-song decisions in Room. Migration 40 → 41 and the exported schema are present. | Finish the Classic menu action, queue prefetch and the migration proof. |
+| Provider security | Scoped changes reject cleartext provider URLs, preserve cancellation, restrict redirects and headers, and remove request details from several logs. | Finish the cache and Spotify error-log audit. The existing Android `:spotify` module remains the integration point, with its native engine and encrypted credential store. |
+
+The first local app compile generated Room schema 41. It failed on Canvas string references while the
+resource file was being added. The resource file is now present and the updated app has yet to compile.
+The user deferred further testing. The app tests, Room proof, screenshots, GPU and main-thread timings,
+120 Hz jank, Android 12 low-RAM checks, and 20-minute thermal and battery measurements remain pending.
+The connected Galaxy M34’s installed APK matched the baseline CI artifact. No physical-device measurements
+were collected because the test devices were unavailable.
+
+The original plan follows for scope and acceptance criteria.
+
 ## 1. Context
 
 - Convx is an Android Compose music player with a Liquid Glass look. It must run at 120 fps where the
