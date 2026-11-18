@@ -5,11 +5,18 @@ import com.convx.storage.domain.*
 import com.convx.storage.playback.NetworkDataSourceFactory
 import kotlinx.coroutines.Dispatchers
 
-class NetworkMusicRepository(
+class NetworkMusicRepository private constructor(
     private val store: NetworkServerStore,
-    private val webDav: WebDavFileSource = WebDavFileSource(),
-    private val smb: SmbFileSource = SmbFileSource(),
-) : NetworkLibraryRepository by RemoteNetworkLibraryRepository(store, webDav, smb, Dispatchers.IO) {
+    private val webDav: WebDavFileSource,
+    private val smb: SmbFileSource,
+    remote: RemoteNetworkLibraryRepository,
+) : NetworkLibraryRepository by remote, NetworkMediaAccess by remote {
+    constructor(
+        store: NetworkServerStore,
+        webDav: WebDavFileSource = WebDavFileSource(),
+        smb: SmbFileSource = SmbFileSource(),
+    ) : this(store, webDav, smb, RemoteNetworkLibraryRepository(store, webDav, smb, Dispatchers.IO))
+
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun dataSourceFactory(downstream: DataSource.Factory): DataSource.Factory = NetworkDataSourceFactory(downstream, store, webDav, smb)
 

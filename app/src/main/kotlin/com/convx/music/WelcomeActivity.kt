@@ -20,6 +20,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -35,6 +37,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -89,6 +93,8 @@ import com.convx.music.ui.ios.compat.Surface
 import com.convx.music.ui.ios.compat.Switch
 import com.convx.music.ui.ios.compat.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -132,7 +138,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.convx.music.constants.IsFirstRunKey
+import com.convx.music.ui.onboarding.AndroidOnboardingHost
+import com.convx.music.ui.screens.ChannelPickerScreen
+import com.convx.music.ui.screens.OnboardingLoginScreen
 import com.convx.music.ui.theme.ConvxTheme
 import com.convx.music.ui.utils.safeOpenUri
 import com.convx.music.utils.dataStore
@@ -166,16 +179,13 @@ class WelcomeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = AppTheme.colorScheme.background
                 ) {
-                    WelcomePagerScreen(onFinished = {
+                    val onFinished: () -> Unit = {
                         lifecycleScope.launch {
                             dataStore.edit { it[IsFirstRunKey] = false }
-                            if (forceShow) {
-                                finish()
-                            } else {
-                                finishOnboarding()
-                            }
+                            if (forceShow) finish() else finishOnboarding()
                         }
-                    })
+                    }
+                    if (forceShow) WelcomePagerScreen(onFinished) else FirstRunOnboarding(onFinished)
                 }
             }
         }
@@ -187,6 +197,46 @@ class WelcomeActivity : ComponentActivity() {
         // The intro picks up from the black splash; a window slide would break the handoff.
         @Suppress("DEPRECATION")
         overridePendingTransition(0, 0)
+    }
+}
+
+@Composable
+private fun FirstRunOnboarding(onFinished: () -> Unit) {
+    val navController = rememberNavController()
+    val entry by navController.currentBackStackEntryAsState()
+    val route = entry?.destination?.route
+    val sheetProgress = remember { mutableFloatStateOf(0f) }
+    val channelPickerOpen = route == "channel_picker"
+
+    Box(Modifier.fillMaxSize()) {
+        // Keep the current welcome step alive while navigating to sign-in or the channel picker.
+        AndroidOnboardingHost(
+            loginOpen = route == "login" || channelPickerOpen,
+            loginProgress = { sheetProgress.floatValue },
+            onYouTubeLoginRequest = {
+                navController.navigate("login") { launchSingleTop = true }
+            },
+            onFinish = onFinished,
+        )
+        CompositionLocalProvider(LocalPlayerAwareWindowInsets provides WindowInsets.safeDrawing) {
+            NavHost(
+                navController = navController,
+                startDestination = "welcome",
+                modifier = Modifier.fillMaxSize(),
+                enterTransition = { EnterTransition.None },
+                exitTransition = { ExitTransition.None },
+            ) {
+                composable("welcome") {}
+                composable("login") {
+                    OnboardingLoginScreen(navController) { sheetProgress.floatValue = it }
+                }
+                composable("channel_picker") {
+                    Surface(Modifier.fillMaxSize(), color = AppTheme.colorScheme.background) {
+                        ChannelPickerScreen(navController)
+                    }
+                }
+            }
+        }
     }
 }
 
