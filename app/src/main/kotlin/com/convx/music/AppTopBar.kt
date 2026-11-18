@@ -65,6 +65,7 @@ import com.convx.music.ui.ios.foundation.IosGlassSpec
 import com.convx.music.ui.ios.foundation.iosGlass
 import com.convx.music.ui.screens.Screens
 import com.convx.music.ui.theme.LocalAccentTextColor
+import com.convx.music.ui.theme.ConvxLogoFontFamily
 import com.convx.music.ui.theme.SfProFontFamily
 import com.convx.music.ui.theme.isHueless
 import dev.chrisbanes.haze.HazeState
@@ -116,6 +117,7 @@ fun AppTopBar(
                 } else {
                     AppTheme.colorScheme.onSurface
                 }
+                val isHome = effectiveRoute == Screens.Home.route
                 if (chromeVisible) FrostedTopBar(
                     // The blur above spans the full width; only the content clears the side bar and cutouts.
                     modifier = Modifier
@@ -130,10 +132,11 @@ fun AppTopBar(
                     leading = {
                         // SF Pro Text is wider than Apple's Display face at this size.
                         Text(
-                            text = titleRes?.let { stringResource(it) } ?: "",
+                            text = if (isHome) stringResource(R.string.home_logo_title)
+                                else titleRes?.let { stringResource(it) } ?: "",
                             style = AppTheme.typography.titleLarge.copy(
-                                fontFamily = SfProFontFamily,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = if (isHome) ConvxLogoFontFamily else SfProFontFamily,
+                                fontWeight = if (isHome) FontWeight.Normal else FontWeight.Bold,
                                 fontSize = 34.sp,
                                 lineHeight = 41.sp,
                                 letterSpacing = (-0.6).sp,

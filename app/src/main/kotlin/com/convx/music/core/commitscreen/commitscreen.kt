@@ -161,36 +161,24 @@ fun CommitScreen(
         fetchCommits()
     }
 
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.commits_title),
+        titleAlpha = 1f,
+        onBack = navController::navigateUp,
+    ) { chrome ->
     Scaffold(
-        modifier = Modifier.pullToRefresh(
+        modifier = Modifier.then(chrome.contentModifier()).pullToRefresh(
             state = pullToRefreshState,
             isRefreshing = isLoading,
             onRefresh = { fetchCommits() }
         ),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.commits_title),
-                            style = AppTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = navController::navigateUp) {
-                        SymbolIcon(symbol = sf("SFChevronLeft"), contentDescription = null)
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        }
+
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(top = com.convx.music.ui.component.TopBarContentHeight)
                 .background(AppTheme.colorScheme.background)
                 .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom))
         ) {
@@ -249,6 +237,7 @@ fun CommitScreen(
                 PullToRefreshDefaults.LoadingIndicator(state = pullToRefreshState, isRefreshing = isLoading)
             }
         }
+    }
     }
 }
 

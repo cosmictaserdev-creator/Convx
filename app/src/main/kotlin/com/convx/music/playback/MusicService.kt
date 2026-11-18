@@ -86,6 +86,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
+import com.music.innertube.soundcloud.SoundCloudIds
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
 import com.music.innertube.models.WatchEndpoint
@@ -2007,6 +2008,7 @@ class MusicService :
         mediaId: String,
         playbackData: YTPlayerUtils.PlaybackData? = null
     ) {
+        if (mediaId.startsWith(SoundCloudIds.PREFIX)) return
         if (!songRecoveryInFlight.add(mediaId)) return
         try {
             val song = database.song(mediaId).first()
@@ -2155,6 +2157,7 @@ class MusicService :
         }
 
         val currentMediaMetadata = player.currentMetadata ?: return
+        if (currentMediaMetadata.id.startsWith(SoundCloudIds.PREFIX)) return
 
         val currentIndex = player.currentMediaItemIndex
         val currentMediaId = currentMediaMetadata.id
@@ -2196,6 +2199,7 @@ class MusicService :
         currentIndex: Int,
         requestVersion: Long,
     ) {
+        if (mediaId.startsWith(SoundCloudIds.PREFIX)) return
         try {
             val relatedEndpoint = withContext(Dispatchers.IO) {
                 YouTube.next(WatchEndpoint(videoId = mediaId)).getOrNull()?.relatedEndpoint
@@ -2277,6 +2281,7 @@ class MusicService :
 
     private suspend fun loadAutomixFromRadio() {
         val currentSong = player.currentMetadata ?: return
+        if (currentSong.id.startsWith(SoundCloudIds.PREFIX)) return
         val radioResult = YouTube.next(WatchEndpoint(videoId = currentSong.id)).getOrNull()
 
         if (radioResult != null) {
@@ -3916,7 +3921,7 @@ class MusicService :
             }
         }
 
-        if (playbackStats.totalPlayTimeMs >= historyDurationMs) {
+        if (playbackStats.totalPlayTimeMs >= historyDurationMs && !mediaItem.mediaId.startsWith(SoundCloudIds.PREFIX)) {
             CoroutineScope(Dispatchers.IO).launch {
                 val playbackUrl = database.format(mediaItem.mediaId).first()?.playbackUrl
                     ?: YTPlayerUtils.playerResponseForMetadata(mediaItem.mediaId, null)

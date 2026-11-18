@@ -159,6 +159,7 @@ fun getAllSearchableSettings(): List<SearchableSetting> {
         SearchableSetting("Import from Spotify", null, "Privacy & storage", "settings/spotify"),
         SearchableSetting("Import from local file", null, "Privacy & storage", "settings/backup_restore"),
         SearchableSetting(stringResource(R.string.integrations), null, "Accounts & services", "settings/integrations"),
+        SearchableSetting(stringResource(R.string.soundcloud_title), stringResource(R.string.soundcloud_notice), "Accounts & services", "settings/integrations", keywords = "soundcloud music source"),
         SearchableSetting(stringResource(R.string.listen_together), null, "Accounts & services", "settings/integrations/listen_together"),
         SearchableSetting(stringResource(R.string.yt_sync), null, "Accounts & services", "settings/account"),
         SearchableSetting(stringResource(R.string.login), null, "Accounts & services", "settings/account"),

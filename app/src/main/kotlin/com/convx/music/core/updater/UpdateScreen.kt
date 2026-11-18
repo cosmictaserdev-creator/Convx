@@ -44,22 +44,23 @@ import zone.ien.hig.CupertinoButtonDefaults
 fun UpdateScreen(navController: NavHostController, viewModel: UpdateViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { viewModel.check(manual = true) }
-    Column(Modifier.fillMaxSize().background(AppTheme.colorScheme.background).windowInsetsPadding(WindowInsets.safeDrawing)) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            CupertinoButton(onClick = { navController.navigateUp() }, colors = CupertinoButtonDefaults.plainButtonColors()) {
-                SymbolIcon(symbol = sf("chevron.left"), contentDescription = stringResource(R.string.back_content_desc), size = 20.dp)
-            }
-            Text(stringResource(R.string.app_updates_title), fontWeight = FontWeight.Bold, style = AppTheme.typography.titleLarge)
-        }
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.app_updates_title),
+        titleAlpha = 1f,
+        onBack = { navController.navigateUp() },
+    ) { chrome ->
+    Column(Modifier.fillMaxSize().then(chrome.contentModifier()).background(AppTheme.colorScheme.background)
+        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))) {
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
             val release = state.release
             if (release != null && maxWidth >= 840.dp) {
                 Row(Modifier.fillMaxSize().padding(horizontal = 32.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                    Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(vertical = 16.dp)) { UpdateSummary(release); ReleaseLink(release) }
-                    Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(vertical = 16.dp)) { UpdateChangelog(release) }
+                    Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(vertical = 16.dp)) { Spacer(Modifier.height(com.convx.music.ui.component.topBarHeight())); UpdateSummary(release); ReleaseLink(release) }
+                    Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(vertical = 16.dp)) { Spacer(Modifier.height(com.convx.music.ui.component.topBarHeight())); UpdateChangelog(release) }
                 }
             } else {
                 Column(Modifier.widthIn(max = 680.dp).fillMaxWidth().align(Alignment.TopCenter).verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                    Spacer(Modifier.height(com.convx.music.ui.component.topBarHeight()))
                     if (release != null) { UpdateSummary(release); UpdateChangelog(release); ReleaseLink(release) }
                     else {
                         SymbolIcon(symbol = sf("arrow.down.circle"), contentDescription = null, size = 48.dp)
@@ -79,6 +80,7 @@ fun UpdateScreen(navController: NavHostController, viewModel: UpdateViewModel = 
             }
         }
     }
+}
 }
 
 @Composable

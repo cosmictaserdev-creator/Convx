@@ -226,6 +226,7 @@ fun DiyEditorScreen(navController: NavController) {
 
     val (pureBlack) = rememberPreference(PureBlackKey, defaultValue = false)
 
+    val toolbarChrome = com.convx.music.ui.component.rememberGlassScreenChrome(background = Color.Black)
     BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black)) {
         // Forced permanently expanded, own state distinct from the real singleton
         // player's — this is a second, preview-only mount of the same composable
@@ -259,9 +260,14 @@ fun DiyEditorScreen(navController: NavController) {
             onTransform = { transform ->
                 replaceSelected { it.withTransform(orientation, transform) }
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().then(toolbarChrome.screenModifier()).then(toolbarChrome.contentModifier()),
         )
 
+        com.convx.music.ui.component.TopFadeBlur(
+            hazeState = toolbarChrome.hazeState,
+            pageColor = Color.Black,
+            backdrop = toolbarChrome.backdrop,
+        )
         TopControls(
             canUndo = undoStack.isNotEmpty(),
             canRedo = redoStack.isNotEmpty(),
