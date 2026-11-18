@@ -3,37 +3,32 @@
 Plan and session handoff. Written for the engineer (or agent) who executes it. Follow
 [`AGENT_CONTRIBUTION_GUIDE.md`](../../AGENT_CONTRIBUTION_GUIDE.md) for every change; section 8 lists the rules that matter most here.
 
-## Implementation status · 2026-11-18
+## Implementation status · 2026-11-19
 
-The working branch is `port/kmp-work-to-android`. Its base is the Android-only
-integration commit `de452e6f`. [Draft PR #196](https://github.com/cosmictaserdev-creator/Convx/pull/196)
-contains the lyrics compiler fixes, expanded library CI coverage, and the NAS
-disc-folder fix through `6846a269`. Build PR, the Universal GMS debug build and
-the Unit Tests job passed on that commit. The earlier `:lyrics-data` run passed
-18 tests and the network-storage run passed after the disc fix.
+The work is on `port/kmp-work-to-android`, based on Android-only integration commit
+`de452e6f`. The review destination is [draft PR #196](https://github.com/cosmictaserdev-creator/Convx/pull/196).
+Build PR, Universal GMS Debug and the Unit Tests job passed on the earlier lyrics
+and NAS commit `6846a269`. Those results apply to that revision.
 
-The entries below distinguish the submitted port from work present in the local implementation checkout.
-
-| Area | Implementation so far | Remaining |
+| Area | Implemented | Verification remaining |
 |---|---|---|
-| Android module port | Local commit `2c64ebfe` contains the playback domain work, album disc index, Fisheye renderer, lyric stickers, onboarding screen and animated mesh. | Submit the local commit with the app port and verify that combined revision. |
-| Android app port | Wired NAS tag reading, batch imports and embedded artwork through scan and folder browsing. Connected first-run onboarding and the web login sheet to the existing sign-in flow. | Verify album rescans, tag timeout and cancellation, and onboarding, login and back behavior. |
-| Canvas identity | Playback now advances a media generation on each transition. The resolver, texture binding, first-frame callbacks and look samples carry or check the generation. V2 and Classic cover paths read the shared controller. | Finish the cache and fallbacks audit. Exercise rapid skips and repeated IDs across providers. |
-| Decoder and inline video | Added a visual decoder arbiter, tuned buffers, loop caps, drift correction, retry URL re-resolution, conservative letterbox detection and a 16:9 inline frame. Removed the fullscreen polling log. Artist, album and Home visual playback use the arbiter. | Verify decoder handoff, foreground and fullscreen lifecycle, PiP, stall behavior and retry. The physical decoder release order remains unmeasured. |
-| Extended backdrop | A frame-callback renderer uses ten-frame Apple history, a single-frame extension for other loops, and reflection for official video. CPU, API 33+ AGSL and colour-only paths are present, with adaptive tier policy. The shared host mounts the renderer in the player. | Verify anchor geometry, low-end behavior, tier recovery and frame latency. The API 33 shader is a candidate pending device measurement. |
-| Gestures and motion | Shared motion specs shorten existing sheet, corner, landing and pill timings. Axis-lock arbitration and origin-cancellation tests are written. | Wire arbitration through both styles. Reproduce the cover swipe/menu bug and verify queue, cancel and interrupted transitions. |
-| Lyrics | Timed inline preview, an Android Fisheye adapter and a Cupertino line picker are present. The snapshot versions of `LyricsV2.kt` and `MetroLyrics.kt` differ only in line endings. | Finish player preview and lyrics-panel wiring, then check progressive blur and the fallback scrim. |
-| Canvas settings and persistence | Added Auto, Ask and Off settings, Extended video and Colour only settings, a Canvas feedback pill, V2 menu hooks, and per-song decisions in Room. Migration 40 → 41 and the exported schema are present. | Finish the Classic menu action, queue prefetch and the migration proof. |
-| Provider security | Scoped changes reject cleartext provider URLs, preserve cancellation, restrict redirects and headers, and remove request details from several logs. | Finish the cache and Spotify error-log audit. The existing Android `:spotify` module remains the integration point, with its native engine and encrypted credential store. |
+| Android port | Ported the playback domain modules, album disc index, Fisheye renderer, lyric stickers, animated mesh and first-run onboarding. Connected NAS tag reading, batch imports and embedded art to the Android scan and browser flows. Connected the web-login sheet to the existing sign-in flow. | Exercise NAS rescans, tag timeouts, onboarding and account handoff. |
+| Canvas identity | One playback presentation serves V2 and Classic. Every media transition advances a generation, including a return to the same song ID. Provider results, first-frame callbacks, texture binding and palette samples check that generation. Cover and gradient caches are bounded. | Exercise provider responses arriving out of order and rapid skips, including a repeated media ID. |
+| Video | Shared arbitration for the foreground video decoders, tuned buffering and startup delay, loop-specific bitrate and frame-rate caps, drift correction, 16:9 inline layout, conservative letterbox zoom, and retry with URL refresh. Fullscreen uses its existing transition and the shared controller. Removed the fullscreen polling log. | Measure physical decoder handoff. Verify buffering, fullscreen, PiP, stretch and retry on device. |
+| Extended backdrop | Wired a decoder-frame callback to the shared backdrop. Apple uses a ten-frame ring with direction-based lag. Other canvases use single-frame extension and official video uses reflection. Added CPU, API 33+ AGSL and colour-only paths with adaptive tier choice. Live hero blur and mesh work are suppressed when the extended path replaces them. | Compare the AGSL candidate and CPU path on both test phones. Measure latency, draw cost, memory and thermal recovery. |
+| Gestures and motion | Both styles use the cover-axis arbitration and queue swipe. A drag that returns to the origin is cancelled. Sheet, corner, dock landing and artwork transition specs share one owner. The V2 handle draws against sheet progress. | Reproduce the old cover-to-menu failure and verify the fix, queue behavior, cancellation, rollback and device timing. |
+| Lyrics | Wired the opt-in timed preview, Fisheye mode, Cupertino line picker, lyrics edge fades and player header band. The snapshot versions of `LyricsV2.kt`, `MetroLyrics.kt` and `PlayerCoverStyle.kt` have no semantic diff to port. | Verify lyric timing, share selection, scroll, RTL, reduced-motion and small-screen layout. |
+| Preferences and prefetch | Added Auto, Ask and Off, Extended video and Colour only, brief feedback with Undo, and per-song menu actions in both styles. Room migration 40 → 41 persists choices, with generated schema and an instrumentation case. Prefetch is limited to three items and skips authenticated providers. Public MP4 warming uses a separate 6 MiB cache namespace on validated unmetered networks. | Run the Room proof and check queue changes, offline behavior, metered networks and saver transitions. |
+| Provider security | Enforced HTTPS at the media boundary, restricted headers and redirects, bounded provider responses, and removed request details from canvas and video error logs. The existing Android `:spotify` module remains in use for its native engine and existing credential and auth flows. | Smoke-test provider coverage and the authentication path. |
 
-The first local app compile generated Room schema 41. It failed on Canvas string references while the
-resource file was being added. The resource file is now present and the updated app has yet to compile.
-The user deferred further testing. The app tests, Room proof, screenshots, GPU and main-thread timings,
-120 Hz jank, Android 12 low-RAM checks, and 20-minute thermal and battery measurements remain pending.
-The connected Galaxy M34’s installed APK matched the baseline CI artifact. No physical-device measurements
-were collected because the test devices were unavailable.
+The final local `:app:compileUniversalFossDebugKotlin` check passed. The shared host owns playback presentation, backdrop and common interaction layers. Existing styles
+still supply their artwork, transport and page layouts. The device measurements, screenshot and
+instrumented interaction checks, and full CI verification were deferred at the user's request. No 120 Hz
+jank rate, 50 ms latency bound, GPU or main-thread budget, or 20-minute thermal result has been established.
+The Galaxy M34's installed APK matched the baseline CI artifact, and device measurements were unavailable.
+The captions alignment feature is optional and remains deferred.
 
-The original plan follows for scope and acceptance criteria.
+The sections below preserve the original scope, handoff and acceptance criteria.
 
 ## 1. Context
 
@@ -66,7 +61,7 @@ The original plan follows for scope and acceptance criteria.
 > new UI. Do not copy code, assets or names from other projects; describe behaviour in Convx's own terms.
 > Measure before and after on a low-end and a 120 Hz device and keep the numbers in the PR.
 
-## 3. Port status (this session)
+## 3. Original port-session handoff
 
 Base: `port/kmp-work-to-android` (from `integrate/night-debug-2026-11-18`). Files are copied from
 `src/commonMain`/`src/commonTest` of the KMP branch to `src/main`/`src/test`. Everything is uncommitted
@@ -288,9 +283,9 @@ player's current one. `epoch` increases on every media transition; async results
 Open items that remain: none blocking. The owner of items 1 and 3 should keep this file's section 3 as the
 reference for what was held back and why.
 
-## 10. Next steps and notes added after the port session
+## 10. Original next steps and notes after the port session
 
-Next steps, in order (none started):
+These were the next steps at the time of the handoff:
 1. **`:lyrics-data`:** fix the remaining suspend-lambda compiler crash in `LrcRed.kt` the same way as
    `BiniLyrics.kt` (a nullable `get` that calls `lyricsGet` directly, no default suspend lambda). The base line
    breaks this module on its own, so the fix belongs on the base too. Then build and test the module.
