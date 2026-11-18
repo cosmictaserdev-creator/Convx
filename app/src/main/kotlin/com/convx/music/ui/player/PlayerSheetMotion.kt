@@ -5,7 +5,6 @@
 package com.convx.music.ui.player
 
 import androidx.compose.ui.geometry.Rect
-import com.convx.music.playback.presentation.PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT
 import com.convx.music.playback.presentation.PLAYER_MORPH_CORNER_EXPANSION_PROGRESS_BAND
 import com.convx.music.playback.presentation.PLAYER_MORPH_INPUT_MINI_END_PROGRESS
 import com.convx.music.playback.presentation.PLAYER_MORPH_SCREEN_CORNER_EXPANSION_MILLIS
@@ -13,7 +12,6 @@ import com.convx.music.playback.presentation.PlayerMorphCornerRadii
 import com.convx.music.playback.presentation.PlayerMorphGeometry
 import com.convx.music.playback.presentation.PlayerMorphInputOwner
 
-const val ARTWORK_VERTICAL_LINEAR_WEIGHT = PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT
 const val SCREEN_CORNER_EXPANSION_MILLIS = PLAYER_MORPH_SCREEN_CORNER_EXPANSION_MILLIS
 const val CORNER_EXPANSION_PROGRESS_BAND = PLAYER_MORPH_CORNER_EXPANSION_PROGRESS_BAND
 internal const val PLAYER_INPUT_MINI_END_PROGRESS = PLAYER_MORPH_INPUT_MINI_END_PROGRESS

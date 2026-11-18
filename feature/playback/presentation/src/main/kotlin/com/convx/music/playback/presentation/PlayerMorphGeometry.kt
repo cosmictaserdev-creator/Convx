@@ -3,7 +3,6 @@ package com.convx.music.playback.presentation
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.util.lerp
 
-const val PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT = 0.4f
 const val PLAYER_MORPH_SCREEN_CORNER_EXPANSION_MILLIS = 140
 const val PLAYER_MORPH_CORNER_EXPANSION_PROGRESS_BAND = 0.02f
 const val PLAYER_MORPH_INPUT_MINI_END_PROGRESS = 0.2f
@@ -71,13 +70,9 @@ object PlayerMorphGeometry {
 
     fun artworkRect(source: Rect, target: Rect, progress: Float): Rect {
         val fraction = sanitizeProgress(progress)
-        val centerX = lerp(source.center.x, target.center.x, easeOutCubic(fraction))
-        val verticalFraction = lerp(
-            easeInCubic(fraction),
-            fraction,
-            PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT,
-        )
-        val centerY = lerp(source.center.y, target.center.y, verticalFraction)
+        // The sheet's spring already shapes the progress, so the cover travels on it unchanged.
+        val centerX = lerp(source.center.x, target.center.x, fraction)
+        val centerY = lerp(source.center.y, target.center.y, fraction)
         val sourceWidth = source.width.coerceAtLeast(1f)
         val targetWidth = target.width.coerceAtLeast(sourceWidth)
         val scale = lerp(1f, targetWidth / sourceWidth, fraction)
@@ -93,16 +88,8 @@ object PlayerMorphGeometry {
 
     fun artworkWindow(source: Rect, target: Rect, progress: Float): Rect {
         val fraction = sanitizeProgress(progress)
-        val centerX = lerp(source.center.x, target.center.x, easeOutCubic(fraction))
-        val centerY = lerp(
-            source.center.y,
-            target.center.y,
-            lerp(
-                easeInCubic(fraction),
-                fraction,
-                PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT,
-            ),
-        )
+        val centerX = lerp(source.center.x, target.center.x, fraction)
+        val centerY = lerp(source.center.y, target.center.y, fraction)
         val halfWidth = lerp(source.width, target.width, fraction).coerceAtLeast(1f) / 2f
         val halfHeight = lerp(source.height, target.height, fraction).coerceAtLeast(1f) / 2f
         return Rect(centerX - halfWidth, centerY - halfHeight, centerX + halfWidth, centerY + halfHeight)
