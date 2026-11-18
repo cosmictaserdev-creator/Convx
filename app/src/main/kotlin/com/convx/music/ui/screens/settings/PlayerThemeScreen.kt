@@ -239,7 +239,7 @@ fun PlayerThemeScreen(
     Column(
         // Scroll first, then pad: the padding belongs to the content, so rows travel under the
         // top bar and the side bar instead of being cut off at their edges.
-        Modifier.then(chrome.contentModifier())
+        Modifier.then(chrome.contentModifier()).align(Alignment.TopCenter)
             .widthIn(max = 720.dp)
             .verticalScroll(rememberScrollState())
             .windowInsetsPadding(LocalPlayerAwareWindowInsets.current),

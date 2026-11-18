@@ -310,7 +310,7 @@ fun GlassEffectSettings(
         onBackLongClick = navController::backToMain,
     ) { chrome ->
     Column(
-        Modifier.then(chrome.contentModifier())
+        Modifier.then(chrome.contentModifier()).align(Alignment.TopCenter)
             .widthIn(max = 720.dp)
             .fillMaxSize()
             .windowInsetsPadding(LocalPlayerAwareWindowInsets.current)
