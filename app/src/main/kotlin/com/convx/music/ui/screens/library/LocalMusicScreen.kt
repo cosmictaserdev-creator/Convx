@@ -148,27 +148,7 @@ fun LocalMusicScreen(
 
     val lazyListState = rememberLazyListState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-    LazyColumn(
-        state = lazyListState,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        item(key = "header") {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(R.string.filter_local),
-                        style = AppTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f),
-                    )
+    val toolbarActions: @Composable () -> Unit = {
                     if (hasStoragePermission) {
                         IconButton(
                             onClick = {
@@ -215,6 +195,37 @@ fun LocalMusicScreen(
                             }
                         }
                     }
+    }
+    val titleProgress = com.convx.music.ui.component.rememberTitleCollapseProgressState(lazyListState, titleItemKey = "header")
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.filter_local),
+        titleAlpha = 0f,
+        titleAlphaProvider = { titleProgress.value },
+        onBack = { navController.navigateUp() },
+        actions = toolbarActions,
+    ) { chrome ->
+    LazyColumn(
+        state = lazyListState,
+        modifier = Modifier.fillMaxSize().then(chrome.contentModifier()),
+        contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
+    ) {
+        item(key = "header") {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.filter_local),
+                        style = AppTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
+
                 }
 
                 Spacer(Modifier.height(4.dp))

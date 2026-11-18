@@ -276,28 +276,24 @@ fun ChangelogScreen(
         fetchChangelog(currentVersionTag)
     }
 
+    com.convx.music.ui.component.ScreenScaffold(
+        title = stringResource(R.string.changelog_title),
+        titleAlpha = 1f,
+        onBack = navController::navigateUp,
+    ) { chrome ->
     Scaffold(
-        modifier = Modifier.pullToRefresh(
+        modifier = Modifier.then(chrome.contentModifier()).pullToRefresh(
             state = pullToRefreshState,
             isRefreshing = isRefreshing,
             onRefresh = { fetchChangelog(currentVersionTag) }
         ),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.changelog_title)) },
-                navigationIcon = {
-                    IconButton(onClick = navController::navigateUp) {
-                        SymbolIcon(symbol = sf("SFChevronLeft"), contentDescription = null)
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        }
+
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(top = com.convx.music.ui.component.TopBarContentHeight)
                 .background(AppTheme.colorScheme.background)
                 .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom))
         ) {
@@ -470,6 +466,7 @@ fun ChangelogScreen(
                 PullToRefreshDefaults.LoadingIndicator(state = pullToRefreshState, isRefreshing = isRefreshing)
             }
         }
+    }
     }
 }
 
