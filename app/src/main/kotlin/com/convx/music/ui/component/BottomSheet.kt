@@ -8,11 +8,7 @@ package com.convx.music.ui.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -43,14 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import com.convx.music.ui.player.PlayerMorph
-import com.convx.music.ui.player.SCREEN_CORNER_EXPANSION_MILLIS
 import com.convx.music.ui.player.recordPlayerLayer
 import com.convx.music.ui.player.sharedContainerCornerRadius
 import com.convx.music.playback.presentation.PLAYER_MORPH_CONTENT_APPEAR_END
 import com.convx.music.playback.presentation.PLAYER_MORPH_CONTENT_APPEAR_START
 import com.convx.music.playback.presentation.PLAYER_MORPH_LAYER_HANDOFF_PROGRESS
 import com.convx.music.playback.presentation.PLAYER_MORPH_MINI_FADE_END
-import com.convx.music.designsystem.MotionTokens
+import com.convx.music.designsystem.PlayerMotionSpec
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.pointerInput
@@ -84,13 +79,7 @@ internal const val PLAYER_CONTENT_APPEAR_END = PLAYER_MORPH_CONTENT_APPEAR_END
  *  the first capture after the glass fades in is warm, not a stale frame. */
 internal const val PLAYER_GLASS_UNFREEZE_PROGRESS = 0.75f
 
-/** Spring stiffness for opening and closing the player sheet. */
-private const val PlayerSheetStiffness = MotionTokens.PlayerSheetStiffness
-
 private const val BackdropFreezeSafetyNs = 900_000_000L
-
-/** Close spring damping when the sheet lands into the mini pill with speed. */
-private const val COLLAPSE_LANDING_DAMPING = MotionTokens.PlayerSheetLandingDamping
 
 /** How far (of the collapse travel) a full predictive-back swipe previews. */
 private const val PREDICTIVE_BACK_TRAVEL = 0.35f
@@ -152,7 +141,7 @@ fun BottomSheet(
         cornerExpansion.animateTo(
             targetValue = if (state.isExpanded) 1f else 0f,
             // Avoid overshoot, which can briefly produce an invalid corner radius.
-            animationSpec = spring(dampingRatio = 1f, stiffness = 550f),
+            animationSpec = PlayerMotionSpec.screenCorner(),
         )
     }
 
@@ -433,10 +422,7 @@ class BottomSheetState(
 
     /** Critically damped normally; a touch underdamped when a landing handler wants the
      *  arrival speed (only reachable because the collapsed bound stops the overshoot). */
-    private fun collapseSpring() = spring<Dp>(
-        dampingRatio = if (onCollapseLanded != null) COLLAPSE_LANDING_DAMPING else Spring.DampingRatioNoBouncy,
-        stiffness = PlayerSheetStiffness,
-    )
+    private fun collapseSpring() = PlayerMotionSpec.sheetClose<Dp>(landing = onCollapseLanded != null)
 
     fun expand(animationSpec: AnimationSpec<Dp>, initialVelocity: Dp = 0.dp) {
         onAnchorChanged(expandedAnchor)
@@ -453,10 +439,7 @@ class BottomSheetState(
 
     private fun expand(velocityPxPerSec: Float = 0f) {
         expand(
-            spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = PlayerSheetStiffness,
-            ),
+            PlayerMotionSpec.sheetOpen(),
             initialVelocity = with(density) { velocityPxPerSec.toDp() },
         )
     }
@@ -471,10 +454,7 @@ class BottomSheetState(
         // Match the opening spring to [collapseSoft].
         endDragState()
         expand(
-            spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = PlayerSheetStiffness,
-            ),
+            PlayerMotionSpec.sheetOpen(),
         )
     }
 

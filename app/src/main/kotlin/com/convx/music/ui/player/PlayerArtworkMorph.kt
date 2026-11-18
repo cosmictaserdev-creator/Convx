@@ -15,7 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
@@ -43,6 +43,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size as CoilSize
+import com.convx.music.designsystem.PlayerMotionSpec
 import com.convx.music.ui.component.PLAYER_MINI_FADE_END
 import com.convx.music.ui.utils.resize
 import kotlin.math.roundToInt
@@ -264,20 +265,22 @@ fun PlayerArtworkMorphOverlay(
             }
             .then(
                 if (heroFade != null) {
-                    Modifier.drawWithContent {
-                        drawContent()
-                        val fraction = progress().coerceIn(0f, 1f)
+                    Modifier.drawWithCache {
                         // Target rect inside this square, in local px (pre-scale).
                         val top = (size.height - target.height) / 2f
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colorStops = heroFade,
-                                startY = top,
-                                endY = top + target.height,
-                            ),
-                            alpha = fraction,
-                            blendMode = BlendMode.DstOut,
+                        val mask = Brush.verticalGradient(
+                            colorStops = heroFade,
+                            startY = top,
+                            endY = top + target.height,
                         )
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(
+                                brush = mask,
+                                alpha = sanitizedProgress(progress()),
+                                blendMode = BlendMode.DstOut,
+                            )
+                        }
                     }
                 } else {
                     Modifier
@@ -318,21 +321,13 @@ fun PlayerArtworkMorphOverlay(
  * Still -> video dissolve across the back half of the flight, smoothstepped so neither end
  * is visible. The same function both ways: an open ends on the video, a close starts on it.
  */
-internal fun posterAlpha(progress: Float): Float {
-    val t = ((sanitizedProgress(progress) - 0.35f) / 0.55f).coerceIn(0f, 1f)
-    return t * t * (3f - 2f * t)
-}
-
-private fun artworkEndpointEase(value: Float): Float {
-    val t = value.coerceIn(0f, 1f)
-    return t * t * (3f - 2f * t)
-}
+internal fun posterAlpha(progress: Float): Float = PlayerMotionSpec.posterAlpha(sanitizedProgress(progress))
 
 internal fun miniArtworkEndpointAlpha(progress: Float): Float =
-    1f - artworkEndpointEase(sanitizedProgress(progress) / 0.18f)
+    PlayerMotionSpec.miniArtworkAlpha(sanitizedProgress(progress))
 
 internal fun fullArtworkEndpointAlpha(progress: Float): Float =
-    artworkEndpointEase((sanitizedProgress(progress) - 0.82f) / 0.18f)
+    PlayerMotionSpec.fullArtworkAlpha(sanitizedProgress(progress))
 
 internal fun flyingArtworkEndpointAlpha(progress: Float): Float =
     (1f - miniArtworkEndpointAlpha(progress) - fullArtworkEndpointAlpha(progress)).coerceIn(0f, 1f)
@@ -392,7 +387,7 @@ private fun FancyArtworkFadeOverlay(
     val density = LocalDensity.current
     val boxWidthDp = with(density) { mini.rect.width.toDp() }
     val boxHeightDp = with(density) { mini.rect.height.toDp() }
-    val miniRadiusDp = with(density) { mini.radiusPx.toDp() }
+    val miniShape = RoundedCornerShape(with(density) { mini.radiusPx.toDp() })
     Box(
         modifier = Modifier
             .offset { IntOffset(mini.rect.left.roundToInt(), mini.rect.top.roundToInt()) }
@@ -409,7 +404,7 @@ private fun FancyArtworkFadeOverlay(
                 scaleX = shrinkScale
                 scaleY = shrinkScale
                 transformOrigin = TransformOrigin.Center
-                shape = RoundedCornerShape(miniRadiusDp)
+                shape = miniShape
                 clip = true
             },
     ) {

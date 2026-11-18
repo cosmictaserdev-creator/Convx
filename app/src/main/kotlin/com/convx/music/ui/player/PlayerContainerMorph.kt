@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
+import com.convx.music.designsystem.PlayerMotionSpec
 import kotlin.math.roundToInt
 import com.convx.music.ui.component.PLAYER_CONTENT_APPEAR_END
 import com.convx.music.ui.component.PLAYER_CONTENT_APPEAR_START
@@ -272,10 +273,6 @@ fun PlayerContainerMorphOverlay(
     )
 }
 
-/** How much the landing pill flattens at the bottom of its dip, and widens with it. */
-private const val LANDING_SQUASH = com.convx.music.designsystem.MotionTokens.PlayerLandingSquash
-private const val LANDING_SPREAD = com.convx.music.designsystem.MotionTokens.PlayerLandingSpread
-
 /**
  * The card during a close landing: the pill's own rect carried [PlayerMorph.landingDipPx]
  * below its slot, flattened and slightly widened in proportion (liquid squash), springing
@@ -285,8 +282,8 @@ private fun landingCardRect(mini: Rect): Rect {
     val dip = PlayerMorph.landingDipPx()
     val maxDip = PlayerMorph.landingMaxDipPx
     val squash = if (maxDip > 0f) (dip / maxDip).coerceIn(-1f, 1f) else 0f
-    val height = mini.height * (1f - LANDING_SQUASH * squash)
-    val width = mini.width * (1f + LANDING_SPREAD * squash)
+    val height = mini.height * (1f - PlayerMotionSpec.LandingSquash * squash)
+    val width = mini.width * (1f + PlayerMotionSpec.LandingSpread * squash)
     val bottom = mini.bottom + dip
     val centerX = mini.center.x
     return Rect(centerX - width / 2f, bottom - height, centerX + width / 2f, bottom)

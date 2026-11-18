@@ -42,7 +42,7 @@ object PlayerMorph {
 
     /**
      * 0..1 multiplier on the docked pill's drop shadow. Snaps to 0 when the morph takes the
-     * pill, eases back to 1 after it lands ([PILL_SHADOW_RETURN_MS]): the returning shadow
+     * pill, eases back to 1 after it lands: the returning shadow
      * fades in instead of popping on the landing frame. Read in the draw phase only.
      */
     val pillShadow = androidx.compose.animation.core.Animatable(1f)

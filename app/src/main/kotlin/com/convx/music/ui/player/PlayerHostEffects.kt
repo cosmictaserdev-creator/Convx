@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.convx.music.constants.PlayerBackgroundStyle
 import com.convx.music.ui.component.BottomSheetState
-import com.convx.music.designsystem.MotionTokens
+import com.convx.music.designsystem.PlayerMotionSpec
 import kotlinx.coroutines.launch
 
 /** Status-bar icon colour and keep-screen-on while the sheet is expanded; skipped for the DIY preview copy. */
@@ -139,15 +139,12 @@ internal suspend fun playPillLanding(
     val fullHeightPx = with(density) { state.expandedBound.toPx() }
     // Card centre per unit of progress near the pill end: screen centre -> pill centre.
     PlayerMorph.landingTravelPx = pill.center.y - fullHeightPx / 2f
-    PlayerMorph.landingMaxDipPx = with(density) { LANDING_MAX_DIP.toPx() }
+    PlayerMorph.landingMaxDipPx = with(density) { PlayerMotionSpec.LandingMaxDipDp.dp.toPx() }
     try {
         PlayerMorph.landing.snapTo(0f)
         PlayerMorph.landing.animateTo(
             targetValue = 0f,
-            animationSpec = androidx.compose.animation.core.spring(
-                dampingRatio = LANDING_DAMPING,
-                stiffness = LANDING_STIFFNESS,
-            ),
+            animationSpec = PlayerMotionSpec.pillLanding(),
             initialVelocity = progressVelocity,
         )
     } finally {
@@ -156,8 +153,3 @@ internal suspend fun playPillLanding(
 }
 
 internal var landingGeneration = 0
-
-/** Slow landing rebound with one soft secondary bounce. */
-private const val LANDING_DAMPING = MotionTokens.PlayerLandingDamping
-private const val LANDING_STIFFNESS = MotionTokens.PlayerLandingStiffness
-private val LANDING_MAX_DIP = MotionTokens.PlayerLandingMaxDipDp.dp

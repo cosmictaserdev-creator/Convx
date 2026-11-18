@@ -47,7 +47,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.height
+import com.convx.music.designsystem.PlayerMotionSpec
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -253,13 +255,13 @@ fun FloatingMiniPlayer(
     val miniShadowPx = with(density) { (if (isInline) 6.dp else 12.dp).toPx() }
     androidx.compose.runtime.SideEffect { PlayerMorph.miniShadowElevationPx = miniShadowPx }
     LaunchedEffect(Unit) {
-        androidx.compose.runtime.snapshotFlow { PlayerMorph.active || PlayerMorph.landingActive }.collect { flying ->
+        androidx.compose.runtime.snapshotFlow { PlayerMorph.active || PlayerMorph.landingActive }.collectLatest { flying ->
             if (flying) {
                 PlayerMorph.pillShadow.snapTo(0f)
             } else if (PlayerMorph.pillShadow.value < 1f) {
                 PlayerMorph.pillShadow.animateTo(
                     1f,
-                    androidx.compose.animation.core.tween(PILL_SHADOW_RETURN_MS, easing = SeamlessEasing),
+                    PlayerMotionSpec.pillShadowReturn(),
                 )
             }
         }
@@ -765,6 +767,3 @@ internal fun Modifier.noOvershootContent(): Modifier {
         }
     }
 }
-
-/** How long the docked pill's shadow takes to come back after the player lands in it. */
-internal const val PILL_SHADOW_RETURN_MS = 320
