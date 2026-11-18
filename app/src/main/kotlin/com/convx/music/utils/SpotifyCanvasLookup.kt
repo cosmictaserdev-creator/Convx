@@ -43,8 +43,8 @@ object SpotifyCanvasLookup {
             null
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
-            Timber.tag("SpotifyCanvas").w("lookup failed: %s", e.message)
+        } catch (_: Exception) {
+            Timber.tag("SpotifyCanvas").w("Canvas lookup failed")
             null
         }
     }

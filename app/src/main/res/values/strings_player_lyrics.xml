@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lyrics_animation_fisheye">Fisheye</string>
+    <string name="player_inline_lyrics">Show current lyric in the player</string>
+</resources>

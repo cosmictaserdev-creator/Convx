@@ -805,12 +805,14 @@ enum class LyricsAnimationStyle {
 
     /** Lines on a tilted plane that recedes into a starfield, like an opening crawl. */
     STAR_CRAWL,
+    FISHEYE,
 }
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
 val LyricsFontKey = stringPreferencesKey("lyricsFont")
 val LyricsCustomFontKey = stringPreferencesKey("lyricsCustomFont")
 val LyricsLineSpacingKey = floatPreferencesKey("lyricsLineSpacing")
+val PlayerInlineLyricsKey = booleanPreferencesKey("playerInlineLyrics")
 
 val PlayerVolumeKey = floatPreferencesKey("playerVolume")
 val RepeatModeKey = intPreferencesKey("repeatMode")
@@ -818,6 +820,11 @@ val RepeatModeKey = intPreferencesKey("repeatMode")
 val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")
 val CanvasThumbnailAnimationKey = booleanPreferencesKey("canvasThumbnailAnimation")
+val CanvasModeKey = stringPreferencesKey("canvasMode")
+val CanvasBackdropModeKey = stringPreferencesKey("canvasBackdropMode")
+
+enum class CanvasMode { AUTO, ASK, OFF }
+enum class CanvasBackdropMode { EXTENDED_VIDEO, COLOUR_ONLY }
 val CanvasSourceKey = stringPreferencesKey("canvasSource")
 
 // Ambient Mode settings are separate from the main player canvas preferences.

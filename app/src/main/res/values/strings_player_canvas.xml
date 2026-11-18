@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_canvas_mode">Canvas playback</string>
+    <string name="player_canvas_mode_auto">Auto</string>
+    <string name="player_canvas_mode_ask">Ask</string>
+    <string name="player_canvas_mode_off">Off</string>
+    <string name="player_canvas_backdrop">Canvas backdrop</string>
+    <string name="player_canvas_backdrop_extended">Extended video</string>
+    <string name="player_canvas_backdrop_colour">Colour only</string>
+    <string name="player_canvas_on">Canvas on</string>
+    <string name="player_canvas_enable">Turn Canvas on</string>
+    <string name="player_canvas_disable">Turn Canvas off</string>
+    <string name="player_canvas_show">Show Canvas</string>
+    <string name="player_collapse">Collapse player</string>
+</resources>

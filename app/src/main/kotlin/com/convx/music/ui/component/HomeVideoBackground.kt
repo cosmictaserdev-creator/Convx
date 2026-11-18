@@ -5,6 +5,7 @@
 
 package com.convx.music.ui.component
 
+import android.net.Uri
 import android.view.TextureView
 import android.view.ViewGroup
 import androidx.compose.animation.core.animateFloatAsState
@@ -12,11 +13,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import com.convx.music.ui.ios.compat.AppTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,29 +26,28 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import android.net.Uri
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
-import java.io.File
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.datasource.FileDataSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import com.convx.music.ui.ios.compat.AppTheme
+import com.convx.music.ui.player.video.PlayerVideoBuffers
+import com.convx.music.ui.player.video.PlayerVideoDecoder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.IOException
 
-/**
- * Looping, muted, no-controls video loop for the Home background — the video
- * counterpart to [HomeImageBackground]. Renders through a [TextureView] (not
- * PlayerView/SurfaceView): a TextureView is a normal View Compose can apply
- * [Modifier.blur] and alpha to correctly, same reasoning as the player's own
- * [com.convx.music.ui.player.BackgroundVideoView].
- *
- * Local file only — the background video is copied into app storage the same
- * way the image is (see HomeBackgroundControls), so this needs none of the
- * streaming cache/track-selector machinery the player's canvas video does.
- */
+/** Muted Home background for a video copied into the app's private files directory. */
 @Composable
 fun BoxScope.HomeVideoBackground(
     path: String,
@@ -56,86 +56,107 @@ fun BoxScope.HomeVideoBackground(
     withGradient: Boolean = false,
 ) {
     val context = LocalContext.current
-    var isReady by remember(path) { mutableStateOf(false) }
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    var inForeground by remember(lifecycleOwner) {
-        mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var inForeground by remember(lifecycle) {
+        mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))
     }
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START, Lifecycle.Event.ON_RESUME -> inForeground = true
-                Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_PAUSE -> inForeground = false
-                else -> Unit
-            }
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, _ ->
+            inForeground = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
     }
 
-    val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_ONE
-            volume = 0f
-            playWhenReady = inForeground
-        }
+    val exoPlayer = remember(context, path) {
+        PlayerVideoDecoder.build(
+            context,
+            ProgressiveMediaSource.Factory(FileDataSource.Factory()),
+            PlayerVideoDecoder.Use.BACKGROUND,
+        )
     }
-
-    LaunchedEffect(inForeground) {
-        if (exoPlayer.playWhenReady != inForeground) {
-            exoPlayer.playWhenReady = inForeground
-        }
-    }
+    var isReady by remember(exoPlayer) { mutableStateOf(false) }
+    var failed by remember(exoPlayer) { mutableStateOf(false) }
+    var isVisible by remember(exoPlayer) { mutableStateOf(false) }
+    val shouldPlay = isVisible && inForeground
 
     DisposableEffect(exoPlayer) {
         val listener = object : Player.Listener {
             override fun onRenderedFirstFrame() {
-                isReady = true
+                if (PlayerVideoDecoder.owns(exoPlayer)) isReady = true
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                if (!PlayerVideoDecoder.owns(exoPlayer)) return
+                failed = true
+                PlayerVideoDecoder.release(exoPlayer)
             }
         }
         exoPlayer.addListener(listener)
         onDispose {
             exoPlayer.removeListener(listener)
+            PlayerVideoDecoder.release(exoPlayer)
             exoPlayer.release()
         }
     }
 
-    LaunchedEffect(path) {
-        isReady = false
-        exoPlayer.setMediaItem(MediaItem.fromUri(Uri.fromFile(File(path))))
-        exoPlayer.prepare()
+    LaunchedEffect(exoPlayer, shouldPlay) {
+        if (!shouldPlay) {
+            PlayerVideoDecoder.release(exoPlayer)
+            return@LaunchedEffect
+        }
+        if (failed) return@LaunchedEffect
+        delay(PlayerVideoBuffers.SETTLE_MS.toLong())
+        val file = withContext(Dispatchers.IO) {
+            homeVideoFile(path, context.filesDir)
+        } ?: return@LaunchedEffect
+        val mediaItem = MediaItem.fromUri(Uri.fromFile(file))
+
+        fun prepareIfAvailable() {
+            if (failed || !isVisible || !inForeground || !PlayerVideoDecoder.available.value) return
+            val claimed = PlayerVideoDecoder.claim(exoPlayer, PlayerVideoDecoder.PRIORITY_BACKGROUND) {
+                isReady = false
+            }
+            if (!claimed) return
+
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
+            exoPlayer.playWhenReady = true
+        }
+
+        PlayerVideoDecoder.available.collect { available ->
+            if (available) prepareIfAvailable()
+        }
     }
 
-    val alpha by animateFloatAsState(targetValue = if (isReady) 1f else 0f, animationSpec = tween(600), label = "homeVideoAlpha")
-
-    AndroidView(
-        factory = { ctx ->
-            TextureView(ctx).apply {
-                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                isEnabled = false
-                isClickable = false
-                isFocusable = false
-                surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                    override fun onSurfaceTextureAvailable(surface: android.graphics.SurfaceTexture, width: Int, height: Int) {
-                        exoPlayer.setVideoTextureView(this@apply)
-                    }
-                    override fun onSurfaceTextureSizeChanged(surface: android.graphics.SurfaceTexture, width: Int, height: Int) {}
-                    override fun onSurfaceTextureDestroyed(surface: android.graphics.SurfaceTexture): Boolean = true
-                    override fun onSurfaceTextureUpdated(surface: android.graphics.SurfaceTexture) {}
-                }
-            }
-        },
-        modifier = Modifier
-            .matchParentSize()
-            .graphicsLayer {
-                this.alpha = alpha
-                val overscan = if (blur > 0f) 1.12f else 1f
-                scaleX = overscan
-                scaleY = overscan
-            }
-            .blur(blur.dp),
+    val alpha by animateFloatAsState(
+        targetValue = if (isReady && shouldPlay) 1f else 0f,
+        animationSpec = tween(600),
+        label = "homeVideoAlpha",
     )
+    key(exoPlayer) {
+        AndroidView(
+            factory = { ctx ->
+                TextureView(ctx).apply {
+                    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                    isEnabled = false
+                    isClickable = false
+                    isFocusable = false
+                    exoPlayer.setVideoTextureView(this)
+                }
+            },
+            modifier = Modifier
+                .matchParentSize()
+                .onVisibilityChanged(minFractionVisible = 0f) { isVisible = it }
+                .graphicsLayer {
+                    this.alpha = alpha
+                    val overscan = if (blur > 0f) 1.12f else 1f
+                    scaleX = overscan
+                    scaleY = overscan
+                }
+                .blur(blur.dp),
+        )
+    }
     Box(
         modifier = Modifier
             .matchParentSize()
@@ -154,4 +175,12 @@ fun BoxScope.HomeVideoBackground(
                 ),
         )
     }
+}
+
+private fun homeVideoFile(path: String, filesDir: File): File? = try {
+    File(path).canonicalFile.takeIf { file ->
+        file.parentFile == filesDir.canonicalFile && file.isFile
+    }
+} catch (_: IOException) {
+    null
 }

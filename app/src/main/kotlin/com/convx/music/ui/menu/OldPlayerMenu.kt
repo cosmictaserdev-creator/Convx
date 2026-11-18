@@ -91,6 +91,7 @@ fun OldPlayerMenu(
     val ringtoneViewModel = com.convx.music.LocalRingtoneViewModel.current
     val database = LocalDatabase.current.get()
     val playerConnection = LocalPlayerConnection.current ?: return
+    val canvasMenuItem = com.convx.music.ui.player.playerCanvasMenuItem(mediaMetadata.id, onDismiss)
     val coroutineScope = rememberCoroutineScope()
     val playerVolume = playerConnection.service.playerVolume.collectAsStateWithLifecycle()
 
@@ -290,6 +291,7 @@ fun OldPlayerMenu(
         item {
             IosMenuGroup(
                 items = buildList {
+                    canvasMenuItem?.let { add(it) }
                     if (!isListenTogetherGuest) {
                         add(
                             IosMenuItemData(

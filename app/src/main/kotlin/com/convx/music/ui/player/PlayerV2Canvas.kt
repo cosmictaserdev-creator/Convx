@@ -6,7 +6,6 @@
 
 package com.convx.music.ui.player
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.view.TextureView
 import android.view.ViewGroup
@@ -17,15 +16,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -34,34 +33,51 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.ui.AspectRatioFrameLayout
-import com.convx.music.applecanvas.AppleMusicCanvasProvider
-import com.convx.music.canvas.CanvasArtwork
-import com.convx.music.canvas.TidalCanvasProvider
 import com.convx.music.constants.CanvasSource
 import com.convx.music.constants.CanvasSourceKey
 import com.convx.music.constants.CanvasThumbnailAnimationKey
+import com.convx.music.LocalDatabase
+import com.convx.music.constants.CanvasBackdropMode
+import com.convx.music.constants.CanvasBackdropModeKey
+import com.convx.music.constants.CanvasMode
+import com.convx.music.constants.CanvasModeKey
+import com.convx.music.constants.DataSaverEnabledKey
+import com.convx.music.constants.ReduceDynamicBlurKey
+import com.convx.music.db.entities.CanvasDecisionEntity
 import com.convx.music.models.MediaMetadata
+import com.convx.music.playback.CanvasDecision
+import com.convx.music.playback.CanvasSession
+import com.convx.music.playback.CanvasTrack
+import com.convx.music.playback.PlayerConnection
+import com.convx.music.playback.secureCanvasUrl
 import com.convx.music.utils.rememberEnumPreference
 import com.convx.music.utils.rememberPreference
-import com.convx.music.convxcanvas.ConvxCanvasProvider
-import com.convx.music.utils.SpotifyCanvasLookup
+import com.convx.music.ui.player.video.PlayerVideoDecoder
+import com.convx.music.ui.player.video.PlayerVideoBuffers
+import com.convx.music.ui.player.video.letterboxCropZoom
+import com.convx.music.ui.player.backdrop.PlayerBackdrop
+import com.convx.music.ui.player.backdrop.PlayerBackdropTier
+import com.convx.music.ui.player.backdrop.rememberPlayerBackdropTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 /*
  * One muted canvas player and decoder are shared by the cover and lyrics/queue surfaces.
@@ -78,6 +94,7 @@ class CanvasVideoLook(
     /** One representative frame, for the blurred-artwork backgrounds. */
     val representative: Bitmap,
     val liveFrameVersion: Long = 0L,
+    internal val epoch: Long? = null,
 )
 
 /**
@@ -85,28 +102,28 @@ class CanvasVideoLook(
  * readbacks spread over its first seconds -- never per frame -- and cached, so a replay or
  * a revisit is instant and the background eases between two fixed palettes.
  */
-object CanvasVideoLooks {
-    private val cache = android.util.LruCache<String, CanvasVideoLook>(24)
+internal object CanvasVideoLooks {
     private val latest = mutableStateOf<CanvasVideoLook?>(null)
+    private val extendedTrack = mutableStateOf<CanvasTrack?>(null)
 
-    /** Composition-safe: re-reads when a new look lands, never per frame. */
-    fun forMedia(mediaId: String?): CanvasVideoLook? {
-        if (mediaId == null) return null
-        val newest = latest.value
-        return if (newest?.mediaId == mediaId) newest else cache.get(mediaId)
+    fun forMedia(track: CanvasTrack, mediaId: String?): CanvasVideoLook? =
+        latest.value?.takeIf { it.mediaId == mediaId && mediaId == track.mediaId && it.epoch == track.epoch }
+
+    fun hasExtendedBackdrop(track: CanvasTrack): Boolean = extendedTrack.value == track
+
+    fun setExtendedBackdrop(track: CanvasTrack?, active: Boolean) {
+        if (active) extendedTrack.value = track
+        else if (extendedTrack.value == track) extendedTrack.value = null
     }
 
-    internal fun has(mediaId: String): Boolean = cache.get(mediaId) != null
-
-    internal fun publish(look: CanvasVideoLook) {
-        cache.put(look.mediaId, look)
+    fun publish(look: CanvasVideoLook) {
         latest.value = look
     }
 
-    internal fun publishLiveFrame(mediaId: String, frame: Bitmap, stitched: Bitmap) {
-        val look = CanvasVideoLook(mediaId, stitched, frame, android.os.SystemClock.uptimeMillis())
-        cache.put(mediaId, look)
-        latest.value = look
+    fun clear(track: CanvasTrack?) {
+        setExtendedBackdrop(track, false)
+        val look = latest.value ?: return
+        if (look.mediaId == track?.mediaId && look.epoch == track?.epoch) latest.value = null
     }
 }
 
@@ -119,12 +136,18 @@ private const val SAMPLE_GAP_MS = 1_100L
  * Samples [mediaId]'s look off [texture]. Main thread (TextureView.getBitmap), but only
  * four 96px readbacks across ~4s; the stitch runs on Default.
  */
-internal suspend fun sampleCanvasVideoLook(mediaId: String, texture: () -> TextureView?) {
-    if (CanvasVideoLooks.has(mediaId)) return
+internal suspend fun sampleCanvasVideoLook(
+    track: CanvasTrack,
+    isCurrent: () -> Boolean,
+    texture: () -> TextureView?,
+) {
+    val mediaId = track.mediaId ?: return
+    if (CanvasVideoLooks.forMedia(track, mediaId) != null) return
     val frames = ArrayList<Bitmap>(SAMPLE_COUNT)
     delay(SAMPLE_START_MS)
     for (i in 0 until SAMPLE_COUNT) {
         if (i > 0) delay(SAMPLE_GAP_MS)
+        if (!isCurrent()) return
         val view = texture()?.takeIf { it.isAvailable } ?: break
         view.getBitmap(SAMPLE_SIZE_PX, SAMPLE_SIZE_PX)?.let(frames::add)
     }
@@ -144,26 +167,7 @@ internal suspend fun sampleCanvasVideoLook(mediaId: String, texture: () -> Textu
         }
         out
     }
-    CanvasVideoLooks.publish(CanvasVideoLook(mediaId, stitched, frames[frames.size / 2]))
-}
-
-private const val LIVE_FRAME_SAMPLE_MS = 1_200L
-private const val LIVE_FRAME_SAMPLE_PX = 48
-
-internal suspend fun sampleLiveCanvasVideoLook(mediaId: String, texture: () -> TextureView?) {
-    while (currentCoroutineContext().isActive) {
-        delay(LIVE_FRAME_SAMPLE_MS)
-        val frame = texture()?.takeIf { it.isAvailable }?.getBitmap(LIVE_FRAME_SAMPLE_PX, LIVE_FRAME_SAMPLE_PX) ?: continue
-        val stitched = withContext(Dispatchers.Default) {
-            Bitmap.createBitmap(LIVE_FRAME_SAMPLE_PX * 2, LIVE_FRAME_SAMPLE_PX * 2, Bitmap.Config.ARGB_8888).also { bitmap ->
-                val canvas = android.graphics.Canvas(bitmap)
-                for (y in 0..1) for (x in 0..1) {
-                    canvas.drawBitmap(frame, x * LIVE_FRAME_SAMPLE_PX.toFloat(), y * LIVE_FRAME_SAMPLE_PX.toFloat(), null)
-                }
-            }
-        }
-        CanvasVideoLooks.publishLiveFrame(mediaId, frame, stitched)
-    }
+    if (isCurrent()) CanvasVideoLooks.publish(CanvasVideoLook(mediaId, stitched, frames[frames.size / 2], epoch = track.epoch))
 }
 
 /**
@@ -183,7 +187,10 @@ internal object CanvasPosterSource {
 class CanvasVideoController internal constructor(
     internal val exoPlayer: ExoPlayer,
     private val scope: CoroutineScope,
+    internal val trackState: StateFlow<CanvasTrack>,
+    private val downloadCache: androidx.media3.datasource.cache.Cache,
 ) {
+    private fun currentTrack() = trackState.value
     /** Loop-level dissolve: out on a track change, in on the first frame. */
     internal val fade = Animatable(0f)
     internal var videoAspect by mutableFloatStateOf(1f)
@@ -192,12 +199,33 @@ class CanvasVideoController internal constructor(
     internal var surfaceWithFrame by mutableStateOf<TextureView?>(null)
         private set
 
-    private var loadingMediaId: String? = null
+    internal var session by mutableStateOf(CanvasSession(currentTrack()))
+        private set
+    internal var decision by mutableStateOf<CanvasDecision?>(null)
+        private set
+    internal var loadGeneration by mutableStateOf(0L)
+        private set
+    internal val backdrop = PlayerBackdrop()
+    internal var canvasMode by mutableStateOf(CanvasMode.OFF)
+    internal var canvasOverride by mutableStateOf<Boolean?>(null)
+    internal var canvasToggle by mutableStateOf<((Boolean) -> Unit)?>(null)
+    internal val canvasEnabled get() = canvasMode != CanvasMode.OFF && (canvasOverride ?: (canvasMode == CanvasMode.AUTO))
+    internal var hasRenderableMedia by mutableStateOf(false)
+        private set
+    internal var letterboxZoom by mutableFloatStateOf(1f)
+        private set
+    private var letterboxSample: Bitmap? = null
+    private var letterboxPixels: IntArray? = null
+    private var letterboxCandidate = 1f
+    private var letterboxHits = 0
+    private var lastLetterboxMs = 0L
+    private var loadingTrack: CanvasTrack? = null
+    private val loadingMediaId get() = loadingTrack?.mediaId
     private var loadingUrl: String? = null
     private var primary: String? = null
     private var fallback: String? = null
     private var loadingVideoStream: com.convx.music.utils.YTPlayerUtils.VideoStream? = null
-    private var frameMediaId: String? = null
+    private var frameTrack: CanvasTrack? = null
     private var boundTexture: TextureView? = null
     private val attached = ArrayList<Pair<Any, TextureView>>()
     private var fadeInJob: Job? = null
@@ -222,7 +250,25 @@ class CanvasVideoController internal constructor(
     }
 
     internal fun onSurfaceFrame(view: TextureView) {
-        if (boundTexture === view && surfaceWithFrame !== view) surfaceWithFrame = view
+        if (frameTrack != currentTrack() || boundTexture !== view) return
+        if (surfaceWithFrame !== view) surfaceWithFrame = view
+        val official = loadingVideoStream != null
+        val now = android.os.SystemClock.uptimeMillis()
+        backdrop.onFrame(view, decision?.source, official, now)
+        if (backdrop.tier != PlayerBackdropTier.C) CanvasVideoLooks.setExtendedBackdrop(frameTrack, true)
+        if (official && letterboxHits < 3 && now - lastLetterboxMs >= 250L) sampleLetterbox(view, now)
+    }
+
+    private fun sampleLetterbox(view: TextureView, now: Long) {
+        lastLetterboxMs = now
+        val bitmap = letterboxSample ?: Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888).also { letterboxSample = it }
+        val pixels = letterboxPixels ?: IntArray(32 * 32).also { letterboxPixels = it }
+        if (view.getBitmap(bitmap) == null) return
+        bitmap.getPixels(pixels, 0, 32, 0, 0, 32, 32)
+        val zoom = letterboxCropZoom(pixels, 32, 32)
+        letterboxHits = if (kotlin.math.abs(zoom - letterboxCandidate) < 0.035f) letterboxHits + 1 else 1
+        letterboxCandidate = zoom
+        if (letterboxHits == 3) letterboxZoom = zoom
     }
 
     private fun bind(view: TextureView?) {
@@ -232,9 +278,13 @@ class CanvasVideoController internal constructor(
         if (view == null) exoPlayer.clearVideoSurface() else exoPlayer.setVideoTextureView(view)
     }
 
-    internal fun onFirstFrame() {
-        frameMediaId = loadingMediaId
+    internal fun onFirstFrame(generation: Long) {
+        if (generation != loadGeneration) return
+        val track = loadingTrack ?: return
+        if (track != currentTrack()) return
+        frameTrack = track
         surfaceWithFrame = boundTexture
+        session = session.firstFrame(track)
         if (loadingVideoStream != null) {
             videoReady = true
             videoFailed = false
@@ -242,87 +292,106 @@ class CanvasVideoController internal constructor(
         }
         fadeInJob?.cancel()
         fadeInJob = scope.launch { fade.animateTo(1f, tween(VIDEO_FADE_IN_MS, easing = SeamlessEasing)) }
-        val id = loadingMediaId ?: return
-        if (loadingVideoStream != null) {
-            if (liveSampleJob?.isActive != true) liveSampleJob = scope.launch { sampleLiveCanvasVideoLook(id) { boundTexture } }
-        } else {
-            scope.launch { sampleCanvasVideoLook(id) { boundTexture } }
-        }
+        liveSampleJob?.cancel()
+        val isCurrent = { loadingTrack == track && currentTrack() == track && frameTrack == track }
+        liveSampleJob = scope.launch { sampleCanvasVideoLook(track, isCurrent) { boundTexture } }
     }
 
     internal fun onVideoSize(size: VideoSize) {
-        if (size.width > 0 && size.height > 0) videoAspect = size.width.toFloat() / size.height
+        size.toAspectRatio().takeIf { it > 0f }?.let { videoAspect = it }
+    }
+
+    internal fun onPlaybackStateChanged(state: Int) {
+        videoLoading = loadingVideoStream != null && videoReady && state == Player.STATE_BUFFERING
     }
 
     internal fun onError() {
+        if (loadingTrack != currentTrack()) return
         if (loadingVideoStream != null) {
-            videoReady = false
+            clearFrame()
             videoFailed = true
-            videoLoading = false
             return
         }
         val next = if (loadingUrl == primary) fallback else null
         val id = loadingMediaId
         if (id != null && !next.isNullOrBlank() && next != loadingUrl) {
+            clearFrame()
             loadingUrl = next
+            hasRenderableMedia = true
             exoPlayer.setMediaItem(mediaItem(id, next))
             exoPlayer.prepare()
+        } else {
+            clearFrame()
+            decision = null
+            session = CanvasSession(currentTrack())
+            loadingUrl = null
+            PlayerVideoDecoder.release(exoPlayer)
         }
     }
 
-    internal suspend fun load(mediaId: String?, primary: String?, fallback: String?, fadeOutMillis: Int) {
-        if (loadingVideoStream != null) {
+    internal suspend fun reset(track: CanvasTrack, resolving: Boolean, enabled: Boolean) {
+        if (loadingTrack != track || loadingUrl != null) {
+            clearFrame()
+            loadingTrack = track
             loadingVideoStream = null
-            liveSampleJob?.cancel()
-            liveSampleJob = null
+            loadingUrl = null
+            PlayerVideoDecoder.release(exoPlayer)
+            exoPlayer.clearMediaItems()
+            fade.snapTo(0f)
         }
-        val url = primary ?: fallback
-        if (mediaId == loadingMediaId && url == loadingUrl) return
-        fadeInJob?.cancel()
-        if (fade.value > 0f) fade.animateTo(0f, tween(fadeOutMillis, easing = SeamlessEasing))
-        loadingMediaId = mediaId
+        decision = null
+        session = CanvasSession(track)
+        if (resolving || !enabled) session = session.resolve(track, enabled)
+    }
+
+    internal fun found(track: CanvasTrack, result: CanvasDecision?) {
+        if (currentTrack() != track) return
+        session = session.resolved(track, result != null)
+        if (session.phase == com.convx.music.playback.CanvasPhase.Found) decision = result
+    }
+
+    internal suspend fun show(track: CanvasTrack, decision: CanvasDecision) {
+        val url = decision.primaryUrl ?: decision.fallbackUrl ?: return
+        if (track != currentTrack() || track != loadingTrack || url == loadingUrl) return
+        val mediaId = track.mediaId ?: return
+        if (!claim(PlayerVideoDecoder.PRIORITY_LOOP)) {
+            PlayerVideoDecoder.available.first { it }
+            if (track != currentTrack() || track != loadingTrack || !claim(PlayerVideoDecoder.PRIORITY_LOOP)) return
+        }
+        exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters.buildUpon()
+            .setMaxVideoFrameRate(30).setMaxVideoBitrate(2_500_000).build()
+        exoPlayer.setPlaybackSpeed(1f)
+        primary = decision.primaryUrl
+        fallback = decision.fallbackUrl
         loadingUrl = url
-        videoReady = false
-        videoFailed = false
-        videoLoading = false
-        this.primary = primary
-        this.fallback = fallback
-        frameMediaId = null
-        surfaceWithFrame = null
-        exoPlayer.stop()
-        exoPlayer.clearMediaItems()
-        if (mediaId == null || url == null) return
-        exoPlayer.setMediaItem(mediaItem(mediaId, url))
+        hasRenderableMedia = true
         exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+        exoPlayer.setMediaItem(mediaItem(mediaId, url))
         exoPlayer.prepare()
     }
 
-    internal suspend fun loadVideo(
+    internal fun loadVideo(
+        track: CanvasTrack,
         stream: com.convx.music.utils.YTPlayerUtils.VideoStream,
         startPositionMs: Long,
-        fadeOutMillis: Int,
     ) {
-        if (loadingVideoStream?.videoId == stream.videoId && loadingVideoStream?.url == stream.url) return
-        fadeInJob?.cancel()
-        liveSampleJob?.cancel()
-        liveSampleJob = null
-        if (fade.value > 0f) fade.animateTo(0f, tween(fadeOutMillis, easing = SeamlessEasing))
+        if (track != currentTrack() || track.mediaId != stream.mediaId) return
+        val url = secureCanvasUrl(stream.url) ?: return
+        if (!claim(PlayerVideoDecoder.PRIORITY_OFFICIAL)) return
+        exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters.buildUpon()
+            .setMaxVideoFrameRate(Int.MAX_VALUE).setMaxVideoBitrate(Int.MAX_VALUE).build()
         loadingVideoStream = stream
-        loadingMediaId = stream.mediaId
-        loadingUrl = stream.url
-        primary = stream.url
+        loadingTrack = track
+        loadingUrl = url
+        primary = url
         fallback = null
-        frameMediaId = null
-        surfaceWithFrame = null
-        videoReady = false
-        videoFailed = false
-        videoLoading = true
+        videoLoading = false
+        hasRenderableMedia = true
         exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
-        exoPlayer.stop()
-        exoPlayer.clearMediaItems()
         exoPlayer.setMediaItem(
             MediaItem.Builder()
-                .setUri(stream.url.trim())
+                .setMediaId(loadGeneration.toString())
+                .setUri(url)
                 .setMimeType(stream.mimeType)
                 .setCustomCacheKey("convx-video-picture:${stream.videoId}")
                 .build(),
@@ -331,52 +400,76 @@ class CanvasVideoController internal constructor(
         exoPlayer.prepare()
     }
 
+    private fun claim(priority: Int): Boolean = PlayerVideoDecoder.claim(exoPlayer, priority) {
+        clearFrame()
+        loadingUrl = null
+        loadingVideoStream = null
+    }
+
+    internal fun setBackdropTier(tier: PlayerBackdropTier) {
+        backdrop.tier = tier
+        if (tier == PlayerBackdropTier.C && frameTrack != null) CanvasVideoLooks.setExtendedBackdrop(frameTrack, false)
+    }
+
+    internal fun close() {
+        PlayerVideoDecoder.release(exoPlayer)
+        clearFrame()
+        exoPlayer.release()
+    }
+
+    private fun clearFrame() {
+        CanvasVideoLooks.clear(frameTrack)
+        backdrop.clear()
+        letterboxZoom = 1f
+        letterboxCandidate = 1f
+        letterboxHits = 0
+        lastLetterboxMs = 0L
+        hasRenderableMedia = false
+        loadGeneration++
+        fadeInJob?.cancel()
+        liveSampleJob?.cancel()
+        frameTrack = null
+        surfaceWithFrame = null
+        videoReady = false
+        videoFailed = false
+        videoLoading = false
+    }
+
     internal fun seekTo(positionMs: Long) {
         if (loadingVideoStream != null) exoPlayer.seekTo(positionMs.coerceAtLeast(0L))
     }
 
     internal fun synchronizeTo(audioPlayer: Player) {
-        if (loadingVideoStream == null || videoFailed) return
-        exoPlayer.playWhenReady = audioPlayer.isPlaying
-        if (exoPlayer.playbackParameters.speed != audioPlayer.playbackParameters.speed) {
-            exoPlayer.setPlaybackSpeed(audioPlayer.playbackParameters.speed)
-        }
+        if (loadingVideoStream == null || videoFailed || loadingTrack != currentTrack()) return
+        exoPlayer.playWhenReady = audioPlayer.isPlaying && audioPlayer.playbackState == Player.STATE_READY
         if (exoPlayer.playbackState == Player.STATE_READY || exoPlayer.playbackState == Player.STATE_ENDED) {
-            if (kotlin.math.abs(exoPlayer.currentPosition - audioPlayer.currentPosition) > 500L) {
+            val drift = exoPlayer.currentPosition - audioPlayer.currentPosition
+            if (com.convx.music.ui.player.video.shouldSeekVideo(drift)) {
                 exoPlayer.seekTo(audioPlayer.currentPosition.coerceAtLeast(0L))
+            } else {
+                val speed = com.convx.music.ui.player.video.synchronizedVideoSpeed(audioPlayer.playbackParameters.speed, drift)
+                if (exoPlayer.playbackParameters.speed != speed) exoPlayer.setPlaybackSpeed(speed)
             }
         }
-    }
-
-    internal fun retryVideo() {
-        val stream = loadingVideoStream ?: return
-        videoReady = false
-        videoFailed = false
-        videoLoading = true
-        exoPlayer.setMediaItem(
-            MediaItem.Builder()
-                .setUri(stream.url.trim())
-                .setMimeType(stream.mimeType)
-                .setCustomCacheKey("convx-video-picture:${stream.videoId}")
-                .build(),
-            exoPlayer.currentPosition.coerceAtLeast(0L),
-        )
-        exoPlayer.prepare()
     }
 
     private fun mediaItem(mediaId: String, url: String): MediaItem {
         val normalized = url.trim()
         return MediaItem.Builder()
+            .setMediaId(loadGeneration.toString())
             .setUri(normalized)
             .setMimeType(canvasMimeType(normalized, primary, fallback))
             // Same key DownloadUtil pre-caches canvas loops under.
-            .setCustomCacheKey("$mediaId#canvas")
+            .setCustomCacheKey(canvasReadCacheKey(downloadCache, mediaId, normalized))
             .build()
     }
 
+    internal fun canDraw(generation: Long, track: CanvasTrack): Boolean =
+        generation == loadGeneration && frameTrack == track && track == currentTrack()
+
     /** A still of the frame on screen, <= 720px, or null when no video is showing. */
     internal fun capturePoster(mediaId: String?): Bitmap? {
-        if (mediaId == null || frameMediaId != mediaId || fade.value < 0.99f) return null
+        if (mediaId == null || frameTrack?.mediaId != mediaId || frameTrack != currentTrack() || fade.value < 0.99f) return null
         val view = boundTexture?.takeIf { it.isAvailable && it === surfaceWithFrame } ?: return null
         val w = view.width
         val h = view.height
@@ -389,7 +482,6 @@ class CanvasVideoController internal constructor(
 }
 
 private const val VIDEO_FADE_IN_MS = 750
-private const val VIDEO_FADE_OUT_MAX_MS = 1_400
 private const val POSTER_MAX_PX = 720f
 
 /**
@@ -397,51 +489,53 @@ private const val POSTER_MAX_PX = 720f
  * [trackFadeMillis] is the ambient transition length (the DJ crossfade while one runs).
  */
 @Composable
-fun rememberCanvasVideoController(
+internal fun rememberCanvasVideoController(
+    connection: PlayerConnection,
     mediaMetadata: MediaMetadata?,
     isPlaying: Boolean,
-    trackFadeMillis: Int,
+    visible: Boolean,
     videoStream: com.convx.music.utils.YTPlayerUtils.VideoStream? = null,
     videoStartPositionMs: Long = 0L,
+    allowCanvas: Boolean = true,
 ): CanvasVideoController {
     val context = LocalContext.current
     val mediaSourceFactory = rememberCanvasMediaSourceFactory()
     val scope = rememberCoroutineScope()
-    val controller = remember {
-        val player = ExoPlayer.Builder(context)
-            .setMediaSourceFactory(mediaSourceFactory)
-            .build()
-            .apply {
-                trackSelectionParameters = trackSelectionParameters
-                    .buildUpon()
-                    .setMaxVideoFrameRate(30)
-                    .setMaxVideoBitrate(2_500_000)
-                    .build()
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(C.USAGE_MEDIA)
-                        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                        .build(),
-                    false,
-                )
-                volume = 0f
-                repeatMode = Player.REPEAT_MODE_ONE
-                playWhenReady = false
-            }
-        CanvasVideoController(player, scope)
+    val downloadCache = com.convx.music.LocalDownloadUtil.current.get().downloadCache
+    val controller = remember(connection, mediaSourceFactory) {
+        val player = PlayerVideoDecoder.build(context, mediaSourceFactory, PlayerVideoDecoder.Use.OFFICIAL)
+        CanvasVideoController(player, scope, connection.canvasTrack, downloadCache)
     }
     DisposableEffect(controller) {
         val listener = object : Player.Listener {
-            override fun onRenderedFirstFrame() = controller.onFirstFrame()
-            override fun onVideoSizeChanged(videoSize: VideoSize) = controller.onVideoSize(videoSize)
-            override fun onPlayerError(error: PlaybackException) = controller.onError()
+            override fun onPlaybackStateChanged(playbackState: Int) = controller.onPlaybackStateChanged(playbackState)
+        }
+        val frames = object : AnalyticsListener {
+            private val window = Timeline.Window()
+
+            private fun generation(eventTime: AnalyticsListener.EventTime): Long? =
+                if (eventTime.windowIndex in 0 until eventTime.timeline.windowCount) {
+                    eventTime.timeline.getWindow(eventTime.windowIndex, window).mediaItem.mediaId.toLongOrNull()
+                } else null
+
+            override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
+                generation(eventTime)?.let(controller::onFirstFrame)
+            }
+
+            override fun onVideoSizeChanged(eventTime: AnalyticsListener.EventTime, videoSize: VideoSize) {
+                if (generation(eventTime) == controller.loadGeneration) controller.onVideoSize(videoSize)
+            }
+
+            override fun onPlayerError(eventTime: AnalyticsListener.EventTime, error: PlaybackException) {
+                if (generation(eventTime) == controller.loadGeneration) controller.onError()
+            }
         }
         controller.exoPlayer.addListener(listener)
-        CanvasPosterSource.controller = controller
+        controller.exoPlayer.addAnalyticsListener(frames)
         onDispose {
-            if (CanvasPosterSource.controller === controller) CanvasPosterSource.controller = null
             controller.exoPlayer.removeListener(listener)
-            controller.exoPlayer.release()
+            controller.exoPlayer.removeAnalyticsListener(frames)
+            controller.close()
         }
     }
 
@@ -461,25 +555,71 @@ fun rememberCanvasVideoController(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    val shouldPlay = isPlaying && inForeground
-    LaunchedEffect(shouldPlay) { controller.exoPlayer.playWhenReady = shouldPlay }
-
-    val enableCanvas by rememberPreference(CanvasThumbnailAnimationKey, defaultValue = true)
-    val (canvasSource) = rememberEnumPreference(CanvasSourceKey, defaultValue = CanvasSource.AUTO)
-    val mediaId = mediaMetadata?.id
-    val latestMetadata by rememberUpdatedState(mediaMetadata)
-    // produceState keeps its previous value while keys change, so tag each result with its track ID.
-    val fetched by produceState<Pair<String?, CanvasArtwork?>?>(null, mediaId, canvasSource, enableCanvas) {
-        val metadata = latestMetadata
-        value = mediaId to if (!enableCanvas || metadata == null) null else fetchCanvasArtwork(context, metadata, canvasSource)
+    val fullscreen = LocalFullscreenVideo.current?.session?.videoController === controller
+    val active = visible || fullscreen
+    DisposableEffect(controller, active) {
+        if (active) CanvasPosterSource.controller = controller
+        onDispose { if (CanvasPosterSource.controller === controller) CanvasPosterSource.controller = null }
     }
-    val artwork = fetched?.takeIf { it.first == mediaId }?.second
-    val fadeOut = trackFadeMillis.coerceAtMost(VIDEO_FADE_OUT_MAX_MS)
-    val primary = artwork?.preferredAnimationUrl?.takeIf { it.isNotBlank() }
-    val fallback = artwork?.animated?.takeIf { it.isNotBlank() }
-    LaunchedEffect(mediaId, primary, fallback, videoStream) {
-        if (videoStream != null) controller.loadVideo(videoStream, videoStartPositionMs, fadeOut)
-        else controller.load(mediaId, primary, fallback, fadeOut)
+    val shouldPlay = isPlaying && inForeground && active
+    val (backdropMode) = rememberEnumPreference(CanvasBackdropModeKey, CanvasBackdropMode.EXTENDED_VIDEO)
+    val reduceMotion by rememberPreference(ReduceDynamicBlurKey, false)
+    val tier = rememberPlayerBackdropTier(
+        extended = backdropMode == CanvasBackdropMode.EXTENDED_VIDEO,
+        visible = active && inForeground && isPlaying &&
+            (controller.videoReady || controller.session.phase == com.convx.music.playback.CanvasPhase.Showing),
+        reducedMotion = reduceMotion || !android.animation.ValueAnimator.areAnimatorsEnabled(),
+    )
+    SideEffect { controller.setBackdropTier(tier) }
+    LaunchedEffect(controller, shouldPlay) { controller.exoPlayer.playWhenReady = shouldPlay }
+
+    val legacyEnabled by rememberPreference(CanvasThumbnailAnimationKey, defaultValue = true)
+    val dataSaver by rememberPreference(DataSaverEnabledKey, defaultValue = false)
+    val (mode) = rememberEnumPreference(CanvasModeKey, if (legacyEnabled) CanvasMode.AUTO else CanvasMode.OFF)
+    val (canvasSource) = rememberEnumPreference(CanvasSourceKey, defaultValue = CanvasSource.AUTO)
+    val track by connection.canvasTrack.collectAsStateWithLifecycle()
+    val database = LocalDatabase.current.get()
+    val mediaId = track.mediaId
+    val choices = remember(database, mediaId) {
+        if (mediaId == null) kotlinx.coroutines.flow.flowOf(null)
+        else database.canvasDecisionDao.observe(mediaId).map { mediaId to it?.enabled }
+    }
+    val choice by choices.collectAsStateWithLifecycle(initialValue = null)
+    val canChange = visible && inForeground && allowCanvas && mode != CanvasMode.OFF && !dataSaver &&
+        mediaId != null && choice?.first == mediaId
+    val metadata = mediaMetadata?.takeIf { it.id == mediaId }
+    val stream = videoStream?.takeIf { it.mediaId == mediaId }
+    val trackChoice = choice?.takeIf { it.first == mediaId }?.second
+    val canResolve = canChange && trackChoice != false
+    val permitted = trackChoice ?: (mode == CanvasMode.AUTO)
+    val toggle = remember(canChange, track, database, controller) {
+        if (canChange && mediaId != null) {
+            { enabled: Boolean ->
+                scope.launch {
+                    if (connection.canvasTrack.value == track) database.canvasDecisionDao.upsert(CanvasDecisionEntity(mediaId, enabled))
+                }
+                Unit
+            }
+        } else null
+    }
+    SideEffect {
+        controller.canvasMode = if (canChange) mode else CanvasMode.OFF
+        controller.canvasOverride = trackChoice
+        controller.canvasToggle = toggle
+    }
+    LaunchedEffect(controller, track, metadata, canvasSource, canResolve, stream, permitted, active, inForeground) {
+        controller.reset(track, canResolve && metadata != null, enabled = canResolve)
+        if (active && inForeground && stream != null) {
+            delay(PlayerVideoBuffers.SETTLE_MS.toLong())
+            controller.loadVideo(track, stream, connection.player.currentPosition.takeIf { it >= 0L } ?: videoStartPositionMs)
+        } else if (canResolve && metadata != null) {
+            val decision = connection.canvasResolver.resolve(metadata, canvasSource)
+            controller.found(track, decision)
+            if (decision != null && permitted) {
+                delay(PlayerVideoBuffers.SETTLE_MS.toLong())
+                controller.show(track, decision)
+            }
+        }
     }
     return controller
 }
@@ -495,10 +635,25 @@ fun CanvasVideoSurface(
     crop: Boolean = true,
     onFrame: (() -> Unit)? = null,
 ) {
-    if (controller == null) return
+    if (controller == null || !controller.hasRenderableMedia) return
+    val generation = controller.loadGeneration
+    key(controller, generation) {
+        BoundCanvasVideoSurface(controller, generation, modifier, crop, onFrame)
+    }
+}
+
+@Composable
+private fun BoundCanvasVideoSurface(
+    controller: CanvasVideoController,
+    generation: Long,
+    modifier: Modifier,
+    crop: Boolean,
+    onFrame: (() -> Unit)?,
+) {
     val token = remember { Any() }
     var texture by remember { mutableStateOf<TextureView?>(null) }
     val surfaceAlpha = remember { Animatable(0f) }
+    val drawTrack = controller.trackState.collectAsStateWithLifecycle()
     val hasFrame = texture != null && controller.surfaceWithFrame === texture
     LaunchedEffect(hasFrame) {
         // Only ever dissolves IN: a surface that loses the output keeps its last frame
@@ -543,46 +698,13 @@ fun CanvasVideoSurface(
         },
         modifier = modifier.graphicsLayer {
             clip = true
-            alpha = controller.fade.value * surfaceAlpha.value
+            if (!crop) {
+                scaleX = controller.letterboxZoom
+                scaleY = controller.letterboxZoom
+            }
+            alpha = if (controller.canDraw(generation, drawTrack.value)) controller.fade.value * surfaceAlpha.value else 0f
         },
     )
 }
 
 private const val SURFACE_FADE_IN_MS = 420
-
-private suspend fun fetchCanvasArtwork(context: Context, metadata: MediaMetadata, canvasSource: CanvasSource): CanvasArtwork? {
-    val cacheKey = "${metadata.id}:${canvasSource.name}"
-    CanvasArtworkPlaybackCache.get(cacheKey)?.let { return it }
-    val countryCode = Locale.getDefault().country
-    val storefront = if (countryCode.length == 2) countryCode.lowercase(Locale.ROOT) else "us"
-    val fetched = withContext(Dispatchers.IO) {
-        runCatching {
-            val songTitle = metadata.title
-            val artistName = metadata.artists.firstOrNull()?.name ?: ""
-            val albumName = metadata.album?.title ?: ""
-            when (canvasSource) {
-                CanvasSource.AUTO ->
-                    SpotifyCanvasLookup.getBySongArtist(context, songTitle, artistName)
-                        ?: AppleMusicCanvasProvider.getBySongArtist(songTitle, artistName, albumName, storefront)
-                        ?.takeIf { !it.animated.isNullOrBlank() }
-                        ?: TidalCanvasProvider.getBySongArtist(songTitle, artistName, albumName)
-                            ?.takeIf { !it.animated.isNullOrBlank() }
-                        ?: ConvxCanvasProvider.getBySongArtist(songTitle, artistName)
-                            ?.takeIf { !it.animated.isNullOrBlank() }
-                CanvasSource.APPLE_MUSIC ->
-                    AppleMusicCanvasProvider.getBySongArtist(songTitle, artistName, albumName, storefront)
-                        ?.takeIf { !it.animated.isNullOrBlank() }
-                CanvasSource.CONVX ->
-                    ConvxCanvasProvider.getBySongArtist(songTitle, artistName)
-                        ?.takeIf { !it.animated.isNullOrBlank() }
-                CanvasSource.TIDAL ->
-                    TidalCanvasProvider.getBySongArtist(songTitle, artistName, albumName)
-                        ?.takeIf { !it.animated.isNullOrBlank() }
-                CanvasSource.SPOTIFY ->
-                    SpotifyCanvasLookup.getBySongArtist(context, songTitle, artistName)
-            }
-        }.getOrNull()
-    }
-    if (fetched != null) CanvasArtworkPlaybackCache.put(cacheKey, fetched)
-    return fetched
-}

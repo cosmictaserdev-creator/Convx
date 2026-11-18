@@ -130,6 +130,7 @@ fun PlayerMenu(
     val ringtoneViewModel = com.convx.music.LocalRingtoneViewModel.current
     val database = LocalDatabase.current.get()
     val playerConnection = LocalPlayerConnection.current ?: return
+    val canvasMenuItem = com.convx.music.ui.player.playerCanvasMenuItem(mediaMetadata.id, onDismiss)
     val sleepTimer = rememberSleepTimerState(playerConnection)
     SleepTimerDialogHost(playerConnection, sleepTimer)
     var showAudioDevices by remember { mutableStateOf(false) }
@@ -296,6 +297,7 @@ fun PlayerMenu(
         item {
             IosMenuGroup(
                 items = buildList {
+                    canvasMenuItem?.let { add(it) }
                     // Always visible. Re-triggers the full resolution chain.
                     add(
                         IosMenuItemData(

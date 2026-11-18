@@ -105,6 +105,8 @@ fun V2OptionsMenu(
     sleepTimerLabel: () -> String?,
     onOpenSleepTimer: () -> Unit,
     onOpenAudioDevices: () -> Unit,
+    canvasEnabled: Boolean = false,
+    onSetCanvasEnabled: ((Boolean) -> Unit)? = null,
 ) {
     V2MenuPopup(
         onDismiss = onDismiss,
@@ -140,6 +142,17 @@ fun V2OptionsMenu(
                 IosMenuItem(stringResource(R.string.v2_menu_go_to), icon = glyph(SfSymbols.Monochrome.SFSquareStack), onClick = onGoTo),
                 IosMenuItem(stringResource(R.string.v2_menu_view_credits), icon = glyph(SfSymbols.Monochrome.SFInfoCircle), onClick = onViewCredits),
                 IosMenuItem(stringResource(R.string.v2_menu_share_lyrics), icon = glyph(SfSymbols.Monochrome.SFQuoteBubble), onClick = onShareLyrics),
+            )),
+            IosMenuSection(listOfNotNull(
+                onSetCanvasEnabled?.let { setCanvasEnabled ->
+                    IosMenuItem(
+                        title = stringResource(
+                            if (canvasEnabled) R.string.player_canvas_disable else R.string.player_canvas_enable,
+                        ),
+                        icon = symbolGlyph(com.convx.music.ui.component.sf("play.rectangle")),
+                        onClick = { setCanvasEnabled(!canvasEnabled) },
+                    )
+                },
             )),
             IosMenuSection(listOf(
                 IosMenuItem(stringResource(R.string.sleep_timer), description = sleepTimerLabel(), icon = symbolGlyph(com.convx.music.ui.component.sf("moon.zzz.fill")), onClick = { onDismiss(); onOpenSleepTimer() }),
@@ -203,6 +216,8 @@ fun V2OptionsMenuHost(
     sleepTimerLabel: () -> String?,
     onOpenSleepTimer: () -> Unit,
     onOpenAudioDevices: () -> Unit,
+    canvasEnabled: Boolean = false,
+    onSetCanvasEnabled: ((Boolean) -> Unit)? = null,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val database = com.convx.music.LocalDatabase.current.get()
@@ -236,6 +251,8 @@ fun V2OptionsMenuHost(
             sleepTimerLabel = sleepTimerLabel,
             onOpenSleepTimer = onOpenSleepTimer,
             onOpenAudioDevices = onOpenAudioDevices,
+            canvasEnabled = canvasEnabled,
+            onSetCanvasEnabled = onSetCanvasEnabled,
         )
     }
     if (showGoTo) {

@@ -99,7 +99,7 @@ internal fun rememberNowPlayingGradient(
 ): androidx.compose.runtime.State<NowPlayingGradient?> {
     val context = LocalContext.current
     val key = if (videoLook != null) {
-        "video:${videoLook.mediaId}:${videoLook.liveFrameVersion}|$hero"
+        "video:${videoLook.mediaId}:${videoLook.epoch}:${videoLook.liveFrameVersion}|$hero"
     } else artworkUrl?.let { "$it|$hero" }
     return produceState(key?.let { gradientCache.get(it) }, key) {
         if (key == null) {

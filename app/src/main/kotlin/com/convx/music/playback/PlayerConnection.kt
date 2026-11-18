@@ -18,6 +18,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import com.convx.music.db.MusicDatabase
+import com.convx.music.lyrics.TimedLyricsParser
 import com.convx.music.extensions.currentMetadata
 import com.convx.music.extensions.getCurrentQueueIndex
 import com.convx.music.extensions.getQueueWindows
@@ -32,6 +33,7 @@ import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -42,8 +44,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -52,7 +57,7 @@ sealed interface VideoStreamLookup {
     data object Idle : VideoStreamLookup
     data object Loading : VideoStreamLookup
     data object Unavailable : VideoStreamLookup
-    data class Ready(val stream: com.convx.music.utils.YTPlayerUtils.VideoStream) : VideoStreamLookup
+    data class Ready(val stream: com.convx.music.utils.YTPlayerUtils.VideoStream, val epoch: Long) : VideoStreamLookup
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -129,7 +134,11 @@ class PlayerConnection(
     )
     
     val mediaMetadata = MutableStateFlow(player.currentMetadata)
-    private val requestedVideo = MutableStateFlow<Pair<String, Long>?>(null)
+    private val mutableCanvasTrack = MutableStateFlow(CanvasTrack.transition(mediaMetadata.value?.id))
+    internal val canvasTrack: StateFlow<CanvasTrack> = mutableCanvasTrack.asStateFlow()
+    internal val canvasResolver = CanvasResolver(service.applicationContext)
+    private data class VideoRequest(val track: CanvasTrack, val refresh: Boolean, val sequence: Long)
+    private val requestedVideo = MutableStateFlow<VideoRequest?>(null)
     private var videoRequestGeneration = 0L
     private val officialVideos = com.music.innertube.OfficialVideoResolver()
     private val requestedVideoAvailability = MutableStateFlow<String?>(null)
@@ -149,8 +158,9 @@ class PlayerConnection(
     }
 
     /** Video lookup starts only after the user asks to watch the current track. */
-    val videoStreamLookup = combine(mediaMetadata, requestedVideo) { metadata, request ->
-        metadata?.takeIf { it.id == request?.first }?.let { it to requireNotNull(request) }
+    val videoStreamLookup = combine(mediaMetadata, requestedVideo, canvasTrack) { metadata, request, track ->
+        if (request == null || request.track != track || metadata?.id != track.mediaId) null
+        else metadata?.let { it to request }
     }.flatMapLatest { request ->
         flow {
             if (request == null) {
@@ -159,15 +169,21 @@ class PlayerConnection(
                 emit(VideoStreamLookup.Loading)
                 val metadata = request.first
                 val video = officialVideos.resolve(metadata.id, metadata.title, metadata.artists.map { it.name }, metadata.duration, metadata.musicVideoType).getOrNull()
-                val stream = video?.let { com.convx.music.utils.YTPlayerUtils.videoStream(it.videoId)?.copy(mediaId = metadata.id) }
-                emit(stream?.let(VideoStreamLookup::Ready) ?: VideoStreamLookup.Unavailable)
+                val stream = video?.let {
+                    com.convx.music.utils.YTPlayerUtils.videoStream(it.videoId, forceRefresh = request.second.refresh)
+                        ?.copy(mediaId = metadata.id)
+                }
+                if (request.second == requestedVideo.value && request.second.track == canvasTrack.value) {
+                    emit(stream?.let { VideoStreamLookup.Ready(it, request.second.track.epoch) } ?: VideoStreamLookup.Unavailable)
+                }
             }
         }
     }.stateIn(scope, SharingStarted.WhileSubscribed(0, 0), VideoStreamLookup.Idle)
 
-    fun requestVideoStream(mediaId: String) {
-        if (mediaMetadata.value?.id == mediaId) {
-            requestedVideo.value = mediaId to ++videoRequestGeneration
+    fun requestVideoStream(mediaId: String, forceRefresh: Boolean = false) {
+        val track = canvasTrack.value
+        if (track.mediaId == mediaId) {
+            requestedVideo.value = VideoRequest(track, forceRefresh, ++videoRequestGeneration)
         }
     }
 
@@ -181,6 +197,17 @@ class PlayerConnection(
     val currentLyrics = mediaMetadata.flatMapLatest { mediaMetadata ->
         database.lyrics(mediaMetadata?.id)
     }
+    val lyricsPreview = currentLyrics
+        .map { lyrics -> lyrics?.let { it.id to it.lyrics } }
+        .distinctUntilChanged()
+        .map { lyrics ->
+            PlayerLyricsPreview(
+                mediaId = lyrics?.first,
+                lines = lyrics?.second?.let(TimedLyricsParser::parse).orEmpty(),
+            )
+        }
+        .flowOn(Dispatchers.Default)
+
     val currentFormat =
         mediaMetadata.flatMapLatest { mediaMetadata ->
             database.format(mediaMetadata?.id)
@@ -266,7 +293,9 @@ class PlayerConnection(
         
         playbackState.value = newPlayer.playbackState
         playWhenReady.value = newPlayer.playWhenReady
-        mediaMetadata.value = newPlayer.currentMetadata
+        val metadata = newPlayer.currentMetadata
+        mutableCanvasTrack.value = CanvasTrack.transition(metadata?.id)
+        mediaMetadata.value = metadata
         queueTitle.value = service.queueTitle
         queueWindows.value = newPlayer.getQueueWindows()
         currentWindowIndex.value = newPlayer.getCurrentQueueIndex()
@@ -756,6 +785,7 @@ class PlayerConnection(
         mediaItem: MediaItem?,
         reason: Int,
     ) {
+        mutableCanvasTrack.value = CanvasTrack.transition(mediaItem?.metadata?.id)
         mediaMetadata.value = mediaItem?.metadata
         currentMediaItemIndex.value = player.currentMediaItemIndex
         currentWindowIndex.value = player.getCurrentQueueIndex()
