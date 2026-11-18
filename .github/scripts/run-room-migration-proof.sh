@@ -44,7 +44,8 @@ run_instrumentation() {
 
 # Each source schema runs in a fresh instrumentation process. This keeps Room
 # and SQLite migration allocations isolated and makes a failing schema clear.
-for ((start_version = 1; start_version < 40; start_version++)); do
+latest_version="$(find app/schemas/com.convx.music.db.InternalDatabase -name '[0-9]*.json' -exec basename {} .json \; | sort -n | tail -n 1)"
+for ((start_version = 1; start_version < latest_version; start_version++)); do
     end_version=$((start_version + 1))
     run_instrumentation \
         com.convx.music.db.RoomSchemaMigrationMatrixTest \

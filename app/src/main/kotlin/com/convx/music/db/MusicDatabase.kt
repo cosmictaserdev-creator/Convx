@@ -22,10 +22,12 @@ import androidx.room.migration.Migration
 import androidx.room.withTransaction as roomWithTransaction
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
+import com.convx.music.db.daos.CanvasDecisionDao
 import com.convx.music.db.daos.SpeedDialDao
 import com.convx.music.db.entities.AlbumArtistMap
 import com.convx.music.db.entities.AlbumEntity
 import com.convx.music.db.entities.ArtistEntity
+import com.convx.music.db.entities.CanvasDecisionEntity
 import com.convx.music.db.entities.Event
 import com.convx.music.db.entities.FormatEntity
 import com.convx.music.db.entities.LyricsEntity
@@ -58,6 +60,9 @@ class MusicDatabase(
     val speedDialDao: SpeedDialDao
         get() = delegate.speedDialDao
 
+    val canvasDecisionDao: CanvasDecisionDao
+        get() = delegate.canvasDecisionDao
+
     val openHelper: SupportSQLiteOpenHelper
         get() = delegate.openHelper
 
@@ -88,7 +93,7 @@ class MusicDatabase(
     fun close() = delegate.close()
 }
 
-const val INTERNAL_DATABASE_VERSION = 40
+const val INTERNAL_DATABASE_VERSION = 41
 
 @Database(
     entities = [
@@ -109,6 +114,7 @@ const val INTERNAL_DATABASE_VERSION = 40
         PlayCountEntity::class,
         RecognitionHistory::class,
         SpeedDialItem::class,
+        CanvasDecisionEntity::class,
         SongAnalysisEntity::class
     ],
     views = [
@@ -157,6 +163,7 @@ const val INTERNAL_DATABASE_VERSION = 40
 abstract class InternalDatabase : RoomDatabase() {
     abstract val dao: DatabaseDao
     abstract val speedDialDao: SpeedDialDao
+    abstract val canvasDecisionDao: CanvasDecisionDao
 
     companion object {
         const val DB_NAME = "song.db"
@@ -181,6 +188,7 @@ abstract class InternalDatabase : RoomDatabase() {
                         MIGRATION_25_26,
                         MIGRATION_35_36,
                         MIGRATION_39_40,
+                        MIGRATION_40_41,
                     )
                     .apply {
                         if (allowDestructiveMigrationOnDowngrade) {
@@ -396,6 +404,13 @@ val MIGRATION_39_40 =
     object : Migration(39, 40) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("ALTER TABLE `song` ADD COLUMN `isPodcastEpisode` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+val MIGRATION_40_41 =
+    object : Migration(40, 41) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `canvas_decision` (`mediaId` TEXT NOT NULL, `enabled` INTEGER NOT NULL, PRIMARY KEY(`mediaId`))")
         }
     }
 

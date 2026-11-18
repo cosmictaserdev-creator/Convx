@@ -13,6 +13,52 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class RoomSchemaMigrationTest {
     @Test
+    fun schema40To41KeepsSongsAndStoresCanvasChoicesByMediaId() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext
+        val databaseName = "canvas-schema-40-to-41-proof.db"
+        val helper = MigrationTestHelper(instrumentation, InternalDatabase::class.java)
+        context.deleteDatabase(databaseName)
+
+        try {
+            helper.createDatabase(databaseName, 40).use { old ->
+                old.execSQL("INSERT INTO song (id, title, duration, liked, totalPlayTime) VALUES ('one', 'Keep me', 1, 1, 9)")
+            }
+            val migrated = InternalDatabase.newInstance(context, databaseName, allowDestructiveMigrationOnDowngrade = false)
+            try {
+                val db = migrated.openHelper.writableDatabase
+                assertEquals(INTERNAL_DATABASE_VERSION, db.version)
+                db.query("SELECT title FROM song WHERE id = 'one'").use { row ->
+                    assertTrue(row.moveToFirst())
+                    assertEquals("Keep me", row.getString(0))
+                }
+                kotlinx.coroutines.runBlocking {
+                    migrated.canvasDecisionDao.upsert(com.convx.music.db.entities.CanvasDecisionEntity("one", false))
+                    migrated.canvasDecisionDao.upsert(com.convx.music.db.entities.CanvasDecisionEntity("stream-only", true))
+                }
+            } finally {
+                migrated.close()
+            }
+            val reopened = InternalDatabase.newInstance(context, databaseName, allowDestructiveMigrationOnDowngrade = false)
+            try {
+                reopened.openHelper.readableDatabase.query("SELECT mediaId, enabled FROM canvas_decision ORDER BY mediaId").use { rows ->
+                    assertTrue(rows.moveToFirst())
+                    assertEquals("one", rows.getString(0))
+                    assertEquals(0, rows.getInt(1))
+                    assertTrue(rows.moveToNext())
+                    assertEquals("stream-only", rows.getString(0))
+                    assertEquals(1, rows.getInt(1))
+                    assertEquals(2, rows.count)
+                }
+            } finally {
+                reopened.close()
+            }
+        } finally {
+            context.deleteDatabase(databaseName)
+        }
+    }
+
+    @Test
     fun schema39To40PreservesSongAndDefaultsPodcastFlag() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val databaseName = "schema-39-to-40-junit-proof.db"
