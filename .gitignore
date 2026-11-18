@@ -100,6 +100,7 @@ output-metadata.json
 
 # Binary files and core dumps
 /core
+!/core/
 /core.*
 *.so
 *.bin
@@ -128,6 +129,7 @@ app/keystore/
 !SECURITY.md
 !docs/CODEBASE_REVIEW_2026-10.md
 !docs/NETWORK_STORAGE_PLAYBACK_FIXES.md
+!docs/plans/*.md
 !.github/CONTRIBUTING.md
 !automation/**/*.md
 !.github/pull_request_template.md

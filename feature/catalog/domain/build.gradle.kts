@@ -15,4 +15,6 @@ android {
 kotlin { jvmToolchain(21) }
 
 dependencies {
+    testImplementation(libs.junit)
+    testImplementation(kotlin("test-junit"))
 }
