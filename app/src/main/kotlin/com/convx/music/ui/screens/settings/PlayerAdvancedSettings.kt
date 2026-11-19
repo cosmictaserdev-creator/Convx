@@ -45,6 +45,7 @@ import com.convx.music.constants.EnableSaavnStreamingKey
 import com.convx.music.constants.HistoryDuration
 import com.convx.music.constants.PersistentShuffleAcrossQueuesKey
 import com.convx.music.constants.PreventDuplicateTracksInQueueKey
+import com.convx.music.constants.SearchSongStartsRadioKey
 import com.convx.music.constants.SaavnAudioQuality
 import com.convx.music.constants.SaavnAudioQualityKey
 import com.convx.music.constants.SeekExtraSeconds
@@ -134,6 +135,10 @@ fun PlayerAdvancedSettings(
     )
     val (preventDuplicateTracksInQueue, onPreventDuplicateTracksInQueueChange) = rememberPreference(
         PreventDuplicateTracksInQueueKey,
+        defaultValue = false
+    )
+    val (searchSongStartsRadio, onSearchSongStartsRadioChange) = rememberPreference(
+        SearchSongStartsRadioKey,
         defaultValue = false
     )
 
@@ -350,6 +355,18 @@ fun PlayerAdvancedSettings(
                                 )
                             },
                             onClick = { onPreventDuplicateTracksInQueueChange(!preventDuplicateTracksInQueue) }
+                        ),
+                        IosSettingsItem(
+                            icon = painterResource(R.drawable.radio),
+                            title = { Text(stringResource(R.string.search_song_starts_radio)) },
+                            description = { Text(stringResource(R.string.search_song_starts_radio_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = searchSongStartsRadio,
+                                    onCheckedChange = onSearchSongStartsRadioChange
+                                )
+                            },
+                            onClick = { onSearchSongStartsRadioChange(!searchSongStartsRadio) }
                         ),
                     )
                 )
