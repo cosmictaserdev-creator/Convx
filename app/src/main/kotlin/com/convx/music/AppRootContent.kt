@@ -499,6 +499,7 @@ internal fun AppRootContent(
                 // Keep the sheet's own mini player hidden; the nav surface hosts it.
                 collapsedBound = 0.dp,
                 expandedBound = maxHeight,
+                isDockedPlayer = true,
             )
 
             // Both ends of the mini-to-full morph are recorded into GraphicsLayers

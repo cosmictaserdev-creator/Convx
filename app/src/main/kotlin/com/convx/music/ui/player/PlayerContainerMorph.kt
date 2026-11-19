@@ -262,7 +262,8 @@ fun PlayerContainerMorphOverlay(
                             if (fraction > PLAYER_CONTENT_APPEAR_START && !stay) {
                                 fullContentLayer.alpha = playerSheetPageAlpha(fraction)
                                 fullContentLayer.renderEffect = null
-                                scale(scaleX = scale, scaleY = scale, pivot = Offset.Zero) {
+                                // Reveal the controls at their resting size as the card grows.
+                                translate(left = (rect.width - fullContentLayer.size.width) * 0.5f) {
                                     drawLayer(fullContentLayer)
                                 }
                             }

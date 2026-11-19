@@ -327,6 +327,7 @@ class BottomSheetState(
     val expandedBound: Dp,
     val dismissedBound: Dp,
     private val density: Density,
+    private val isDockedPlayer: Boolean = false,
 ) : DraggableState by draggableState {
     // A plain array lets draw-phase glass reads avoid snapshot invalidations.
     internal val dragClockNs = longArrayOf(0L)
@@ -342,18 +343,20 @@ class BottomSheetState(
     /** Marks a gesture start and which end owns it; mirrored to [PlayerMorph]. */
     fun onDragStart(fromMiniPlayer: Boolean) {
         isDragging = true
-        PlayerMorph.isDragging = true
-        PlayerMorph.dragFromMiniPlayer = fromMiniPlayer
+        if (isDockedPlayer) {
+            PlayerMorph.isDragging = true
+            PlayerMorph.dragFromMiniPlayer = fromMiniPlayer
+        }
     }
 
     private fun endDragState() {
         isDragging = false
-        PlayerMorph.isDragging = false
+        if (isDockedPlayer) PlayerMorph.isDragging = false
     }
 
     private fun publishTarget(open: Boolean) {
         targetOpen = open
-        PlayerMorph.targetOpen = open
+        if (isDockedPlayer) PlayerMorph.targetOpen = open
     }
 
     /** Pass to a `background` slot's [layerBackdrop] to skip re-recording it
@@ -363,7 +366,7 @@ class BottomSheetState(
         (started != 0L && System.nanoTime() - started < BackdropFreezeSafetyNs) ||
             // Q3 lock: tap-driven open/close runs no drag, so without this the
             // backdrop re-samples every animation frame into the morph recording.
-            PlayerMorph.glassFrozen
+            (isDockedPlayer && PlayerMorph.glassFrozen)
     }
 
     val value by animatable.asState()
@@ -422,7 +425,11 @@ class BottomSheetState(
 
     /** Critically damped normally; a touch underdamped when a landing handler wants the
      *  arrival speed (only reachable because the collapsed bound stops the overshoot). */
-    private fun collapseSpring() = PlayerMotionSpec.sheetClose<Dp>(landing = onCollapseLanded != null)
+    private fun collapseSpring() = if (isDockedPlayer) PlayerMotionSpec.dockTransition<Dp>(opening = false)
+    else PlayerMotionSpec.sheetClose<Dp>(landing = onCollapseLanded != null)
+
+    private fun expandSpring() = if (isDockedPlayer) PlayerMotionSpec.dockTransition<Dp>(opening = true)
+    else PlayerMotionSpec.sheetOpen<Dp>()
 
     fun expand(animationSpec: AnimationSpec<Dp>, initialVelocity: Dp = 0.dp) {
         onAnchorChanged(expandedAnchor)
@@ -439,7 +446,7 @@ class BottomSheetState(
 
     private fun expand(velocityPxPerSec: Float = 0f) {
         expand(
-            PlayerMotionSpec.sheetOpen(),
+            expandSpring(),
             initialVelocity = with(density) { velocityPxPerSec.toDp() },
         )
     }
@@ -454,7 +461,7 @@ class BottomSheetState(
         // Match the opening spring to [collapseSoft].
         endDragState()
         expand(
-            PlayerMotionSpec.sheetOpen(),
+            expandSpring(),
         )
     }
 
@@ -594,6 +601,7 @@ fun rememberBottomSheetState(
     initialAnchor: Int = dismissedAnchor,
     // Pane-sized sheets start at rest; screen-edge sheets can reveal on mount.
     animateOnMount: Boolean = true,
+    isDockedPlayer: Boolean = false,
 ): BottomSheetState {
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
@@ -602,7 +610,7 @@ fun rememberBottomSheetState(
         mutableIntStateOf(initialAnchor)
     }
 
-    return remember(dismissedBound, expandedBound, collapsedBound, coroutineScope) {
+    return remember(dismissedBound, expandedBound, collapsedBound, coroutineScope, isDockedPlayer) {
         val initialValue = when (previousAnchor) {
             expandedAnchor -> expandedBound
             collapsedAnchor -> collapsedBound
@@ -638,6 +646,7 @@ fun rememberBottomSheetState(
             expandedBound = expandedBound,
             dismissedBound = dismissedBound,
             density = density,
+            isDockedPlayer = isDockedPlayer,
         )
     }
 }
