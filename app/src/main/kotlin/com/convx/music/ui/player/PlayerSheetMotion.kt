@@ -57,9 +57,6 @@ fun sharedMiniPlayerControlsShift(
 fun sharedArtworkRect(source: Rect, target: Rect, progress: Float): Rect =
     PlayerMorphGeometry.artworkRect(source, target, progress)
 
-fun sharedArtworkWindow(source: Rect, target: Rect, progress: Float): Rect =
-    PlayerMorphGeometry.artworkWindow(source, target, progress)
-
 internal fun sharedContainerCornerRadii(
     source: SharedContainerCornerRadii,
     target: SharedContainerCornerRadii,

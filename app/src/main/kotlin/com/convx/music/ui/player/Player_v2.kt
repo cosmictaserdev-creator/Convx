@@ -689,7 +689,7 @@ private fun PlayerV2Content(
                 color = adaptivePrimary,
                 fontWeight = FontWeight.SemiBold,
                 scroll = !state.isCollapsed,
-                modifier = titleModifier.clickable {
+                modifier = titleModifier.playerMorphBounds(PlayerMorphElement.TITLE).clickable {
                     state.collapseSoft()
                     mediaMetadata?.album?.id?.let { navController.navigate("album/$it") }
                 }
@@ -1020,22 +1020,20 @@ private fun PlayerV2Content(
                                                 animatedVisibilityScope = this@AnimatedContent,
                                                 boundsTransform = { _, _ -> Motion.artwork() },
                                             )
-                                            // Squared morphs into this card. Hero Bleed uses
-                                            // its separate thumbnail beside the track title.
-                                            .then(if (!isHeroLook) Modifier.fullArtworkMorphTarget(
+                                            .fullArtworkMorphTarget(
                                                 cornerRadiusPx = with(androidx.compose.ui.platform.LocalDensity.current) {
-                                                    12.dp.toPx()
+                                                    if (isHeroLook) 0f else 12.dp.toPx()
+                                                },
+                                                heroFade = when {
+                                                    !isHeroLook -> null
+                                                    isWidePlayerLayout -> HeroArtworkFade.END
+                                                    else -> HeroArtworkFade.BOTTOM
                                                 },
                                                 shadowPx = with(androidx.compose.ui.platform.LocalDensity.current) {
-                                                    if (showPlayerThumbnailShadow) playerThumbnailShadowElevation.dp.toPx() else 0f
+                                                    if (!isHeroLook && showPlayerThumbnailShadow) playerThumbnailShadowElevation.dp.toPx() else 0f
                                                 },
-                                                pauseShrinks = true,
-                                            ) else Modifier.fullArtworkMorphTarget(
-                                                cornerRadiusPx = 0f,
-                                                travels = false,
-                                                pauseShrinks = false,
-                                                fadeOnly = true,
-                                            ))
+                                                pauseShrinks = !isHeroLook,
+                                            )
                                             // Keep this as a stable morph anchor; the animated child draws and scales the card.
                                             .then(
                                                 rememberSwipeCardModifier(
@@ -1210,15 +1208,13 @@ private fun PlayerV2Content(
                                     Box(
                                         modifier = headerArtworkModifier
                                             .size(60.dp)
-                                            .then(if (!isHeroLook || targetState == PlayerInternalState.COVER) Modifier.fullArtworkMorphTarget(
+                                            .then(if (targetState != PlayerInternalState.COVER) Modifier.fullArtworkMorphTarget(
                                                 cornerRadiusPx = with(androidx.compose.ui.platform.LocalDensity.current) { 7.dp.toPx() },
-                                                travels = !isHeroLook,
                                                 shadowPx = with(androidx.compose.ui.platform.LocalDensity.current) {
                                                     if (showPlayerThumbnailShadow) (playerThumbnailShadowElevation / 2f).dp.toPx() else 0f
                                                 },
-                                                videoPoster = !isHeroLook,
-                                                fadeEndpoints = !isHeroLook,
-                                                fadeOnly = isHeroLook,
+                                                videoPoster = false,
+                                                fadeEndpoints = true,
                                             ) else Modifier)
                                             .then(rememberDragToQueueModifier(
                                                 enabled = true,
@@ -1609,6 +1605,7 @@ private fun PlayerV2Content(
                             interactionSource = previousInteraction,
                             modifier = Modifier
                                 .size(61.dp)
+                                .playerMorphBounds(PlayerMorphElement.PREVIOUS)
                                 .transportPressDisc(previousInteraction, adaptivePrimary.copy(alpha = 0.16f))
                                 .alpha(if (isListenTogetherGuest || !canSkipPrevious) 0.4f else 1f)
                         ) {
@@ -1635,6 +1632,7 @@ private fun PlayerV2Content(
                             interactionSource = playInteraction,
                             modifier = Modifier
                                 .size(72.dp)
+                                .playerMorphBounds(PlayerMorphElement.PLAY)
                                 .transportPressDisc(playInteraction, adaptivePrimary.copy(alpha = 0.16f))
                         ) {
                             if (isListenTogetherGuest) {
@@ -1665,6 +1663,7 @@ private fun PlayerV2Content(
                             interactionSource = nextInteraction,
                             modifier = Modifier
                                 .size(61.dp)
+                                .playerMorphBounds(PlayerMorphElement.NEXT)
                                 .transportPressDisc(nextInteraction, adaptivePrimary.copy(alpha = 0.16f))
                                 .alpha(if (isListenTogetherGuest || !canSkipNext) 0.4f else 1f)
                         ) {

@@ -319,7 +319,7 @@ fun BottomSheet(
 
 @Stable
 class BottomSheetState(
-    draggableState: DraggableState,
+    private val draggableState: DraggableState,
     private val coroutineScope: CoroutineScope,
     private val animatable: Animatable<Dp, AnimationVector1D>,
     private val onAnchorChanged: (Int) -> Unit,
@@ -340,18 +340,37 @@ class BottomSheetState(
     var targetOpen by mutableStateOf(false)
         private set
 
+    private var dragFromMiniPlayer = false
+    private var heldValue: Dp? = null
+
     /** Marks a gesture start and which end owns it; mirrored to [PlayerMorph]. */
     fun onDragStart(fromMiniPlayer: Boolean) {
+        dragFromMiniPlayer = fromMiniPlayer
         isDragging = true
         if (isDockedPlayer) {
+            heldValue = value.coerceIn(collapsedBound, expandedBound)
             PlayerMorph.isDragging = true
             PlayerMorph.dragFromMiniPlayer = fromMiniPlayer
         }
     }
 
     private fun endDragState() {
+        heldValue = null
         isDragging = false
         if (isDockedPlayer) PlayerMorph.isDragging = false
+    }
+
+    override fun dispatchRawDelta(delta: Float) {
+        val held = heldValue
+        if (held == null) {
+            draggableState.dispatchRawDelta(delta)
+            return
+        }
+        val next = (held - with(density) { delta.toDp() }).coerceIn(collapsedBound, expandedBound)
+        heldValue = next
+        coroutineScope.launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            animatable.snapTo(next)
+        }
     }
 
     private fun publishTarget(open: Boolean) {
@@ -471,6 +490,8 @@ class BottomSheetState(
     }
 
     fun performFling(velocity: Float, onDismiss: (() -> Unit)?) {
+        val closingDrag = isDockedPlayer && isDragging && !dragFromMiniPlayer
+        val releaseValue = heldValue ?: value
         endDragState()
         if (velocity > 250) {
             expand(velocity)
@@ -481,11 +502,15 @@ class BottomSheetState(
             } else {
                 collapse(velocity)
             }
+        } else if (closingDrag) {
+            val travel = expandedBound - collapsedBound
+            val commitDistance = minOf(24.dp, travel * 0.25f)
+            if (expandedBound - releaseValue >= commitDistance) collapse(velocity) else expand(velocity)
         } else {
             // Slow release: snap nearest the *projected* endpoint, not the release
             // point, so a gentle toss toward an anchor still lands there. Work in px
             // since velocity is px/s; value/anchors are Dp.
-            val currentPx = with(density) { value.toPx() }
+            val currentPx = with(density) { releaseValue.toPx() }
             val snapsPx = buildList {
                 if (onDismiss != null) add(with(density) { dismissedBound.toPx() })
                 add(with(density) { collapsedBound.toPx() })

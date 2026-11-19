@@ -36,6 +36,22 @@ class PlayerCoverGesturesTest {
     }
 
     @Test
+    fun diagonalCloseKeepsOwnershipThroughAReversalNearTheOrigin() {
+        val gesture = CoverDragGesture(touchSlop = 10f, horizontal = true, vertical = true)
+
+        gesture.move(Offset(-9f, 8f))
+        assertEquals(CoverDragState.Dragging(CoverDragAxis.VERTICAL), gesture.state)
+
+        gesture.move(Offset(8f, -7f))
+        assertEquals(CoverDragState.Dragging(CoverDragAxis.VERTICAL), gesture.state)
+        assertEquals(1f, gesture.displacement, 0f)
+
+        gesture.move(Offset(-18f, 65f))
+        assertEquals(66f, gesture.displacement, 0f)
+        assertEquals(CoverDragAxis.VERTICAL, gesture.settle())
+    }
+
+    @Test
     fun reversalToTheOriginCancelsAndCannotBeClaimedAgain() {
         val gesture = CoverDragGesture(touchSlop = 10f, horizontal = true, vertical = true)
 

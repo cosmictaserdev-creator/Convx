@@ -2,6 +2,7 @@ package com.convx.music.ui.player
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.util.lerp
+import com.convx.music.playback.presentation.PlayerMorphGeometry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -36,13 +37,13 @@ class PlayerSheetMotionTest {
     fun `artwork window lands exactly on a non-square hero target`() {
         val squareArt = Rect(24f, 900f, 88f, 964f)
         val hero = Rect(0f, 0f, 1080f, 1560f)
-        assertEquals(squareArt, sharedArtworkWindow(squareArt, hero, 0f))
-        val end = sharedArtworkWindow(squareArt, hero, 1f)
+        assertEquals(squareArt, PlayerMorphGeometry.artworkWindow(squareArt, hero, 0f, edgeToEdge = true))
+        val end = PlayerMorphGeometry.artworkWindow(squareArt, hero, 1f, edgeToEdge = true)
         assertEquals(hero.left, end.left, 0.01f)
         assertEquals(hero.top, end.top, 0.01f)
         assertEquals(hero.right, end.right, 0.01f)
         assertEquals(hero.bottom, end.bottom, 0.01f)
-        val nan = sharedArtworkWindow(squareArt, hero, Float.NaN)
+        val nan = PlayerMorphGeometry.artworkWindow(squareArt, hero, Float.NaN, edgeToEdge = true)
         assertEquals(squareArt, nan)
     }
 

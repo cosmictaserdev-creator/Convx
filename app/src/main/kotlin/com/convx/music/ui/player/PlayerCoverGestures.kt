@@ -18,6 +18,8 @@ import kotlin.math.abs
 
 internal enum class CoverDragAxis { HORIZONTAL, VERTICAL }
 
+private const val HORIZONTAL_DOMINANCE = 1.4f
+
 internal sealed interface CoverDragState {
     data object Idle : CoverDragState
     data class Dragging(val axis: CoverDragAxis) : CoverDragState
@@ -50,7 +52,11 @@ internal class CoverDragGesture(
         val dragging = when (val current = state) {
             CoverDragState.Idle -> {
                 if (insideOrigin) return
-                val axis = if (abs(position.x) >= abs(position.y)) CoverDragAxis.HORIZONTAL else CoverDragAxis.VERTICAL
+                val axis = if (abs(position.x) > abs(position.y) * HORIZONTAL_DOMINANCE) {
+                    CoverDragAxis.HORIZONTAL
+                } else {
+                    CoverDragAxis.VERTICAL
+                }
                 val enabled = if (axis == CoverDragAxis.HORIZONTAL) horizontal else vertical
                 if (!enabled) {
                     settle()
@@ -59,7 +65,7 @@ internal class CoverDragGesture(
                 CoverDragState.Dragging(axis).also { state = it }
             }
             is CoverDragState.Dragging -> {
-                if (insideOrigin || crossesOrigin(previous, change)) {
+                if (current.axis == CoverDragAxis.HORIZONTAL && (insideOrigin || crossesOrigin(previous, change))) {
                     settle()
                     return
                 }

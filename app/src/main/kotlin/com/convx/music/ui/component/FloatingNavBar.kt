@@ -60,6 +60,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
@@ -125,6 +126,7 @@ fun AppFloatingNavBar(
     currentRoute: String?,
     onItemClick: (Screens, Boolean) -> Unit,
     scrollConnection: FloatingTabBarScrollConnection,
+    tabMotion: GraphicsLayerScope.() -> Unit,
     modifier: Modifier = Modifier,
     pureBlack: Boolean = false,
     showPlayerAccessory: Boolean = false,
@@ -165,7 +167,7 @@ fun AppFloatingNavBar(
             NavBarSearchInputBar(
                 state = navSearch,
                 pureBlack = pureBlack,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().graphicsLayer(tabMotion),
             )
         } else {
             AppFloatingNavBarChrome(
@@ -173,6 +175,7 @@ fun AppFloatingNavBar(
                 currentRoute = currentRoute,
                 onItemClick = onItemClick,
                 scrollConnection = scrollConnection,
+                tabMotion = tabMotion,
                 pureBlack = pureBlack,
                 showPlayerAccessory = showPlayerAccessory,
                 onAccessoryClick = onAccessoryClick,
@@ -195,6 +198,7 @@ private fun AppFloatingNavBarChrome(
     currentRoute: String?,
     onItemClick: (Screens, Boolean) -> Unit,
     scrollConnection: FloatingTabBarScrollConnection,
+    tabMotion: GraphicsLayerScope.() -> Unit,
     pureBlack: Boolean,
     showPlayerAccessory: Boolean,
     onAccessoryClick: () -> Unit,
@@ -305,6 +309,7 @@ private fun AppFloatingNavBarChrome(
     FoldingTabBar(
         selectedTabKey = selectedTabKey,
         scrollConnection = scrollConnection,
+        tabMotion = tabMotion,
         rowHeight = NavBarRowHeight,
         tabBarContentModifier = tabBarContentModifier,
         colors = FloatingTabBarDefaults.colors(

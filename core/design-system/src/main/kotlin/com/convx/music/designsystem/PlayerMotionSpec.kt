@@ -12,8 +12,9 @@ object PlayerMotionSpec {
     // Keeping damping fixed, spring time scales approximately with the inverse square root of stiffness.
     private const val SheetStiffness = 500f
     private const val SheetLandingDamping = 0.72f
-    private const val DockStiffness = 120f
-    private const val DockOpeningDamping = 0.95f
+    private const val DockOpeningStiffness = 80f
+    private const val DockClosingStiffness = 190f
+    private const val DockOpeningDamping = 0.96f
     private const val CornerStiffness = 760f
     private const val PillShadowReturnMillis = 272
     private const val ArtworkEndpointFade = 0.18f
@@ -34,7 +35,7 @@ object PlayerMotionSpec {
 
     fun <T> dockTransition(opening: Boolean): FiniteAnimationSpec<T> = spring(
         dampingRatio = if (opening) DockOpeningDamping else Spring.DampingRatioNoBouncy,
-        stiffness = DockStiffness,
+        stiffness = if (opening) DockOpeningStiffness else DockClosingStiffness,
     )
 
     fun <T> screenCorner(): FiniteAnimationSpec<T> = spring(

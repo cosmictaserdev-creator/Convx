@@ -18,22 +18,51 @@ class PlayerMorphGeometryTest {
     }
 
     @Test
-    fun artworkWindowKeepsTheAndroidLeadAndHitsBothEndpoints() {
+    fun boxedArtworkTravelsAtMiniSizeBeforeGrowingIntoPlace() {
+        val source = Rect(24f, 900f, 88f, 964f)
+        val target = Rect(120f, 160f, 960f, 1000f)
+
+        assertEquals(source, PlayerMorphGeometry.artworkWindow(source, target, 0f, edgeToEdge = false))
+        assertEquals(target, PlayerMorphGeometry.artworkWindow(source, target, 1f, edgeToEdge = false))
+
+        val middle = PlayerMorphGeometry.artworkWindow(source, target, 0.5f, edgeToEdge = false)
+        assertEquals(source.size, middle.size)
+        assertEquals(source.center.x + (target.center.x - source.center.x) * 0.875f, middle.center.x)
+        assertEquals(source.center.y + (target.center.y - source.center.y) * 0.75f, middle.center.y)
+
+        val growing = PlayerMorphGeometry.artworkWindow(source, target, 0.85f, edgeToEdge = false)
+        assertEquals((source.width + target.width) / 2f, growing.width, 0.001f)
+    }
+
+    @Test
+    fun edgeToEdgeArtworkMovesAndGrowsAcrossTheWholeTransition() {
         val source = Rect(24f, 900f, 88f, 964f)
         val target = Rect(0f, 0f, 1080f, 1560f)
+        val middle = PlayerMorphGeometry.artworkWindow(source, target, 0.5f, edgeToEdge = true)
+        assertEquals(Rect(193.5f, 450f, 765.5f, 1262f), middle)
 
-        assertEquals(source, PlayerMorphGeometry.artworkWindow(source, target, 0f))
-        assertEquals(target, PlayerMorphGeometry.artworkWindow(source, target, 1f))
+        val closing = (10 downTo 0).map { step ->
+            PlayerMorphGeometry.artworkWindow(source, target, step / 10f, edgeToEdge = true)
+        }
+        closing.zipWithNext().forEach { (previous, current) ->
+            assertTrue(current.center.x <= previous.center.x)
+            assertTrue(current.center.y >= previous.center.y)
+            assertTrue(current.left >= 0f)
+        }
+    }
 
-        val middle = PlayerMorphGeometry.artworkWindow(source, target, 0.5f)
-        val horizontalFraction = (middle.center.x - source.center.x) / (target.center.x - source.center.x)
-        val verticalFraction = (middle.center.y - source.center.y) / (target.center.y - source.center.y)
-        assertTrue(horizontalFraction > verticalFraction)
+    @Test
+    fun navRowFadesInStepWithTheSheet() {
+        assertEquals(1f, PlayerMorphGeometry.navigationBarAlpha(0f))
+        assertEquals(0.5f, PlayerMorphGeometry.navigationBarAlpha(0.3f))
+        assertEquals(0f, PlayerMorphGeometry.navigationBarAlpha(0.6f))
+        assertEquals(0f, PlayerMorphGeometry.navigationBarAlpha(1f))
     }
 
     @Test
     fun stagedFadesPreserveThePlayerHandoff() {
         assertEquals(1f, PlayerMorphGeometry.miniContentAlpha(0f), 0.001f)
+        assertEquals(0.5f, PlayerMorphGeometry.miniContentAlpha(0.25f), 0.001f)
         assertEquals(0f, PlayerMorphGeometry.miniContentAlpha(PLAYER_MORPH_MINI_FADE_END), 0.001f)
         assertEquals(0f, PlayerMorphGeometry.pageAlpha(PLAYER_MORPH_CONTENT_APPEAR_START), 0.001f)
         assertEquals(1f, PlayerMorphGeometry.pageAlpha(PLAYER_MORPH_CONTENT_APPEAR_END), 0.001f)

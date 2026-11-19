@@ -179,6 +179,7 @@ import com.convx.music.ui.menu.PlayerMenu
 import com.convx.music.ui.menu.YouTubeSongMenu
 import com.convx.music.ui.player.BottomSheetPlayer
 import com.convx.music.ui.player.InstallPlayerMorphLayers
+import com.convx.music.playback.presentation.PlayerMorphGeometry
 import com.convx.music.ui.screens.Screens
 import com.convx.music.ui.screens.SettingDialoge
 import com.convx.music.ui.screens.settings.DarkMode
@@ -1157,6 +1158,9 @@ internal fun AppRootContent(
                                         .align(Alignment.BottomCenter)
                                         .fillMaxWidth()
                                         .height(navBarTotalHeight + 56.dp)
+                                        .graphicsLayer {
+                                            translationY = navBarTotalHeight.toPx() * playerBottomSheetState.progress
+                                        }
                                         .background(
                                             Brush.verticalGradient(
                                                 0f to Color.Transparent,
@@ -1212,6 +1216,11 @@ internal fun AppRootContent(
                                     currentRoute = effectiveRoute,
                                     onItemClick = onNavItemClick,
                                     scrollConnection = floatingNavBarScrollConnection,
+                                    tabMotion = {
+                                        val progress = playerBottomSheetState.progress
+                                        translationY = (size.height + (bottomInset + 8.dp).toPx()) * progress
+                                        alpha = PlayerMorphGeometry.navigationBarAlpha(progress)
+                                    },
                                     pureBlack = pureBlack,
                                     showPlayerAccessory = hasDockedPlayerAccessory,
                                     onAccessoryClick = { playerBottomSheetState.expandSoft() },

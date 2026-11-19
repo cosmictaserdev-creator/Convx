@@ -266,10 +266,6 @@ fun FloatingMiniPlayer(
             }
         }
     }
-    // Clear stale morph bounds when switching layout branches.
-    LaunchedEffect(tabStyle, isInline) {
-        clearMiniContentControlsRects()
-    }
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = Modifier
@@ -503,6 +499,7 @@ fun FloatingMiniPlayer(
                         // Combine both lines into one layer; their glyphs do not overlap.
                         modifier = Modifier
                             .weight(1f)
+                            .playerMorphBounds(PlayerMorphElement.TITLE, isMini = true)
                             .flamingoChrome(useGlass && isDark),
                     ) {
                         // Scroll long titles only during playback; paused titles stay still.
@@ -567,7 +564,7 @@ fun FloatingMiniPlayer(
                     onClick = { playerConnection.player.togglePlayPause() },
                     modifier = Modifier
                         .size(controlSize)
-                        .registerMiniControlsPlayRect(),
+                        .playerMorphBounds(PlayerMorphElement.PLAY, isMini = true),
                 ) {
                     AnimatedPlayPauseIcon(
                         isPlaying = isPlaying,
@@ -581,7 +578,7 @@ fun FloatingMiniPlayer(
                     modifier = Modifier
                         .scaledWidth(controlSize, fade = true, fraction = extras)
                         .height(controlSize)
-                        .registerMiniControlsNextRect(),
+                        .playerMorphBounds(PlayerMorphElement.NEXT, isMini = true),
                 ) {
                     PlayerGlyph(
                         slot = PlayerIconSlot.NEXT,
@@ -603,7 +600,8 @@ fun FloatingMiniPlayer(
                 IconButton(
                     onClick = { playerConnection.requestSkip(forward = false) },
                     enabled = canSkipPrevious,
-                    modifier = Modifier.size(controlSize),
+                    modifier = Modifier.size(controlSize)
+                        .playerMorphBounds(PlayerMorphElement.PREVIOUS, isMini = true),
                 ) {
                     PlayerGlyph(
                         slot = PlayerIconSlot.PREVIOUS,
@@ -614,7 +612,8 @@ fun FloatingMiniPlayer(
                 }
                 IconButton(
                     onClick = { playerConnection.player.togglePlayPause() },
-                    modifier = Modifier.size(controlSize),
+                    modifier = Modifier.size(controlSize)
+                        .playerMorphBounds(PlayerMorphElement.PLAY, isMini = true),
                 ) {
                     AnimatedPlayPauseIcon(
                         isPlaying = isPlaying,
@@ -625,7 +624,8 @@ fun FloatingMiniPlayer(
                 IconButton(
                     onClick = { playerConnection.requestSkip(forward = true) },
                     enabled = canSkipNext,
-                    modifier = Modifier.size(controlSize),
+                    modifier = Modifier.size(controlSize)
+                        .playerMorphBounds(PlayerMorphElement.NEXT, isMini = true),
                 ) {
                     PlayerGlyph(
                         slot = PlayerIconSlot.NEXT,
@@ -681,7 +681,10 @@ fun FloatingMiniPlayer(
 
                     Column(
                         // Combine both lines into one layer; their glyphs do not overlap.
-                        modifier = Modifier.weight(1f).flamingoChrome(useGlass && isDark),
+                        modifier = Modifier
+                            .weight(1f)
+                            .playerMorphBounds(PlayerMorphElement.TITLE, isMini = true)
+                            .flamingoChrome(useGlass && isDark),
                     ) {
                         Text(
                             text = mediaMetadata?.title.orEmpty(),

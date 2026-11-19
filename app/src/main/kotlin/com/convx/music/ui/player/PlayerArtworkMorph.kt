@@ -6,9 +6,8 @@ package com.convx.music.ui.player
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -32,40 +31,42 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.lerp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size as CoilSize
 import com.convx.music.designsystem.PlayerMotionSpec
-import com.convx.music.ui.component.PLAYER_MINI_FADE_END
+import com.convx.music.playback.presentation.PlayerMorphGeometry
+import com.convx.music.ui.component.heroFadeOutStops
+import com.convx.music.ui.component.rememberNoArtworkPainter
 import com.convx.music.ui.utils.resize
 import kotlin.math.roundToInt
 
-/**
- * One end of the artwork flight, as the element that owns it describes itself.
- *
- * The target controls whether the cover travels or fades at the mini-player bounds.
- */
+internal enum class HeroArtworkFade { BOTTOM, END }
+
+/** One measured endpoint of the artwork flight. */
 internal data class MorphArtTarget(
     val rect: Rect,
     val radiusPx: Float,
-    val travels: Boolean = true,
-    /** Optional lower-edge fade on the travelling artwork. */
-    val heroMask: Boolean = false,
+    val heroFade: HeroArtworkFade? = null,
     val shadowPx: Float = 0f,
     /** V2 Squared's pause-shrink applies to this target's painted size. */
     val pauseShrinks: Boolean = false,
     /** A separate album-cover thumbnail must not dissolve into the hero's motion-video poster. */
     val videoPoster: Boolean = true,
     val fadeEndpoints: Boolean = false,
-    val fadeOnly: Boolean = false,
 )
 
 /**
@@ -114,28 +115,26 @@ fun Modifier.miniArtworkMorphSource(cornerRadiusPx: Float): Modifier {
             if (it.isAttached) miniArtworkSlot.report(owner, MorphArtTarget(it.boundsInRoot(), cornerRadiusPx))
         }
         .graphicsLayer {
-            alpha = if (!PlayerMorph.active) 1f
-            else if (fullArtworkSlot.value?.fadeEndpoints == true && fullArtworkSlot.value?.travels == true) {
-                miniArtworkEndpointAlpha(PlayerMorph.progress)
+            alpha = if (!PlayerMorph.active) 1f else when (fullArtworkSlot.value?.fadeEndpoints) {
+                null -> 1f
+                true -> miniArtworkEndpointAlpha(PlayerMorph.progress)
+                false -> 0f
             }
-            else 0f
         }
 }
 
 /**
- * Target end: a full player's cover or lyrics/queue header. Travelling targets hide while
- * the overlay carries the cover; stationary targets keep their own fade behavior.
+ * Target end: a full player's cover or lyrics/queue header. The overlay carries the cover
+ * while the target hides or crossfades into its fully rendered shape.
  */
 @Composable
-fun Modifier.fullArtworkMorphTarget(
+internal fun Modifier.fullArtworkMorphTarget(
     cornerRadiusPx: Float,
-    travels: Boolean = true,
-    heroMask: Boolean = false,
+    heroFade: HeroArtworkFade? = null,
     shadowPx: Float = 0f,
     pauseShrinks: Boolean = false,
     videoPoster: Boolean = true,
     fadeEndpoints: Boolean = false,
-    fadeOnly: Boolean = false,
 ): Modifier {
     val owner = remember { Any() }
     DisposableEffect(owner) { onDispose { fullArtworkSlot.release(owner) } }
@@ -147,20 +146,24 @@ fun Modifier.fullArtworkMorphTarget(
             if (!it.isAttached || it.boundsInWindow().isEmpty) return@onGloballyPositioned
             fullArtworkSlot.report(
                 owner,
-                MorphArtTarget(it.boundsInRoot(), cornerRadiusPx, travels, heroMask, shadowPx, pauseShrinks, videoPoster, fadeEndpoints, fadeOnly),
+                MorphArtTarget(
+                    rect = Rect(it.positionInRoot(), it.size.toSize()),
+                    radiusPx = cornerRadiusPx,
+                    heroFade = heroFade,
+                    shadowPx = shadowPx,
+                    pauseShrinks = pauseShrinks,
+                    videoPoster = videoPoster,
+                    fadeEndpoints = fadeEndpoints,
+                ),
             )
         }
         .graphicsLayer {
             alpha = if (!PlayerMorph.active) {
                 1f
-            } else if (fadeOnly) {
-                1f
             } else if (fadeEndpoints) {
                 fullArtworkEndpointAlpha(PlayerMorph.progress)
-            } else if (travels) {
-                0f
             } else {
-                playerSheetPageAlpha(PlayerMorph.progress)
+                0f
             }
         }
 }
@@ -172,7 +175,7 @@ fun Modifier.fullArtworkMorphTarget(
  * The image is laid out once as a square of side max(target w, h) centred on the
  * target -- exactly what ContentScale.Crop shows at the target -- and scaled down, never
  * up, so it stays sharp. A rounded clip window then interpolates per axis from the mini
- * rect to the target rect ([sharedArtworkWindow]), which is what lets a square pill cover
+ * rect to the target rect, which is what lets a square pill cover
  * open into V2's tall Hero and land on its true shape, and a square card land exactly on
  * itself. Both ends are frozen for the flight (the reference app freezeArtworkBounds).
  */
@@ -198,10 +201,9 @@ fun PlayerArtworkMorphOverlay(
     // Canvas video on the target: one still of the frame on screen, grabbed in the first
     // flight frame's composition (before its draw). Collapsed, the loop is paused, so this
     // is also the exact frame an open lands on.
-    // Same rule as the container: frozen source while opening, live pill cover while closing.
-    val mini = if (PlayerMorph.targetOpen) frozen?.first ?: liveMini else liveMini ?: frozen?.first
+    val mini = frozen?.first ?: liveMini
     val full = frozen?.second ?: liveFull
-    if (mini == null || full == null || thumbnailUrl == null) return
+    if (mini == null || full == null) return
     val poster = remember(flying, mediaId, full.videoPoster) {
         if (flying && full.videoPoster) CanvasPosterSource.capture(mediaId) else null
     }
@@ -209,32 +211,34 @@ fun PlayerArtworkMorphOverlay(
     // coil3.size.Dimension throws on any px <= 0 (measured crash, Samsung).
     if (mini.rect.width <= 0f || mini.rect.height <= 0f || full.rect.width <= 0f || full.rect.height <= 0f) return
 
-    if (!full.travels) {
-        FancyArtworkFadeOverlay(
-            thumbnailUrl = thumbnailUrl,
-            mini = mini,
-            progress = progress,
-            shrink = !full.fadeOnly,
-        )
-        return
-    }
-
     val shrink = if (full.pauseShrinks) artworkRestScaleState.floatValue.coerceIn(0.1f, 1f) else 1f
     val target = full.rect.scaledAboutCenter(shrink)
     val side = maxOf(target.width, target.height)
     val density = LocalDensity.current
-    val sideDp = with(density) { side.toDp() }
-    val heroFade = if (full.heroMask) remember { heroFadeInverseStops() } else null
+    val heroFade = full.heroFade
+    val fadeStops = remember(heroFade) {
+        heroFade?.let {
+            heroFadeOutStops(start = if (it == HeroArtworkFade.END) 0.6f else 0.78f)
+                .map { (position, color) -> position to Color.Black.copy(alpha = 1f - color.alpha) }
+                .toTypedArray()
+        }
+    }
 
     Box(
         modifier = Modifier
-            .offset {
-                IntOffset(
-                    (target.center.x - side / 2f).roundToInt(),
-                    (target.center.y - side / 2f).roundToInt(),
-                )
+            .fillMaxSize()
+            .layout { measurable, constraints ->
+                // A tall Hero crop needs a square drawing layer wider than the viewport.
+                // Measure it at its real extent so its transform origin stays at the cover center.
+                val extent = side.roundToInt().coerceAtLeast(1)
+                val layer = measurable.measure(Constraints.fixed(extent, extent))
+                layout(constraints.constrainWidth(extent), constraints.constrainHeight(extent)) {
+                    layer.place(
+                        (target.center.x - extent / 2f).roundToInt(),
+                        (target.center.y - extent / 2f).roundToInt(),
+                    )
+                }
             }
-            .size(sideDp)
             .graphicsLayer {
                 val fraction = progress().coerceIn(0f, 1f)
                 if (fraction <= 0f || fraction >= 1f || !PlayerMorph.active) {
@@ -243,36 +247,39 @@ fun PlayerArtworkMorphOverlay(
                     return@graphicsLayer
                 }
                 alpha = if (full.fadeEndpoints) flyingArtworkEndpointAlpha(fraction) else 1f
-                val window = sharedArtworkWindow(mini.rect, target, fraction)
+                val edgeToEdge = heroFade != null
+                val window = PlayerMorphGeometry.artworkWindow(mini.rect, target, fraction, edgeToEdge)
+                val growth = PlayerMorphGeometry.artworkGrowth(fraction, edgeToEdge)
                 // Image square side at this instant: covers the window at every fraction
                 // (lerp of the max >= max of the lerps), full image at 0, Crop at 1.
-                val imageSide = lerp(maxOf(mini.rect.width, mini.rect.height), side, fraction)
-                val scale = imageSide / side
+                val imageSide = lerp(maxOf(mini.rect.width, mini.rect.height), side, growth)
+                val scale = imageSide / size.width
                 transformOrigin = TransformOrigin.Center
                 scaleX = scale
                 scaleY = scale
                 translationX = window.center.x - target.center.x
                 translationY = window.center.y - target.center.y
-                val radius = lerp(mini.radiusPx, full.radiusPx * shrink, fraction)
+                val radius = lerp(mini.radiusPx, full.radiusPx * shrink, growth)
                 shape = CenteredWindowShape(
                     windowWidth = window.width / scale,
                     windowHeight = window.height / scale,
                     radius = radius / scale,
                 )
                 clip = true
-                shadowElevation = full.shadowPx * fraction
+                shadowElevation = full.shadowPx * growth
                 compositingStrategy = if (heroFade != null) CompositingStrategy.Offscreen else CompositingStrategy.Auto
             }
             .then(
-                if (heroFade != null) {
+                if (heroFade != null && fadeStops != null) {
                     Modifier.drawWithCache {
-                        // Target rect inside this square, in local px (pre-scale).
-                        val top = (size.height - target.height) / 2f
-                        val mask = Brush.verticalGradient(
-                            colorStops = heroFade,
-                            startY = top,
-                            endY = top + target.height,
-                        )
+                        // Use the full player's mask within its crop window in this layer.
+                        val mask = if (heroFade == HeroArtworkFade.END) {
+                            val left = (size.width - target.width) / 2f
+                            Brush.horizontalGradient(colorStops = fadeStops, startX = left, endX = left + target.width)
+                        } else {
+                            val top = (size.height - target.height) / 2f
+                            Brush.verticalGradient(colorStops = fadeStops, startY = top, endY = top + target.height)
+                        }
                         onDrawWithContent {
                             drawContent()
                             drawRect(
@@ -287,18 +294,23 @@ fun PlayerArtworkMorphOverlay(
                 },
             ),
     ) {
+        val artwork = thumbnailUrl?.resize(1200, 1200)
+        val placeholder = rememberNoArtworkPainter()
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 // Same URL AND decode size as every real player artwork -- Coil serves the
                 // identical cached bitmap at the handoff, no second decode, no landing pop.
-                .data(thumbnailUrl.resize(1200, 1200))
+                .data(artwork)
                 .size(CoilSize.ORIGINAL)
-                .placeholderMemoryCacheKey(thumbnailUrl.resize(1200, 1200))
+                .placeholderMemoryCacheKey(artwork)
                 .crossfade(false)
                 .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(sideDp),
+            placeholder = placeholder,
+            error = placeholder,
+            fallback = placeholder,
+            modifier = Modifier.matchParentSize(),
         )
         if (poster != null) {
             val targetWidthDp = with(density) { target.width.toDp() }
@@ -352,72 +364,6 @@ private class CenteredWindowShape(
         val r = radius.coerceIn(0f, minOf(windowWidth, windowHeight) / 2f)
         return Outline.Rounded(
             RoundRect(left, top, left + windowWidth, top + windowHeight, CornerRadius(r, r)),
-        )
-    }
-}
-
-/**
- * Inverse of heroFadeOutBrush's stops (DstOut erases where this is opaque): clear down to
- * the 0.78 knee, then smoothstep to opaque at the foot. Drawn at alpha = progress, the
- * erased amount is progress x (1 - hero mask), i.e. the mask grows in as the cover lands.
- */
-private fun heroFadeInverseStops(start: Float = 0.78f, steps: Int = 24): Array<Pair<Float, Color>> {
-    val stops = ArrayList<Pair<Float, Color>>(steps + 2)
-    stops.add(0f to Color.Transparent)
-    stops.add(start to Color.Transparent)
-    for (i in 0..steps) {
-        val t = i / steps.toFloat()
-        val eased = t * t * (3f - 2f * t)
-        stops.add((start + (1f - start) * t).coerceIn(0f, 1f) to Color.Black.copy(alpha = eased))
-    }
-    return stops.toTypedArray()
-}
-
-/**
- * Stationary fade path for layouts that should not move artwork between bounds. The mini
- * copy can shrink while fading; Hero Bleed keeps its size and lets the player content fade in.
- */
-@Composable
-private fun FancyArtworkFadeOverlay(
-    thumbnailUrl: String,
-    mini: MorphArtTarget,
-    progress: () -> Float,
-    shrink: Boolean,
-) {
-    val density = LocalDensity.current
-    val boxWidthDp = with(density) { mini.rect.width.toDp() }
-    val boxHeightDp = with(density) { mini.rect.height.toDp() }
-    val miniShape = RoundedCornerShape(with(density) { mini.radiusPx.toDp() })
-    Box(
-        modifier = Modifier
-            .offset { IntOffset(mini.rect.left.roundToInt(), mini.rect.top.roundToInt()) }
-            .size(boxWidthDp, boxHeightDp)
-            .graphicsLayer {
-                val fraction = progress().coerceIn(0f, 1f)
-                if (fraction <= 0f || fraction >= PLAYER_MINI_FADE_END || !PlayerMorph.active) {
-                    alpha = 0f
-                    return@graphicsLayer
-                }
-                val fade = easeOutCubic((fraction / PLAYER_MINI_FADE_END).coerceIn(0f, 1f))
-                alpha = 1f - fade
-                val shrinkScale = if (shrink) 1f - 0.15f * fade else 1f
-                scaleX = shrinkScale
-                scaleY = shrinkScale
-                transformOrigin = TransformOrigin.Center
-                shape = miniShape
-                clip = true
-            },
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(thumbnailUrl.resize(1200, 1200))
-                .size(CoilSize.ORIGINAL)
-                .placeholderMemoryCacheKey(thumbnailUrl.resize(1200, 1200))
-                .crossfade(false)
-                .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(boxWidthDp, boxHeightDp),
         )
     }
 }

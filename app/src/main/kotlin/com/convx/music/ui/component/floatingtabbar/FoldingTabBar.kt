@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
@@ -61,6 +62,7 @@ fun FoldingTabBar(
     shapes: FloatingTabBarShapes,
     sizes: FloatingTabBarSizes,
     elevations: FloatingTabBarElevations,
+    tabMotion: GraphicsLayerScope.() -> Unit,
     expandedTabs: @Composable (tabs: List<FoldingTab>, surfaceBackdrop: LayerBackdrop) -> Unit,
     modifier: Modifier = Modifier,
     accessory: (@Composable (Modifier, isInline: Boolean) -> Unit)? = null,
@@ -248,12 +250,13 @@ fun FoldingTabBar(
         val field = children[5].measure(Constraints.fixed(geometry.searchWidth, height))
         layout(width, geometry.height) {
             val rowY = geometry.rowY
-            surface.placeRelative(0, rowY)
-            tabs.placeRelative(0, rowY)
-            selectedButton.placeRelative(geometry.selectedX, rowY)
-            searchSurface.placeRelative(geometry.searchX, rowY)
-            searchControl.placeRelative(geometry.searchX, rowY)
-            field.placeRelative(geometry.searchX, rowY)
+            surface.placeRelativeWithLayer(0, rowY, layerBlock = tabMotion)
+            tabs.placeRelativeWithLayer(0, rowY, layerBlock = tabMotion)
+            selectedButton.placeRelativeWithLayer(geometry.selectedX, rowY, layerBlock = tabMotion)
+            searchSurface.placeRelativeWithLayer(geometry.searchX, rowY, layerBlock = tabMotion)
+            searchControl.placeRelativeWithLayer(geometry.searchX, rowY, layerBlock = tabMotion)
+            field.placeRelativeWithLayer(geometry.searchX, rowY, layerBlock = tabMotion)
+            // The player has its own morph. Keep its resting bounds available throughout the slide.
             player.placeRelative(geometry.playerX, geometry.playerY)
         }
     }

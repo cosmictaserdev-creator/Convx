@@ -8,11 +8,13 @@ const val PLAYER_MORPH_SCREEN_CORNER_EXPANSION_MILLIS = 140
 const val PLAYER_MORPH_CORNER_EXPANSION_PROGRESS_BAND = 0.02f
 const val PLAYER_MORPH_INPUT_MINI_END_PROGRESS = 0.2f
 const val PLAYER_MORPH_LAYER_HANDOFF_PROGRESS = 0.2f
-const val PLAYER_MORPH_MINI_FADE_END = 0.3f
+const val PLAYER_MORPH_MINI_FADE_END = 0.5f
 const val PLAYER_MORPH_CONTENT_APPEAR_START = 0.1f
 const val PLAYER_MORPH_CONTENT_APPEAR_END = 0.6f
 const val PLAYER_MORPH_FLING_THRESHOLD_PX_PER_SECOND = 250f
 private const val PLAYER_MORPH_FLING_DECELERATION_RATE = 0.998f
+private const val DOCKED_ARTWORK_GROWTH_START = 0.7f
+private const val NAVIGATION_BAR_FADE_END = 0.6f
 
 enum class PlayerMorphInputOwner { MINI, FULL, NONE }
 
@@ -91,22 +93,28 @@ object PlayerMorphGeometry {
         )
     }
 
-    fun artworkWindow(source: Rect, target: Rect, progress: Float): Rect {
+    fun artworkGrowth(progress: Float, edgeToEdge: Boolean): Float {
         val fraction = sanitizeProgress(progress)
+        if (edgeToEdge) return fraction
+        val growth = ((fraction - DOCKED_ARTWORK_GROWTH_START) / (1f - DOCKED_ARTWORK_GROWTH_START)).coerceIn(0f, 1f)
+        return growth * growth * (3f - 2f * growth)
+    }
+
+    fun artworkWindow(source: Rect, target: Rect, progress: Float, edgeToEdge: Boolean): Rect {
+        val fraction = sanitizeProgress(progress)
+        val remaining = 1f - fraction
+        val travel = if (edgeToEdge) fraction else 1f - remaining * remaining
+        val growth = artworkGrowth(fraction, edgeToEdge)
+        // Let the cover come down before it moves across the screen into the pill.
         val centerX = lerp(source.center.x, target.center.x, easeOutCubic(fraction))
-        val centerY = lerp(
-            source.center.y,
-            target.center.y,
-            lerp(
-                easeInCubic(fraction),
-                fraction,
-                PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT,
-            ),
-        )
-        val halfWidth = lerp(source.width, target.width, fraction).coerceAtLeast(1f) / 2f
-        val halfHeight = lerp(source.height, target.height, fraction).coerceAtLeast(1f) / 2f
+        val centerY = lerp(source.center.y, target.center.y, travel)
+        val halfWidth = lerp(source.width, target.width, growth) / 2f
+        val halfHeight = lerp(source.height, target.height, growth) / 2f
         return Rect(centerX - halfWidth, centerY - halfHeight, centerX + halfWidth, centerY + halfHeight)
     }
+
+    fun navigationBarAlpha(progress: Float): Float =
+        (1f - sanitizeProgress(progress) / NAVIGATION_BAR_FADE_END).coerceIn(0f, 1f)
 
     fun cornerRadii(
         source: PlayerMorphCornerRadii,
@@ -143,7 +151,7 @@ object PlayerMorphGeometry {
     }
 
     fun miniContentAlpha(progress: Float): Float =
-        1f - easeOutCubic((sanitizeProgress(progress) / PLAYER_MORPH_MINI_FADE_END).coerceIn(0f, 1f))
+        (1f - sanitizeProgress(progress) / PLAYER_MORPH_MINI_FADE_END).coerceIn(0f, 1f)
 
     fun pageAlpha(progress: Float): Float = easeInCubic(
         (

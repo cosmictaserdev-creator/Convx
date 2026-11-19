@@ -689,17 +689,16 @@ private fun ThumbnailItem(
             modifier = Modifier
                 .coverMorph(coverStyle)
                 .size(dimensions.thumbnailSize)
-                // Register the morph target shape and hide its traveling copy during handoff.
-                .fullArtworkMorphTarget(
+                .then(if (isCurrentItem && !hidePlayerThumbnail) Modifier.fullArtworkMorphTarget(
                     cornerRadiusPx = with(artworkDensity) {
                         when (artworkStyle) {
                             PlayerArtworkStyle.CARD -> dimensions.cornerRadius.toPx()
                             else -> dimensions.thumbnailSize.toPx() / 2f
                         }
                     },
-                    // Cards travel between players; vinyl and clover covers resolve in place.
-                    travels = artworkStyle == PlayerArtworkStyle.CARD,
-                )
+                    // The travelling crop blends into the live outline for shaped covers.
+                    fadeEndpoints = artworkStyle != PlayerArtworkStyle.CARD,
+                ) else Modifier)
                 .graphicsLayer {
                     rotationZ = rotation.value
                 }

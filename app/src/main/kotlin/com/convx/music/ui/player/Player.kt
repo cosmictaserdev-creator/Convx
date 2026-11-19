@@ -1282,6 +1282,14 @@ fun BottomSheetPlayer(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .fillMaxHeight(0.65f) // Occupies top 65%
+                                            .then(
+                                                if (!isLandscapeLayout && !showInlineLyrics && !classicPages.showing) {
+                                                    Modifier.fullArtworkMorphTarget(
+                                                        cornerRadiusPx = 0f,
+                                                        heroFade = HeroArtworkFade.BOTTOM,
+                                                    )
+                                                } else Modifier,
+                                            )
                                             .graphicsLayer {
                                                 alpha = clearArtworkAlpha
                                                 compositingStrategy = CompositingStrategy.Offscreen
@@ -1864,7 +1872,9 @@ fun BottomSheetPlayer(
                         targetState = mediaMetadata.title,
                         transitionSpec = { fadeIn() togetherWith fadeOut() },
                         label = "",
-                        modifier = Modifier.auxiliaryBoundsMorph("title"),
+                        modifier = Modifier
+                            .auxiliaryBoundsMorph("title")
+                            .playerMorphBounds(PlayerMorphElement.TITLE),
                     ) { title ->
                         Text(
                             text = title,
@@ -2758,6 +2768,7 @@ fun BottomSheetPlayer(
                                 modifier = Modifier
                                     .height(68.dp)
                                     .weight(backButtonWeight)
+                                    .playerMorphBounds(PlayerMorphElement.PREVIOUS)
                                     .widthIn(min = 44.dp)
                                     .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
@@ -2800,6 +2811,7 @@ fun BottomSheetPlayer(
                                 modifier = Modifier
                                     .height(68.dp)
                                     .weight(playPauseWeight)
+                                    .playerMorphBounds(PlayerMorphElement.PLAY)
                                     .widthIn(min = 44.dp)
                                     .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
@@ -2858,6 +2870,7 @@ fun BottomSheetPlayer(
                                 modifier = Modifier
                                     .height(68.dp)
                                     .weight(nextButtonWeight)
+                                    .playerMorphBounds(PlayerMorphElement.NEXT)
                                     .widthIn(min = 44.dp)
                                     .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
@@ -2888,6 +2901,7 @@ fun BottomSheetPlayer(
                                 Modifier
                                     .size(48.dp)
                                     .align(Alignment.Center)
+                                    .playerMorphBounds(PlayerMorphElement.PREVIOUS)
                                     .alpha(if (isListenTogetherGuest) 0.5f else 1f)
                                     .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
@@ -2901,6 +2915,7 @@ fun BottomSheetPlayer(
                                 modifier =
                                 Modifier
                                     .size(100.dp) //100
+                                    .playerMorphBounds(PlayerMorphElement.PLAY)
                                     .clip(RoundedCornerShape(playPauseRoundness))
                                     .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha }
@@ -2971,6 +2986,7 @@ fun BottomSheetPlayer(
                                 Modifier
                                     .size(48.dp)
                                     .align(Alignment.Center)
+                                    .playerMorphBounds(PlayerMorphElement.NEXT)
                                     .alpha(if (isListenTogetherGuest) 0.5f else 1f)
                                     .flamingoChrome(additiveChrome)
                                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
@@ -3272,7 +3288,11 @@ fun BottomSheetPlayer(
                                     } else Thumbnail(
                                         canvasController = playerVideo.controller,
                                         sliderPositionProvider = sliderPositionProvider,
-                                        modifier = Modifier.animateContentSize(),
+                                        modifier = rememberDragToQueueModifier(
+                                            enabled = !isListenTogetherGuest && !classicPages.showing,
+                                            state = state,
+                                            onOpenQueue = { classicPages.value = PlayerInternalState.QUEUE },
+                                        ).animateContentSize(),
                                         isPlayerExpanded = isExpandedProvider,
                                         isLandscape = true,
                                         isListenTogetherGuest = isListenTogetherGuest
