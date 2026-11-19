@@ -53,7 +53,7 @@ object LrcRed {
         artist: String,
         durationMs: Long,
         isrc: String? = null,
-        get: suspend (String) -> String? = { lyricsGet(it) },
+        get: (suspend (String) -> String?)? = null,
     ): List<LyricLine>? = withContext(Dispatchers.IO) {
         val known = isrc?.let(::documentUrl)
         if (known != null) document(known, get)?.let { return@withContext it }
@@ -66,8 +66,10 @@ object LrcRed {
         document(found, get)
     }
 
-    private suspend fun document(url: String, get: suspend (String) -> String?): List<LyricLine>? =
-        get(url)?.let(TtmlLyrics::parse)?.takeIf { it.isNotEmpty() }
+    private suspend fun document(url: String, get: (suspend (String) -> String?)?): List<LyricLine>? {
+        val body = if (get == null) lyricsGet(url) else get(url)
+        return body?.let(TtmlLyrics::parse)?.takeIf { it.isNotEmpty() }
+    }
 
     private suspend fun search(title: String, artist: String, durationMs: Long): Hit? {
         val url = "${BASE}search.json".toHttpUrl().newBuilder()

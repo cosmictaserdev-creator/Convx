@@ -8,11 +8,7 @@ package com.convx.music.ui.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -43,14 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import com.convx.music.ui.player.PlayerMorph
-import com.convx.music.ui.player.SCREEN_CORNER_EXPANSION_MILLIS
 import com.convx.music.ui.player.recordPlayerLayer
 import com.convx.music.ui.player.sharedContainerCornerRadius
 import com.convx.music.playback.presentation.PLAYER_MORPH_CONTENT_APPEAR_END
 import com.convx.music.playback.presentation.PLAYER_MORPH_CONTENT_APPEAR_START
 import com.convx.music.playback.presentation.PLAYER_MORPH_LAYER_HANDOFF_PROGRESS
 import com.convx.music.playback.presentation.PLAYER_MORPH_MINI_FADE_END
-import com.convx.music.designsystem.MotionTokens
+import com.convx.music.designsystem.PlayerMotionSpec
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.pointerInput
@@ -84,13 +79,7 @@ internal const val PLAYER_CONTENT_APPEAR_END = PLAYER_MORPH_CONTENT_APPEAR_END
  *  the first capture after the glass fades in is warm, not a stale frame. */
 internal const val PLAYER_GLASS_UNFREEZE_PROGRESS = 0.75f
 
-/** Spring stiffness for opening and closing the player sheet. */
-private const val PlayerSheetStiffness = MotionTokens.PlayerSheetStiffness
-
 private const val BackdropFreezeSafetyNs = 900_000_000L
-
-/** Close spring damping when the sheet lands into the mini pill with speed. */
-private const val COLLAPSE_LANDING_DAMPING = MotionTokens.PlayerSheetLandingDamping
 
 /** How far (of the collapse travel) a full predictive-back swipe previews. */
 private const val PREDICTIVE_BACK_TRAVEL = 0.35f
@@ -152,7 +141,7 @@ fun BottomSheet(
         cornerExpansion.animateTo(
             targetValue = if (state.isExpanded) 1f else 0f,
             // Avoid overshoot, which can briefly produce an invalid corner radius.
-            animationSpec = spring(dampingRatio = 1f, stiffness = 550f),
+            animationSpec = PlayerMotionSpec.screenCorner(),
         )
     }
 
@@ -330,7 +319,7 @@ fun BottomSheet(
 
 @Stable
 class BottomSheetState(
-    draggableState: DraggableState,
+    private val draggableState: DraggableState,
     private val coroutineScope: CoroutineScope,
     private val animatable: Animatable<Dp, AnimationVector1D>,
     private val onAnchorChanged: (Int) -> Unit,
@@ -338,6 +327,7 @@ class BottomSheetState(
     val expandedBound: Dp,
     val dismissedBound: Dp,
     private val density: Density,
+    private val isDockedPlayer: Boolean = false,
 ) : DraggableState by draggableState {
     // A plain array lets draw-phase glass reads avoid snapshot invalidations.
     internal val dragClockNs = longArrayOf(0L)
@@ -350,21 +340,42 @@ class BottomSheetState(
     var targetOpen by mutableStateOf(false)
         private set
 
+    private var dragFromMiniPlayer = false
+    private var heldValue: Dp? = null
+
     /** Marks a gesture start and which end owns it; mirrored to [PlayerMorph]. */
     fun onDragStart(fromMiniPlayer: Boolean) {
+        dragFromMiniPlayer = fromMiniPlayer
         isDragging = true
-        PlayerMorph.isDragging = true
-        PlayerMorph.dragFromMiniPlayer = fromMiniPlayer
+        if (isDockedPlayer) {
+            heldValue = value.coerceIn(collapsedBound, expandedBound)
+            PlayerMorph.isDragging = true
+            PlayerMorph.dragFromMiniPlayer = fromMiniPlayer
+        }
     }
 
     private fun endDragState() {
+        heldValue = null
         isDragging = false
-        PlayerMorph.isDragging = false
+        if (isDockedPlayer) PlayerMorph.isDragging = false
+    }
+
+    override fun dispatchRawDelta(delta: Float) {
+        val held = heldValue
+        if (held == null) {
+            draggableState.dispatchRawDelta(delta)
+            return
+        }
+        val next = (held - with(density) { delta.toDp() }).coerceIn(collapsedBound, expandedBound)
+        heldValue = next
+        coroutineScope.launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            animatable.snapTo(next)
+        }
     }
 
     private fun publishTarget(open: Boolean) {
         targetOpen = open
-        PlayerMorph.targetOpen = open
+        if (isDockedPlayer) PlayerMorph.targetOpen = open
     }
 
     /** Pass to a `background` slot's [layerBackdrop] to skip re-recording it
@@ -374,7 +385,7 @@ class BottomSheetState(
         (started != 0L && System.nanoTime() - started < BackdropFreezeSafetyNs) ||
             // Q3 lock: tap-driven open/close runs no drag, so without this the
             // backdrop re-samples every animation frame into the morph recording.
-            PlayerMorph.glassFrozen
+            (isDockedPlayer && PlayerMorph.glassFrozen)
     }
 
     val value by animatable.asState()
@@ -396,47 +407,19 @@ class BottomSheetState(
         if (totalRange <= 0f) 0f else ((animatable.value - collapsedBound).value / totalRange).coerceIn(0f, 1f)
     }
 
-    /**
-     * Set by the player sheet: its collapse lands WITH speed (slightly underdamped, stopped
-     * by the collapsed bound) and hands that speed (dp/s, negative = downward) here, so the
-     * mini pill can carry it on as an overshoot dip below its slot and settle.
-     */
-    var onCollapseLanded: ((velocityDpPerSec: Float) -> Unit)? = null
-
-    /**
-     * true when a collapse starts, false when it ends WITHOUT landing (interrupted, or
-     * already at rest). Lets the landing take over on the very frame the sheet reaches its
-     * bound: flagged only from [onCollapseLanded], that frame had nobody drawing the card.
-     */
-    var onCollapseArmed: ((armed: Boolean) -> Unit)? = null
-    private var collapseGeneration = 0
-
     fun collapse(animationSpec: AnimationSpec<Dp>, initialVelocity: Dp = 0.dp) {
         onAnchorChanged(collapsedAnchor)
         publishTarget(false)
         coroutineScope.launch {
-            val generation = ++collapseGeneration
-            onCollapseArmed?.invoke(true)
-            var landed = false
-            try {
-                val result = animatable.animateTo(collapsedBound, animationSpec, initialVelocity)
-                if (result.endReason == androidx.compose.animation.core.AnimationEndReason.BoundReached) {
-                    landed = true
-                    onCollapseLanded?.invoke(result.endState.velocity.value)
-                }
-            } finally {
-                // A newer collapse cancelled this one and has already re-armed.
-                if (!landed && generation == collapseGeneration) onCollapseArmed?.invoke(false)
-            }
+            animatable.animateTo(collapsedBound, animationSpec, initialVelocity)
         }
     }
 
-    /** Critically damped normally; a touch underdamped when a landing handler wants the
-     *  arrival speed (only reachable because the collapsed bound stops the overshoot). */
-    private fun collapseSpring() = spring<Dp>(
-        dampingRatio = if (onCollapseLanded != null) COLLAPSE_LANDING_DAMPING else Spring.DampingRatioNoBouncy,
-        stiffness = PlayerSheetStiffness,
-    )
+    private fun collapseSpring() = if (isDockedPlayer) PlayerMotionSpec.dockTransition<Dp>(opening = false)
+    else PlayerMotionSpec.sheetOpen<Dp>()
+
+    private fun expandSpring() = if (isDockedPlayer) PlayerMotionSpec.dockTransition<Dp>(opening = true)
+    else PlayerMotionSpec.sheetOpen<Dp>()
 
     fun expand(animationSpec: AnimationSpec<Dp>, initialVelocity: Dp = 0.dp) {
         onAnchorChanged(expandedAnchor)
@@ -453,10 +436,7 @@ class BottomSheetState(
 
     private fun expand(velocityPxPerSec: Float = 0f) {
         expand(
-            spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = PlayerSheetStiffness,
-            ),
+            expandSpring(),
             initialVelocity = with(density) { velocityPxPerSec.toDp() },
         )
     }
@@ -471,10 +451,7 @@ class BottomSheetState(
         // Match the opening spring to [collapseSoft].
         endDragState()
         expand(
-            spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = PlayerSheetStiffness,
-            ),
+            expandSpring(),
         )
     }
 
@@ -513,6 +490,8 @@ class BottomSheetState(
     }
 
     fun performFling(velocity: Float, onDismiss: (() -> Unit)?) {
+        val closingDrag = isDockedPlayer && isDragging && !dragFromMiniPlayer
+        val releaseValue = heldValue ?: value
         endDragState()
         if (velocity > 250) {
             expand(velocity)
@@ -523,11 +502,15 @@ class BottomSheetState(
             } else {
                 collapse(velocity)
             }
+        } else if (closingDrag) {
+            val travel = expandedBound - collapsedBound
+            val commitDistance = minOf(24.dp, travel * 0.25f)
+            if (expandedBound - releaseValue >= commitDistance) collapse(velocity) else expand(velocity)
         } else {
             // Slow release: snap nearest the *projected* endpoint, not the release
             // point, so a gentle toss toward an anchor still lands there. Work in px
             // since velocity is px/s; value/anchors are Dp.
-            val currentPx = with(density) { value.toPx() }
+            val currentPx = with(density) { releaseValue.toPx() }
             val snapsPx = buildList {
                 if (onDismiss != null) add(with(density) { dismissedBound.toPx() })
                 add(with(density) { collapsedBound.toPx() })
@@ -614,6 +597,7 @@ fun rememberBottomSheetState(
     initialAnchor: Int = dismissedAnchor,
     // Pane-sized sheets start at rest; screen-edge sheets can reveal on mount.
     animateOnMount: Boolean = true,
+    isDockedPlayer: Boolean = false,
 ): BottomSheetState {
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
@@ -622,7 +606,7 @@ fun rememberBottomSheetState(
         mutableIntStateOf(initialAnchor)
     }
 
-    return remember(dismissedBound, expandedBound, collapsedBound, coroutineScope) {
+    return remember(dismissedBound, expandedBound, collapsedBound, coroutineScope, isDockedPlayer) {
         val initialValue = when (previousAnchor) {
             expandedAnchor -> expandedBound
             collapsedAnchor -> collapsedBound
@@ -658,6 +642,7 @@ fun rememberBottomSheetState(
             expandedBound = expandedBound,
             dismissedBound = dismissedBound,
             density = density,
+            isDockedPlayer = isDockedPlayer,
         )
     }
 }

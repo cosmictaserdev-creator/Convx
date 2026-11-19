@@ -1,0 +1,21 @@
+package com.convx.music.playback.presentation
+
+import android.graphics.RenderEffect
+import android.graphics.RuntimeShader
+import android.os.Build
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.unit.IntSize
+
+/**
+ * A true barrel lens over the whole stack: each pixel samples nearer the centre the closer to it it
+ * is, so the middle bulges toward the viewer and straight rows bend toward the rim. Android 13+.
+ */
+internal fun fisheyeLens(size: IntSize, strength: Float, radius: Float): androidx.compose.ui.graphics.RenderEffect? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || size.width <= 0 || size.height <= 0) return null
+    val shader = RuntimeShader(FISHEYE_AGSL).apply {
+        setFloatUniform("size", size.width.toFloat(), size.height.toFloat())
+        setFloatUniform("strength", strength)
+        setFloatUniform("radiusScale", radius)
+    }
+    return RenderEffect.createRuntimeShaderEffect(shader, "content").asComposeRenderEffect()
+}

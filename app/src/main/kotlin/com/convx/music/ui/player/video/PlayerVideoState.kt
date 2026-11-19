@@ -1,4 +1,4 @@
-package com.convx.music.ui.player
+package com.convx.music.ui.player.video
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -12,11 +12,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.convx.music.models.MediaMetadata
 import com.convx.music.playback.PlayerConnection
 import com.convx.music.playback.VideoStreamLookup
+import com.convx.music.ui.player.CanvasVideoController
+import com.convx.music.ui.player.LocalFullscreenVideo
+import com.convx.music.ui.player.rememberCanvasVideoController
 import com.convx.music.utils.YTPlayerUtils
 
-/** The song/video choice for the classic cover, sharing V2's selection so both skins agree. */
+/** Playback presentation shared by both player styles. */
 @Stable
-internal class ClassicVideo(
+internal class PlayerVideoState(
     val watch: Boolean,
     val canWatch: Boolean,
     val stream: YTPlayerUtils.VideoStream?,
@@ -24,20 +27,19 @@ internal class ClassicVideo(
     val controller: CanvasVideoController,
     val select: (Boolean) -> Unit,
     val requestStream: () -> Unit,
-) {
-    val active: Boolean get() = watch && stream != null
-}
+)
 
 @Composable
-internal fun rememberClassicVideo(
+internal fun rememberPlayerVideo(
     connection: PlayerConnection,
     metadata: MediaMetadata?,
     isPlaying: Boolean,
     sheetCollapsed: Boolean,
     isPreviewOnly: Boolean,
-): ClassicVideo {
+): PlayerVideoState {
     val id = metadata?.id
     val lookup by connection.videoStreamLookup.collectAsStateWithLifecycle()
+    val track by connection.canvasTrack.collectAsStateWithLifecycle()
     val available by connection.videoAvailability.collectAsStateWithLifecycle()
     val presentation = LocalFullscreenVideo.current
     var previewWatch by remember(id) { mutableStateOf(false) }
@@ -57,29 +59,30 @@ internal fun rememberClassicVideo(
     }
 
     LaunchedEffect(id, sheetCollapsed, isPreviewOnly) {
-        connection.requestVideoAvailability(id.takeIf { !sheetCollapsed && !isPreviewOnly })
+        if (!isPreviewOnly) connection.requestVideoAvailability(id.takeIf { !sheetCollapsed && !isPreviewOnly })
     }
-    DisposableEffect(connection) { onDispose { connection.requestVideoAvailability(null) } }
-    LaunchedEffect(watch, id) {
-        if (watch) id?.let(connection::requestVideoStream) else connection.clearVideoStreamRequest()
+    DisposableEffect(connection, isPreviewOnly) { onDispose { if (!isPreviewOnly) connection.requestVideoAvailability(null) } }
+    LaunchedEffect(watch, track, isPreviewOnly) {
+        if (isPreviewOnly) return@LaunchedEffect
+        if (watch) id?.let { connection.requestVideoStream(it) } else connection.clearVideoStreamRequest()
     }
 
-    val stream = (lookup as? VideoStreamLookup.Ready)?.stream?.takeIf { it.mediaId == id }
-    // Without a watched video the controller gets no metadata, so it never fetches canvas art.
+    val stream = (lookup as? VideoStreamLookup.Ready)?.takeIf { it.epoch == track.epoch }?.stream?.takeIf { it.mediaId == id }
     val controller = rememberCanvasVideoController(
-        mediaMetadata = metadata.takeIf { watch },
-        isPlaying = isPlaying && !sheetCollapsed && watch,
-        trackFadeMillis = 300,
+        connection = connection,
+        mediaMetadata = metadata,
+        isPlaying = isPlaying,
+        visible = !sheetCollapsed && !isPreviewOnly,
         videoStream = stream.takeIf { watch },
         videoStartPositionMs = connection.player.currentPosition,
     )
-    return ClassicVideo(
+    return PlayerVideoState(
         watch = watch,
-        canWatch = available != null && available?.songId == id,
+        canWatch = !isPreviewOnly && available != null && available?.songId == id,
         stream = stream,
         unavailable = lookup is VideoStreamLookup.Unavailable,
         controller = controller,
         select = select,
-        requestStream = { id?.let(connection::requestVideoStream) },
+        requestStream = { id?.let { connection.requestVideoStream(it, forceRefresh = true) } },
     )
 }

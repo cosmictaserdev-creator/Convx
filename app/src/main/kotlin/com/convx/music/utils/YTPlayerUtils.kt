@@ -176,9 +176,10 @@ object YTPlayerUtils {
     private const val VIDEO_STREAM_CACHE_MS = 10 * 60 * 1000L
 
     /** Resolve a video track separately; music playback remains owned by MusicService. */
-    suspend fun videoStream(videoId: String): VideoStream? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+    suspend fun videoStream(videoId: String, forceRefresh: Boolean = false): VideoStream? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         if (!videoId.matches(Regex("[A-Za-z0-9_-]{11}"))) return@withContext null
         val now = android.os.SystemClock.elapsedRealtime()
+        if (forceRefresh) resolvedVideoStreams.remove(videoId)
         resolvedVideoStreams.get(videoId)?.let { (cachedAt, stream) ->
             if (now - cachedAt < VIDEO_STREAM_CACHE_MS) return@withContext stream
             resolvedVideoStreams.remove(videoId)
@@ -193,19 +194,22 @@ object YTPlayerUtils {
                     .filter { it.width != null && it.height != null && it.mimeType.startsWith("video/") }
                     .sortedWith(compareByDescending<PlayerResponse.StreamingData.Format> { it.mimeType.contains("avc1") }
                         .thenByDescending { (it.height ?: 0) <= 1080 }
-                        .thenByDescending { (it.fps ?: 30) <= 30 }
                         .thenByDescending { it.height ?: 0 }.thenBy { it.bitrate })
                 for (format in candidates.take(3)) {
                     // Never use findUrlOrNull's audio-only fallback for a video surface.
                     val rawUrl = format.url ?: (format.signatureCipher ?: format.cipher)?.let {
                         CipherDeobfuscator.deobfuscateStreamUrl(it, videoId)
                     } ?: continue
-                    val url = EjsNTransformSolver.transformNParamInUrl(rawUrl)
+                    val url = com.convx.music.playback.secureCanvasUrl(EjsNTransformSolver.transformNParamInUrl(rawUrl))
+                        ?: continue
                     val probe = okhttp3.Request.Builder().url(url)
                         .header("User-Agent", YouTubeClient.USER_AGENT_WEB)
                         .header("Range", "bytes=0-131071").build()
-                    val length = httpClient.newCall(probe).execute().use { result ->
-                        val prefix = result.body.bytes()
+                    if (probe.url.host != "googlevideo.com" && !probe.url.host.endsWith(".googlevideo.com")) continue
+                    val length = videoProbeClient.newCall(probe).execute().use { result ->
+                        if (result.code != 206) return@use null
+                        val bytes = result.body.source()
+                        val prefix = if (bytes.request(8)) bytes.readByteArray(8) else return@use null
                         val boxType = if (prefix.size >= 8) String(prefix, 4, 4, Charsets.US_ASCII) else null
                         val mp4 = boxType == "ftyp" || boxType == "styp"
                         val webm = prefix.size >= 4 &&
@@ -224,11 +228,19 @@ object YTPlayerUtils {
                 }
             } catch (cancelled: kotlinx.coroutines.CancellationException) {
                 throw cancelled
-            } catch (error: Exception) {
-                Timber.tag("VideoStream").d(error, "Video unavailable from %s", client.clientName)
+            } catch (_: Exception) {
+                Timber.tag("VideoStream").d("Video unavailable from %s", client.clientName)
             }
         }
         null
+    }
+
+    private val videoProbeClient by lazy {
+        httpClient.newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .callTimeout(4, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
     }
 
     private const val logTag = "YTPlayerUtils"
@@ -252,7 +264,7 @@ object YTPlayerUtils {
         .proxySelector(object : ProxySelector() {
             override fun select(uri: URI?): List<Proxy> = listOf(YouTube.proxy.toJavaProxy() ?: Proxy.NO_PROXY)
             override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {
-                Timber.tag(TAG).e(ioe, "Proxy connection failed for URI: $uri")
+                Timber.tag(TAG).e("Playback proxy connection failed")
             }
         })
         .proxyAuthenticator { _, response ->

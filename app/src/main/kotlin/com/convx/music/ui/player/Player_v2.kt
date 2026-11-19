@@ -103,8 +103,6 @@ import com.convx.music.ui.component.Lyrics
 import com.convx.music.ui.component.rememberBottomSheetState
 import com.convx.music.ui.component.expandedAnchor
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalConfiguration
@@ -175,9 +173,10 @@ private fun Modifier.customSoftShadow(elevation: androidx.compose.ui.unit.Dp, co
 @OptIn(androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun PlayerV2(
+internal fun PlayerV2(
     state: BottomSheetState,
     navController: NavController,
+    video: com.convx.music.ui.player.video.PlayerVideoState,
     modifier: Modifier = Modifier,
     showDiyStickers: Boolean = true,
     forcedOrientation: DiyOrientation? = null,
@@ -213,7 +212,7 @@ fun PlayerV2(
                     )
                 ) {
                     PlayerV2Content(state, navController, Modifier, showDiyStickers, forcedOrientation,
-                        isPreviewOnly, diyRootCoordinates, onCoverShowingChange, auxiliaryPageState)
+                        isPreviewOnly, diyRootCoordinates, onCoverShowingChange, auxiliaryPageState, video)
                 }
                 V2OverlayHost(overlaySlot, overlayBackdrop)
             }
@@ -237,40 +236,18 @@ private fun PlayerV2Content(
     /** Reports whether the cover is showing so Player.kt can hide its sticker overlay on Lyrics and Queue. */
     onCoverShowingChange: ((Boolean) -> Unit)? = null,
     auxiliaryPageState: PlayerAuxiliaryPageState? = null,
+    video: com.convx.music.ui.player.video.PlayerVideoState,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
 
     val playerConnection = LocalPlayerConnection.current ?: return
     val ui = rememberPlayerUiState(playerConnection)
     val mediaMetadata by ui.mediaMetadata
-    val videoLookup by ui.rememberVideoStreamLookup()
-    val availableVideo by playerConnection.videoAvailability.collectAsStateWithLifecycle()
-    val canWatchVideo = availableVideo?.songId == mediaMetadata?.id && availableVideo != null
-    val videoStream = (videoLookup as? com.convx.music.playback.VideoStreamLookup.Ready)
-        ?.stream?.takeIf { it.mediaId == mediaMetadata?.id }
-    val videoPresentation = LocalFullscreenVideo.current
-    var previewWatchVideo by remember(mediaMetadata?.id) { mutableStateOf(false) }
-    val watchVideo = if (isPreviewOnly || videoPresentation == null) previewWatchVideo else
-        mediaMetadata?.id != null && videoPresentation.selectedVideoId == mediaMetadata?.id
-    val selectVideo: (Boolean) -> Unit = { selected ->
-        if (isPreviewOnly || videoPresentation == null) previewWatchVideo = selected
-        else {
-            videoPresentation.selectVideo(mediaMetadata?.id, selected)
-            mediaMetadata?.id?.let { playerConnection.service.setVideoPlaybackMode(it, selected) }
-        }
-    }
-    LaunchedEffect(mediaMetadata?.id, state.isCollapsed, isPreviewOnly) {
-        if (auxiliaryPageState != null) return@LaunchedEffect
-        playerConnection.requestVideoAvailability(mediaMetadata?.id.takeIf { !state.isCollapsed && !isPreviewOnly })
-    }
-    DisposableEffect(playerConnection) {
-        onDispose { if (auxiliaryPageState == null) playerConnection.requestVideoAvailability(null) }
-    }
-    LaunchedEffect(watchVideo, mediaMetadata?.id) {
-        if (auxiliaryPageState != null) return@LaunchedEffect
-        if (watchVideo) mediaMetadata?.id?.let(playerConnection::requestVideoStream)
-        else playerConnection.clearVideoStreamRequest()
-    }
+    val artworkTrack by playerConnection.canvasTrack.collectAsStateWithLifecycle()
+    val canWatchVideo = video.canWatch
+    val videoStream = video.stream
+    val watchVideo = video.watch
+    val selectVideo = video.select
     val isPlaying by ui.isPlaying
     // Delay pause transitions to avoid a false pause/play flash during player swaps or focus changes.
     var glyphPlaying by remember { mutableStateOf(isPlaying) }
@@ -280,30 +257,13 @@ private fun PlayerV2Content(
     }
     // One canvas decoder for the whole V2 player, shared by the cover and the lyrics/queue
     // header (see PlayerV2Canvas.kt). Paused whenever the sheet is collapsed.
-    val v2CrossfadeMs by ui.crossfadeDurationMs
     // Track-change ladder (TrackChoreography): cover -> words -> details -> ambience.
     val trackChoreography = rememberTrackChoreography(mediaMetadata)
-    val artworkMetadata = trackChoreography.artwork.value
+    val artworkMetadata = mediaMetadata?.takeIf { it.id == artworkTrack.mediaId }
     val paneArtworkStore = remember { com.convx.artwork.ArtworkBitmapStore() }
     val textMetadata = trackChoreography.text.value
     val detailMetadata = trackChoreography.detail.value
-    val canvasVideo = rememberCanvasVideoController(
-        mediaMetadata = trackChoreography.ambient.value,
-        isPlaying = isPlaying && !state.isCollapsed,
-        trackFadeMillis = ambientTransitionMillis(v2CrossfadeMs),
-        videoStream = videoStream.takeIf { watchVideo },
-        videoStartPositionMs = playerConnection.player.currentPosition,
-    )
-    val videoLifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    LaunchedEffect(canvasVideo, watchVideo, videoStream?.videoId, state.isCollapsed, videoLifecycleOwner) {
-        if (!watchVideo || videoStream == null || state.isCollapsed) return@LaunchedEffect
-        videoLifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
-            while (isActive) {
-                canvasVideo.synchronizeTo(playerConnection.player)
-                delay(500L)
-            }
-        }
-    }
+    val canvasVideo = video.controller
     // For the hero artwork's live swipe peek below: the neighbour thumbnail slides in from
     // whichever side the finger is dragging toward, tracking the drag itself rather than
     // only appearing once the gesture commits.
@@ -521,7 +481,7 @@ private fun PlayerV2Content(
         PlayerMorph.stayInPlace = false
         onDispose { PlayerMorph.stayInPlace = false }
     }
-    val heroVideoFrame = remember(canvasVideo) { mutableIntStateOf(0) }
+    val coverHasCanvas = canvasVideo.session.phase == com.convx.music.playback.CanvasPhase.Showing
     val selectedBackground by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.GRADIENT)
     // Hero owns its artwork gradient. Squared follows the same background choice
     // as Player.kt, including contrast on static and custom gradient backgrounds.
@@ -641,10 +601,12 @@ private fun PlayerV2Content(
     val additiveChrome = adaptivePrimary.luminance() > 0.5f
     val referenceBackground = playerBackground == PlayerBackgroundStyle.APPLE_MUSIC ||
         playerBackground == PlayerBackgroundStyle.GRADIENT
-    val referenceGradient by rememberNowPlayingGradient(
-        artworkMetadata?.thumbnailUrl?.takeIf { referenceBackground }, isHeroLook,
-        CanvasVideoLooks.forMedia(artworkMetadata?.id).takeIf { videoActive && referenceBackground },
-    )
+    val referenceGradient by androidx.compose.runtime.key(artworkTrack) {
+        rememberNowPlayingGradient(
+            artworkMetadata?.thumbnailUrl?.takeIf { referenceBackground }, isHeroLook,
+            CanvasVideoLooks.forMedia(artworkTrack, artworkMetadata?.id).takeIf { referenceBackground },
+        )
+    }
     // Avoid color dodge on nearly black artwork, where it produces no visible contrast.
     // Chrome stays on while the gradient is still loading; waiting for it dropped the seek bar to plain
     // white for a second every time the controls came back.
@@ -727,7 +689,7 @@ private fun PlayerV2Content(
                 color = adaptivePrimary,
                 fontWeight = FontWeight.SemiBold,
                 scroll = !state.isCollapsed,
-                modifier = titleModifier.clickable {
+                modifier = titleModifier.playerMorphBounds(PlayerMorphElement.TITLE).clickable {
                     state.collapseSoft()
                     mediaMetadata?.album?.id?.let { navController.navigate("album/$it") }
                 }
@@ -748,6 +710,13 @@ private fun PlayerV2Content(
                     .flamingoChrome(additiveChrome)
                     .graphicsLayer { if (additiveChrome) alpha = AdditiveChromeContentAlpha },
                 color = adaptiveSecondary,
+            )
+            PlayerInlineLyrics(
+                connection = playerConnection,
+                positionMs = { playerConnection.player.currentPosition },
+                tint = adaptivePrimary,
+                onOpenLyrics = { playerState = PlayerInternalState.LYRICS },
+                active = playerState == PlayerInternalState.COVER && !state.isCollapsed,
             )
         }
 
@@ -795,6 +764,8 @@ private fun PlayerV2Content(
                         sleepTimerLabel = { sleepTimer.menuLabel },
                         onOpenSleepTimer = { sleepTimer.showDialog.value = true },
                         onOpenAudioDevices = { showAudioDeviceBottomSheet = true },
+                        canvasEnabled = canvasVideo.canvasEnabled,
+                        onSetCanvasEnabled = canvasVideo.canvasToggle,
                         onMore = {
                             menuState.show {
                                 PlayerMenu(
@@ -850,25 +821,18 @@ private fun PlayerV2Content(
                 // The song / video switch replaces the grab pill whenever a video exists for the track.
                 val videoSwitchEnabled by rememberPreference(com.convx.music.constants.ShowVideoSwitchKey, true)
                 val showVideoSwitch = canWatchVideo && videoSwitchEnabled && playerState == PlayerInternalState.COVER
-                if (!showVideoSwitch) Box(
-                    modifier = Modifier
-                        .width(54.dp)
-                        .height(5.dp)
-                        .clip(RoundedCornerShape(2.5.dp))
-                        .background(adaptivePrimary.copy(alpha = 0.3f))
-                        .clickable { state.collapseSoft() }
-                )
+                if (!showVideoSwitch) PlayerHandle(state, adaptivePrimary)
                 val partyViewModel: com.convx.music.viewmodels.JamViewModel = koinViewModel()
                 val party by partyViewModel.session.collectAsStateWithLifecycle()
                 party?.let { PartyChip(it.code, it.members.size, adaptivePrimary) { state.collapseSoft(); navController.navigate("listen_together/party") } }
                 if (showVideoSwitch) {
                     SongVideoModeControl(watchVideo, adaptivePrimary) { selected ->
-                        if (selected && watchVideo && videoLookup is com.convx.music.playback.VideoStreamLookup.Unavailable) {
-                            mediaMetadata?.id?.let(playerConnection::requestVideoStream)
+                        if (selected && watchVideo && video.unavailable) {
+                            video.requestStream()
                         }
                         selectVideo(selected)
                     }
-                    if (watchVideo && videoLookup is com.convx.music.playback.VideoStreamLookup.Unavailable) {
+                    if (watchVideo && video.unavailable) {
                         Text(stringResource(R.string.video_unavailable), color = adaptiveSecondary, fontSize = 12.sp)
                     }
                 }
@@ -876,7 +840,18 @@ private fun PlayerV2Content(
             }
             },
             pane = { paneModifier ->
-            Box(paneModifier.fillMaxSize()) {
+            PlayerHost(
+                controller = canvasVideo,
+                anchor = when {
+                    LocalConfiguration.current.smallestScreenWidthDp >= 600 -> com.convx.music.ui.player.backdrop.BackdropAnchor.CENTER
+                    isWidePlayerLayout -> com.convx.music.ui.player.backdrop.BackdropAnchor.LEFT
+                    isHeroLook -> com.convx.music.ui.player.backdrop.BackdropAnchor.HERO
+                    else -> com.convx.music.ui.player.backdrop.BackdropAnchor.TOP
+                },
+                modifier = paneModifier.fillMaxSize(),
+                lyricsVisible = playerState == PlayerInternalState.LYRICS,
+                showCanvasFeedback = playerState == PlayerInternalState.COVER,
+            ) {
             val paneVideoStream = videoStream.takeIf { watchVideo }
             if (paneVideoStream != null) {
                 YouTubeVideoPane(
@@ -916,12 +891,12 @@ private fun PlayerV2Content(
                         label = "InternalWindow"
                     ) { targetState ->
                         if (targetState == PlayerInternalState.COVER && videoCover) {
-                            val frameRatio = videoStream?.let { it.width.coerceAtLeast(1).toFloat() / it.height.coerceAtLeast(1) } ?: (16f / 9f)
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Box(
                                     Modifier
                                         .fillMaxWidth()
-                                        .aspectRatio(frameRatio)
+                                        .padding(horizontal = 16.dp)
+                                        .aspectRatio(16f / 9f)
                                         .sharedElement(
                                             rememberSharedContentState(key = "coverArt"),
                                             animatedVisibilityScope = this@AnimatedContent,
@@ -1045,39 +1020,33 @@ private fun PlayerV2Content(
                                                 animatedVisibilityScope = this@AnimatedContent,
                                                 boundsTransform = { _, _ -> Motion.artwork() },
                                             )
-                                            // Squared morphs into this card. Hero Bleed uses
-                                            // its separate thumbnail beside the track title.
-                                            .then(if (!isHeroLook) Modifier.fullArtworkMorphTarget(
+                                            .fullArtworkMorphTarget(
                                                 cornerRadiusPx = with(androidx.compose.ui.platform.LocalDensity.current) {
-                                                    12.dp.toPx()
+                                                    if (isHeroLook) 0f else 12.dp.toPx()
+                                                },
+                                                heroFade = when {
+                                                    !isHeroLook -> null
+                                                    isWidePlayerLayout -> HeroArtworkFade.END
+                                                    else -> HeroArtworkFade.BOTTOM
                                                 },
                                                 shadowPx = with(androidx.compose.ui.platform.LocalDensity.current) {
-                                                    if (showPlayerThumbnailShadow) playerThumbnailShadowElevation.dp.toPx() else 0f
+                                                    if (!isHeroLook && showPlayerThumbnailShadow) playerThumbnailShadowElevation.dp.toPx() else 0f
                                                 },
-                                                pauseShrinks = true,
-                                            ) else Modifier.fullArtworkMorphTarget(
-                                                cornerRadiusPx = 0f,
-                                                travels = false,
-                                                pauseShrinks = false,
-                                                fadeOnly = true,
-                                            ))
+                                                pauseShrinks = !isHeroLook,
+                                            )
                                             // Keep this as a stable morph anchor; the animated child draws and scales the card.
                                             .then(
                                                 rememberSwipeCardModifier(
                                                     enabled = (playerState == PlayerInternalState.COVER && !isHeroLook && playerBackground != PlayerBackgroundStyle.APPLE_MUSIC && !isListenTogetherGuest && committedFromId == null),
+                                                    verticalEnabled = playerState == PlayerInternalState.COVER && !isListenTogetherGuest,
+                                                    sheetState = state,
+                                                    onOpenQueue = { playerState = PlayerInternalState.QUEUE },
                                                     playerConnection = playerConnection,
                                                     offsetXAnimatable = heroDragOffset,
                                                     onCommit = { forward ->
                                                         committedFromId = artworkMetadata?.id ?: ""
                                                         committedPeek = if (forward) nextMediaMetadata else previousMediaMetadata
                                                     },
-                                                )
-                                            )
-                                            .then(
-                                                rememberDragToQueueModifier(
-                                                    enabled = (playerState == PlayerInternalState.COVER && !isListenTogetherGuest),
-                                                    state = state,
-                                                    onOpenQueue = { playerState = PlayerInternalState.QUEUE },
                                                 )
                                             )
                                     ) {
@@ -1138,14 +1107,15 @@ private fun PlayerV2Content(
                                             )
                                             .background(adaptiveSurface, RoundedCornerShape(if (isHeroLook) 0.dp else 12.dp))
                                             .clip(RoundedCornerShape(if (isHeroLook) 0.dp else 12.dp))
-                                            // Hero Blend: the artist page's live progressive foot over the
-                                            // art AND the canvas video (one blur of the real pixels), then
-                                            // the frame's outer fade hands it to the gradient, which starts
-                                            // from this art's own bottom-edge colour.
-                                            .then(if (isHeroLook && isWidePlayerLayout) Modifier.heroSideLiveBlur()
-                                                else if (isHeroLook) Modifier.heroFootLiveBlur(boxExtent = 1f,
-                                                videoFrame = { heroVideoFrame.intValue }) else Modifier)
+                                            .then(
+                                                when {
+                                                    coverHasCanvas || !isHeroLook -> Modifier
+                                                    isWidePlayerLayout -> Modifier.heroSideLiveBlur()
+                                                    else -> Modifier.heroFootLiveBlur(boxExtent = 1f)
+                                                },
+                                            )
                                     ) {
+                                        androidx.compose.runtime.key(artworkTrack) {
                                         ThumbnailImage(
                                             artworkUri = artworkMetadata?.thumbnailUrl?.resize(1200, 1200),
                                             cropArtwork = true,
@@ -1158,10 +1128,10 @@ private fun PlayerV2Content(
                                             bitmapStore = paneArtworkStore,
                                             modifier = Modifier.fillMaxSize(),
                                         )
+                                        }
                                         CanvasVideoSurface(
                                             controller = canvasVideo,
                                             modifier = Modifier.fillMaxSize(),
-                                            onFrame = if (isHeroLook) ({ heroVideoFrame.intValue++ }) else null,
                                         )
                                     }
                                     }
@@ -1238,15 +1208,13 @@ private fun PlayerV2Content(
                                     Box(
                                         modifier = headerArtworkModifier
                                             .size(60.dp)
-                                            .then(if (!isHeroLook || targetState == PlayerInternalState.COVER) Modifier.fullArtworkMorphTarget(
+                                            .then(if (targetState != PlayerInternalState.COVER) Modifier.fullArtworkMorphTarget(
                                                 cornerRadiusPx = with(androidx.compose.ui.platform.LocalDensity.current) { 7.dp.toPx() },
-                                                travels = !isHeroLook,
                                                 shadowPx = with(androidx.compose.ui.platform.LocalDensity.current) {
                                                     if (showPlayerThumbnailShadow) (playerThumbnailShadowElevation / 2f).dp.toPx() else 0f
                                                 },
-                                                videoPoster = !isHeroLook,
-                                                fadeEndpoints = !isHeroLook,
-                                                fadeOnly = isHeroLook,
+                                                videoPoster = false,
+                                                fadeEndpoints = true,
                                             ) else Modifier)
                                             .then(rememberDragToQueueModifier(
                                                 enabled = true,
@@ -1396,6 +1364,8 @@ private fun PlayerV2Content(
                         sleepTimerLabel = { sleepTimer.menuLabel },
                         onOpenSleepTimer = { sleepTimer.showDialog.value = true },
                         onOpenAudioDevices = { showAudioDeviceBottomSheet = true },
+                        canvasEnabled = canvasVideo.canvasEnabled,
+                        onSetCanvasEnabled = canvasVideo.canvasToggle,
                                                     onMore = {
                                                         menuState.show {
                                                             PlayerMenu(
@@ -1635,6 +1605,7 @@ private fun PlayerV2Content(
                             interactionSource = previousInteraction,
                             modifier = Modifier
                                 .size(61.dp)
+                                .playerMorphBounds(PlayerMorphElement.PREVIOUS)
                                 .transportPressDisc(previousInteraction, adaptivePrimary.copy(alpha = 0.16f))
                                 .alpha(if (isListenTogetherGuest || !canSkipPrevious) 0.4f else 1f)
                         ) {
@@ -1661,6 +1632,7 @@ private fun PlayerV2Content(
                             interactionSource = playInteraction,
                             modifier = Modifier
                                 .size(72.dp)
+                                .playerMorphBounds(PlayerMorphElement.PLAY)
                                 .transportPressDisc(playInteraction, adaptivePrimary.copy(alpha = 0.16f))
                         ) {
                             if (isListenTogetherGuest) {
@@ -1691,6 +1663,7 @@ private fun PlayerV2Content(
                             interactionSource = nextInteraction,
                             modifier = Modifier
                                 .size(61.dp)
+                                .playerMorphBounds(PlayerMorphElement.NEXT)
                                 .transportPressDisc(nextInteraction, adaptivePrimary.copy(alpha = 0.16f))
                                 .alpha(if (isListenTogetherGuest || !canSkipNext) 0.4f else 1f)
                         ) {
@@ -2146,84 +2119,66 @@ private fun PlayerV2Frame(
 @Composable
 private fun rememberSwipeCardModifier(
     enabled: Boolean,
+    verticalEnabled: Boolean,
+    sheetState: BottomSheetState,
+    onOpenQueue: () -> Unit,
     playerConnection: PlayerConnection,
-    // Hoisted so the caller can read the live drag position too, to slide the next/previous
-    // song's own thumbnail in as a preview while the finger is still moving.
     offsetXAnimatable: Animatable<Float, AnimationVector1D>,
     onCommit: (forward: Boolean) -> Unit,
 ): Modifier {
     val (swipeThumbnail) = rememberPreference(SwipeThumbnailKey, true)
     val (swipeSensitivity) = rememberPreference(SwipeSensitivityKey, 0.73f)
-    val coroutineScope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val density = androidx.compose.ui.platform.LocalDensity.current.density
-    val configuration = LocalConfiguration.current
-    val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
-    val travelPx = configuration.screenWidthDp * density
-    val autoSwipeThreshold = remember(swipeSensitivity, configuration.screenWidthDp, density) {
-        travelPx * (0.45f - 0.33f * swipeSensitivity.coerceIn(0f, 1f))
-    }
-    val currentOnCommit by rememberUpdatedState(onCommit)
+    val travelPx = LocalConfiguration.current.screenWidthDp * density
+    val direction = if (androidx.compose.ui.platform.LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
+    val threshold = travelPx * (0.45f - 0.33f * swipeSensitivity.coerceIn(0f, 1f))
+    val queue = rememberQueueCoverDrag(sheetState, onOpenQueue)
 
     return Modifier
         .graphicsLayer { carouselCard(offsetXAnimatable.value, travelPx) }
-        .then(
-            if (enabled && swipeThumbnail) {
-                Modifier.pointerInput(Unit) {
-                    val velocityTracker = androidx.compose.ui.input.pointer.util.VelocityTracker()
-                    var rawX = 0f
-                    detectHorizontalDragGestures(
-                        onDragStart = {
-                            velocityTracker.resetTracking()
-                            rawX = offsetXAnimatable.value
-                        },
-                        onDragCancel = {
-                            coroutineScope.launch { offsetXAnimatable.animateTo(0f, SwipeHomeSpring) }
-                        },
-                        onHorizontalDrag = { change, dragAmount ->
-                            velocityTracker.addPointerInputChange(change)
-                            val delta = if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
-                            rawX += delta
-                            val canSkipPrevious = playerConnection.player.previousMediaItemIndex != -1
-                            val canSkipNext = playerConnection.player.nextMediaItemIndex != -1
-                            // Nothing that way: follow at a third, like pulling on elastic.
-                            val blocked = (rawX > 0f && !canSkipPrevious) || (rawX < 0f && !canSkipNext)
-                            val shown = if (blocked) rawX * 0.3f else rubberBand(rawX, travelPx)
-                            coroutineScope.launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-                                offsetXAnimatable.animateTo(shown, SwipeFollowSpring)
-                            }
-                        },
-                        onDragEnd = {
-                            val velocityX = velocityTracker.calculateVelocity().x.let {
-                                if (layoutDirection == LayoutDirection.Rtl) -it else it
-                            }
-                            val current = offsetXAnimatable.value
-                            val canSkipPrevious = playerConnection.player.previousMediaItemIndex != -1
-                            val canSkipNext = playerConnection.player.nextMediaItemIndex != -1
-                            val flung = kotlin.math.abs(velocityX) > SwipeFlingDpPerSecond * density &&
-                                kotlin.math.sign(velocityX) == kotlin.math.sign(current)
-                            val far = kotlin.math.abs(current) > autoSwipeThreshold
-                            val forward = current < 0f
-                            val allowed = if (forward) canSkipNext else canSkipPrevious
-                            coroutineScope.launch {
-                                if ((far || flung) && allowed && current != 0f) {
-                                    currentOnCommit(forward)
-                                    // Incoming card to centre = this card one travel away.
-                                    offsetXAnimatable.animateTo(
-                                        targetValue = if (forward) -travelPx else travelPx,
-                                        animationSpec = SwipeLandSpring,
-                                        initialVelocity = velocityX,
-                                    )
-                                    playerConnection.jumpBy(if (forward) 1 else -1)
-                                } else {
-                                    offsetXAnimatable.animateTo(0f, SwipeHomeSpring, initialVelocity = velocityX)
-                                }
-                            }
-                        },
-                    )
+        .playerCoverGestures(
+            horizontal = enabled && swipeThumbnail,
+            vertical = verticalEnabled,
+            onStart = {},
+            onMove = { axis, delta, displacement ->
+                if (axis == CoverDragAxis.VERTICAL) {
+                    queue.move(delta, displacement)
+                } else {
+                    val x = direction * displacement
+                    val player = playerConnection.player
+                    val blocked = if (x > 0f) player.previousMediaItemIndex == -1 else player.nextMediaItemIndex == -1
+                    val shown = if (blocked) x * 0.3f else rubberBand(x, travelPx)
+                    scope.launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { offsetXAnimatable.snapTo(shown) }
                 }
-            } else {
-                Modifier
-            }
+            },
+            onEnd = { axis, displacement, velocity ->
+                if (axis == CoverDragAxis.VERTICAL) {
+                    queue.finish(displacement, velocity)
+                } else {
+                    val x = direction * displacement
+                    val vx = direction * velocity
+                    val forward = x < 0f
+                    val player = playerConnection.player
+                    val allowed = if (forward) player.nextMediaItemIndex != -1 else player.previousMediaItemIndex != -1
+                    val fling = kotlin.math.abs(vx) > SwipeFlingDpPerSecond * density &&
+                        kotlin.math.sign(vx) == kotlin.math.sign(x)
+                    val executedTrack = playerConnection.canvasTrack.value
+                    scope.launch {
+                        if (allowed && (kotlin.math.abs(x) > threshold || fling)) {
+                            onCommit(forward)
+                            offsetXAnimatable.animateTo(if (forward) -travelPx else travelPx, SwipeLandSpring, vx)
+                            if (executedTrack == playerConnection.canvasTrack.value) playerConnection.jumpBy(if (forward) 1 else -1)
+                        } else {
+                            offsetXAnimatable.animateTo(0f, SwipeHomeSpring, vx)
+                        }
+                    }
+                }
+            },
+            onCancel = { axis ->
+                if (axis == CoverDragAxis.VERTICAL) queue.cancel()
+                else scope.launch { offsetXAnimatable.animateTo(0f, SwipeHomeSpring) }
+            },
         )
 }
 
@@ -2252,71 +2207,9 @@ private const val GLYPH_PAUSE_SETTLE_MS = 120L
 private val CarouselDip = 28.dp
 private const val CarouselTiltDegrees = 7f
 private const val SwipeFlingDpPerSecond = 450f
-private val SwipeFollowSpring = spring<Float>(dampingRatio = 0.85f, stiffness = 1800f)
 // Finish the landing when the card looks home instead of creeping through its last pixels.
 private val SwipeLandSpring = spring<Float>(dampingRatio = 0.66f, stiffness = 240f, visibilityThreshold = 0.5f)
 private val SwipeHomeSpring = spring<Float>(dampingRatio = 0.6f, stiffness = 380f)
-
-/**
- * Opens the queue on an upward cover drag and moves the player sheet on a downward drag.
- * Separate horizontal and vertical detectors keep skip swipes from opening the queue.
- */
-@Composable
-private fun rememberDragToQueueModifier(
-    enabled: Boolean,
-    state: BottomSheetState,
-    onOpenQueue: () -> Unit,
-): Modifier {
-    val density = androidx.compose.ui.platform.LocalDensity.current
-    val openThresholdPx = remember(density) { with(density) { 80.dp.toPx() } }
-    val openQueue by rememberUpdatedState(onOpenQueue)
-    return if (enabled) {
-        Modifier.pointerInput(state, openThresholdPx) {
-            var dragged = 0f
-            var closing = false
-            val velocityTracker = androidx.compose.ui.input.pointer.util.VelocityTracker()
-            detectVerticalDragGestures(
-                onDragStart = {
-                    dragged = 0f
-                    closing = false
-                    velocityTracker.resetTracking()
-                },
-                onDragCancel = {
-                    if (closing) {
-                        state.dragClockNs[0] = 0L
-                        state.performFling(0f, onDismiss = null)
-                    }
-                    dragged = 0f
-                },
-                onVerticalDrag = { change, dragAmount ->
-                    dragged += dragAmount
-                    velocityTracker.addPointerInputChange(change)
-                    if (!closing && dragged > 0f) {
-                        closing = true
-                        state.onDragStart(fromMiniPlayer = false)
-                        state.dragClockNs[0] = System.nanoTime()
-                        state.dispatchRawDelta(dragged)
-                    } else if (closing) {
-                        state.dragClockNs[0] = System.nanoTime()
-                        state.dispatchRawDelta(dragAmount)
-                    }
-                    change.consume()
-                },
-                onDragEnd = {
-                    if (closing) {
-                        state.dragClockNs[0] = 0L
-                        state.performFling(-velocityTracker.calculateVelocity().y, onDismiss = null)
-                    } else if (dragged <= -openThresholdPx) {
-                        openQueue()
-                    }
-                    dragged = 0f
-                },
-            )
-        }
-    } else {
-        Modifier
-    }
-}
 
 /** Reference utility icons and elapsed/remaining labels use the secondary tier. */
 private const val FlamingoSecondaryAlpha = 0.35f

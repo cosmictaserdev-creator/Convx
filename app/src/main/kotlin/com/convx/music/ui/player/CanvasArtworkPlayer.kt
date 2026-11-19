@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -23,24 +24,24 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
-import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.convx.music.LocalDownloadUtil
+import com.convx.music.playback.secureCanvasUrl
+import com.convx.music.ui.player.video.PlayerVideoBuffers
+import com.convx.music.ui.player.video.PlayerVideoDecoder
 import com.convx.music.utils.toJavaProxy
 import com.music.innertube.YouTube
 import com.music.innertube.models.YouTubeClient
+import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
+import java.io.IOException
 import java.util.Locale
 import android.view.ViewGroup
 import android.view.TextureView
@@ -63,8 +64,9 @@ fun CanvasArtworkPlayer(
     onVideoAspectRatio: (Float) -> Unit = {},
 ) {
     val context = LocalContext.current
-    val primary = primaryUrl?.takeIf { it.isNotBlank() }
-    val fallback = fallbackUrl?.takeIf { it.isNotBlank() }
+    val downloadCache = LocalDownloadUtil.current.get().downloadCache
+    val primary = secureCanvasUrl(primaryUrl)
+    val fallback = secureCanvasUrl(fallbackUrl)?.takeIf { it != primary }
     val initial = primary ?: fallback ?: return
 
     // Stop the decorative video when the app is backgrounded to save battery and heat.
@@ -84,48 +86,23 @@ fun CanvasArtworkPlayer(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val shouldPlay = isPlaying && inForeground
-    var currentUrl by remember(initial) { mutableStateOf(initial) }
-    var isVideoReady by remember(initial) { mutableStateOf(false) }
+    var currentUrl by remember(initial, mediaId) { mutableStateOf(initial) }
+    var isVideoReady by remember(initial, mediaId) { mutableStateOf(false) }
+    var exhausted by remember(initial, fallback, mediaId) { mutableStateOf(false) }
     val currentOnExhausted by rememberUpdatedState(onExhausted)
     val currentOnReady by rememberUpdatedState(onReady)
     val currentOnVideoAspectRatio by rememberUpdatedState(onVideoAspectRatio)
 
     val mediaSourceFactory = rememberCanvasMediaSourceFactory()
-    val exoPlayer =
-        remember(initial) {
-            ExoPlayer.Builder(context)
-                .setMediaSourceFactory(mediaSourceFactory)
-                .build()
-                .apply {
-                trackSelectionParameters = trackSelectionParameters
-                    .buildUpon()
-                    .setMaxVideoFrameRate(30)
-                    .setMaxVideoBitrate(2_500_000)
-                    .build()
-                setAudioAttributes(
-                    AudioAttributes
-                        .Builder()
-                        .setUsage(C.USAGE_MEDIA)
-                        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                        .build(),
-                    false,
-                )
-                volume = 0f
-                repeatMode = Player.REPEAT_MODE_ONE
-                playWhenReady = false
-            }
-        }
-
-    LaunchedEffect(shouldPlay) {
-        if (exoPlayer.playWhenReady != shouldPlay) {
-            exoPlayer.playWhenReady = shouldPlay
-        }
+    val exoPlayer = remember(context, mediaSourceFactory, initial, mediaId) {
+        PlayerVideoDecoder.build(context, mediaSourceFactory, PlayerVideoDecoder.Use.LOOP)
     }
 
     DisposableEffect(exoPlayer, primary, fallback) {
         val listener =
             object : Player.Listener {
                 override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                    if (!PlayerVideoDecoder.owns(exoPlayer)) return
                     val next =
                         when (currentUrl) {
                             primary -> fallback
@@ -138,17 +115,21 @@ fun CanvasArtworkPlayer(
                         // Both this artwork's own URLs are dead — let the caller
                         // try a different candidate (a different provider's match)
                         // instead of just leaving the screen blank.
+                        exhausted = true
+                        PlayerVideoDecoder.release(exoPlayer)
                         currentOnExhausted()
                     }
                 }
 
                 override fun onRenderedFirstFrame() {
+                    if (!PlayerVideoDecoder.owns(exoPlayer)) return
                     isVideoReady = true
                     currentOnReady()
                     exoPlayer.videoSize.toAspectRatio().takeIf { it > 0f }?.let(currentOnVideoAspectRatio)
                 }
 
                 override fun onVideoSizeChanged(videoSize: VideoSize) {
+                    if (!PlayerVideoDecoder.owns(exoPlayer)) return
                     videoSize.toAspectRatio().takeIf { it > 0f }?.let(currentOnVideoAspectRatio)
                 }
             }
@@ -156,31 +137,45 @@ fun CanvasArtworkPlayer(
         onDispose { exoPlayer.removeListener(listener) }
     }
 
-    LaunchedEffect(currentUrl, exoPlayer) {
-        val normalized = currentUrl.trim()
-        val mimeType = canvasMimeType(normalized, primary, fallback)
+    LaunchedEffect(currentUrl, primary, fallback, exoPlayer, shouldPlay) {
+        if (!shouldPlay) return@LaunchedEffect
+        if (!PlayerVideoDecoder.owns(exoPlayer)) delay(PlayerVideoBuffers.SETTLE_MS.toLong())
+        val mediaItem = MediaItem.Builder()
+            .setUri(currentUrl)
+            .setMimeType(canvasMimeType(currentUrl, primary, fallback))
+            .apply {
+                // DownloadUtil uses this key for the offline copy.
+                if (!mediaId.isNullOrBlank()) setCustomCacheKey(canvasReadCacheKey(downloadCache, mediaId, currentUrl))
+            }
+            .build()
 
-        val mediaItem =
-            MediaItem.Builder()
-                .setUri(normalized)
-                .setMimeType(mimeType)
-                .apply {
-                    // Same key DownloadUtil.kt pre-caches this canvas video
-                    // under — without it CacheDataSource has no way to find
-                    // an already-downloaded copy and always hits the network.
-                    if (!mediaId.isNullOrBlank()) setCustomCacheKey("$mediaId#canvas")
-                }
-                .build()
+        fun prepare() {
+            if (exhausted) return
+            val claimed = PlayerVideoDecoder.claim(exoPlayer, PlayerVideoDecoder.PRIORITY_LOOP) {
+                isVideoReady = false
+            }
+            if (!claimed) return
+            exoPlayer.stop()
+            isVideoReady = false
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
+            exoPlayer.playWhenReady = true
+        }
 
-        exoPlayer.stop()
-        isVideoReady = false
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = shouldPlay
+        prepare()
+        PlayerVideoDecoder.available.collect { available ->
+            if (available) prepare()
+        }
+    }
+
+    DisposableEffect(exoPlayer, shouldPlay) {
+        if (!shouldPlay) PlayerVideoDecoder.release(exoPlayer)
+        onDispose {}
     }
 
     DisposableEffect(exoPlayer) {
         onDispose {
+            PlayerVideoDecoder.release(exoPlayer)
             exoPlayer.release()
         }
     }
@@ -192,25 +187,27 @@ fun CanvasArtworkPlayer(
         label = "canvasAlpha"
     )
 
-    AndroidView(
-        factory = { viewContext ->
-            AspectRatioFrameLayout(viewContext).apply {
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                this.resizeMode = resizeMode
-                
-                val textureView = TextureView(viewContext).apply {
+    key(exoPlayer) {
+        AndroidView(
+            factory = { viewContext ->
+                AspectRatioFrameLayout(viewContext).apply {
                     layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                    this.resizeMode = resizeMode
+
+                    val textureView = TextureView(viewContext).apply {
+                        layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                    }
+                    addView(textureView)
+                    exoPlayer.setVideoTextureView(textureView)
+                    setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 }
-                addView(textureView)
-                exoPlayer.setVideoTextureView(textureView)
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            }
-        },
-        update = { view ->
-            if (view.resizeMode != resizeMode) view.resizeMode = resizeMode
-        },
-        modifier = modifier.graphicsLayer { this.alpha = alpha },
-    )
+            },
+            update = { view ->
+                if (view.resizeMode != resizeMode) view.resizeMode = resizeMode
+            },
+            modifier = modifier.graphicsLayer { this.alpha = alpha },
+        )
+    }
 }
 
 internal fun VideoSize.toAspectRatio(): Float {
@@ -220,27 +217,44 @@ internal fun VideoSize.toAspectRatio(): Float {
 }
 
 
+private val youtubeMediaDomains = listOf(
+    "googlevideo.com",
+    "googleusercontent.com",
+    "youtube.com",
+    "youtube-nocookie.com",
+    "ytimg.com",
+)
+
 /** Canvas loops are served by several CDNs; YouTube-hosted ones need the client UA. */
 @Composable
 internal fun rememberCanvasMediaSourceFactory(): DefaultMediaSourceFactory {
-    val context = LocalContext.current
     val downloadUtil = LocalDownloadUtil.current.get()
     val okHttpClient =
         remember {
             OkHttpClient
                 .Builder()
                 .proxy(YouTube.proxy.toJavaProxy())
+                .followSslRedirects(false)
                 .addInterceptor { chain ->
                     val request = chain.request()
+                    if (!request.url.isHttps) throw IOException("Canvas transport requires HTTPS")
+                    chain.proceed(request)
+                }
+                .addNetworkInterceptor { chain ->
+                    val request = chain.request()
+                    if (!request.url.isHttps || request.url.username.isNotEmpty() || request.url.password.isNotEmpty()) {
+                        throw IOException("Canvas transport requires an HTTPS URL without credentials")
+                    }
                     val host = request.url.host
-                    val isYouTubeMediaHost =
-                        host.endsWith("googlevideo.com") ||
-                            host.endsWith("googleusercontent.com") ||
-                            host.endsWith("youtube.com") ||
-                            host.endsWith("youtube-nocookie.com") ||
-                            host.endsWith("ytimg.com")
-
-                    if (!isYouTubeMediaHost) return@addInterceptor chain.proceed(request)
+                    if (youtubeMediaDomains.none { domain -> host == domain || host.endsWith(".$domain") }) {
+                        return@addNetworkInterceptor chain.proceed(
+                            request.newBuilder()
+                                .removeHeader("User-Agent")
+                                .removeHeader("Origin")
+                                .removeHeader("Referer")
+                                .build(),
+                        )
+                    }
 
                     val clientParam = request.url.queryParameter("c")?.trim().orEmpty()
                     val isWeb =
@@ -262,7 +276,10 @@ internal fun rememberCanvasMediaSourceFactory(): DefaultMediaSourceFactory {
                             else -> YouTubeClient.USER_AGENT_WEB
                         }
 
-                    val builder = request.newBuilder().header("User-Agent", userAgent)
+                    val builder = request.newBuilder()
+                        .header("User-Agent", userAgent)
+                        .removeHeader("Origin")
+                        .removeHeader("Referer")
                     if (isWeb) {
                         builder.header("Origin", YouTubeClient.ORIGIN_YOUTUBE_MUSIC)
                         builder.header("Referer", YouTubeClient.REFERER_YOUTUBE_MUSIC)
@@ -276,12 +293,7 @@ internal fun rememberCanvasMediaSourceFactory(): DefaultMediaSourceFactory {
             DefaultMediaSourceFactory(
                 CacheDataSource.Factory()
                     .setCache(downloadUtil.downloadCache)
-                    .setUpstreamDataSourceFactory(
-                        DefaultDataSource.Factory(
-                            context,
-                            OkHttpDataSource.Factory(okHttpClient),
-                        ),
-                    )
+                    .setUpstreamDataSourceFactory(OkHttpDataSource.Factory(okHttpClient))
                     .setCacheWriteDataSinkFactory(null)
                     .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
             )

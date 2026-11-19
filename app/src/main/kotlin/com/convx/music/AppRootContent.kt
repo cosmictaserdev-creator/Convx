@@ -53,6 +53,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.remember
@@ -66,6 +67,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -176,6 +179,7 @@ import com.convx.music.ui.menu.PlayerMenu
 import com.convx.music.ui.menu.YouTubeSongMenu
 import com.convx.music.ui.player.BottomSheetPlayer
 import com.convx.music.ui.player.InstallPlayerMorphLayers
+import com.convx.music.playback.presentation.PlayerMorphGeometry
 import com.convx.music.ui.screens.Screens
 import com.convx.music.ui.screens.SettingDialoge
 import com.convx.music.ui.screens.settings.DarkMode
@@ -496,6 +500,7 @@ internal fun AppRootContent(
                 // Keep the sheet's own mini player hidden; the nav surface hosts it.
                 collapsedBound = 0.dp,
                 expandedBound = maxHeight,
+                isDockedPlayer = true,
             )
 
             // Both ends of the mini-to-full morph are recorded into GraphicsLayers
@@ -834,13 +839,26 @@ internal fun AppRootContent(
                 val menuBackdrop = rememberLayerBackdrop()
                 val playerBackdropHolder = remember { com.convx.music.ui.player.PlayerBackdropHolder() }
                 val menuSourceBackdrop = (if (playerBottomSheetState.isExpanded) playerBackdropHolder.backdrop else null) ?: menuBackdrop
+                val lastCanvasInteraction = remember { mutableLongStateOf(android.os.SystemClock.uptimeMillis()) }
 
                 // Capture the page and chrome behind the menu. Keep the menu as a sibling
                 // to avoid a RenderNode cycle.
                 Box(
-                    Modifier.fillMaxSize().then(
-                        if (AppRoutePolicy.isWebViewRoute(currentRoute)) Modifier else Modifier.layerBackdrop(menuBackdrop),
-                    ),
+                    Modifier.fillMaxSize()
+                        // Observe touches above both the feed and player so neither loses its hit target.
+                        .pointerInput(lastCanvasInteraction) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                                    if (event.changes.any { it.pressed || it.previousPressed }) {
+                                        lastCanvasInteraction.longValue = android.os.SystemClock.uptimeMillis()
+                                    }
+                                }
+                            }
+                        }
+                        .then(
+                            if (AppRoutePolicy.isWebViewRoute(currentRoute)) Modifier else Modifier.layerBackdrop(menuBackdrop),
+                        ),
                 ) {
                     Scaffold(
                         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -1140,6 +1158,9 @@ internal fun AppRootContent(
                                         .align(Alignment.BottomCenter)
                                         .fillMaxWidth()
                                         .height(navBarTotalHeight + 56.dp)
+                                        .graphicsLayer {
+                                            translationY = navBarTotalHeight.toPx() * playerBottomSheetState.progress
+                                        }
                                         .background(
                                             Brush.verticalGradient(
                                                 0f to Color.Transparent,
@@ -1176,7 +1197,8 @@ internal fun AppRootContent(
                                     BottomSheetPlayer(
                                         state = playerBottomSheetState,
                                         navController = navController,
-                                        pureBlack = pureBlack
+                                        pureBlack = pureBlack,
+                                        canvasInteraction = lastCanvasInteraction,
                                     )
                                     }
                                 }
@@ -1194,6 +1216,11 @@ internal fun AppRootContent(
                                     currentRoute = effectiveRoute,
                                     onItemClick = onNavItemClick,
                                     scrollConnection = floatingNavBarScrollConnection,
+                                    tabMotion = {
+                                        val progress = playerBottomSheetState.progress
+                                        translationY = (size.height + (bottomInset + 8.dp).toPx()) * progress
+                                        alpha = PlayerMorphGeometry.navigationBarAlpha(progress)
+                                    },
                                     pureBlack = pureBlack,
                                     showPlayerAccessory = hasDockedPlayerAccessory,
                                     onAccessoryClick = { playerBottomSheetState.expandSoft() },
@@ -1251,7 +1278,8 @@ internal fun AppRootContent(
                                     BottomSheetPlayer(
                                         state = playerBottomSheetState,
                                         navController = navController,
-                                        pureBlack = pureBlack
+                                        pureBlack = pureBlack,
+                                        canvasInteraction = lastCanvasInteraction,
                                     )
                                 }
                             }

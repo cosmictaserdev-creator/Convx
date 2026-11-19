@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import com.convx.music.ui.component.backdrop.catalog.utils.InteractiveHighlight
 import com.convx.music.ui.component.shapes.shadowShape
-import com.convx.music.ui.player.PlayerMorph
 import kotlinx.coroutines.flow.drop
 
 /**
@@ -81,18 +80,6 @@ internal class BarBoundsTransforms(
 }
 
 internal val LocalBarBoundsTransforms = staticCompositionLocalOf { BarBoundsTransforms.Collapse }
-
-/** How much of the docked mini's landing dip the bar's other items carry. */
-internal const val LandingEchoShare = 0.4f
-
-/**
- * The tab pill and the side circles answer the mini's landing overshoot
- * ([com.convx.music.ui.player.PlayerMorph.landingDipPx]) with a smaller dip of their own, so
- * the bar lands as one piece instead of the pill bouncing alone. Draw-phase read; 0 at rest.
- */
-internal fun Modifier.landingEcho(): Modifier = graphicsLayer {
-    translationY = PlayerMorph.landingDipPx() * LandingEchoShare
-}
 
 /**
  * The docked mini pill's drop shadow, scaled by [com.convx.music.ui.player.PlayerMorph.pillShadow]

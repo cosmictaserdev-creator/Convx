@@ -11,8 +11,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,79 +22,140 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.common.VideoSize
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.AspectRatioFrameLayout
+import com.convx.music.playback.secureCanvasUrl
+import com.convx.music.ui.player.video.PlayerVideoBuffers
+import com.convx.music.ui.player.video.PlayerVideoDecoder
+import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
+import java.io.IOException
 
-/**
- * A looping, muted motion-video player that can outlive the view showing it: hoist it above a
- * lazy list and the hero can scroll out of composition and back without rebuffering.
- * [active] pauses decoding (off screen, app in background) without dropping the buffer.
- */
+/** Owns the artist hero's muted video while its surface is visible. */
 @Stable
 class ArtistVideoPlayer internal constructor(context: Context, videoUrl: String) {
-    internal val exoPlayer: ExoPlayer = ExoPlayer.Builder(context)
-        .setMediaSourceFactory(
-            DefaultMediaSourceFactory(
-                DefaultDataSource.Factory(context, OkHttpDataSource.Factory(sharedClient)),
-            ),
-        )
-        .build()
-        .apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(C.USAGE_MEDIA)
-                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                    .build(),
-                false,
-            )
-            // The hero is screen-wide and partly blurred, so higher resolution is unnecessary.
-            trackSelectionParameters = trackSelectionParameters.buildUpon()
-                .setMaxVideoSize(1080, 1080)
-                .build()
-            volume = 0f
-            repeatMode = Player.REPEAT_MODE_ONE
-            setMediaItem(MediaItem.fromUri(videoUrl.trim()))
-            prepare()
-            playWhenReady = true
-        }
+    private val mediaItem = secureCanvasUrl(videoUrl)?.let { MediaItem.fromUri(it) }
+
+    internal val exoPlayer: ExoPlayer = PlayerVideoDecoder.build(
+        context,
+        DefaultMediaSourceFactory(OkHttpDataSource.Factory(sharedClient)),
+        PlayerVideoDecoder.Use.BACKGROUND,
+    )
 
     internal var isReady by mutableStateOf(false)
+        private set
 
-    var active: Boolean
-        get() = exoPlayer.playWhenReady
-        set(value) {
-            exoPlayer.playWhenReady = value
-        }
+    var active by mutableStateOf(true)
+
+    private var videoFailed = false
+    private var visibleViews by mutableStateOf(0)
+    internal val shouldDecode: Boolean get() = active && visibleViews > 0
 
     init {
         exoPlayer.addListener(
             object : Player.Listener {
                 override fun onRenderedFirstFrame() {
-                    isReady = true
+                    if (PlayerVideoDecoder.owns(exoPlayer)) isReady = true
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    if (!PlayerVideoDecoder.owns(exoPlayer)) return
+                    videoFailed = true
+                    PlayerVideoDecoder.release(exoPlayer)
+                }
+
+                override fun onVideoSizeChanged(videoSize: VideoSize) {
+                    if (!PlayerVideoDecoder.owns(exoPlayer)) return
+                    if (videoSize.width <= 0 || videoSize.height <= 0) return
+
+                    val portrait = videoSize.height > videoSize.width
+                    val width = if (portrait) 720 else 1_280
+                    val height = if (portrait) 1_280 else 720
+                    val parameters = exoPlayer.trackSelectionParameters
+                    if (parameters.maxVideoWidth == width && parameters.maxVideoHeight == height) return
+                    exoPlayer.trackSelectionParameters = parameters.buildUpon()
+                        .setMaxVideoSize(width, height)
+                        .build()
                 }
             },
         )
     }
 
-    internal fun release() = exoPlayer.release()
+    internal fun visibilityChanged(visible: Boolean) {
+        visibleViews += if (visible) 1 else -1
+        if (visibleViews == 0) PlayerVideoDecoder.release(exoPlayer)
+    }
+
+    internal fun prepareIfAvailable() {
+        val item = mediaItem ?: return
+        if (!shouldDecode || videoFailed || PlayerVideoDecoder.owns(exoPlayer)) return
+        val claimed = PlayerVideoDecoder.claim(exoPlayer, PlayerVideoDecoder.PRIORITY_BACKGROUND) {
+            isReady = false
+        }
+        if (!claimed) return
+
+        exoPlayer.setMediaItem(item)
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
+    }
+
+    internal fun stop() {
+        PlayerVideoDecoder.release(exoPlayer)
+    }
+
+    internal fun release() {
+        stop()
+        exoPlayer.release()
+    }
 
     private companion object {
-        val sharedClient: OkHttpClient by lazy { OkHttpClient.Builder().build() }
+        val sharedClient: OkHttpClient by lazy {
+            OkHttpClient.Builder()
+                .followSslRedirects(false)
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    if (!request.url.isHttps) throw IOException("Artist video transport requires HTTPS")
+                    chain.proceed(request)
+                }
+                .addNetworkInterceptor { chain ->
+                    val request = chain.request()
+                    if (!request.url.isHttps || request.url.username.isNotEmpty() || request.url.password.isNotEmpty()) {
+                        throw IOException("Artist video transport requires an HTTPS URL without credentials")
+                    }
+                    chain.proceed(request)
+                }
+                .build()
+        }
     }
 }
 
 @Composable
 fun rememberArtistVideoPlayer(videoUrl: String): ArtistVideoPlayer {
     val context = LocalContext.current.applicationContext
-    val player = remember(videoUrl) { ArtistVideoPlayer(context, videoUrl) }
+    val player = remember(context, videoUrl) { ArtistVideoPlayer(context, videoUrl) }
+    val shouldDecode = player.shouldDecode
+    LaunchedEffect(player, shouldDecode) {
+        if (!shouldDecode) return@LaunchedEffect
+
+        delay(PlayerVideoBuffers.SETTLE_MS.toLong())
+        player.prepareIfAvailable()
+        PlayerVideoDecoder.available.collect { available ->
+            if (available) player.prepareIfAvailable()
+        }
+    }
+    DisposableEffect(player, shouldDecode) {
+        if (!shouldDecode) player.stop()
+        onDispose {}
+    }
     DisposableEffect(player) { onDispose { player.release() } }
     return player
 }
@@ -113,6 +176,24 @@ fun ArtistVideo(
     onFrame: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(player, lifecycle) {
+        var visible = false
+        fun updateVisibility() {
+            val started = lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+            if (visible == started) return
+            visible = started
+            player.visibilityChanged(started)
+        }
+        val observer = LifecycleEventObserver { _, _ -> updateVisibility() }
+        lifecycle.addObserver(observer)
+        updateVisibility()
+        onDispose {
+            lifecycle.removeObserver(observer)
+            if (visible) player.visibilityChanged(false)
+        }
+    }
+
     val videoAlpha by animateFloatAsState(
         targetValue = if (player.isReady) 1f else 0f,
         animationSpec = tween(durationMillis = 400),
@@ -126,33 +207,35 @@ fun ArtistVideo(
             indication = null,
         ) { onClick() },
     ) {
-        AndroidView(
-            factory = { viewContext ->
-                AspectRatioFrameLayout(viewContext).apply {
-                    layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                    this.resizeMode = resizeMode
-
-                    val textureView = VideoFrameTextureView(viewContext).apply {
+        key(player) {
+            AndroidView(
+                factory = { viewContext ->
+                    AspectRatioFrameLayout(viewContext).apply {
                         layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                        this.onFrame = onFrame
+                        this.resizeMode = resizeMode
+
+                        val textureView = VideoFrameTextureView(viewContext).apply {
+                            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                            this.onFrame = onFrame
+                        }
+                        addView(textureView)
+                        player.exoPlayer.setVideoTextureView(textureView)
+                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
                     }
-                    addView(textureView)
-                    player.exoPlayer.setVideoTextureView(textureView)
-                    setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                }
-            },
-            update = { view ->
-                (view.getChildAt(0) as? VideoFrameTextureView)?.onFrame = onFrame
-                if (view.resizeMode != resizeMode) {
-                    view.resizeMode = resizeMode
-                }
-            },
-            onRelease = { view ->
-                (view.getChildAt(0) as? TextureView)?.let(player.exoPlayer::clearVideoTextureView)
-            },
-            modifier = Modifier
-                .matchParentSize()
-                .alpha(videoAlpha),
-        )
+                },
+                update = { view ->
+                    (view.getChildAt(0) as? VideoFrameTextureView)?.onFrame = onFrame
+                    if (view.resizeMode != resizeMode) {
+                        view.resizeMode = resizeMode
+                    }
+                },
+                onRelease = { view ->
+                    (view.getChildAt(0) as? TextureView)?.let(player.exoPlayer::clearVideoTextureView)
+                },
+                modifier = Modifier
+                    .matchParentSize()
+                    .alpha(videoAlpha),
+            )
+        }
     }
 }

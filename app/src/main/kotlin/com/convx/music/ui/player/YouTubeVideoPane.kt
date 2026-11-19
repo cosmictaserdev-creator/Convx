@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
 import com.convx.music.R
@@ -71,6 +73,15 @@ internal fun YouTubeVideoPane(
     val playing by connection.isPlaying.collectAsStateWithLifecycle()
     val firstFrame = videoController.videoReady
     val failed = videoController.videoFailed
+    val stalled = videoController.videoLoading
+    var showStall by remember(stream.mediaId) { mutableStateOf(false) }
+    LaunchedEffect(visible, firstFrame, stalled) {
+        showStall = false
+        if (visible && firstFrame && stalled) {
+            delay(600L)
+            showStall = true
+        }
+    }
     val paneVideoAlpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(if (reduceMotion) 1 else 260),
@@ -93,21 +104,14 @@ internal fun YouTubeVideoPane(
         }
     }
 
-    // The owning player pauses its decoder when its own sheet reports collapsed; fullscreen must
-    // follow playback itself or it opens on a frozen first frame.
-    LaunchedEffect(fullscreenOnly, playing) {
-        if (fullscreenOnly) videoController.exoPlayer.playWhenReady = playing
-    }
-
-    if (fullscreenOnly) LaunchedEffect(videoController) {
-        while (true) {
-            val exo = videoController.exoPlayer
-            android.util.Log.d(
-                "FsVideo",
-                "state=${exo.playbackState} pwr=${exo.playWhenReady} playing=${exo.isPlaying} pos=${exo.currentPosition} " +
-                    "size=${exo.videoSize.width}x${exo.videoSize.height} ready=$firstFrame failed=$failed err=${exo.playerError?.errorCodeName}",
-            )
-            delay(1_000)
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    LaunchedEffect(owner, visible, coveredByFullscreen, stream, videoController) {
+        if (!visible || coveredByFullscreen) return@LaunchedEffect
+        owner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            while (isActive) {
+                videoController.synchronizeTo(connection.player)
+                delay(500L)
+            }
         }
     }
 
@@ -119,7 +123,7 @@ internal fun YouTubeVideoPane(
     }
 
     val videoSurface: @Composable (Modifier) -> Unit = { bounds ->
-        Box(bounds.background(Color.Black), contentAlignment = Alignment.Center) {
+        Box(bounds.clipToBounds().background(Color.Black), contentAlignment = Alignment.Center) {
             AsyncImage(
                 model = metadata?.thumbnailUrl,
                 contentDescription = null,
@@ -130,11 +134,11 @@ internal fun YouTubeVideoPane(
             if (visible && failed) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.video_unavailable), color = Color.White)
-                    TextButton(onClick = videoController::retryVideo) {
+                    TextButton(onClick = { connection.requestVideoStream(stream.mediaId, forceRefresh = true) }) {
                         Text(stringResource(R.string.video_retry), color = Color.White)
                     }
                 }
-            } else if (visible && !firstFrame) {
+            } else if (showStall) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(28.dp))
             }
         }
@@ -146,7 +150,8 @@ internal fun YouTubeVideoPane(
         if (!coveredByFullscreen) Box(
             Modifier
                 .fillMaxWidth()
-                .aspectRatio(stream.width.coerceAtLeast(1).toFloat() / stream.height.coerceAtLeast(1))
+                .padding(horizontal = 16.dp)
+                .aspectRatio(16f / 9f)
                 .pointerInput(visible) { detectTapGestures { if (visible) inlineControls = !inlineControls } },
         ) {
             videoSurface(Modifier.fillMaxSize())

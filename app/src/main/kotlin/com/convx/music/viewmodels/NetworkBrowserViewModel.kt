@@ -10,12 +10,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.convx.music.db.MusicDatabase
 import com.convx.music.extensions.toMediaItem
-import com.convx.music.utils.NetworkLibraryImporter
+import com.convx.music.utils.RoomNetworkLibraryWriter
 import com.convx.storage.data.NetworkMusicRepository
 import com.convx.storage.domain.NetworkEntry
 import com.convx.storage.domain.NetworkMedia
 import com.convx.storage.domain.NetworkServer
 import com.convx.storage.domain.RemotePath
+import com.convx.storage.domain.addTracks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,9 +61,9 @@ class NetworkBrowserViewModel(
     }
 
     /** Adds [files] to the library, if new, and returns them as queue items in the same order. */
-    suspend fun mediaItems(serverId: String, files: List<NetworkEntry>): List<MediaItem> = files.mapNotNull { entry ->
-        val track = NetworkMedia.track(serverId, entry, emptyList())
-        NetworkLibraryImporter.insert(database, track)
-        database.getSongById(track.id)?.toMediaItem()
+    suspend fun mediaItems(serverId: String, files: List<NetworkEntry>): List<MediaItem> {
+        val tracks = files.map { NetworkMedia.track(serverId, it, emptyList()) }
+        RoomNetworkLibraryWriter(database).addTracks(tracks.distinctBy { it.id })
+        return tracks.mapNotNull { database.getSongById(it.id)?.toMediaItem() }
     }
 }

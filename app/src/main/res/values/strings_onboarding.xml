@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_tagline">Your music, your way</string>
+    <string name="onboarding_feature_lyrics_title">Synced lyrics</string>
+    <string name="onboarding_feature_lyrics_body">Follow the lyrics as your music plays.</string>
+    <string name="onboarding_feature_glass_title">Artwork that fills the player</string>
+    <string name="onboarding_feature_glass_body">See colors from the album artwork throughout the player.</string>
+    <string name="onboarding_feature_offline_title">Listen offline</string>
+    <string name="onboarding_feature_offline_body">Play music stored on your device without an internet connection.</string>
+    <string name="onboarding_feature_together_title">Listen together</string>
+    <string name="onboarding_feature_together_body">Start a room and listen with friends.</string>
+    <string name="onboarding_feature_sound_title">Tune your sound</string>
+    <string name="onboarding_feature_sound_body">Adjust playback to suit the way you listen.</string>
+    <string name="onboarding_title">What should we call you?</string>
+    <string name="onboarding_name_prompt">Choose a display name</string>
+    <string name="onboarding_name_hint">Your name</string>
+    <string name="onboarding_name_footer">This is the name friends will see when you listen together.</string>
+    <string name="onboarding_next">Continue</string>
+    <string name="onboarding_connect_title">Connect to YouTube Music</string>
+    <string name="onboarding_connect_body">Sign in to access your YouTube Music library and playlists.</string>
+    <string name="onboarding_sign_in_google">Sign in with Google</string>
+    <string name="onboarding_skip_sign_in">Continue without signing in</string>
+    <string name="onboarding_mode_title">How do you want to listen?</string>
+    <string name="onboarding_mode_body">Stream music online or listen to files already on your device.</string>
+    <string name="onboarding_mode_online">Online and local music</string>
+    <string name="onboarding_mode_local">Local music only</string>
+    <string name="onboarding_notifications_title">Allow notifications</string>
+    <string name="onboarding_notifications_body">Get playback controls and updates from Convx.</string>
+    <string name="onboarding_notifications_allow">Allow notifications</string>
+    <string name="onboarding_notifications_skip">Maybe later</string>
+</resources>

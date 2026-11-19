@@ -32,6 +32,7 @@ import com.convx.music.constants.FlamingoBrightSingingWordsKey
 import com.convx.music.constants.FlamingoWordSwellKey
 import com.convx.music.constants.FlamingoGlowColorKey
 import com.convx.music.constants.LyricsStandardBlurKey
+import com.convx.music.constants.PlayerInlineLyricsKey
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
 import com.convx.music.ui.ios.compat.Switch
@@ -71,6 +72,7 @@ fun LyricsSettingsScreen(navController: NavController) {
     var showGlowColorPicker by rememberSaveable { mutableStateOf(false) }
     val (appleBlur, onAppleBlurChange) = rememberPreference(AppleMusicLyricsBlurKey, defaultValue = true)
     val (standardBlur, onStandardBlurChange) = rememberPreference(LyricsStandardBlurKey, defaultValue = false)
+    val (inlineLyrics, setInlineLyrics) = rememberPreference(PlayerInlineLyricsKey, defaultValue = false)
 
     if (showGlowColorPicker) {
         ColorPickerDialog(
@@ -96,6 +98,11 @@ fun LyricsSettingsScreen(navController: NavController) {
                 title = { Text(lyricsStyleLabel(animationStyle)) },
                 description = { Text(stringResource(R.string.lyrics_centered_scroll_description)) },
                 onClick = { showStyleDialog = true },
+            ),
+            IosSettingsItem(
+                title = { Text(stringResource(R.string.player_inline_lyrics)) },
+                trailingContent = { Switch(checked = inlineLyrics, onCheckedChange = setInlineLyrics) },
+                onClick = { setInlineLyrics(!inlineLyrics) },
             ),
         ))
         LyricsFontSettings()

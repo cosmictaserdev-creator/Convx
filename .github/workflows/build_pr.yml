@@ -53,10 +53,21 @@ jobs:
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
 
-      - name: Test network storage and playback routing
+      - name: Test Android libraries and playback routing
         run: |
-          ./gradlew :network-storage-core:testDebugUnitTest :network-storage-transports:testDebugUnitTest :network-storage-presentation:testDebugUnitTest --no-configuration-cache --console=plain
-          ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
+          ./gradlew \
+            :network-storage-core:testDebugUnitTest \
+            :network-storage-transports:testDebugUnitTest \
+            :network-storage-presentation:testDebugUnitTest \
+            :playback-core:testDebugUnitTest \
+            :catalog-core:testDebugUnitTest \
+            :playback-presentation:testDebugUnitTest \
+            :account-presentation:testDebugUnitTest \
+            :lyrics-data:testDebugUnitTest \
+            :hig:testDebugUnitTest \
+            :canvas:testDebugUnitTest \
+            --no-configuration-cache --console=plain
+          ./gradlew :app:testUniversalFossDebugUnitTest --no-configuration-cache --console=plain
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

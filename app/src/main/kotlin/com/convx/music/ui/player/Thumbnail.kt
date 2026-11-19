@@ -123,21 +123,10 @@ import com.convx.music.constants.ThumbnailCornerRadius
 import com.convx.music.listentogether.RoomRole
 import com.convx.music.ui.component.CastButton
 import com.convx.music.utils.rememberEnumPreference
-import com.convx.music.constants.CanvasSource
-import com.convx.music.constants.CanvasSourceKey
-import com.convx.music.constants.CanvasThumbnailAnimationKey
-import com.convx.music.constants.DataSaverEnabledKey
-import com.convx.music.canvas.TidalCanvasProvider
 import com.convx.music.canvas.CanvasArtwork
-import com.convx.music.extensions.metadata
 import com.convx.music.ui.utils.resize
 import com.convx.music.utils.rememberPreference
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
-import com.convx.music.applecanvas.AppleMusicCanvasProvider
-import com.convx.music.convxcanvas.ConvxCanvasProvider
-import com.convx.music.utils.SpotifyCanvasLookup
 import java.util.Locale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -298,6 +287,7 @@ fun Thumbnail(
     isPlayerExpanded: () -> Boolean = { true },
     isLandscape: Boolean = false,
     isListenTogetherGuest: Boolean = false,
+    canvasController: CanvasVideoController? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val context = LocalContext.current
@@ -515,7 +505,7 @@ fun Thumbnail(
                                 isListenTogetherGuest = isListenTogetherGuest,
                                 currentMediaId = mediaMetadata?.id,
                                 currentMediaThumbnail = mediaMetadata?.thumbnailUrl,
-                                playerBackground = playerBackground
+                                canvasController = canvasController,
                             )
                 }
             }
@@ -630,12 +620,11 @@ private fun ThumbnailItem(
     isListenTogetherGuest: Boolean = false,
     currentMediaId: String? = null,
     currentMediaThumbnail: String? = null,
-    playerBackground: PlayerBackgroundStyle = PlayerBackgroundStyle.DEFAULT,
+    canvasController: CanvasVideoController? = null,
     modifier: Modifier = Modifier,
 ) {
     val (artworkStyle) = rememberEnumPreference(PlayerArtworkStyleKey, defaultValue = PlayerArtworkStyle.CARD)
     val coverStyle = artworkStyle.coverStyle()
-    val rotatingThumbnail = coverStyle.spins
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
     val isCurrentItem = item.mediaId == currentMediaId
 
@@ -645,10 +634,6 @@ private fun ThumbnailItem(
     val incrementalSeekSkipEnabled by rememberPreference(SeekExtraSeconds, defaultValue = false)
     var skipMultiplier by remember { mutableIntStateOf(1) }
     var lastTapTime by remember { mutableLongStateOf(0L) }
-
-    val dataSaverEnabled by rememberPreference(DataSaverEnabledKey, defaultValue = false)
-    val canvasThumbnailAnimationPref by rememberPreference(CanvasThumbnailAnimationKey, defaultValue = true)
-    val canvasThumbnailAnimation = if (dataSaverEnabled) false else canvasThumbnailAnimationPref
 
     Box(
         modifier = modifier
@@ -704,17 +689,16 @@ private fun ThumbnailItem(
             modifier = Modifier
                 .coverMorph(coverStyle)
                 .size(dimensions.thumbnailSize)
-                // Register the morph target shape and hide its traveling copy during handoff.
-                .fullArtworkMorphTarget(
+                .then(if (isCurrentItem && !hidePlayerThumbnail) Modifier.fullArtworkMorphTarget(
                     cornerRadiusPx = with(artworkDensity) {
                         when (artworkStyle) {
                             PlayerArtworkStyle.CARD -> dimensions.cornerRadius.toPx()
                             else -> dimensions.thumbnailSize.toPx() / 2f
                         }
                     },
-                    // Cards travel between players; vinyl and clover covers resolve in place.
-                    travels = artworkStyle == PlayerArtworkStyle.CARD,
-                )
+                    // The travelling crop blends into the live outline for shaped covers.
+                    fadeEndpoints = artworkStyle != PlayerArtworkStyle.CARD,
+                ) else Modifier)
                 .graphicsLayer {
                     rotationZ = rotation.value
                 }
@@ -742,146 +726,10 @@ private fun ThumbnailItem(
                 )
             }
             
-            coverStyle.Decoration(Modifier.fillMaxSize())
-
-            if (canvasThumbnailAnimation && item.mediaId == currentMediaId && !rotatingThumbnail && playerBackground != PlayerBackgroundStyle.APPLE_MUSIC) {
-                val (canvasSource) = rememberEnumPreference(CanvasSourceKey, defaultValue = CanvasSource.AUTO)
-                var canvasArtwork by remember(item.mediaId) { mutableStateOf<CanvasArtwork?>(null) }
-                var canvasFetchInFlight by remember(item.mediaId) { mutableStateOf(false) }
-                val storefront = remember {
-                    val country = Locale.getDefault().country
-                    if (country.length == 2) country.lowercase(Locale.ROOT) else "us"
-                }
-
-                LaunchedEffect(item.mediaId, canvasSource) {
-                    val cacheKey = "${item.mediaId}:${canvasSource.name}"
-                    CanvasArtworkPlaybackCache.get(cacheKey)?.let { cached ->
-                        canvasArtwork = cached
-                        return@LaunchedEffect
-                    }
-
-                    if (canvasFetchInFlight) return@LaunchedEffect
-                    canvasFetchInFlight = true
-
-                    val fetched = withContext(Dispatchers.IO) {
-                        val metadata = item.metadata
-                        val albumName = (metadata?.album?.title ?: item.mediaMetadata.albumTitle)?.toString()
-                        val duration = metadata?.duration
-                        
-                        val songTitleRaw = item.mediaMetadata.title?.toString() ?: ""
-                        val artistNameRaw = item.mediaMetadata.artist?.toString() ?: ""
-                        
-                        val searchTasks = listOf(
-                            songTitleRaw to artistNameRaw
-                        ).filter { (s, a) -> s.isNotBlank() && a.isNotBlank() }
-
-                        when (canvasSource) {
-                            CanvasSource.AUTO -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    SpotifyCanvasLookup.getBySongArtist(context, s, a)
-                                        ?: AppleMusicCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a,
-                                        album = albumName,
-                                        storefront = storefront
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                        ?: ConvxCanvasProvider.getBySongArtist(
-                                            song = s,
-                                            artist = a
-                                        )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                        ?: TidalCanvasProvider.getBySongArtist(
-                                            song = s,
-                                            artist = a,
-                                            album = albumName
-                                        )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.APPLE_MUSIC -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    AppleMusicCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a,
-                                        album = albumName,
-                                        storefront = storefront
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.CONVX -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    ConvxCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.TIDAL -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    TidalCanvasProvider.getBySongArtist(
-                                        song = s,
-                                        artist = a,
-                                        album = albumName
-                                    )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
-                                }
-                            }
-                            CanvasSource.SPOTIFY -> {
-                                searchTasks.firstNotNullOfOrNull { (s, a) ->
-                                    SpotifyCanvasLookup.getBySongArtist(context, s, a)
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Client-side safety check: ensure the fetched canvas matches the requested song
-                    // This prevents "wrong canvas" if a provider returned a generic or incorrect match
-                    val requestedArtist = item.mediaMetadata.artist?.toString() ?: ""
-                    val requestedTitle = item.mediaMetadata.title?.toString() ?: ""
-                    
-                    val validated = fetched?.let { artwork ->
-                        val resultArtist = artwork.artist
-                        val resultName = artwork.name
-                        
-                        val artistMatches = if (resultArtist != null && requestedArtist.isNotBlank()) {
-                            val requestedList = splitAndNormalizeArtists(requestedArtist)
-                            val resultList = splitAndNormalizeArtists(resultArtist)
-                            requestedList.any { req -> resultList.any { res -> res.contains(req) || req.contains(res) } }
-                        } else true
-
-                        val songMatches = if (resultName != null && requestedTitle.isNotBlank()) {
-                            resultName.trim().equals(requestedTitle.trim(), ignoreCase = true)
-                        } else true
-                        val requestedAlbum = item.mediaMetadata.albumTitle?.toString() ?: ""
-                        val canvasAlbumName = artwork.albumName
-
-                        val albumMatches = if (canvasAlbumName != null && requestedAlbum.isNotBlank()) {
-                            canvasAlbumName.trim().equals(requestedAlbum.trim(), ignoreCase = true)
-                        } else false
-
-                        val titleMatches = songMatches && albumMatches
-
-                        if (artistMatches && titleMatches) {
-                            artwork
-                        } else {
-                            null
-                        }
-                    }
-                    
-                    canvasArtwork = validated
-                    if (validated != null) {
-                        CanvasArtworkPlaybackCache.put("${item.mediaId}:${canvasSource.name}", validated)
-                    }
-                    canvasFetchInFlight = false
-                }
-
-                canvasArtwork?.let { artwork ->
-                    CanvasArtworkPlayer(
-                        primaryUrl = artwork.animated,
-                        fallbackUrl = artwork.videoUrl,
-                        isPlaying = isPlaying,
-                        mediaId = item.mediaId,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+            if (isCurrentItem && !hidePlayerThumbnail && canvasController != null) {
+                CanvasVideoSurface(controller = canvasController, modifier = Modifier.fillMaxSize())
             }
+            coverStyle.Decoration(Modifier.fillMaxSize())
         }
     }
 }

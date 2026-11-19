@@ -299,9 +299,10 @@ class DownloadUtil(
                     SpotifyCanvasLookup.getBySongArtist(appContext, requestedTitle, requestedArtist)?.preferredAnimationUrl
             } ?: return@launch
 
+            val url = secureCanvasUrl(canvasUrl) ?: return@launch
             val dataSpec = DataSpec.Builder()
-                .setUri(canvasUrl.toUri())
-                .setKey("$mediaId#canvas")
+                .setUri(url.toUri())
+                .setKey(com.convx.music.ui.player.canvasPlaybackCacheKey(mediaId, url))
                 .setFlags(DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION)
                 .build()
             val dataSource = CacheDataSource.Factory()
@@ -312,7 +313,10 @@ class DownloadUtil(
             currentCoroutineContext().ensureActive()
             runCatching { CacheWriter(dataSource, dataSpec, null, null).cache() }
                 .onSuccess { Timber.tag("CanvasDownload").d("Successfully cached canvas for $mediaId") }
-                .onFailure { Timber.tag("CanvasDownload").e(it, "Failed to cache canvas for $mediaId") }
+                .onFailure { error ->
+                    if (error is kotlinx.coroutines.CancellationException) throw error
+                    Timber.tag("CanvasDownload").w("Canvas cache write failed")
+                }
         }
     }
 

@@ -13,10 +13,8 @@ import androidx.compose.ui.unit.Dp
  * Q2 lock: the single host owning the mini <-> full morph flight.
  *
  * One composition driven by one [progress] source, composing (in z order):
- * the interpolated container ([PlayerContainerMorphOverlay]) with the mini
- * recording fading out early and the full recording fading in late, then the
- * artwork ([PlayerArtworkMorphOverlay]) -- a travelling window for Squared and
- * the classic card, with stationary fades for Hero Bleed and vinyl / clover.
+ * the interpolated container ([PlayerContainerMorphOverlay]) with its title and transport
+ * handoff, followed by a travelling artwork window ([PlayerArtworkMorphOverlay]).
  * The overlay contract is progress in, draw-phase reads only.
  */
 @Composable

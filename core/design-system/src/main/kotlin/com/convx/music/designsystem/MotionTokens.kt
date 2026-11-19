@@ -19,13 +19,6 @@ object MotionTokens {
     const val PlayerMorphEnterMillis = 340
     const val PlayerMorphExitMillis = 260
     const val PlayerMorphStiffness = 950f
-    const val PlayerSheetStiffness = 360f
-    const val PlayerSheetLandingDamping = 0.72f
-    const val PlayerLandingDamping = 0.5f
-    const val PlayerLandingStiffness = 140f
-    const val PlayerLandingMaxDipDp = 22f
-    const val PlayerLandingSquash = 0.14f
-    const val PlayerLandingSpread = 0.04f
     const val PushParallax = 0.30f
     const val PushDimAlpha = 0.85f
 
@@ -52,15 +45,10 @@ object MotionTokens {
     fun <T> playerMorphExit(): FiniteAnimationSpec<T> =
         tween(PlayerMorphExitMillis, easing = PlayerMorphEasing)
 
-    fun <T> playerSheetOpen(): FiniteAnimationSpec<T> = spring(
-        dampingRatio = Spring.DampingRatioNoBouncy,
-        stiffness = PlayerSheetStiffness,
-    )
+    fun <T> playerSheetOpen(): FiniteAnimationSpec<T> = PlayerMotionSpec.sheetOpen()
 
-    fun <T> playerSheetClose(landing: Boolean = false): FiniteAnimationSpec<T> = spring(
-        dampingRatio = if (landing) PlayerSheetLandingDamping else Spring.DampingRatioNoBouncy,
-        stiffness = PlayerSheetStiffness,
-    )
+    fun <T> playerSheetClose(landing: Boolean = false): FiniteAnimationSpec<T> =
+        PlayerMotionSpec.sheetClose(landing)
 
     fun collectionPush(): FiniteAnimationSpec<IntOffset> = spring(
         dampingRatio = 1f,

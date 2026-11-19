@@ -7,7 +7,8 @@ package com.convx.music.ui.player
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
@@ -15,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -23,12 +25,14 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.util.lerp
 import kotlin.math.roundToInt
-import com.convx.music.ui.component.PLAYER_CONTENT_APPEAR_END
 import com.convx.music.ui.component.PLAYER_CONTENT_APPEAR_START
-import com.convx.music.ui.component.PLAYER_LAYER_HANDOFF_PROGRESS
 import com.convx.music.ui.component.PLAYER_MINI_FADE_END
 
 /**
@@ -59,46 +63,26 @@ fun Modifier.miniContainerMorphSource(): Modifier {
     }
 }
 
-/**
- * Mini transport cluster, in root coordinates (the reference app miniPlayerControlsBounds).
- *
- * The overlay draws the mini recording twice -- title side riding the
- * travelling corner, controls shifted to keep their right inset -- so both
- * visibly travel instead of crossfading. Controls report per-button and read
- * back the union: variants mount exclusively, so at most one set is live.
- */
-private val miniControlsPlayRect = mutableStateOf<Rect?>(null)
-private val miniControlsNextRect = mutableStateOf<Rect?>(null)
+internal enum class PlayerMorphElement {
+    TITLE, PREVIOUS, PLAY, NEXT;
 
-internal val miniPlayerControlsRect: Rect?
-    get() {
-        val play = miniControlsPlayRect.value
-        val next = miniControlsNextRect.value
-        if (play == null) return next
-        if (next == null) return play
-        return Rect(
-            left = minOf(play.left, next.left),
-            top = minOf(play.top, next.top),
-            right = maxOf(play.right, next.right),
-            bottom = maxOf(play.bottom, next.bottom),
-        )
+    val mini = MorphSlot<Rect>()
+    val full = MorphSlot<Rect>()
+}
+
+@Composable
+internal fun Modifier.playerMorphBounds(element: PlayerMorphElement, isMini: Boolean = false): Modifier {
+    val slot = if (isMini) element.mini else element.full
+    val owner = remember(slot) { Any() }
+    DisposableEffect(slot, owner) { onDispose { slot.release(owner) } }
+    return onGloballyPositioned {
+        if (it.isAttached && (isMini || !it.boundsInWindow().isEmpty)) {
+            slot.report(owner, Rect(it.positionInRoot(), it.size.toSize()))
+        }
     }
-
-/** Clears stale variant bounds when the mini switches layout (tab style, inline). */
-internal fun clearMiniContentControlsRects() {
-    miniControlsPlayRect.value = null
-    miniControlsNextRect.value = null
 }
 
-fun Modifier.registerMiniControlsPlayRect(): Modifier = onGloballyPositioned {
-    if (it.isAttached) miniControlsPlayRect.value = it.boundsInRoot()
-}
-
-fun Modifier.registerMiniControlsNextRect(): Modifier = onGloballyPositioned {
-    if (it.isAttached) miniControlsNextRect.value = it.boundsInRoot()
-}
-
-/** Mini title/buttons track across the first three tenths, then hand over. */
+/** Mini title and buttons fade as they move toward the full player. */
 fun playerSheetMiniContentAlpha(progress: Float): Float =
     com.convx.music.playback.presentation.PlayerMorphGeometry.miniContentAlpha(progress)
 
@@ -112,9 +96,7 @@ fun playerSheetBackgroundAlpha(progress: Float): Float =
 
 /**
  * Draws the mini and full player layers in one container during the sheet morph.
- * The mini title stays anchored while its controls travel; the full player scales in as
- * the mini hands off. Progress is read during drawing so every frame updates without
- * recomposing the player.
+ * Progress is read during drawing so every frame updates without recomposing the player.
  */
 @Composable
 fun PlayerContainerMorphOverlay(
@@ -127,32 +109,20 @@ fun PlayerContainerMorphOverlay(
             .fillMaxSize()
             .drawWithCache {
                 val clipPath = Path()
+                val miniContentCutouts = Path()
                 val shadowLayer = obtainGraphicsLayer()
-                // Both pill-side rects frozen for the flight, like the artwork's ends: the
-                // pill's own stretch and the bar's inline/expanded resize move the live rect
-                // mid-gesture, which walked the card's source edge away from the flying cover.
                 var flightMini: Rect? = null
-                var flightControls: Rect? = null
                 // The sheet's first draw marks it ready; avoid forcing repeated full-frame redraws.
                 onDrawBehind {
                     val fraction = progress().coerceIn(0f, 1f)
-                    // Close landing: the sheet has stopped on its bound, the card has not.
-                    val landing = fraction <= 0f && PlayerMorph.landingActive
-                    if ((fraction <= 0f && !landing) || fraction >= 1f || !PlayerMorph.sharedLayersReady) {
+                    if (fraction <= 0f || fraction >= 1f || !PlayerMorph.sharedLayersReady) {
                         flightMini = null
-                        flightControls = null
                         return@onDrawBehind
                     }
                     if (flightMini == null) {
                         flightMini = miniContainerSlot.value
-                        flightControls = miniPlayerControlsRect
                     }
-                    // Opening: the frozen source (the pill stretches under the finger). Closing:
-                    // the LIVE pill, so the card lands exactly on the size the pill has now -- a
-                    // frozen rect from flight start landed bigger, then snapped to size.
-                    val mini = (if (PlayerMorph.targetOpen) flightMini else miniContainerSlot.value ?: flightMini)
-                        ?: return@onDrawBehind
-                    val controlsNow = if (PlayerMorph.targetOpen) flightControls else miniPlayerControlsRect ?: flightControls
+                    val mini = flightMini ?: return@onDrawBehind
                     // onGloballyPositioned can fire once with a degenerate size before layout
                     // settles.
                     if (mini.width <= 0f || mini.height <= 0f) return@onDrawBehind
@@ -165,8 +135,8 @@ fun PlayerContainerMorphOverlay(
                     // overlay's own size. Nothing to register at that end, nothing to go
                     // stale.
                     val full = Rect(0f, 0f, size.width, size.height)
-                    val rect = if (landing) landingCardRect(mini) else sharedContainerRect(mini, full, fraction)
-                    val radius = if (landing) rect.height / 2f else sharedContainerCornerRadii(
+                    val rect = sharedContainerRect(mini, full, fraction)
+                    val radius = sharedContainerCornerRadii(
                         // The nav bar draws the pill as a 50%-rounded capsule, so its radius
                         // is half its height by definition. Derived rather than passed in, so
                         // restyling the pill cannot leave the two out of step.
@@ -229,25 +199,6 @@ fun PlayerContainerMorphOverlay(
                                     drawRect(color = color, size = rect.size, alpha = plateAlpha)
                                 }
                             }
-                            if (miniLayer.size.width > 0 && fraction < PLAYER_MINI_FADE_END) {
-                                miniLayer.alpha = playerSheetMiniContentAlpha(fraction)
-                                miniLayer.renderEffect = null
-                                if (landing) {
-                                    // The whole pill squashes as one body while it lands.
-                                    scale(
-                                        scaleX = rect.width / miniLayer.size.width,
-                                        scaleY = rect.height / miniLayer.size.height,
-                                        pivot = Offset.Zero,
-                                    ) { drawLayer(miniLayer) }
-                                } else {
-                                    drawTrackedMiniLayer(
-                                        miniLayer = miniLayer,
-                                        mini = mini,
-                                        container = rect,
-                                        controls = controlsNow,
-                                    )
-                                }
-                            }
                             // Background leads (first fifth), content follows (tenth
                             // to six tenths): two recordings, staged like the reference app.
                             val scale = rect.width / size.width
@@ -261,9 +212,21 @@ fun PlayerContainerMorphOverlay(
                             if (fraction > PLAYER_CONTENT_APPEAR_START && !stay) {
                                 fullContentLayer.alpha = playerSheetPageAlpha(fraction)
                                 fullContentLayer.renderEffect = null
-                                scale(scaleX = scale, scaleY = scale, pivot = Offset.Zero) {
+                                // Reveal the controls at their resting size as the card grows.
+                                translate(left = (rect.width - fullContentLayer.size.width) * 0.5f) {
                                     drawLayer(fullContentLayer)
                                 }
+                            }
+                            if (miniLayer.size.width > 0 && fraction < PLAYER_MINI_FADE_END) {
+                                miniLayer.alpha = playerSheetMiniContentAlpha(fraction)
+                                miniLayer.renderEffect = null
+                                drawTrackedMiniLayer(
+                                    miniLayer = miniLayer,
+                                    mini = mini,
+                                    container = rect,
+                                    progress = fraction,
+                                    cutouts = miniContentCutouts,
+                                )
                             }
                         }
                     }
@@ -272,68 +235,40 @@ fun PlayerContainerMorphOverlay(
     )
 }
 
-/** How much the landing pill flattens at the bottom of its dip, and widens with it. */
-private const val LANDING_SQUASH = com.convx.music.designsystem.MotionTokens.PlayerLandingSquash
-private const val LANDING_SPREAD = com.convx.music.designsystem.MotionTokens.PlayerLandingSpread
-
-/**
- * The card during a close landing: the pill's own rect carried [PlayerMorph.landingDipPx]
- * below its slot, flattened and slightly widened in proportion (liquid squash), springing
- * back to exactly [mini] as the landing settles.
- */
-private fun landingCardRect(mini: Rect): Rect {
-    val dip = PlayerMorph.landingDipPx()
-    val maxDip = PlayerMorph.landingMaxDipPx
-    val squash = if (maxDip > 0f) (dip / maxDip).coerceIn(-1f, 1f) else 0f
-    val height = mini.height * (1f - LANDING_SQUASH * squash)
-    val width = mini.width * (1f + LANDING_SPREAD * squash)
-    val bottom = mini.bottom + dip
-    val centerX = mini.center.x
-    return Rect(centerX - width / 2f, bottom - height, centerX + width / 2f, bottom)
-}
-
-/**
- * Mini recording drawn as two tracked halves (the reference app clip split, pill-origin
- * layer, inside the caller's translate to the container origin).
- *
- * Title side compensates the corner travel so it stays absolute while the
- * card grows around it; the controls half adds the edge shift, keeping its
- * right inset and breaking away rightward. Falls back to one plain draw
- * until the controls bounds report.
- */
+/** Each registered mini element keeps its own path while the rest of the pill follows the card. */
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawTrackedMiniLayer(
     miniLayer: androidx.compose.ui.graphics.layer.GraphicsLayer,
     mini: Rect,
     container: Rect,
-    controls: Rect?,
+    progress: Float,
+    cutouts: Path,
 ) {
-    if (controls == null || controls.width <= 0f || controls.height <= 0f) {
-        drawLayer(miniLayer)
-        return
+    cutouts.reset()
+    for (element in PlayerMorphElement.entries) {
+        val source = element.mini.value ?: continue
+        val target = element.full.value ?: continue
+        if (source.isEmpty || target.isEmpty) continue
+        cutouts.addRect(source.translate(-mini.topLeft))
     }
-    // Layer-space x of the split: controls' left edge relative to the pill.
-    val split = controls.left - mini.left
-    val titleShift = sharedMiniPlayerTitleShift(
-        sourcePlayerBounds = mini,
-        animatedPlayerBounds = container,
-    )
-    val edgeShift = sharedMiniPlayerControlsShift(
-        sourcePlayerBounds = mini,
-        animatedPlayerBounds = container,
-        controlsBounds = controls,
-    )
-    clipRect(right = titleShift + split) {
+    clipPath(cutouts, clipOp = ClipOp.Difference) { drawLayer(miniLayer) }
+
+    for (element in PlayerMorphElement.entries) {
+        val source = element.mini.value ?: continue
+        val target = element.full.value ?: continue
+        if (source.isEmpty || target.isEmpty) continue
+
+        val isTitle = element == PlayerMorphElement.TITLE
+        val from = if (isTitle) source.topLeft else source.center
+        val to = if (isTitle) target.topLeft else target.center
+        val left = lerp(from.x, to.x, progress) - from.x + mini.left - container.left
+        val top = lerp(from.y, to.y, progress) - from.y + mini.top - container.top
+        val local = source.translate(-mini.topLeft)
+        val glyphScale = if (isTitle) 1f else 1f + progress
         withTransform({
-            translate(left = titleShift, top = 0f)
+            translate(left, top)
+            scale(glyphScale, glyphScale, pivot = local.center)
         }) {
-            drawLayer(miniLayer)
-        }
-    }
-    clipRect(left = titleShift + split + edgeShift) {
-        withTransform({
-            translate(left = titleShift + edgeShift, top = 0f)
-        }) {
-            drawLayer(miniLayer)
+            clipRect(local.left, local.top, local.right, local.bottom) { drawLayer(miniLayer) }
         }
     }
 }

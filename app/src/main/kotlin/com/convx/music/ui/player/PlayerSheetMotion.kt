@@ -5,6 +5,7 @@
 package com.convx.music.ui.player
 
 import androidx.compose.ui.geometry.Rect
+import com.convx.music.designsystem.PlayerMotionSpec
 import com.convx.music.playback.presentation.PLAYER_MORPH_ARTWORK_VERTICAL_LINEAR_WEIGHT
 import com.convx.music.playback.presentation.PLAYER_MORPH_CORNER_EXPANSION_PROGRESS_BAND
 import com.convx.music.playback.presentation.PLAYER_MORPH_INPUT_MINI_END_PROGRESS
@@ -56,9 +57,6 @@ fun sharedMiniPlayerControlsShift(
 fun sharedArtworkRect(source: Rect, target: Rect, progress: Float): Rect =
     PlayerMorphGeometry.artworkRect(source, target, progress)
 
-fun sharedArtworkWindow(source: Rect, target: Rect, progress: Float): Rect =
-    PlayerMorphGeometry.artworkWindow(source, target, progress)
-
 internal fun sharedContainerCornerRadii(
     source: SharedContainerCornerRadii,
     target: SharedContainerCornerRadii,
@@ -89,7 +87,7 @@ fun playerWindowUsesPhysicalScreenCorners(
     currentWidth >= maximumWidth &&
     currentHeight >= maximumHeight
 
-val SeamlessEasing = androidx.compose.animation.core.CubicBezierEasing(0.37f, 0f, 0.63f, 1f)
+val SeamlessEasing = PlayerMotionSpec.SeamlessEasing
 
 const val AMBIENT_TRANSITION_DEFAULT_MS = 1_100
 

@@ -13,7 +13,6 @@ import android.webkit.WebViewClient
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -22,9 +21,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.convx.music.ui.ios.compat.Icon
-import com.convx.music.ui.ios.compat.Text
-import com.convx.music.ui.ios.compat.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
@@ -44,12 +39,11 @@ import com.convx.music.constants.DataSyncIdKey
 import com.convx.music.constants.InnerTubeCookieKey
 import com.convx.music.constants.SavedAccount
 import com.convx.music.constants.VisitorDataKey
-import com.convx.music.ui.component.IconButton
 import com.convx.music.ui.utils.backToMain
 import com.convx.music.ui.component.FrostedTopBar
+import com.convx.music.ui.component.WebLoginSheet
 import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.utils.rememberPreference
-import com.convx.music.utils.reportException
 import com.convx.music.viewmodels.AccountSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -71,11 +65,22 @@ object PendingChannelLogin {
     var channels: List<SavedAccount> = emptyList()
 }
 
+@Composable
+fun LoginScreen(navController: NavController) {
+    YouTubeLoginScreen(navController)
+}
+
+@Composable
+internal fun OnboardingLoginScreen(navController: NavController, onSheetProgress: (Float) -> Unit) {
+    YouTubeLoginScreen(navController, onSheetProgress)
+}
+
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun LoginScreen(
+private fun YouTubeLoginScreen(
     navController: NavController,
+    onSheetProgress: ((Float) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -94,26 +99,22 @@ fun LoginScreen(
     // Bound retries so accounts without a YouTube channel cannot trigger endless requests.
     val validationAttempts = remember { AtomicInteger(0) }
 
+    var canGoBack by remember { mutableStateOf(false) }
+
     // Keep Chromium's hardware surface out of Haze captures; repeated capture can blank or
     // flicker the sign-in page.
-    Column(
-        modifier = Modifier.fillMaxSize().background(AppTheme.colorScheme.background),
-    ) {
-        FrostedTopBar(
-            title = stringResource(R.string.login),
-            titleAlpha = 1f,
-            onBack = navController::navigateUp,
-            onBackLongClick = navController::backToMain,
-        )
+    val browser: @Composable (Modifier) -> Unit = { modifier ->
         AndroidView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)),
+            modifier = modifier,
             factory = { webViewContext ->
                 WebView(webViewContext).apply {
                     webViewClient = object : WebViewClient() {
+                        override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
+                            canGoBack = view.canGoBack()
+                        }
+
                         override fun onPageFinished(view: WebView, url: String?) {
+                            canGoBack = view.canGoBack()
                             loadUrl("javascript:Android.onRetrieveVisitorData(window.yt.config_.VISITOR_DATA)")
                             loadUrl("javascript:Android.onRetrieveDataSyncId(window.yt.config_.DATASYNC_ID)")
 
@@ -182,9 +183,8 @@ fun LoginScreen(
                                             )
                                         }
                                     }.onFailure {
-                                        Timber.e(it, "Login: Authentication validation failed")
+                                        Timber.e("Login: Account channel validation failed")
                                         hasCompletedLogin = false // Allow retry
-                                        reportException(it)
                                         // Resetting this flag won't rerun onPageFinished; reload to retry validation.
                                         val attempt = validationAttempts.incrementAndGet()
                                         if (attempt <= 3) {
@@ -243,17 +243,45 @@ fun LoginScreen(
                     webViewRef.value = this
                     loadUrl("https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fmusic.youtube.com")
                 }
-            }
+            },
+            onRelease = { webView ->
+                webViewRef.value = null
+                webView.stopLoading()
+                webView.removeJavascriptInterface("Android")
+                webView.destroy()
+            },
         )
-
+        BackHandler(enabled = canGoBack) {
+            webViewRef.value?.goBack()
+        }
     }
 
-    BackHandler(enabled = webViewRef.value?.canGoBack() == true) {
-        webViewRef.value?.goBack()
+    if (onSheetProgress != null) {
+        WebLoginSheet(
+            title = stringResource(R.string.onboarding_sign_in_google),
+            onDismiss = { navController.navigateUp() },
+            onProgress = onSheetProgress,
+        ) {
+            browser(Modifier.fillMaxSize())
+        }
+    } else {
+        Column(Modifier.fillMaxSize().background(AppTheme.colorScheme.background)) {
+            FrostedTopBar(
+                title = stringResource(R.string.login),
+                titleAlpha = 1f,
+                onBack = navController::navigateUp,
+                onBackLongClick = navController::backToMain,
+            )
+            browser(
+                Modifier.fillMaxWidth().weight(1f).windowInsetsPadding(
+                    LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+                ),
+            )
+        }
     }
 }
 
-private fun String.hasYouTubeAccountSession(): Boolean {
+internal fun String.hasYouTubeAccountSession(): Boolean {
     if (isBlank()) return false
     val authenticatedCookieNames = setOf(
         "SID",

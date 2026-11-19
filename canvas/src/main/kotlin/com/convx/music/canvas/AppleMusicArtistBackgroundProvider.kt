@@ -1,19 +1,18 @@
 package com.convx.music.canvas
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
+import io.ktor.client.request.prepareGet
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.serialization.kotlinx.KotlinxSerializationConverter
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -49,7 +48,7 @@ object AppleMusicArtistBackgroundProvider {
                 gzip()
                 deflate()
             }
-            install(HttpCache)
+            followRedirects = false
             expectSuccess = false
         }
     }
@@ -82,7 +81,7 @@ object AppleMusicArtistBackgroundProvider {
         return runCatching {
             val url = "$AMP_BASE_URL/v1/catalog/$storefront/search"
             val token = AppleMusicToken.get()
-            val response = client.get(url) {
+            val root = client.prepareGet(url) {
                 header("Authorization", "Bearer $token")
                 header("Origin", "https://music.apple.com")
                 header("Referer", "https://music.apple.com/")
@@ -90,10 +89,10 @@ object AppleMusicArtistBackgroundProvider {
                 parameter("term", artistName)
                 parameter("types", "artists")
                 parameter("limit", "3")
-            }
-            if (response.status != HttpStatusCode.OK) return@runCatching null
-
-            val root = response.body<JsonObject>()
+            }.execute { response ->
+                if (response.status != HttpStatusCode.OK) return@execute null
+                json.decodeFromString<JsonObject>(response.readCanvasResponseText())
+            } ?: return@runCatching null
             val results = root["results"]?.jsonObject?.get("artists")?.jsonObject?.get("data")?.jsonArray ?: return@runCatching null
             
             val scoredResults = results.mapNotNull { item ->
@@ -118,6 +117,8 @@ object AppleMusicArtistBackgroundProvider {
                 if (fetched != null) return@runCatching fetched
             }
             null
+        }.onFailure {
+            if (it is CancellationException) throw it
         }.getOrNull()
     }
 
@@ -128,16 +129,16 @@ object AppleMusicArtistBackgroundProvider {
         return runCatching {
             val url = "$AMP_BASE_URL/v1/catalog/$storefront/artists/$artistId"
             val token = AppleMusicToken.get()
-            val response = client.get(url) {
+            val root = client.prepareGet(url) {
                 header("Authorization", "Bearer $token")
                 header("Origin", "https://music.apple.com")
                 header("Referer", "https://music.apple.com/")
                 header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                 parameter("extend", "editorialVideo,editorialArtwork")
-            }
-            if (response.status != HttpStatusCode.OK) return@runCatching null
-
-            val root = response.body<JsonObject>()
+            }.execute { response ->
+                if (response.status != HttpStatusCode.OK) return@execute null
+                json.decodeFromString<JsonObject>(response.readCanvasResponseText())
+            } ?: return@runCatching null
             val artist = root["data"]?.jsonArray?.firstOrNull()?.jsonObject
                 ?: return@runCatching null
             val attributes = artist["attributes"]?.jsonObject
@@ -147,6 +148,8 @@ object AppleMusicArtistBackgroundProvider {
 
             val editorialArtwork = attributes?.get("editorialArtwork")?.jsonObject
             editorialArtwork?.let(::extractEditorialVideoUrl)
+        }.onFailure {
+            if (it is CancellationException) throw it
         }.getOrNull()
     }
 
@@ -160,11 +163,11 @@ object AppleMusicArtistBackgroundProvider {
         )
         for (key in preferredKeys) {
             val videoUrl = editorialData[key]?.jsonObject?.get("video")?.jsonPrimitive?.contentOrNull
-            if (!videoUrl.isNullOrBlank()) return videoUrl
+            if (videoUrl?.startsWith("https://", ignoreCase = true) == true) return videoUrl
         }
         for ((_, value) in editorialData) {
             val videoUrl = (value as? JsonObject)?.get("video")?.jsonPrimitive?.contentOrNull
-            if (!videoUrl.isNullOrBlank()) return videoUrl
+            if (videoUrl?.startsWith("https://", ignoreCase = true) == true) return videoUrl
         }
         return null
     }

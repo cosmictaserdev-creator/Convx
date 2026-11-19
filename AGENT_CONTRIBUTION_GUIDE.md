@@ -14,8 +14,8 @@ The repository is a Gradle multi-module Android project. Current modules are:
 | Module | Responsibility |
 | --- | --- |
 | `app/` | Android application, app navigation, screens, ViewModels, playback service, persistence, settings, and feature wiring. |
-| `hig/` | Shared Cupertino-style controls, theme primitives, accessibility helpers, and glass/backdrop utilities. |
-| `innertube/` | YouTube Music / InnerTube client and related models. |
+| `core/hig/` | Shared Cupertino-style controls, theme primitives, accessibility helpers, and glass/backdrop utilities. |
+| `core/innertube/` | YouTube Music / InnerTube client and related models. |
 | `lyrics/` | Lyrics providers, parsing, and presentation support. |
 | `canvas/` | Animated canvas and catalog-related functionality. |
 | `artwork/` | Artwork loading, caching, and presentation support. |

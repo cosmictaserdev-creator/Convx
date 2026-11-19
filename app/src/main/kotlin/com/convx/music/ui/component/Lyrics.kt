@@ -63,6 +63,16 @@ import com.convx.music.ui.ios.compat.FilledTonalButton
 import com.convx.music.ui.ios.compat.Icon
 import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.ui.ios.compat.Text
+import com.convx.music.ui.ios.component.IosButton
+import com.convx.music.ui.ios.component.IosButtonStyle
+import dev.chrisbanes.haze.ExperimentalHazeApi
+import dev.chrisbanes.haze.HazeInputScale
+import dev.chrisbanes.haze.HazeProgressive
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
 import com.convx.music.ui.utils.VibrantChromeInk
 import com.convx.music.ui.utils.vibrantChrome
 import androidx.compose.runtime.Composable
@@ -107,6 +117,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -146,6 +157,7 @@ import com.convx.music.constants.LyricsRomanizeRussianKey
 import com.convx.music.constants.LyricsRomanizeSerbianKey
 import com.convx.music.constants.LyricsRomanizeUkrainianKey
 import com.convx.music.constants.LyricsStandardBlurKey
+import com.convx.music.constants.ReduceDynamicBlurKey
 import com.convx.music.constants.LyricsScrollKey
 import com.convx.music.constants.LyricsTextPositionKey
 import com.convx.music.constants.LyricsTextSizeKey
@@ -465,6 +477,11 @@ fun Lyrics(
     val lyricsTextSize = textSizeOverride ?: storedLyricsTextSize
     val lyricsLineSpacing by rememberPreference(LyricsLineSpacingKey, 1.3f)
     val lyricsStandardBlur by rememberPreference(LyricsStandardBlurKey, false)
+    val reduceDynamicBlur by rememberPreference(ReduceDynamicBlurKey, false)
+    val edgeBlur = showLyrics && !reduceDynamicBlur &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+        android.animation.ValueAnimator.areAnimatorsEnabled()
+    val edgeHaze = if (edgeBlur) remember { HazeState() } else null
     
     val openRouterApiKey by rememberPreference(OpenRouterApiKey, "")
     val deeplApiKey by rememberPreference(DeeplApiKey, "")
@@ -692,7 +709,23 @@ fun Lyrics(
     val usesFlamingoRenderer = (lyricsAnimationStyle == LyricsAnimationStyle.FLAMINGO ||
             lyricsAnimationStyle == LyricsAnimationStyle.CONVX_1) && lines.isNotEmpty()
     val usesCrawlRenderer = lyricsAnimationStyle == LyricsAnimationStyle.STAR_CRAWL && lines.isNotEmpty()
-    val hasProviderRow = isLyricsProviderShown && !usesArchiveTuneRenderer && !usesFlamingoRenderer && !usesCrawlRenderer && !usesBitChordRenderer
+    val usesFisheyeRenderer = lyricsAnimationStyle == LyricsAnimationStyle.FISHEYE &&
+        isSynced && scrollLyrics && lines.isNotEmpty()
+    val isSpecialtyRenderer = usesArchiveTuneRenderer || usesFlamingoRenderer ||
+        usesCrawlRenderer || usesBitChordRenderer || usesFisheyeRenderer
+    val hasProviderRow = isLyricsProviderShown && !isSpecialtyRenderer
+    var linePickerStart by remember(lines, mediaMetadata?.id) { mutableStateOf<Int?>(null) }
+
+    fun shareSelectedLines(selectedLyrics: List<String>) {
+        val selectedText = selectedLyrics.joinToString("\n")
+        if (selectedText.isBlank()) return
+        shareDialogData = Triple(
+            selectedText,
+            mediaMetadata?.title.orEmpty(),
+            mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
+        )
+        showShareDialog = true
+    }
 
     val lazyListState = rememberLazyListState()
     val rubber = rememberLyricRubber(lazyListState)
@@ -795,7 +828,7 @@ fun Lyrics(
         initialScrollDone = false
     }
     LaunchedEffect(currentLineIndex, lastPreviewTime, initialScrollDone, isAutoScrollEnabled, scrollLyrics, isSeeking, hasProviderRow, lines, lazyListState.layoutInfo.totalItemsCount) {
-        if (!isSynced || usesFlamingoRenderer || usesBitChordRenderer || usesCrawlRenderer || usesArchiveTuneRenderer || !scrollLyrics) return@LaunchedEffect
+        if (!isSynced || isSpecialtyRenderer || !scrollLyrics) return@LaunchedEffect
         // The playhead-to-line lookup starts asynchronously. Don't interpret its
         // initial -1 as line zero and briefly jump to the start of the lyrics.
         if (currentLineIndex < 0) return@LaunchedEffect
@@ -839,8 +872,27 @@ fun Lyrics(
                 .padding(top = 56.dp),
         )
 
+        val edgeHeight = minOf(64.dp, maxHeight / 5)
+        val rendererModifier = if (edgeHeight > 0.dp) {
+            Modifier
+                .then(if (edgeHaze == null) Modifier else Modifier.hazeSource(edgeHaze))
+                .fadingEdge(vertical = edgeHeight)
+        } else Modifier
+
         if (lyrics == LYRICS_NOT_FOUND || (lyrics != null && lines.all { it.text.isBlank() })) {
             LyricsEmptyNote(fontFamily = lyricsFontFamily, color = AppTheme.colorScheme.secondary)
+        } else if (usesFisheyeRenderer) {
+            val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
+            FisheyeLyrics(
+                lines = lines,
+                fontFamily = lyricsFontFamily,
+                positionMs = { (sliderPositionProvider() ?: playerConnection.player.currentPosition) + lyricsOffset },
+                highlight = textColor,
+                onSeek = if (changeLyrics && !isGuest) {
+                    { startMs -> playerConnection.player.seekTo((startMs - lyricsOffset).coerceAtLeast(0L)) }
+                } else null,
+                modifier = rendererModifier.fillMaxSize(),
+            )
         } else if (usesCrawlRenderer) {
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
             StarCrawlLyrics(
@@ -851,7 +903,7 @@ fun Lyrics(
                 isSynced = isSynced,
                 autoScrollEnabled = scrollLyrics,
                 onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
-                modifier = Modifier.fillMaxSize(),
+                modifier = rendererModifier.fillMaxSize(),
             )
         } else if (usesBitChordRenderer) {
             // BitChord's own lyrics panel, ported as is, so the look and the motion match the original.
@@ -865,7 +917,7 @@ fun Lyrics(
                 offsetMs = lyricsOffset,
                 blur = lyricsStandardBlur,
                 onSeekMs = { if (changeLyrics && !isGuest) playerConnection.player.seekTo(it) },
-                modifier = Modifier.fillMaxSize(),
+                modifier = rendererModifier.fillMaxSize(),
             )
         } else if (usesFlamingoRenderer) {
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
@@ -886,7 +938,7 @@ fun Lyrics(
                 wordSwell = flamingoWordSwell,
                 artistName = mediaMetadata?.artists?.joinToString { it.name },
                 onSeek = { if (isSynced && changeLyrics && !isGuest) playerConnection.player.seekTo((it.toLong() - lyricsOffset).coerceAtLeast(0)) },
-                modifier = Modifier.fillMaxSize().fadingEdge(vertical = 64.dp),
+                modifier = rendererModifier.fillMaxSize(),
             )
         } else if (
             // This renderer needs API 29; older devices use the regular list below.
@@ -907,7 +959,7 @@ fun Lyrics(
                 onLineClick = { startMs ->
                     if (changeLyrics) playerConnection.player.seekTo(startMs.toLong())
                 },
-                modifier = Modifier.fillMaxSize(),
+                modifier = rendererModifier.fillMaxSize(),
             )
         } else {
             val lyricsOffset = currentSong?.song?.lyricsOffset?.toLong() ?: 0L
@@ -920,8 +972,7 @@ fun Lyrics(
             LazyColumn(
                 state = lazyListState,
                 contentPadding = PaddingValues(vertical = maxHeight / 2),
-                modifier = Modifier
-                    .fadingEdge(vertical = 64.dp)
+                modifier = rendererModifier
                     .nestedScroll(remember {
                         object : NestedScrollConnection {
                             override fun onPostScroll(
@@ -1861,6 +1912,32 @@ fun Lyrics(
         }
     }
 
+    if (edgeHaze != null && edgeHeight > 0.dp && lines.isNotEmpty() && !isSelectionModeActive) {
+        LyricsEdgeBlur(edgeHaze, edgeHeight, bottom = false, modifier = Modifier.align(Alignment.TopCenter))
+        LyricsEdgeBlur(edgeHaze, edgeHeight, bottom = true, modifier = Modifier.align(Alignment.BottomCenter))
+    }
+
+    if (showLyrics && isSpecialtyRenderer && lines.any { it.text.isNotBlank() }) {
+        IosButton(
+            title = stringResource(R.string.share_lyrics),
+            onClick = { linePickerStart = currentLineIndex },
+            style = IosButtonStyle.Bordered,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(horizontal = 16.dp, vertical = 12.dp),
+        )
+    }
+
+    linePickerStart?.let { initial ->
+        LyricsLinePicker(
+            lines = remember(lines) { lines.map { it.text } },
+            initial = initial,
+            onDismiss = { linePickerStart = null },
+            onShare = { picked ->
+                linePickerStart = null
+                shareSelectedLines(picked)
+            },
+        )
+    }
+
     LyricsBottomControls(
         modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
         showAutoScroll = !isAutoScrollEnabled && isSynced,
@@ -1875,18 +1952,7 @@ fun Lyrics(
         },
         onShareSelection = {
             if (selectedIndices.isNotEmpty()) {
-                val selectedLyricsText = selectedIndices.sorted()
-                    .mapNotNull { lines.getOrNull(it)?.text }
-                    .joinToString("\n")
-
-                if (selectedLyricsText.isNotBlank()) {
-                    shareDialogData = Triple(
-                        selectedLyricsText,
-                        mediaMetadata?.title ?: "",
-                        mediaMetadata?.artists?.joinToString { it.name } ?: "",
-                    )
-                    showShareDialog = true
-                }
+                shareSelectedLines(selectedIndices.sorted().mapNotNull { lines.getOrNull(it)?.text })
                 isSelectionModeActive = false
                 selectedIndices.clear()
             }
@@ -2144,3 +2210,30 @@ fun Lyrics(
 }
 
 val LyricsPreviewTime = 2.seconds
+
+@OptIn(ExperimentalHazeApi::class, ExperimentalHazeMaterialsApi::class)
+@Composable
+private fun LyricsEdgeBlur(
+    state: HazeState,
+    height: Dp,
+    bottom: Boolean,
+    modifier: Modifier,
+) {
+    val blur = remember(bottom) {
+        HazeProgressive.verticalGradient(
+            startIntensity = if (bottom) 0f else 1f,
+            endIntensity = if (bottom) 1f else 0f,
+            preferPerformance = true,
+        )
+    }
+    Box(
+        modifier
+            .fillMaxWidth()
+            .height(height)
+            .hazeEffect(state = state, style = HazeMaterials.ultraThin(Color.Transparent)) {
+                progressive = blur
+                noiseFactor = 0f
+                inputScale = HazeInputScale.Fixed(0.5f)
+            },
+    )
+}

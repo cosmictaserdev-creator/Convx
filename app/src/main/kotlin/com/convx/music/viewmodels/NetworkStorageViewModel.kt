@@ -10,13 +10,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.convx.music.R
 import com.convx.music.db.MusicDatabase
-import com.convx.music.utils.NetworkLibraryImporter
+import com.convx.music.utils.AndroidArtworkCache
+import com.convx.music.utils.AndroidNetworkTagReader
+import com.convx.music.utils.RoomNetworkLibraryWriter
 import com.convx.storage.data.NetworkMusicRepository
+import com.convx.storage.domain.NetworkLibraryImporter
 import com.convx.storage.domain.NetworkProtocol
 import com.convx.storage.domain.NetworkServer
 import com.convx.storage.domain.SourceCredentials
 import com.convx.storage.domain.StorageError
 import com.convx.storage.domain.StorageException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +33,10 @@ class NetworkStorageViewModel(
     private val repository: NetworkMusicRepository,
     private val database: MusicDatabase,
 ) : ViewModel() {
+
+    private val importer = NetworkLibraryImporter(
+        repository, repository, AndroidNetworkTagReader(), AndroidArtworkCache(context), RoomNetworkLibraryWriter(database),
+    )
 
     val servers: StateFlow<List<NetworkServer>> = repository.servers
 
@@ -66,8 +76,8 @@ class NetworkStorageViewModel(
 
     fun scan(server: NetworkServer) = run(server) {
         _status.value = context.getString(R.string.network_storage_scanning, server.name)
-        val result = NetworkLibraryImporter.import(database, repository, server.id)
-        context.getString(R.string.network_storage_scanned, result.added, result.skipped) +
+        val result = withContext(Dispatchers.IO) { importer.import(server.id) }
+        context.getString(R.string.network_storage_scanned, result.added, result.skipped + result.refreshed) +
             if (result.truncated) context.getString(R.string.network_storage_truncated) else ""
     }
 
@@ -83,6 +93,8 @@ class NetworkStorageViewModel(
             _busyId.value = server.id
             _status.value = try {
                 block()
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 describe(e)
             } finally {

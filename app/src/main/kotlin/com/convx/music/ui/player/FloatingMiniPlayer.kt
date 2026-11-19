@@ -47,7 +47,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.height
+import com.convx.music.designsystem.PlayerMotionSpec
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -253,20 +255,16 @@ fun FloatingMiniPlayer(
     val miniShadowPx = with(density) { (if (isInline) 6.dp else 12.dp).toPx() }
     androidx.compose.runtime.SideEffect { PlayerMorph.miniShadowElevationPx = miniShadowPx }
     LaunchedEffect(Unit) {
-        androidx.compose.runtime.snapshotFlow { PlayerMorph.active || PlayerMorph.landingActive }.collect { flying ->
+        androidx.compose.runtime.snapshotFlow { PlayerMorph.active }.collectLatest { flying ->
             if (flying) {
                 PlayerMorph.pillShadow.snapTo(0f)
             } else if (PlayerMorph.pillShadow.value < 1f) {
                 PlayerMorph.pillShadow.animateTo(
                     1f,
-                    androidx.compose.animation.core.tween(PILL_SHADOW_RETURN_MS, easing = SeamlessEasing),
+                    PlayerMotionSpec.pillShadowReturn(),
                 )
             }
         }
-    }
-    // Clear stale morph bounds when switching layout branches.
-    LaunchedEffect(tabStyle, isInline) {
-        clearMiniContentControlsRects()
     }
     Box(
         contentAlignment = Alignment.CenterStart,
@@ -278,9 +276,7 @@ fun FloatingMiniPlayer(
             .graphicsLayer(elasticStretchLayerBlock(glow, magnitude = if (isInline) 0.6f else 1.2f))
             // Hide the whole pill while the shared card draws its plate during the morph.
             .graphicsLayer {
-                // Hidden through the close landing too: the morph card carries the landing
-                // (dip + squash) and hands back only once it has settled on the slot.
-                alpha = if (PlayerMorph.active || PlayerMorph.landingActive) 0f else 1f
+                alpha = if (PlayerMorph.active) 0f else 1f
             }
             // Capture the pill surface separately; the morph card stretches it as its starting skin.
             .recordPlayerLayer(
@@ -296,7 +292,7 @@ fun FloatingMiniPlayer(
             .recordPlayerLayer(
                 // Avoid layer capture when morphing is disabled.
                 layer = { if (PlayerMorph.enabled) PlayerMorph.miniLayer else null },
-                drawInPlace = { !PlayerMorph.active && !PlayerMorph.landingActive },
+                drawInPlace = { !PlayerMorph.active },
                 markReady = { PlayerMorph.miniFrameReady = true },
             )
             .onSizeChanged { measuredHeightPx = it.height }
@@ -503,6 +499,7 @@ fun FloatingMiniPlayer(
                         // Combine both lines into one layer; their glyphs do not overlap.
                         modifier = Modifier
                             .weight(1f)
+                            .playerMorphBounds(PlayerMorphElement.TITLE, isMini = true)
                             .flamingoChrome(useGlass && isDark),
                     ) {
                         // Scroll long titles only during playback; paused titles stay still.
@@ -567,7 +564,7 @@ fun FloatingMiniPlayer(
                     onClick = { playerConnection.player.togglePlayPause() },
                     modifier = Modifier
                         .size(controlSize)
-                        .registerMiniControlsPlayRect(),
+                        .playerMorphBounds(PlayerMorphElement.PLAY, isMini = true),
                 ) {
                     AnimatedPlayPauseIcon(
                         isPlaying = isPlaying,
@@ -581,7 +578,7 @@ fun FloatingMiniPlayer(
                     modifier = Modifier
                         .scaledWidth(controlSize, fade = true, fraction = extras)
                         .height(controlSize)
-                        .registerMiniControlsNextRect(),
+                        .playerMorphBounds(PlayerMorphElement.NEXT, isMini = true),
                 ) {
                     PlayerGlyph(
                         slot = PlayerIconSlot.NEXT,
@@ -603,7 +600,8 @@ fun FloatingMiniPlayer(
                 IconButton(
                     onClick = { playerConnection.requestSkip(forward = false) },
                     enabled = canSkipPrevious,
-                    modifier = Modifier.size(controlSize),
+                    modifier = Modifier.size(controlSize)
+                        .playerMorphBounds(PlayerMorphElement.PREVIOUS, isMini = true),
                 ) {
                     PlayerGlyph(
                         slot = PlayerIconSlot.PREVIOUS,
@@ -614,7 +612,8 @@ fun FloatingMiniPlayer(
                 }
                 IconButton(
                     onClick = { playerConnection.player.togglePlayPause() },
-                    modifier = Modifier.size(controlSize),
+                    modifier = Modifier.size(controlSize)
+                        .playerMorphBounds(PlayerMorphElement.PLAY, isMini = true),
                 ) {
                     AnimatedPlayPauseIcon(
                         isPlaying = isPlaying,
@@ -625,7 +624,8 @@ fun FloatingMiniPlayer(
                 IconButton(
                     onClick = { playerConnection.requestSkip(forward = true) },
                     enabled = canSkipNext,
-                    modifier = Modifier.size(controlSize),
+                    modifier = Modifier.size(controlSize)
+                        .playerMorphBounds(PlayerMorphElement.NEXT, isMini = true),
                 ) {
                     PlayerGlyph(
                         slot = PlayerIconSlot.NEXT,
@@ -681,7 +681,10 @@ fun FloatingMiniPlayer(
 
                     Column(
                         // Combine both lines into one layer; their glyphs do not overlap.
-                        modifier = Modifier.weight(1f).flamingoChrome(useGlass && isDark),
+                        modifier = Modifier
+                            .weight(1f)
+                            .playerMorphBounds(PlayerMorphElement.TITLE, isMini = true)
+                            .flamingoChrome(useGlass && isDark),
                     ) {
                         Text(
                             text = mediaMetadata?.title.orEmpty(),
@@ -765,6 +768,3 @@ internal fun Modifier.noOvershootContent(): Modifier {
         }
     }
 }
-
-/** How long the docked pill's shadow takes to come back after the player lands in it. */
-internal const val PILL_SHADOW_RETURN_MS = 320

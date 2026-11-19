@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -17,6 +18,12 @@ kotlin { jvmToolchain(21) }
 dependencies {
     api(project(":account-core"))
     api(libs.kotlinx.coroutines.core)
+    api(libs.compose.runtime)
+    api(libs.compose.foundation)
+    api(libs.compose.ui)
+    implementation(project(":design-system"))
+    implementation(project(":hig"))
+    implementation(libs.compose.multiplatform.animation)
     implementation(libs.koin.core)
     testImplementation(libs.junit)
     testImplementation(kotlin("test-junit"))
