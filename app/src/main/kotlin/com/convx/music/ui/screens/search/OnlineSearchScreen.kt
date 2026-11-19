@@ -79,6 +79,8 @@ import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.LocalPlayerConnection
 import com.convx.music.R
 import com.convx.music.constants.SuggestionItemHeight
+import com.convx.music.constants.SearchSongStartsRadioKey
+import com.convx.music.utils.rememberPreference
 import com.convx.music.playback.queues.searchResultQueue
 import com.convx.music.ui.component.LocalMenuState
 import com.convx.music.ui.component.YouTubeListItem
@@ -127,6 +129,7 @@ fun OnlineSearchScreen(
 
     val lazyListState = rememberLazyListState()
     val searchedSongsTitle = stringResource(R.string.queue_searched_songs)
+    val (searchSongStartsRadio) = rememberPreference(SearchSongStartsRadioKey, defaultValue = false)
 
     LaunchedEffect(Unit) {
         snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
@@ -328,7 +331,7 @@ fun OnlineSearchScreen(
                                         // radio: the other rows the user can see should not
                                         // vanish the moment one of them is tapped.
                                         playerConnection.playQueue(
-                                            searchResultQueue(item, viewState.items, searchedSongsTitle)
+                                            searchResultQueue(item, viewState.items, searchedSongsTitle, startRadio = searchSongStartsRadio)
                                         )
                                         onDismiss()
                                     }

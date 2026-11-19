@@ -289,6 +289,8 @@
     <string name="shuffle_playlist_first">Shuffle playlist/album first</string>
     <string name="shuffle_playlist_first_desc">When shuffling, play all songs from the original playlist/album first, then similar content</string>
     <string name="prevent_duplicate_tracks_in_queue">Prevent duplicate tracks in queue</string>
+    <string name="search_song_starts_radio">Start radio from search results</string>
+    <string name="search_song_starts_radio_desc">Tapping a song in search starts a radio from it instead of queuing the other results</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">When adding a track to queue, remove it from its previous position if already present</string>
     <string name="show_wrapped_card">Show Wrapped card</string>
     <string name="skip_silence_desc">Fast forward through silent parts of songs</string>

@@ -82,6 +82,8 @@ import com.convx.music.ui.utils.onlinePlaylistRoute
 import com.convx.music.LocalPlayerConnection
 import com.convx.music.R
 import com.convx.music.constants.MiniPlayerBottomSpacing
+import com.convx.music.constants.SearchSongStartsRadioKey
+import com.convx.music.utils.rememberPreference
 import com.convx.music.constants.MiniPlayerHeight
 import com.convx.music.constants.NavigationBarHeight
 import com.convx.music.playback.queues.searchResultQueue
@@ -182,6 +184,7 @@ fun OnlineSearchResult(
 
     // Sibling results let a song tap queue this result set instead of starting one-song radio.
     val searchedSongsTitle = stringResource(R.string.queue_searched_songs)
+    val (searchSongStartsRadio) = rememberPreference(SearchSongStartsRadioKey, defaultValue = false)
     val ytItemContent: @Composable LazyItemScope.(YTItem, Int, List<YTItem>) -> Unit = { item: YTItem, index: Int, siblings: List<YTItem> ->
         val size = siblings.size
         val longClick = {
@@ -243,7 +246,7 @@ fun OnlineSearchResult(
                                 if (item.id == mediaMetadata?.id) {
                                     playerConnection.togglePlayPause()
                                 } else {
-                                    playerConnection.playQueue(searchResultQueue(item, siblings, searchedSongsTitle))
+                                    playerConnection.playQueue(searchResultQueue(item, siblings, searchedSongsTitle, startRadio = searchSongStartsRadio))
                                 }
                             }
 

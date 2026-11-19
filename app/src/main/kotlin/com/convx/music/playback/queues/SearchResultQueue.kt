@@ -11,12 +11,17 @@ import com.music.innertube.models.SongItem
 import com.music.innertube.models.WatchEndpoint
 import com.music.innertube.models.YTItem
 
-/** Plays the tapped song in list order, falling back to YouTube radio when no surrounding list exists. */
+/**
+ * Plays the tapped song in list order, or starts YouTube radio from it when [startRadio] is set
+ * or no surrounding list exists.
+ */
 fun searchResultQueue(
     song: SongItem,
     siblings: List<YTItem>,
     title: String? = null,
+    startRadio: Boolean = false,
 ): Queue {
+    if (startRadio) return radioQueue(song)
     val songs = siblings.filterIsInstance<SongItem>().distinctBy { it.id }
     val startIndex = songs.indexOfFirst { it.id == song.id }
     return if (songs.size > 1 && startIndex >= 0) {
@@ -26,6 +31,9 @@ fun searchResultQueue(
             startIndex = startIndex,
         )
     } else {
-        YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata())
+        radioQueue(song)
     }
 }
+
+private fun radioQueue(song: SongItem): Queue =
+    YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata())
