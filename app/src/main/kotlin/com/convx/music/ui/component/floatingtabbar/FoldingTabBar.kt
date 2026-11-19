@@ -104,7 +104,7 @@ fun FoldingTabBar(
     val searchGlow = remember(glowScope) { InteractiveHighlight(animationScope = glowScope) }
 
     Layout(
-        modifier = modifier.fillMaxWidth().landingEcho(),
+        modifier = modifier.fillMaxWidth(),
         content = {
             // 0: the navigation surface.
             Box(

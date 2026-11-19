@@ -388,45 +388,16 @@ class BottomSheetState(
         if (totalRange <= 0f) 0f else ((animatable.value - collapsedBound).value / totalRange).coerceIn(0f, 1f)
     }
 
-    /**
-     * Set by the player sheet: its collapse lands WITH speed (slightly underdamped, stopped
-     * by the collapsed bound) and hands that speed (dp/s, negative = downward) here, so the
-     * mini pill can carry it on as an overshoot dip below its slot and settle.
-     */
-    var onCollapseLanded: ((velocityDpPerSec: Float) -> Unit)? = null
-
-    /**
-     * true when a collapse starts, false when it ends WITHOUT landing (interrupted, or
-     * already at rest). Lets the landing take over on the very frame the sheet reaches its
-     * bound: flagged only from [onCollapseLanded], that frame had nobody drawing the card.
-     */
-    var onCollapseArmed: ((armed: Boolean) -> Unit)? = null
-    private var collapseGeneration = 0
-
     fun collapse(animationSpec: AnimationSpec<Dp>, initialVelocity: Dp = 0.dp) {
         onAnchorChanged(collapsedAnchor)
         publishTarget(false)
         coroutineScope.launch {
-            val generation = ++collapseGeneration
-            onCollapseArmed?.invoke(true)
-            var landed = false
-            try {
-                val result = animatable.animateTo(collapsedBound, animationSpec, initialVelocity)
-                if (result.endReason == androidx.compose.animation.core.AnimationEndReason.BoundReached) {
-                    landed = true
-                    onCollapseLanded?.invoke(result.endState.velocity.value)
-                }
-            } finally {
-                // A newer collapse cancelled this one and has already re-armed.
-                if (!landed && generation == collapseGeneration) onCollapseArmed?.invoke(false)
-            }
+            animatable.animateTo(collapsedBound, animationSpec, initialVelocity)
         }
     }
 
-    /** Critically damped normally; a touch underdamped when a landing handler wants the
-     *  arrival speed (only reachable because the collapsed bound stops the overshoot). */
     private fun collapseSpring() = if (isDockedPlayer) PlayerMotionSpec.dockTransition<Dp>(opening = false)
-    else PlayerMotionSpec.sheetClose<Dp>(landing = onCollapseLanded != null)
+    else PlayerMotionSpec.sheetOpen<Dp>()
 
     private fun expandSpring() = if (isDockedPlayer) PlayerMotionSpec.dockTransition<Dp>(opening = true)
     else PlayerMotionSpec.sheetOpen<Dp>()

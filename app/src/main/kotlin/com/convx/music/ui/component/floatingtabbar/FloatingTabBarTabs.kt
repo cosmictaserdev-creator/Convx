@@ -274,7 +274,6 @@ internal fun SharedTransitionScope.ExpandedTabs(
     }
     Box(
         modifier
-            .landingEcho()
             .width(pillWidth)
             .graphicsLayer {
                 shape = shapes.tabBarShape

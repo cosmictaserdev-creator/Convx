@@ -48,35 +48,6 @@ object PlayerMorph {
     val pillShadow = androidx.compose.animation.core.Animatable(1f)
 
     /**
-     * The close's landing, in sheet-progress units (<= 0 while it runs, 0 at rest).
-     *
-     * The card keeps control after reaching the collapsed anchor so its arrival speed carries
-     * into the overshoot spring. The docked pill reappears after the landing settles.
-     */
-    val landing = androidx.compose.animation.core.Animatable(0f)
-
-    /** True while [landing] runs: the morph card, not the docked pill, owns the drawing. */
-    var landingActive: Boolean by androidx.compose.runtime.mutableStateOf(false)
-
-    /** Card centre travel per unit of progress at the pill end (px); set when a landing starts. */
-    @JvmField var landingTravelPx: Float = 0f
-
-    /** Ceiling of the landing dip (px); the dip eases into it rather than clipping. */
-    @JvmField var landingMaxDipPx: Float = 0f
-
-    /**
-     * How far below its slot the landing card's centre is right now, px (0 at rest). Linear in
-     * [landing] near the slot -- so the card keeps exactly the speed it arrived with -- and
-     * soft-saturating toward [landingMaxDipPx] for hard flings. Snapshot read: callers in the
-     * draw phase redraw every landing frame.
-     */
-    fun landingDipPx(): Float {
-        val overshoot = landing.value
-        if (overshoot >= 0f || landingMaxDipPx <= 0f) return 0f
-        return landingMaxDipPx * kotlin.math.tanh(-overshoot * landingTravelPx / landingMaxDipPx)
-    }
-
-    /**
      * Set after each player layer has been recorded at a usable size. This keeps
      * the morph from hiding its source before the destination has a frame to draw.
      * Flags stay true across resizes because recording automatically updates.

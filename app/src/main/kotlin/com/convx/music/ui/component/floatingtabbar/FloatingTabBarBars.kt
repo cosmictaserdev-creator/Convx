@@ -141,7 +141,6 @@ internal fun SharedTransitionScope.InlineTab(
 
     Box(
         modifier = modifier
-            .landingEcho()
             // Outside sharedElement: draw-only, so bounds tracking is
             // unaffected, and no overlay clipping can cut the stretch.
             .graphicsLayer(elasticStretchLayerBlock(glow))
@@ -213,7 +212,6 @@ internal fun SharedTransitionScope.InlineStandaloneTab(
         isStandalone = true,
         modifier = modifier
             // Let the draw-only stretch protrude beyond the bar without clipping.
-            .landingEcho()
             .graphicsLayer(elasticStretchLayerBlock(glow))
             .sharedElement(
                 sharedContentState = rememberSharedContentState("standaloneTab"),
@@ -464,7 +462,6 @@ internal fun SharedTransitionScope.ExpandedStandaloneTab(
             // exactly as tall as the nav bar (see InlineStandaloneTab).
             // Outside sharedElement: draw-only, so bounds tracking is
             // unaffected, and no overlay clipping can cut the stretch.
-            .landingEcho()
             .graphicsLayer(elasticStretchLayerBlock(glow))
             .sharedElement(
                 sharedContentState = rememberSharedContentState("standaloneTab"),

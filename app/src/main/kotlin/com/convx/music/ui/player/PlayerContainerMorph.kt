@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
-import com.convx.music.designsystem.PlayerMotionSpec
 import kotlin.math.roundToInt
 import com.convx.music.ui.component.PLAYER_CONTENT_APPEAR_END
 import com.convx.music.ui.component.PLAYER_CONTENT_APPEAR_START
@@ -137,9 +136,7 @@ fun PlayerContainerMorphOverlay(
                 // The sheet's first draw marks it ready; avoid forcing repeated full-frame redraws.
                 onDrawBehind {
                     val fraction = progress().coerceIn(0f, 1f)
-                    // Close landing: the sheet has stopped on its bound, the card has not.
-                    val landing = fraction <= 0f && PlayerMorph.landingActive
-                    if ((fraction <= 0f && !landing) || fraction >= 1f || !PlayerMorph.sharedLayersReady) {
+                    if (fraction <= 0f || fraction >= 1f || !PlayerMorph.sharedLayersReady) {
                         flightMini = null
                         flightControls = null
                         return@onDrawBehind
@@ -166,8 +163,8 @@ fun PlayerContainerMorphOverlay(
                     // overlay's own size. Nothing to register at that end, nothing to go
                     // stale.
                     val full = Rect(0f, 0f, size.width, size.height)
-                    val rect = if (landing) landingCardRect(mini) else sharedContainerRect(mini, full, fraction)
-                    val radius = if (landing) rect.height / 2f else sharedContainerCornerRadii(
+                    val rect = sharedContainerRect(mini, full, fraction)
+                    val radius = sharedContainerCornerRadii(
                         // The nav bar draws the pill as a 50%-rounded capsule, so its radius
                         // is half its height by definition. Derived rather than passed in, so
                         // restyling the pill cannot leave the two out of step.
@@ -233,21 +230,12 @@ fun PlayerContainerMorphOverlay(
                             if (miniLayer.size.width > 0 && fraction < PLAYER_MINI_FADE_END) {
                                 miniLayer.alpha = playerSheetMiniContentAlpha(fraction)
                                 miniLayer.renderEffect = null
-                                if (landing) {
-                                    // The whole pill squashes as one body while it lands.
-                                    scale(
-                                        scaleX = rect.width / miniLayer.size.width,
-                                        scaleY = rect.height / miniLayer.size.height,
-                                        pivot = Offset.Zero,
-                                    ) { drawLayer(miniLayer) }
-                                } else {
-                                    drawTrackedMiniLayer(
-                                        miniLayer = miniLayer,
-                                        mini = mini,
-                                        container = rect,
-                                        controls = controlsNow,
-                                    )
-                                }
+                                drawTrackedMiniLayer(
+                                    miniLayer = miniLayer,
+                                    mini = mini,
+                                    container = rect,
+                                    controls = controlsNow,
+                                )
                             }
                             // Background leads (first fifth), content follows (tenth
                             // to six tenths): two recordings, staged like the reference app.
@@ -272,22 +260,6 @@ fun PlayerContainerMorphOverlay(
                 }
             },
     )
-}
-
-/**
- * The card during a close landing: the pill's own rect carried [PlayerMorph.landingDipPx]
- * below its slot, flattened and slightly widened in proportion (liquid squash), springing
- * back to exactly [mini] as the landing settles.
- */
-private fun landingCardRect(mini: Rect): Rect {
-    val dip = PlayerMorph.landingDipPx()
-    val maxDip = PlayerMorph.landingMaxDipPx
-    val squash = if (maxDip > 0f) (dip / maxDip).coerceIn(-1f, 1f) else 0f
-    val height = mini.height * (1f - PlayerMotionSpec.LandingSquash * squash)
-    val width = mini.width * (1f + PlayerMotionSpec.LandingSpread * squash)
-    val bottom = mini.bottom + dip
-    val centerX = mini.center.x
-    return Rect(centerX - width / 2f, bottom - height, centerX + width / 2f, bottom)
 }
 
 /**

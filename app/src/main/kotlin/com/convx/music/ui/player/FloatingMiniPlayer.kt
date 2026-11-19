@@ -255,7 +255,7 @@ fun FloatingMiniPlayer(
     val miniShadowPx = with(density) { (if (isInline) 6.dp else 12.dp).toPx() }
     androidx.compose.runtime.SideEffect { PlayerMorph.miniShadowElevationPx = miniShadowPx }
     LaunchedEffect(Unit) {
-        androidx.compose.runtime.snapshotFlow { PlayerMorph.active || PlayerMorph.landingActive }.collectLatest { flying ->
+        androidx.compose.runtime.snapshotFlow { PlayerMorph.active }.collectLatest { flying ->
             if (flying) {
                 PlayerMorph.pillShadow.snapTo(0f)
             } else if (PlayerMorph.pillShadow.value < 1f) {
@@ -280,9 +280,7 @@ fun FloatingMiniPlayer(
             .graphicsLayer(elasticStretchLayerBlock(glow, magnitude = if (isInline) 0.6f else 1.2f))
             // Hide the whole pill while the shared card draws its plate during the morph.
             .graphicsLayer {
-                // Hidden through the close landing too: the morph card carries the landing
-                // (dip + squash) and hands back only once it has settled on the slot.
-                alpha = if (PlayerMorph.active || PlayerMorph.landingActive) 0f else 1f
+                alpha = if (PlayerMorph.active) 0f else 1f
             }
             // Capture the pill surface separately; the morph card stretches it as its starting skin.
             .recordPlayerLayer(
@@ -298,7 +296,7 @@ fun FloatingMiniPlayer(
             .recordPlayerLayer(
                 // Avoid layer capture when morphing is disabled.
                 layer = { if (PlayerMorph.enabled) PlayerMorph.miniLayer else null },
-                drawInPlace = { !PlayerMorph.active && !PlayerMorph.landingActive },
+                drawInPlace = { !PlayerMorph.active },
                 markReady = { PlayerMorph.miniFrameReady = true },
             )
             .onSizeChanged { measuredHeightPx = it.height }
