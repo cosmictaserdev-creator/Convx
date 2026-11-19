@@ -53,6 +53,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.remember
@@ -66,6 +67,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -834,13 +837,26 @@ internal fun AppRootContent(
                 val menuBackdrop = rememberLayerBackdrop()
                 val playerBackdropHolder = remember { com.convx.music.ui.player.PlayerBackdropHolder() }
                 val menuSourceBackdrop = (if (playerBottomSheetState.isExpanded) playerBackdropHolder.backdrop else null) ?: menuBackdrop
+                val lastCanvasInteraction = remember { mutableLongStateOf(android.os.SystemClock.uptimeMillis()) }
 
                 // Capture the page and chrome behind the menu. Keep the menu as a sibling
                 // to avoid a RenderNode cycle.
                 Box(
-                    Modifier.fillMaxSize().then(
-                        if (AppRoutePolicy.isWebViewRoute(currentRoute)) Modifier else Modifier.layerBackdrop(menuBackdrop),
-                    ),
+                    Modifier.fillMaxSize()
+                        // Observe touches above both the feed and player so neither loses its hit target.
+                        .pointerInput(lastCanvasInteraction) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                                    if (event.changes.any { it.pressed || it.previousPressed }) {
+                                        lastCanvasInteraction.longValue = android.os.SystemClock.uptimeMillis()
+                                    }
+                                }
+                            }
+                        }
+                        .then(
+                            if (AppRoutePolicy.isWebViewRoute(currentRoute)) Modifier else Modifier.layerBackdrop(menuBackdrop),
+                        ),
                 ) {
                     Scaffold(
                         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -1176,7 +1192,8 @@ internal fun AppRootContent(
                                     BottomSheetPlayer(
                                         state = playerBottomSheetState,
                                         navController = navController,
-                                        pureBlack = pureBlack
+                                        pureBlack = pureBlack,
+                                        canvasInteraction = lastCanvasInteraction,
                                     )
                                     }
                                 }
@@ -1251,7 +1268,8 @@ internal fun AppRootContent(
                                     BottomSheetPlayer(
                                         state = playerBottomSheetState,
                                         navController = navController,
-                                        pureBlack = pureBlack
+                                        pureBlack = pureBlack,
+                                        canvasInteraction = lastCanvasInteraction,
                                     )
                                 }
                             }

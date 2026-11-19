@@ -352,6 +352,7 @@ fun BottomSheetPlayer(
      *  effects (status bar icon color, keep-screen-on) are suppressed to keep the two copies
      *  from fighting over that global state. */
     isPreviewOnly: Boolean = false,
+    canvasInteraction: androidx.compose.runtime.State<Long>? = null,
 ) {
     val context = LocalContext.current
     val database = LocalDatabase.current.get()
@@ -867,8 +868,7 @@ fun BottomSheetPlayer(
 
     PlayerMorphHostEffects(state, isPreviewOnly)
 
-    val lastCanvasInteraction = remember { mutableLongStateOf(android.os.SystemClock.uptimeMillis()) }
-    if (!isPreviewOnly) {
+    if (!isPreviewOnly && canvasInteraction != null) {
         val windows by playerConnection.queueWindows.collectAsStateWithLifecycle()
         val queueIndex by playerConnection.currentWindowIndex.collectAsStateWithLifecycle()
         val upcoming = remember(windows, queueIndex) {
@@ -883,21 +883,14 @@ fun BottomSheetPlayer(
         CanvasPrefetch(
             connection = playerConnection,
             upcoming = upcoming,
-            interaction = lastCanvasInteraction,
+            interaction = canvasInteraction,
             isPlaying = isPlaying,
             enabled = canvasMode != com.convx.music.constants.CanvasMode.OFF,
         )
     }
     BottomSheet(
         state = state,
-        modifier = if (isPreviewOnly) modifier else modifier.pointerInput(lastCanvasInteraction) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
-                    if (event.changes.any { it.pressed }) lastCanvasInteraction.longValue = android.os.SystemClock.uptimeMillis()
-                }
-            }
-        },
+        modifier = modifier,
         // iOS 27 container morph: the player grows out of the mini player as one card.
         morphEnabled = PlayerMorph.enabled,
         // Keep content composed while collapsed so it is ready when the opening morph starts.
