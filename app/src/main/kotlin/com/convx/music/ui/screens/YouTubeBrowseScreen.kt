@@ -68,7 +68,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import com.music.innertube.models.AlbumItem
 import com.music.innertube.models.ArtistItem
@@ -127,7 +127,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun YouTubeBrowseScreen(
     navController: NavController,
-    viewModel: YouTubeBrowseViewModel = hiltViewModel(),
+    viewModel: YouTubeBrowseViewModel = koinViewModel(),
 ) {
     val menuState = LocalMenuState.current
     val playerConnection = LocalPlayerConnection.current ?: return

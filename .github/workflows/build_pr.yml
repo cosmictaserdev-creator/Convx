@@ -1,6 +1,7 @@
 name: Build PR
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - "**"
@@ -25,9 +26,6 @@ jobs:
         with:
           cache-read-only: true
           cache-cleanup: on-success
-
-      - name: Setup FFTW for Android
-        uses: ./.github/actions/setup-fftw
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -55,8 +53,13 @@ jobs:
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
 
+      - name: Test network storage and playback routing
+        run: |
+          ./gradlew :network-storage-core:desktopTest :network-storage-transports:desktopTest :network-storage-presentation:desktopTest --no-configuration-cache --console=plain
+          ./gradlew :app:testUniversalFossDebugUnitTest --tests com.convx.music.playback.NetworkPlaybackRoutingTest --no-configuration-cache --console=plain
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-universal-debug-pr-${{ github.event.number }}
+          name: app-universal-foss-debug-${{ github.run_id }}
           path: app/build/outputs/apk/universalFoss/debug/*.apk

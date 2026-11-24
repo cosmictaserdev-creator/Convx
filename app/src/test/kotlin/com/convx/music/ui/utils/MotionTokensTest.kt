@@ -35,7 +35,7 @@ class MotionTokensTest {
         assertEquals(260, push.durationMillis)
         assertEquals(Motion.PushEasing, push.easing)
         val exit = Motion.appearExit<Float>() as TweenSpec<Float>
-        assertEquals(240, exit.durationMillis)
+        assertEquals(Motion.AppearExitMillis, exit.durationMillis)
     }
 
     @Test

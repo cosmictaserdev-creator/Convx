@@ -120,6 +120,7 @@ fun V2OptionsMenu(
     onViewCredits: () -> Unit,
     onShareLyrics: () -> Unit,
     onMore: () -> Unit,
+    sleepTimerLabel: () -> String?,
     onOpenSleepTimer: () -> Unit,
     onOpenAudioDevices: () -> Unit,
 ) {
@@ -159,7 +160,7 @@ fun V2OptionsMenu(
                 IosMenuItem(stringResource(R.string.v2_menu_share_lyrics), icon = glyph(SfSymbols.Monochrome.SFQuoteBubble), onClick = onShareLyrics),
             )),
             IosMenuSection(listOf(
-                IosMenuItem(stringResource(R.string.sleep_timer), icon = symbolGlyph(com.convx.music.ui.component.sf("moon.zzz.fill")), onClick = { onDismiss(); onOpenSleepTimer() }),
+                IosMenuItem(stringResource(R.string.sleep_timer), description = sleepTimerLabel(), icon = symbolGlyph(com.convx.music.ui.component.sf("moon.zzz.fill")), onClick = { onDismiss(); onOpenSleepTimer() }),
                 IosMenuItem(stringResource(R.string.audio_devices), icon = symbolGlyph(com.convx.music.ui.component.sf("airplayaudio")), onClick = { onDismiss(); onOpenAudioDevices() }),
             )),
             IosMenuSection(listOf(
@@ -217,6 +218,7 @@ fun V2OptionsMenuHost(
     onViewCredits: () -> Unit,
     onShareLyrics: () -> Unit,
     onMore: () -> Unit,
+    sleepTimerLabel: () -> String?,
     onOpenSleepTimer: () -> Unit,
     onOpenAudioDevices: () -> Unit,
 ) {
@@ -249,6 +251,7 @@ fun V2OptionsMenuHost(
             onViewCredits = onViewCredits,
             onShareLyrics = onShareLyrics,
             onMore = onMore,
+            sleepTimerLabel = sleepTimerLabel,
             onOpenSleepTimer = onOpenSleepTimer,
             onOpenAudioDevices = onOpenAudioDevices,
         )

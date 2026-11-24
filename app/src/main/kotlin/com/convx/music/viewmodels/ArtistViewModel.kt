@@ -27,8 +27,6 @@ import com.convx.music.extensions.filterExplicitAlbums
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -38,15 +36,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.convx.music.utils.PageCaches
-import javax.inject.Inject
 import java.io.File
 import com.convx.music.utils.ArtistWordmarkAssets
 import com.convx.music.extensions.filterVideoSongs as filterVideoSongsLocal
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class ArtistViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class ArtistViewModel(
+    private val context: Context,
     database: MusicDatabase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

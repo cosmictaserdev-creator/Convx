@@ -42,7 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.music.innertube.SearchFilter
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
@@ -81,7 +81,7 @@ fun AddToPlaylistDialogOnline(
     onDismiss: () -> Unit,
     onProgressStart: (Boolean) -> Unit,
     onPercentageChange: (Int) -> Unit,
-    viewModel: PlaylistsViewModel = hiltViewModel()
+    viewModel: PlaylistsViewModel = koinViewModel()
 ) {
     val database = LocalDatabase.current.get()
     val syncUtils = LocalSyncUtils.current.get()
@@ -107,7 +107,7 @@ fun AddToPlaylistDialogOnline(
         if (searchQuery.isBlank()) {
             playlists
         } else {
-            playlists.filter { it.playlist.name.contains(searchQuery, ignoreCase = true) }
+            playlists.filter { it.name.contains(searchQuery, ignoreCase = true) }
         }
     }
 
@@ -249,7 +249,7 @@ fun AddToPlaylistDialogOnline(
                                                                 Timber.tag("Exception inserting song in database:")
                                                                     .e(e.toString())
                                                             }
-                                                            database.addSongToPlaylist(playlist, ids)
+                                                            viewModel.addSongs(playlist.id, ids)
                                                             syncUtils.uploadPlaylistToYouTube(playlist.id, ids)
                                                         }
                                                     }

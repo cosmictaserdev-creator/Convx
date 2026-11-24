@@ -9,15 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.music.innertube.YouTube
 import com.music.innertube.pages.ChartsPage
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ChartsViewModel @Inject constructor() : ViewModel() {
+class ChartsViewModel : ViewModel() {
     private val _chartsPage = MutableStateFlow<ChartsPage?>(null)
     val chartsPage = _chartsPage.asStateFlow()
 

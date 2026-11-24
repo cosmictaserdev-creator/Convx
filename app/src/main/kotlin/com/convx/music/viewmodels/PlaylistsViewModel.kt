@@ -13,26 +13,23 @@ import androidx.lifecycle.viewModelScope
 import com.convx.music.constants.AddToPlaylistSortDescendingKey
 import com.convx.music.constants.AddToPlaylistSortTypeKey
 import com.convx.music.constants.PlaylistSortType
-import com.convx.music.db.MusicDatabase
 import com.convx.music.extensions.toEnum
+import com.convx.music.library.ObservePlaylists
+import com.convx.music.library.PlaylistCommands
+import com.convx.music.library.PlaylistOrder
 import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 
-@HiltViewModel
-class PlaylistsViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
-    database: MusicDatabase,
+class PlaylistsViewModel(
+    context: Context,
+    private val observePlaylists: ObservePlaylists,
+    private val playlistCommands: PlaylistCommands,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
     val allPlaylists =
@@ -42,10 +39,23 @@ constructor(
                     ?: true)
             }.distinctUntilChanged()
             .flatMapLatest { (sortType, descending) ->
-                database.playlists(sortType, descending)
+                observePlaylists(sortType.toPlaylistOrder(), descending)
             }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     suspend fun sync() {
         syncUtils.syncSavedPlaylists()
+    }
+
+    suspend fun duplicateSongIds(playlistId: String, songIds: List<String>): List<String> =
+        playlistCommands.duplicateSongIds(playlistId, songIds)
+
+    suspend fun addSongs(playlistId: String, songIds: List<String>): Boolean =
+        playlistCommands.addSongs(playlistId, songIds)
+
+    private fun PlaylistSortType.toPlaylistOrder(): PlaylistOrder = when (this) {
+        PlaylistSortType.CREATE_DATE -> PlaylistOrder.CREATED
+        PlaylistSortType.NAME -> PlaylistOrder.NAME
+        PlaylistSortType.SONG_COUNT -> PlaylistOrder.SONG_COUNT
+        PlaylistSortType.LAST_UPDATED -> PlaylistOrder.LAST_UPDATED
     }
 }

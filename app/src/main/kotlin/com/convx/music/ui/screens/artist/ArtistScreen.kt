@@ -119,7 +119,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import com.composables.sfsymbols.SfSymbols
 import com.composables.sfsymbols.monochrome.SFHeart
@@ -240,7 +240,7 @@ private fun artistItemsRoute(artistId: String, browseId: String, params: String?
 fun ArtistScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: ArtistViewModel = hiltViewModel(),
+    viewModel: ArtistViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val database = LocalDatabase.current.get()

@@ -9,6 +9,9 @@ import android.content.Context
 import android.net.Uri
 import com.convx.music.db.MusicDatabase
 import com.convx.music.db.entities.LyricsEntity
+import com.music.innertube.SearchFilter
+import com.music.innertube.YouTube
+import com.music.innertube.models.ArtistItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -76,6 +79,22 @@ object SongBundle {
         val album = withContext(Dispatchers.IO) { database.album(albumId).first()?.album } ?: return false
         withContext(Dispatchers.IO) { database.update(album.copy(thumbnailUrl = uri.toString())) }
         return true
+    }
+
+    suspend fun applyArtistCover(context: Context, database: MusicDatabase, artistId: String, url: String): Boolean {
+        val uri = saveImage(context, "artist:$artistId", url) ?: return false
+        val artist = withContext(Dispatchers.IO) { database.artist(artistId).first()?.artist } ?: return false
+        withContext(Dispatchers.IO) { database.update(artist.copy(thumbnailUrl = uri.toString())) }
+        return true
+    }
+
+    /** Saves the online artist's photo for an artist known only from device files; false when none matches by name. */
+    suspend fun downloadArtistImage(context: Context, database: MusicDatabase, artistId: String, name: String): Boolean {
+        val match = YouTube.search(name, SearchFilter.FILTER_ARTIST).getOrNull()?.items
+            ?.filterIsInstance<ArtistItem>()
+            ?.firstOrNull { it.title.equals(name, ignoreCase = true) && it.thumbnail != null }
+            ?: return false
+        return applyArtistCover(context, database, artistId, match.thumbnail!!.replace(Regex("=w\\d+-h\\d+.*$"), "=w1080-h1080"))
     }
 
     suspend fun applyLyrics(database: MusicDatabase, songId: String, lyrics: String, provider: String) {

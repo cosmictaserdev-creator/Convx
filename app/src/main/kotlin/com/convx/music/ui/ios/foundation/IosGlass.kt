@@ -89,7 +89,7 @@ fun Modifier.iosGlass(
     spec: IosGlassSpec = IosGlassSpec.Chrome,
     tint: Color = Color.Unspecified,
     interactive: Boolean = false,
-    backdrop: Backdrop = IosTheme.backdrop,
+    backdrop: Backdrop = currentIosBackdrop(),
     wash: Color = Color.Transparent,
 ): Modifier {
     val colors = IosTheme.colors

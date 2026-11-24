@@ -25,7 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.convx.music.R
 import com.convx.music.constants.LyricsProviderOrderKey
@@ -81,7 +81,7 @@ fun LyricsProviderMenu(
     lyrics: LyricsEntity?,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LyricsProviderViewModel = hiltViewModel(),
+    viewModel: LyricsProviderViewModel = koinViewModel(),
 ) {
     val statuses by viewModel.statuses.collectAsStateWithLifecycle()
     val syncLevels by viewModel.syncLevels.collectAsStateWithLifecycle()

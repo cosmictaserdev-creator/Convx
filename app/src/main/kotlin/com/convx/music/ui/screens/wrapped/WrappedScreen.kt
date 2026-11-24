@@ -7,13 +7,11 @@ package com.convx.music.ui.screens.wrapped
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,6 +20,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
 
 
 sealed class WrappedScreenType {
@@ -43,12 +42,7 @@ sealed class WrappedScreenType {
 
 @Composable
 fun WrappedScreen(navController: NavController) {
-    val context = LocalContext.current
-    val manager = remember { provideWrappedManager(context) }
-
-    CompositionLocalProvider(LocalWrappedManager provides manager) {
-        WrappedScreenContent(navController = navController)
-    }
+    WrappedScreenContent(navController = navController)
 }
 
 @Composable
@@ -59,8 +53,8 @@ fun WrappedScreenContent(navController: NavController) {
     }
     BackHandler(onBack = onClose)
 
+    val manager = koinInject<WrappedManager>()
     val view = LocalView.current
-    val manager = LocalWrappedManager.current
     val audioService = remember { WrappedAudioService(view.context) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -93,6 +87,7 @@ fun WrappedScreenContent(navController: NavController) {
 
     ReplayStory(
         state = state,
+        manager = manager,
         isMuted = isMuted,
         onToggleMute = { audioService.toggleMute() },
         onPageAudio = { screen -> audioService.playTrack(state.trackMap[screen]) },

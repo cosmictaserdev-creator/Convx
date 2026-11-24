@@ -49,7 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.R
@@ -78,7 +78,7 @@ fun LocalFoldersSettingsScreen(
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     val context = LocalContext.current
-    val viewModel: LocalMusicViewModel = hiltViewModel()
+    val viewModel: LocalMusicViewModel = koinViewModel()
     val coroutineScope = rememberCoroutineScope()
     val isScanning by viewModel.isScanning.collectAsStateWithLifecycle()
 

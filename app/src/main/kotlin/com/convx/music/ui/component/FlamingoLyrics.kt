@@ -1,6 +1,14 @@
 package com.convx.music.ui.component
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import com.convx.music.lyrics.LyricsEntry
@@ -22,7 +30,12 @@ fun FlamingoLyrics(
     useBlur: Boolean,
     isSynced: Boolean = true,
     autoScrollEnabled: Boolean = true,
-    wordGlowEnabled: Boolean = true,
+    glow: Boolean = false,
+    isPlaying: Boolean = false,
+    glowColor: Color = Color.White,
+    brightSingingWords: Boolean = true,
+    wordSwell: Boolean = true,
+    artistName: String? = null,
     modifier: Modifier = Modifier,
     onSeek: (Int) -> Unit,
 ) {
@@ -45,6 +58,9 @@ fun FlamingoLyrics(
         }
     }
     val sides = remember(lines) { lines.map { it.agent == "v2" } }
+    val backgrounds = remember(lines) { lines.map { it.isBackground } }
+    val exposureTarget = remember { mutableFloatStateOf(0f) }
+    val exposure = animateFloatAsState(exposureTarget.floatValue, tween(350), label = "lyric_exposure")
     val subtitles by remember(lines) { combine(lines.map { it.translatedTextFlow }) { it.toList() } }
         .collectAsStateWithLifecycle(initialValue = emptyList())
     val transliterations by remember(lines) { combine(lines.map { it.romanizedTextFlow }) { it.toList() } }
@@ -58,8 +74,10 @@ fun FlamingoLyrics(
             withFrameNanos { }
             val position = playhead()
             current.intValue = primaryLyricLineIndex(lines, position)
+            exposureTarget.floatValue = heldWordExposure(lines.getOrNull(current.intValue), position)
         }
     }
+    Box(modifier) {
     key(lines) {
         YosLyricView(
             lrcEntriesLambda = { entries },
@@ -76,12 +94,32 @@ fun FlamingoLyrics(
             isSynced = isSynced,
             autoScrollEnabled = autoScrollEnabled,
             weightLambda = { false },
+            isPlaying = isPlaying,
+            glowColor = glowColor,
             otherSideForLines = sides,
+            backgroundLines = backgrounds,
+            glow = glow && isSynced,
+            brightSingingWords = brightSingingWords,
+            wordSwell = wordSwell,
+            exposure = { exposure.value },
             currentLyricIndex = current,
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             textStyle = MainTextStyle.copy(fontFamily = fontFamily, fontSize = fontSize.sp, lineHeight = (fontSize * lineSpacing).sp),
             onBackClick = {},
-            wordGlowEnabled = wordGlowEnabled,
         )
     }
+    if (!artistName.isNullOrBlank()) {
+        LyricsArtistIntro(artistName, positionMs, Modifier.align(Alignment.TopCenter).padding(top = 72.dp))
+    }
+    }
+}
+
+/** Longer held words raise the bloom gently, capped at 0.55 exposure around 1.45 s. */
+private const val MAX_HELD_WORD_GLOW_EXPOSURE = 0.55f
+
+private fun heldWordExposure(line: LyricsEntry?, positionMs: Long): Float {
+    val seconds = positionMs / 1000.0
+    val word = line?.words?.firstOrNull { seconds >= it.startTime && seconds <= it.endTime } ?: return 0f
+    val durationExposure = (((word.endTime - word.startTime) * 1000 - 250) / 1200).toFloat().coerceIn(0f, 1f)
+    return durationExposure * MAX_HELD_WORD_GLOW_EXPOSURE
 }

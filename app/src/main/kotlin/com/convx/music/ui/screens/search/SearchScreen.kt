@@ -78,15 +78,15 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.music.innertube.models.WatchEndpoint
 import com.music.innertube.utils.YouTubeUrlParser
-import com.convx.music.LocalDatabase
 import com.convx.music.LocalIsPlayerExpanded
 import com.convx.music.LocalPlayerAwareWindowInsets
 import com.convx.music.LocalPlayerConnection
 import com.convx.music.R
 import com.convx.music.ui.utils.rememberGridColumns
-import com.convx.music.constants.PauseSearchHistoryKey
 import com.convx.music.constants.SearchSource
-import com.convx.music.db.entities.SearchHistory
+import com.convx.music.search.SearchHistoryCommands
+import com.convx.music.search.SearchHistorySettingsRepository
+import com.convx.music.search.shouldRecordSearchQuery
 import com.convx.music.playback.queues.YouTubeQueue
 import com.convx.music.ui.component.NavigationTitle
 import com.convx.music.ui.utils.albumRoute
@@ -94,14 +94,14 @@ import com.convx.music.ui.utils.bounceClick
 import com.convx.music.ui.utils.combinedBounceClick
 import com.convx.music.ui.utils.youtubeBrowseRoute
 import com.convx.music.utils.rememberEnumPreference
-import com.convx.music.utils.rememberPreference
 import com.convx.music.viewmodels.MoodAndGenresViewModel
 import com.convx.music.viewmodels.ExploreViewModel
 import com.convx.music.ui.screens.search.suggestions.SuggestionsTabContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
@@ -154,7 +154,13 @@ fun SearchScreen(
     accountName: String = "",
     onAccountClick: () -> Unit = { navController.navigate(com.convx.music.ui.screens.Screens.Settings.route) },
 ) {
-    val database = LocalDatabase.current.get()
+    val searchHistoryCommands: SearchHistoryCommands = koinInject()
+    val searchHistorySettingsRepository: SearchHistorySettingsRepository = koinInject()
+    val searchHistorySettingsFlow = remember(searchHistorySettingsRepository) {
+        searchHistorySettingsRepository.observe()
+    }
+    val searchHistorySettings by searchHistorySettingsFlow
+        .collectAsStateWithLifecycle(initialValue = null)
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -164,11 +170,17 @@ fun SearchScreen(
 
     // Read the shared nav-bar query so results update as the user types.
     val navSearch = LocalNavSearchState.current
-    val pauseSearchHistory by rememberPreference(PauseSearchHistoryKey, defaultValue = false)
 
     val localOnly = com.convx.music.LocalLocalOnlyMode.current
 
-    val onSearchFromSuggestion: (String) -> Unit = remember {
+    val onSearchFromSuggestion: (String) -> Unit = remember(
+        searchHistorySettings,
+        searchHistoryCommands,
+        coroutineScope,
+        focusManager,
+        navController,
+        playerConnection,
+    ) {
         { searchQuery ->
             if (searchQuery.isNotEmpty()) {
                 focusManager.clearFocus()
@@ -185,11 +197,9 @@ fun SearchScreen(
                         navController.openSearchResults(searchQuery)
                     }
                 }
-                if (!pauseSearchHistory) {
+                if (shouldRecordSearchQuery(searchQuery, searchHistorySettings)) {
                     coroutineScope.launch(Dispatchers.IO) {
-                        database.query {
-                            insert(SearchHistory(query = searchQuery))
-                        }
+                        searchHistoryCommands.record(searchQuery)
                     }
                 }
             }
@@ -304,7 +314,7 @@ fun SearchScreen(
 @Composable
 fun ExploreTabContent(
     navController: NavController,
-    viewModel: MoodAndGenresViewModel = hiltViewModel(),
+    viewModel: MoodAndGenresViewModel = koinViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val moodAndGenresList by viewModel.moodAndGenres.collectAsStateWithLifecycle()
@@ -373,7 +383,7 @@ fun ExploreTabContent(
 @Composable
 fun AlbumsTabContent(
     navController: NavController,
-    viewModel: ExploreViewModel = hiltViewModel(),
+    viewModel: ExploreViewModel = koinViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val menuState = LocalMenuState.current

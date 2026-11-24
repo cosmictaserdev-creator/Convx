@@ -25,6 +25,7 @@ import com.convx.music.ui.component.TextFieldDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @Composable
 fun ImportPlaylistDialog(
@@ -48,7 +49,8 @@ fun ImportPlaylistDialog(
             onDismiss = onDismiss,
             onDone = { finalName ->
                 val newPlaylist = PlaylistEntity(
-                    name = finalName
+                    name = finalName,
+                    bookmarkedAt = LocalDateTime.now(),
                 )
                 database.query { insert(newPlaylist) }
 

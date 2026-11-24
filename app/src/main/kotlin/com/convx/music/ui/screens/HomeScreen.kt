@@ -129,7 +129,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -293,7 +293,7 @@ fun HomeRoute(navController: NavController, snackbarHostState: SnackbarHostState
 fun HomeScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
 ) {
     val menuState = LocalMenuState.current
     val bottomSheetPageState = LocalBottomSheetPageState.current
@@ -472,12 +472,12 @@ fun HomeScreen(
         remember(forgottenFavorites) { forgottenFavorites.orEmpty().map { it.id } },
     )
 
-    val chartsViewModel: ChartsViewModel = hiltViewModel()
+    val chartsViewModel: ChartsViewModel = koinViewModel()
     val chartsPage by chartsViewModel.chartsPage.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         if (chartsPage == null) chartsViewModel.loadCharts()
     }
-    val newReleaseViewModel: NewReleaseViewModel = hiltViewModel()
+    val newReleaseViewModel: NewReleaseViewModel = koinViewModel()
     val newReleaseAlbums by newReleaseViewModel.newReleaseAlbums.collectAsStateWithLifecycle()
     val topPicks = remember(chartsPage) {
         chartsPage?.sections?.firstOrNull { it.chartType == ChartType.TOP }?.items.orEmpty()

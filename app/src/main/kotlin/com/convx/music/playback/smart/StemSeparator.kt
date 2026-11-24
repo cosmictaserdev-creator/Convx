@@ -48,45 +48,66 @@ object StemSeparator {
     ): Boolean {
         if (durationSeconds > MAX_SECONDS) return false
         val appContext = context.applicationContext
-        val names = if (quality == StemQuality.DEMUCS && DemucsModel.isInstalled(appContext)) {
+        StemStore.prepare(appContext)
+        return split(appContext, uri, quality, isCurrent) { StemStore.stem(appContext, id, it) } != null
+    }
+
+    /** The stems [quality] produces here: Demucs' four when its model is installed, else two. */
+    fun stemNames(context: Context, quality: StemQuality): List<String> =
+        if (quality == StemQuality.DEMUCS && DemucsModel.isInstalled(context)) {
             listOf("drums", "bass", "other", "vocals")
         } else {
             listOf("vocals", "instrumental")
         }
-        val directory = StemStore.prepare(appContext)
-        val finals = names.map { StemStore.stem(appContext, id, it) }
-        val temps = finals.map { File(directory, it.name + ".part") }
+
+    /**
+     * Decodes [uri], splits it with [quality] and writes each stem as AAC to `target(name)`.
+     * Returns the stem names written, or null on failure or cancel; nothing is left behind then.
+     */
+    fun split(
+        context: Context,
+        uri: Uri,
+        quality: StemQuality,
+        isCurrent: () -> Boolean,
+        target: (String) -> File,
+    ): List<String>? {
+        val appContext = context.applicationContext
+        val names = stemNames(appContext, quality)
+        val demucs = names.size == 4
+        val finals = names.map(target)
+        val temps = finals.map { File(it.path + ".part") }
         val writers = arrayOfNulls<AacFileWriter>(names.size)
         var finished = false
         try {
-            val source = open(appContext, uri) ?: return false
+            val source = open(appContext, uri) ?: return null
             val decoded = source.use { AudioDecoder.decodeRegionStereo(it, 0.0, MAX_SECONDS.toDouble(), isCurrent) }
-                ?: return false
-            val rate = VocalSpectrogram.sampleRate
+                ?: return null
+            // Each separator was trained at one rate; Demucs' is fixed rather than borrowed from the other one.
+            val rate = if (demucs) DemucsSeparator.SAMPLE_RATE else VocalSpectrogram.sampleRate
             var left = decoded.first.left
             var right = decoded.first.right
             if (kotlin.math.abs(decoded.first.sampleRate - rate) > 1.0) {
-                left = MelSpectrogram.resample(left, decoded.first.sampleRate, rate) ?: return false
-                right = MelSpectrogram.resample(right, decoded.first.sampleRate, rate) ?: return false
+                left = MelSpectrogram.resample(left, decoded.first.sampleRate, rate) ?: return null
+                right = MelSpectrogram.resample(right, decoded.first.sampleRate, rate) ?: return null
             }
-            if (left.size < rate) return false
+            if (left.size < rate) return null
             for (i in names.indices) writers[i] = AacFileWriter(temps[i], rate.toInt())
 
-            val ok = if (names.size == 4) {
-                DemucsSeparator(appContext).use { demucs ->
-                    demucs.separate(left, right, isCurrent) { stem, l, r, count -> writers[stem]!!.write(l, r, 0, count) }
+            val ok = if (demucs) {
+                DemucsSeparator(appContext).use { separator ->
+                    separator.separate(left, right, isCurrent) { stem, l, r, count -> writers[stem]!!.write(l, r, 0, count) }
                 }
             } else {
                 separateFast(appContext, left, right, writers[0]!!, writers[1]!!, isCurrent)
             }
-            if (!ok) return false
+            if (!ok) return null
             writers.forEach { it!!.finish() }
             writers.fill(null)
             finished = temps.indices.all { temps[it].renameTo(finals[it]) }
-            return finished
+            return names.takeIf { finished }
         } catch (error: Throwable) {
-            Log.w(TAG, "Stem separation of $id failed", error)
-            return false
+            Log.w(TAG, "Stem separation of $uri failed", error)
+            return null
         } finally {
             writers.forEach { it?.abort() }
             if (!finished) temps.forEach { it.delete() }

@@ -416,8 +416,7 @@ object AiDjSetBuilder {
         if (response == null) return chosenSongs
 
         try {
-            val json = response.replace("```json", "").replace("```", "").trim()
-            val songs = JSONArray(json)
+            val songs = JSONArray(AiRequests.jsonPart(response, '['))
             for (index in 0 until songs.length()) {
                 val song = songs.optJSONObject(index) ?: continue
                 val title = song.optString("title")

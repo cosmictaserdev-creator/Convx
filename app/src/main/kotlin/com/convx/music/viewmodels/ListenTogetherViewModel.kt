@@ -7,11 +7,8 @@ package com.convx.music.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.convx.music.listentogether.ListenTogetherManager
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class ListenTogetherViewModel @Inject constructor(
+class ListenTogetherViewModel(
     private val manager: ListenTogetherManager
 ) : ViewModel() {
 

@@ -8,15 +8,12 @@ import com.convx.music.eq.audio.CustomEqualizerAudioProcessor
 import com.convx.music.eq.data.ParametricEQ
 import com.convx.music.eq.data.SavedEQProfile
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Service for managing custom EQ using ExoPlayer's AudioProcessor
  * Supports 10+ band Parametric EQ format (APO)
  */
-@Singleton
-class EqualizerService @Inject constructor() {
+class EqualizerService {
 
     @SuppressLint("UnsafeOptInUsageError")
     private val audioProcessors = mutableListOf<CustomEqualizerAudioProcessor>()

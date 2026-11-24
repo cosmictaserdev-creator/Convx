@@ -79,6 +79,10 @@ fun rememberSleepTimerState(playerConnection: PlayerConnection): SleepTimerState
     return SleepTimerState(sleepTimerEnabled, timeLeft, showDialog, value)
 }
 
+/** Time left to show beside the "Sleep timer" menu row, or null while no timer runs. */
+val SleepTimerState.menuLabel: String?
+    get() = if (enabled) com.convx.music.utils.makeTimeString(timeLeft.value.coerceAtLeast(0)) else null
+
 /** The dialog that starts a sleep timer; renders nothing while [SleepTimerState.showDialog] is false. */
 @Composable
 fun SleepTimerDialogHost(playerConnection: PlayerConnection, state: SleepTimerState) {

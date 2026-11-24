@@ -50,7 +50,6 @@ import com.convx.music.models.toMediaMetadata
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -59,13 +58,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.guava.future
-import javax.inject.Inject
 
 @androidx.annotation.OptIn(UnstableApi::class)
-class MediaLibrarySessionCallback
-@Inject
-constructor(
-    @ApplicationContext val context: Context,
+class MediaLibrarySessionCallback(
+    val context: Context,
     val database: MusicDatabase,
     val downloadUtil: DownloadUtil,
 ) : MediaLibrarySession.Callback {

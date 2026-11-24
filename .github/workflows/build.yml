@@ -161,5 +161,4 @@ jobs:
           retention-days: 14
       - name: Remove signing material
         if: always()
-        run: rm -f app/keystore/release.keystore A
-        
+        run: rm -f app/keystore/release.keystore

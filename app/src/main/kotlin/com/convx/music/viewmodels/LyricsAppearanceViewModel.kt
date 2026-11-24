@@ -10,19 +10,15 @@ import com.convx.music.constants.LyricsFontKey
 import com.convx.music.constants.LyricsCustomFontKey
 import com.convx.music.constants.LyricsTextSizeKey
 import com.convx.music.utils.dataStore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
 data class LyricsAppearanceState(
     val font: String = "default", val size: Float = 30f,
     val importing: Boolean = false, val error: String? = null, val customFont: String = "",
 )
 
-@HiltViewModel
-class LyricsAppearanceViewModel @Inject constructor(@ApplicationContext private val context: Context) : ViewModel() {
+class LyricsAppearanceViewModel(private val context: Context) : ViewModel() {
     private val pendingSize = MutableStateFlow<Float?>(null)
     private val importing = MutableStateFlow(false)
     private val error = MutableStateFlow<String?>(null)

@@ -21,23 +21,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavHostController
-import com.convx.music.constants.PauseSearchHistoryKey
 import com.convx.music.constants.SearchSource
 import com.convx.music.constants.SearchSourceKey
-import com.convx.music.db.MusicDatabase
-import com.convx.music.db.entities.SearchHistory
+import com.convx.music.search.SearchHistoryCommands
+import com.convx.music.search.SearchHistorySettingsRepository
+import com.convx.music.search.shouldRecordSearchQuery
 import com.convx.music.ui.component.NavSearchState
 import com.convx.music.ui.screens.Screens
-import com.convx.music.utils.dataStore
-import com.convx.music.utils.get
 import com.convx.music.utils.rememberEnumPreference
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 /** The nav bar's search field state and the enter/exit/submit handlers around it. */
 @Stable
@@ -92,11 +91,16 @@ class AppSearchController(
 @Composable
 fun rememberAppSearchController(
     navController: NavHostController,
-    database: dagger.Lazy<MusicDatabase>,
     localOnlyMode: Boolean,
     ioScope: CoroutineScope,
 ): AppSearchController {
-    val context = LocalContext.current
+    val searchHistoryCommands: SearchHistoryCommands = koinInject()
+    val searchHistorySettingsRepository: SearchHistorySettingsRepository = koinInject()
+    val searchHistorySettingsFlow = remember(searchHistorySettingsRepository) {
+        searchHistorySettingsRepository.observe()
+    }
+    val searchHistorySettings by searchHistorySettingsFlow
+        .collectAsStateWithLifecycle(initialValue = null)
     val coroutineScope = rememberCoroutineScope()
     val queryState = rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
     // Whether the nav bar's search field currently owns the keyboard — the
@@ -114,7 +118,13 @@ fun rememberAppSearchController(
     val visualOverride = remember { mutableStateOf<Boolean?>(null) }
     var searchVisualOverride by visualOverride
 
-    val onSearch: (String) -> Unit = remember(localOnlyMode) {
+    val onSearch: (String) -> Unit = remember(
+        localOnlyMode,
+        navController,
+        ioScope,
+        searchHistoryCommands,
+        searchHistorySettings,
+    ) {
         { searchQuery ->
             if (searchQuery.isNotEmpty()) {
                 // Local results are already shown live, so submitting only saves history.
@@ -123,11 +133,9 @@ fun rememberAppSearchController(
                     popUpTo("search/{query}") { inclusive = true }
                 }
 
-                if (context.dataStore[PauseSearchHistoryKey] != true) {
+                if (shouldRecordSearchQuery(searchQuery, searchHistorySettings)) {
                     ioScope.launch(Dispatchers.IO) {
-                        database.get().query {
-                            insert(SearchHistory(query = searchQuery))
-                        }
+                        searchHistoryCommands.record(searchQuery)
                     }
                 }
             }

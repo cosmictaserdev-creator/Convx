@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.convx.music.R
 import com.convx.music.eq.data.SavedEQProfile
 import com.convx.music.ui.component.IosSettingsGroup
@@ -60,7 +60,7 @@ import com.convx.music.ui.ios.compat.TextButton as TextButton
 @Composable
 fun AxionEqScreen(
     onBackClick: () -> Unit,
-    viewModel: AxionEqViewModel = hiltViewModel()
+    viewModel: AxionEqViewModel = koinViewModel()
 ) {
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val bandGains by viewModel.bandGains.collectAsStateWithLifecycle()

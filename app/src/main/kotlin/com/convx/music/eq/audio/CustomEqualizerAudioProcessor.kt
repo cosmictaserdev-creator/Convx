@@ -1,5 +1,6 @@
 package com.convx.music.eq.audio
 
+import com.convx.music.playback.EqualizerProfileParser
 import androidx.media3.common.C
 import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.util.UnstableApi
@@ -47,7 +48,7 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
      */
     @Synchronized
     fun applyProfile(parametricEQ: ParametricEQ) {
-        require(com.convx.music.eq.data.ParametricEQParser.validate(parametricEQ).isEmpty()) { "Invalid EQ profile" }
+        require(EqualizerProfileParser.validate(parametricEQ).isEmpty()) { "Invalid EQ profile" }
         // Retain the profile so a new sample rate rebuilds every coefficient.
         pendingProfile = parametricEQ
         if (sampleRate <= 0 || encoding != C.ENCODING_PCM_16BIT || channelCount !in 1..2) {

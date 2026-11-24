@@ -24,16 +24,11 @@ import okhttp3.Response
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resumeWithException
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
 
 /** Sends chat-completions requests using the configured provider URL, model, and API key. */
 object AiChatClient {
-    private val client = OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS).build()
+    private val client = OkHttpClient.Builder().callTimeout(120, TimeUnit.SECONDS).build()
 
     /** Returns the assistant response, or null if the request fails. */
     suspend fun complete(
@@ -42,52 +37,44 @@ object AiChatClient {
         userPrompt: String,
         onLog: suspend (String) -> Unit,
     ): String? = withContext(Dispatchers.IO) {
-        val provider = context.dataStore.get(AiProviderKey, "OpenRouter")
+        val provider = context.dataStore.get(AiProviderKey, AiDefaults.PROVIDER)
         if (provider == "Puter") {
             onLog("Puter is not implemented yet.")
             return@withContext null
         }
+        if (provider in AiDefaults.TRANSLATION_ONLY) {
+            onLog("$provider only translates lyrics. Pick a chat provider such as Groq in Settings → AI.")
+            return@withContext null
+        }
 
         val apiKey = context.dataStore.get(OpenRouterApiKey, "")
-        val baseUrl = context.dataStore.get(OpenRouterBaseUrlKey, "https://openrouter.ai/api/v1/chat/completions")
-        val model = context.dataStore.get(OpenRouterModelKey, "google/gemini-3.1-flash-lite")
+        val baseUrl = context.dataStore.get(OpenRouterBaseUrlKey, AiDefaults.BASE_URL)
+        val model = context.dataStore.get(OpenRouterModelKey, AiDefaults.MODEL)
         onLog("Using $provider / $model")
+        if (baseUrl.isBlank()) {
+            onLog("No address is set for $provider. Set the base URL in Settings → AI.")
+            return@withContext null
+        }
 
         if (apiKey.isEmpty()) {
             onLog("API Key is missing. Please set it in Settings.")
             return@withContext null
         }
 
-        val requestBody = JSONObject().apply {
-            put("model", model)
-            put("messages", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("role", "system")
-                    put("content", systemPrompt)
-                })
-                put(JSONObject().apply {
-                    put("role", "user")
-                    put("content", userPrompt)
-                })
-            })
-        }.toString().toRequestBody("application/json".toMediaType())
-
         try {
-            val request = Request.Builder()
-                .url(baseUrl)
-                .addHeader("Authorization", "Bearer $apiKey")
-                .post(requestBody)
-                .build()
+            val request = AiRequests.chat(baseUrl, apiKey, model, systemPrompt, userPrompt)
             client.newCall(request).awaitResponse().use { response ->
+                val responseString = response.body.string()
                 if (!response.isSuccessful) {
-                    onLog("AI request failed: HTTP ${response.code}")
+                    // The provider's own message says what to fix: a wrong model, a bad key, a rate limit.
+                    onLog("AI request failed: ${AiRequests.errorMessage(responseString, response.code, response.message)}")
                     return@withContext null
                 }
-                val responseString = response.body.string()
                 currentCoroutineContext().ensureActive()
-                val responseJson = JSONObject(responseString)
-                val choices = responseJson.optJSONArray("choices") ?: return@withContext null
-                choices.optJSONObject(0)?.optJSONObject("message")?.optString("content")
+                AiRequests.text(responseString) ?: run {
+                    onLog("$provider returned no answer.")
+                    null
+                }
             }
         } catch (cancelled: CancellationException) {
             throw cancelled

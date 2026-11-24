@@ -50,7 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.composables.sfsymbols.SfSymbols
 import com.composables.sfsymbols.monochrome.SFPlus
@@ -68,7 +68,7 @@ import timber.log.Timber
 @Composable
 fun EqScreen(
     navController: NavController? = null,
-    viewModel: EQViewModel = hiltViewModel(),
+    viewModel: EQViewModel = koinViewModel(),
     playbackState: PlaybackState? = null
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

@@ -18,19 +18,13 @@ import com.convx.music.db.MusicDatabase
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ExploreViewModel
-@Inject
-constructor(
-    @ApplicationContext val context: Context,
+class ExploreViewModel(
+    val context: Context,
     val database: MusicDatabase,
 ) : ViewModel() {
     // Seeded from the last fetch so a return visit paints immediately; a refresh then replaces it.

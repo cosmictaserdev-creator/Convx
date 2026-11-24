@@ -7,7 +7,6 @@ package com.convx.music.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.convx.music.constants.PlaylistSongSortType
 
 /**
  * Sort control for a list header over any enum of sort fields. It is the menu-style
@@ -22,6 +21,7 @@ inline fun <reified T : Enum<T>> SortHeader(
     crossinline sortTypeText: (T) -> Int,
     modifier: Modifier = Modifier,
     showDescending: Boolean? = true,
+    supportsDescending: (T) -> Boolean = { true },
 ) {
     val options = enumValues<T>().map { SortOption(it, sortTypeText(it)) }
     SortPopupButton(
@@ -31,7 +31,6 @@ inline fun <reified T : Enum<T>> SortHeader(
         onSelectedChange = { onSortTypeChange(it) },
         onDescendingChange = { onSortDescendingChange(it) },
         modifier = modifier,
-        // A custom order has no direction to flip.
-        showDescending = showDescending == true && sortType != PlaylistSongSortType.CUSTOM,
+        showDescending = showDescending == true && supportsDescending(sortType),
     )
 }

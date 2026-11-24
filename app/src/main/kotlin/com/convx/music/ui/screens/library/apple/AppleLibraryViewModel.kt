@@ -25,8 +25,6 @@ import com.convx.music.db.entities.LocalItem
 import com.convx.music.db.entities.Playlist
 import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -38,16 +36,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import javax.inject.Inject
 
 /**
  * Apple Music's Library main page data: pinned items on top, and "Recently Added" —
  * device albums and playlists created in this app, newest first.
  */
-@HiltViewModel
-class AppleLibraryViewModel @Inject constructor(
+class AppleLibraryViewModel(
     private val database: MusicDatabase,
-    @ApplicationContext private val context: Context,
+    private val context: Context,
 ) : ViewModel() {
 
     /** Local-only mode: device items only. Otherwise the whole library, online items included. */

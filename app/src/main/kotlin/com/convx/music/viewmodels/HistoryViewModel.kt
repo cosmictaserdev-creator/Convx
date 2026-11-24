@@ -19,8 +19,6 @@ import com.music.innertube.utils.parseCookieString
 import com.convx.music.history.HistoryLocalDataSource
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,25 +31,21 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import com.convx.music.db.entities.EventWithSong
-import javax.inject.Inject
+import com.convx.music.history.HistoryDate
+import com.convx.music.history.HistoryRecord
+import com.convx.music.history.HistorySection
+import com.convx.music.history.groupHistoryRecords
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class HistoryViewModel
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+class HistoryViewModel(
+    private val context: Context,
     private val historyDataSource: HistoryLocalDataSource,
 ) : ViewModel() {
     var historySource = MutableStateFlow(HistorySource.LOCAL)
 
     private val today = LocalDate.now()
-    private val thisMonday = today.with(DayOfWeek.MONDAY)
-    private val lastMonday = thisMonday.minusDays(7)
 
     val historyPage = MutableStateFlow<HistoryPage?>(null)
 
@@ -65,26 +59,31 @@ constructor(
     private var hideVideoSongs = false
     private var localLoadJob: kotlinx.coroutines.Job? = null
 
-    private fun groupEvents(events: List<EventWithSong>) =
-        events.groupBy {
-            val date = it.event.timestamp.toLocalDate()
-            val daysAgo = ChronoUnit.DAYS.between(date, today).toInt()
-            when {
-                daysAgo == 0 -> DateAgo.Today
-                daysAgo == 1 -> DateAgo.Yesterday
-                date >= thisMonday -> DateAgo.ThisWeek
-                date >= lastMonday -> DateAgo.LastWeek
-                else -> DateAgo.Other(date.withDayOfMonth(1))
+    private fun groupEvents(events: List<EventWithSong>): Map<DateAgo, List<EventWithSong>> {
+        val grouped = groupHistoryRecords(
+            records = events.map { item ->
+                val date = item.event.timestamp.toLocalDate()
+                HistoryRecord(
+                    eventId = item.event.id,
+                    songId = item.song.id,
+                    date = HistoryDate(date.year, date.monthValue, date.dayOfMonth),
+                    value = item,
+                )
+            },
+            today = HistoryDate(today.year, today.monthValue, today.dayOfMonth),
+        )
+
+        return grouped.associateTo(linkedMapOf()) { group ->
+            val section = when (val key = group.section) {
+                HistorySection.Today -> DateAgo.Today
+                HistorySection.Yesterday -> DateAgo.Yesterday
+                HistorySection.ThisWeek -> DateAgo.ThisWeek
+                HistorySection.LastWeek -> DateAgo.LastWeek
+                is HistorySection.Month -> DateAgo.Other(LocalDate.of(key.year, key.month, 1))
             }
-        }.toSortedMap(compareBy { dateAgo ->
-            when (dateAgo) {
-                DateAgo.Today -> 0L
-                DateAgo.Yesterday -> 1L
-                DateAgo.ThisWeek -> 2L
-                DateAgo.LastWeek -> 3L
-                is DateAgo.Other -> ChronoUnit.DAYS.between(dateAgo.date, today)
-            }
-        }).mapValues { (_, items) -> items.distinctBy { it.song.id } }
+            section to group.records.map { it.value }
+        }
+    }
 
     fun loadMoreEvents() {
         if (reachedEnd || localLoadJob?.isActive == true) return

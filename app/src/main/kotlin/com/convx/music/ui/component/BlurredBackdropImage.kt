@@ -28,8 +28,8 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.convx.music.ui.utils.stackBlur
+import com.convx.music.utils.ArtworkProcessing
 import kotlin.math.roundToInt
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
@@ -72,27 +72,29 @@ fun BlurredBackdropImage(
     LaunchedEffect(cacheKey) {
         if (baked != null) return@LaunchedEffect
         val source = model ?: return@LaunchedEffect
-        val request = ImageRequest.Builder(context)
-            .data(source)
-            .size(decodeSize)
-            .allowHardware(false) // pixel readback for the bake
-            .build()
-        val bmp = context.imageLoader.execute(request).image?.toBitmap() ?: return@LaunchedEffect
-        val upscale = maxOf(
-            screenWidthPx / bmp.width.coerceAtLeast(1),
-            screenHeightPx / bmp.height.coerceAtLeast(1),
-        ).coerceAtLeast(1f)
-        val sourceRadius = (screenRadiusPx / upscale).roundToInt()
-        // LaunchedEffect runs on AndroidUiDispatcher, i.e. the MAIN thread inside a frame
-        // callback -- a pixel copy plus three blur passes there is a dropped frame every
-        // time a new backdrop is baked. The bake is pure CPU over a private bitmap, so it
-        // belongs on Default; only the state write below has to come back.
-        val blurred = withContext(Dispatchers.Default) {
-            bmp.copy(Bitmap.Config.ARGB_8888, true).stackBlur(sourceRadius)
-                .let { finish?.invoke(it) ?: it }
+        baked = ArtworkProcessing.cached("blur|$cacheKey", { blurredBackdropCache.get(cacheKey) }) {
+            val request = ImageRequest.Builder(context)
+                .data(source)
+                .size(decodeSize)
+                .allowHardware(false) // pixel readback for the bake
+                .build()
+            val bmp = context.imageLoader.execute(request).image?.toBitmap() ?: return@cached null
+            val upscale = maxOf(
+                screenWidthPx / bmp.width.coerceAtLeast(1),
+                screenHeightPx / bmp.height.coerceAtLeast(1),
+            ).coerceAtLeast(1f)
+            val sourceRadius = (screenRadiusPx / upscale).roundToInt()
+            // LaunchedEffect runs on AndroidUiDispatcher, i.e. the MAIN thread inside a frame
+            // callback -- a pixel copy plus three blur passes there is a dropped frame every
+            // time a new backdrop is baked. The bake is pure CPU over a private bitmap, so it
+            // belongs on Default; only the state write below has to come back.
+            val blurred = withContext(ArtworkProcessing.dispatcher) {
+                bmp.copy(Bitmap.Config.ARGB_8888, true).stackBlur(sourceRadius)
+                    .let { finish?.invoke(it) ?: it }
+            }
+            blurredBackdropCache.put(cacheKey, blurred)
+            blurred
         }
-        blurredBackdropCache.put(cacheKey, blurred)
-        baked = blurred
     }
 
     // Covers both paths in one place: the bake finishing above, and the cache hit that

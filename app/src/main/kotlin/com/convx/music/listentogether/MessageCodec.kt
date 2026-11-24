@@ -246,6 +246,7 @@ class MessageCodec(
             MessageTypes.SYNC_PLAYBACK -> json.decodeFromString<PlaybackActionPayload>(payloadString)
             MessageTypes.BUFFER_WAIT -> json.decodeFromString<BufferWaitPayload>(payloadString)
             MessageTypes.BUFFER_COMPLETE -> json.decodeFromString<BufferCompletePayload>(payloadString)
+            MessageTypes.PONG -> json.decodeFromString<PongPayload>(payloadString)
             MessageTypes.ERROR -> json.decodeFromString<ErrorPayload>(payloadString)
             MessageTypes.HOST_CHANGED -> json.decodeFromString<HostChangedPayload>(payloadString)
             MessageTypes.KICKED -> json.decodeFromString<KickedPayload>(payloadString)

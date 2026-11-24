@@ -185,7 +185,7 @@ fun Modifier.menuVibrancy(): Modifier = additiveChrome(IosTheme.colors.isDark &&
 fun Modifier.iosMenuSurface(
     shape: Shape,
     stretch: InteractiveHighlight? = null,
-    backdrop: Backdrop = IosTheme.backdrop,
+    backdrop: Backdrop = currentIosBackdrop(),
     /**
      * False on a surface that is itself opaque (a menu sheet): sampling the page behind
      * would punch a window through the sheet, so the fill is laid on flat instead.

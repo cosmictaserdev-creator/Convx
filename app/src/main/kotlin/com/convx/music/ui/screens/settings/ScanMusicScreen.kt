@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.convx.music.LocalPlayerAwareWindowInsets
@@ -54,7 +54,7 @@ import com.convx.music.utils.LocalFolderIndex
 fun ScanMusicScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: LocalMusicViewModel = hiltViewModel(),
+    viewModel: LocalMusicViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val isScanning by viewModel.isScanning.collectAsStateWithLifecycle()

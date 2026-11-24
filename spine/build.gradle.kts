@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.music.spine"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -23,6 +23,7 @@ kotlin {
 }
 
 dependencies {
+    api(project(":modules-core"))
     implementation(libs.quickjs.kt)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)

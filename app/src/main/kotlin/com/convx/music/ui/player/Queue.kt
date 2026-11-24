@@ -122,9 +122,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.Player
 import androidx.media3.common.Timeline
-import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import androidx.navigation.NavController
 import com.convx.music.LocalListenTogetherManager
 import com.convx.music.LocalPlayerConnection
@@ -138,9 +136,11 @@ import com.convx.music.constants.ShowCommentButtonKey
 import com.convx.music.constants.UseNewPlayerDesignKey
 import com.convx.music.extensions.metadata
 import com.convx.music.extensions.move
-import com.convx.music.extensions.toggleRepeatMode
 import com.convx.music.listentogether.RoomRole
 import com.convx.music.models.MediaMetadata
+import com.convx.music.playback.PlaybackRepeatMode
+import com.convx.music.playback.PlaybackController
+import com.convx.music.playback.PlaybackQueueController
 import com.convx.music.ui.component.ActionPromptDialog
 import com.convx.music.ui.component.BottomSheet
 import com.convx.music.ui.component.BottomSheetState
@@ -158,17 +158,8 @@ import com.convx.music.utils.listItemShape
 import com.convx.music.utils.makeTimeString
 import com.convx.music.utils.rememberPreference
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.produceState
-import android.content.IntentFilter
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.media.AudioManager
 import android.bluetooth.BluetoothDevice
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import com.convx.music.core.isBluetoothHeadphoneConnected
+import com.convx.music.core.rememberHeadphoneConnected
 import com.convx.music.core.AudioDeviceMenu
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -242,51 +233,7 @@ fun Queue(
     // Keep the active pill translucent so additiveChrome preserves its white glyph.
     val chromePillActive = chromePrimary.copy(alpha = 0.28f)
 
-    val isBluetoothConnected by produceState(initialValue = isBluetoothHeadphoneConnected(context)) {
-        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                value = isBluetoothHeadphoneConnected(context)
-            }
-        }
-
-        val callback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            object : android.media.AudioDeviceCallback() {
-                override fun onAudioDevicesAdded(addedDevices: Array<out android.media.AudioDeviceInfo>?) {
-                    value = isBluetoothHeadphoneConnected(context)
-                }
-                override fun onAudioDevicesRemoved(removedDevices: Array<out android.media.AudioDeviceInfo>?) {
-                    value = isBluetoothHeadphoneConnected(context)
-                }
-            }
-        } else null
-
-        val filter = IntentFilter().apply {
-            addAction(AudioManager.ACTION_HEADSET_PLUG)
-            addAction("android.bluetooth.adapter.action.STATE_CHANGED")
-            addAction("android.bluetooth.device.action.ACL_CONNECTED")
-            addAction("android.bluetooth.device.action.ACL_DISCONNECTED")
-            addAction("android.media.AUDIO_BECOMING_NOISY")
-        }
-        
-        androidx.core.content.ContextCompat.registerReceiver(
-            context,
-            receiver,
-            filter,
-            androidx.core.content.ContextCompat.RECEIVER_EXPORTED,
-        )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && callback != null) {
-            audioManager.registerAudioDeviceCallback(callback, Handler(Looper.getMainLooper()))
-        }
-
-        awaitDispose {
-            context.unregisterReceiver(receiver)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && callback != null) {
-                audioManager.unregisterAudioDeviceCallback(callback)
-            }
-        }
-    }
+    val isBluetoothConnected by rememberHeadphoneConnected()
 
     // Listen Together state (reactive)
     val listenTogetherManager = LocalListenTogetherManager.current
@@ -296,13 +243,16 @@ fun Queue(
     val isListenTogetherGuest = canControlTogether?.value == false
 
     val playerConnection = LocalPlayerConnection.current ?: return
+    val playbackController: PlaybackController = playerConnection
+    val playbackQueueController: PlaybackQueueController = playerConnection
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsStateWithLifecycle()
-    val repeatMode by playerConnection.repeatMode.collectAsStateWithLifecycle()
+    val playbackSnapshot by playerConnection.playbackSnapshot.collectAsStateWithLifecycle()
+    val repeatMode = playbackSnapshot.repeatMode
 
     val currentWindowIndex by playerConnection.currentWindowIndex.collectAsStateWithLifecycle()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val currentSong by playerConnection.currentSong.collectAsState(initial = null)
-    val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+    val shuffleModeEnabled = playbackSnapshot.shuffleEnabled
 
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
 
@@ -471,7 +421,7 @@ fun Queue(
                         )
                     }
 
-                    val shuffleModeEnabledInside by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+                    val shuffleModeEnabledInside = playbackSnapshot.shuffleEnabled
                     PlayerQueueButton(
                         icon = R.drawable.shuffle,
                         onClick = {
@@ -480,7 +430,7 @@ fun Queue(
                                     if (shuffleModeEnabledInside) currentWindowIndex else 0,
                                 )
                             }.invokeOnCompletion {
-                                playerConnection.player.shuffleModeEnabled = !shuffleModeEnabledInside
+                                playbackController.setShuffleEnabled(!shuffleModeEnabledInside)
                             }
                         },
                         isActive = shuffleModeEnabledInside,
@@ -497,14 +447,14 @@ fun Queue(
 
                     PlayerQueueButton(
                         icon = when (repeatMode) {
-                            Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                            Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
+                            PlaybackRepeatMode.ALL -> R.drawable.repeat
+                            PlaybackRepeatMode.ONE -> R.drawable.repeat_one
                             else -> R.drawable.repeat
                         },
                         onClick = {
-                            playerConnection.player.toggleRepeatMode()
+                            playbackController.cycleRepeatMode()
                         },
-                        isActive = repeatMode != Player.REPEAT_MODE_OFF,
+                        isActive = repeatMode != PlaybackRepeatMode.OFF,
                         enabled = !isListenTogetherGuest,
                         shape = middleShape,
                         modifier = Modifier.size(buttonSize),
@@ -841,19 +791,7 @@ fun Queue(
                     val safeFrom = (from - headerItems).coerceIn(0, queueWindows.lastIndex)
                     val safeTo = (to - headerItems).coerceIn(0, queueWindows.lastIndex)
 
-                    if (!playerConnection.player.shuffleModeEnabled) {
-                        playerConnection.player.moveMediaItem(safeFrom, safeTo)
-                    } else {
-                        playerConnection.player.setShuffleOrder(
-                            DefaultShuffleOrder(
-                                queueWindows.map { it.firstPeriodIndex }
-                                    .toMutableList()
-                                    .move(safeFrom, safeTo)
-                                    .toIntArray(),
-                                System.currentTimeMillis()
-                            )
-                        )
-                    }
+                    playbackQueueController.moveQueueItem(safeFrom, safeTo)
                 }
             }
         }
@@ -1028,7 +966,7 @@ fun Queue(
                                     if (shuffleModeEnabled) currentWindowIndex else 0,
                                 )
                             }.invokeOnCompletion {
-                                playerConnection.player.shuffleModeEnabled = checked
+                                playbackController.setShuffleEnabled(checked)
                             }
                         },
                         enabled = !isListenTogetherGuest,
@@ -1037,10 +975,10 @@ fun Queue(
                     )
 
                     QueuePill(
-                        checked = repeatMode != Player.REPEAT_MODE_OFF,
-                        onCheckedChange = { playerConnection.player.toggleRepeatMode() },
+                        checked = repeatMode != PlaybackRepeatMode.OFF,
+                        onCheckedChange = { playbackController.cycleRepeatMode() },
                         enabled = !isListenTogetherGuest,
-                        icon = if (repeatMode == Player.REPEAT_MODE_ONE) R.drawable.repeat_one else R.drawable.repeat,
+                        icon = if (repeatMode == PlaybackRepeatMode.ONE) R.drawable.repeat_one else R.drawable.repeat,
                         description = stringResource(R.string.repeat),
                     )
 
@@ -1108,9 +1046,7 @@ fun Queue(
                             modifier = Modifier
                                 .additiveChrome(chromeAdditive)
                                 .clickable {
-                                    val player = playerConnection.player
-                                    val from = player.currentMediaItemIndex + 1
-                                    if (from < player.mediaItemCount) player.removeMediaItems(from, player.mediaItemCount)
+                                    playbackQueueController.removeQueueItemsAfterCurrent()
                                 }
                                 .padding(start = 12.dp),
                         )
@@ -1261,7 +1197,7 @@ fun Queue(
                                             )
                                 ) {
                                     processedDismiss = true
-                                    playerConnection.player.removeMediaItem(currentItem.firstPeriodIndex)
+                                    playbackQueueController.removeQueueItem(currentItem.firstPeriodIndex)
                                     dismissJob?.cancel()
                                     dismissJob = coroutineScope.launch {
                                         val snackbarResult = snackbarHostState.showSnackbar(
@@ -1274,9 +1210,8 @@ fun Queue(
                                             duration = SnackbarDuration.Short,
                                         )
                                         if (snackbarResult == SnackbarResult.ActionPerformed) {
-                                            playerConnection.player.addMediaItem(currentItem.mediaItem)
-                                            playerConnection.player.moveMediaItem(
-                                                mutableQueueWindows.size,
+                                            playerConnection.restoreQueueItem(
+                                                currentItem.mediaItem,
                                                 currentItem.firstPeriodIndex,
                                             )
                                         }
@@ -1373,7 +1308,7 @@ fun Queue(
                                                                         castHandler?.play()
                                                                     }
                                                                 } else {
-                                                                    playerConnection.togglePlayPause()
+                                                                    playbackController.togglePlayPause()
                                                                 }
                                                             } else {
                                                                 if (isCasting) {

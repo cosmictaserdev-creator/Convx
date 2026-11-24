@@ -11,17 +11,14 @@ import com.convx.music.lyrics.LyricsProviderRepository
 import com.convx.music.lyrics.LyricsProviderStatus
 import com.convx.music.lyrics.LyricsTranslationHelper
 import com.convx.music.models.MediaMetadata
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class LyricsProviderViewModel @Inject constructor(
+class LyricsProviderViewModel(
     private val repository: LyricsProviderRepository,
     private val database: MusicDatabase,
 ) : ViewModel() {

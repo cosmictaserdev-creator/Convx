@@ -1,0 +1,76 @@
+name: Android Room migration proof
+
+on:
+  pull_request:
+    paths:
+      - 'app/src/main/kotlin/com/convx/music/db/**'
+      - 'app/src/main/kotlin/com/convx/music/viewmodels/AtomicFileReplacement.kt'
+      - 'app/src/main/kotlin/com/convx/music/viewmodels/BackupArchiveStagedSettingsValidator.kt'
+      - 'app/src/main/kotlin/com/convx/music/viewmodels/BackupRestoreViewModel.kt'
+      - 'app/src/androidTest/**'
+      - 'app/schemas/com.convx.music.db.InternalDatabase/39.json'
+      - 'app/schemas/com.convx.music.db.InternalDatabase/40.json'
+      - 'app/build.gradle.kts'
+      - 'gradle/libs.versions.toml'
+      - '.github/workflows/android-room-migration-proof.yml'
+      - '.github/scripts/run-room-migration-proof.sh'
+  push:
+    branches: ['**']
+    paths:
+      - 'app/src/main/kotlin/com/convx/music/db/**'
+      - 'app/src/main/kotlin/com/convx/music/viewmodels/AtomicFileReplacement.kt'
+      - 'app/src/main/kotlin/com/convx/music/viewmodels/BackupArchiveStagedSettingsValidator.kt'
+      - 'app/src/main/kotlin/com/convx/music/viewmodels/BackupRestoreViewModel.kt'
+      - 'app/src/androidTest/**'
+      - 'app/schemas/com.convx.music.db.InternalDatabase/39.json'
+      - 'app/schemas/com.convx.music.db.InternalDatabase/40.json'
+      - 'app/build.gradle.kts'
+      - 'gradle/libs.versions.toml'
+      - '.github/workflows/android-room-migration-proof.yml'
+      - '.github/scripts/run-room-migration-proof.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-room-migration-proof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema-39-to-40:
+    name: Verify released Room migrations and staged backup validation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+      - name: Create Android debug signing key
+        run: |
+          mkdir -p ~/.android
+          keytool -genkey -v \
+            -keystore ~/.android/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+      - name: Build app and migration instrumentation APKs
+        run: ./gradlew :app:assembleUniversalFossDebug :app:assembleUniversalFossDebugAndroidTest -PconvxTestRunner=com.convx.music.db.RoomMigrationTestRunner --no-configuration-cache --console=plain
+      - name: Run schema migration on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          # Leave CPU capacity for the Android host and adb on the two-vCPU runner.
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -cores 1 -memory 3072
+          disable-animations: true
+          script: bash .github/scripts/run-room-migration-proof.sh

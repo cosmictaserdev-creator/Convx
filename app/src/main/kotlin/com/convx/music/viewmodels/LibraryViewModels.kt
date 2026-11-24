@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Convx Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -8,8 +8,6 @@
 package com.convx.music.viewmodels
 
 import android.content.Context
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +29,6 @@ import com.convx.music.constants.HideExplicitKey
 import com.convx.music.constants.HideVideoSongsKey
 import com.convx.music.constants.DataSaverEnabledKey
 import com.convx.music.constants.HideYoutubeShortsKey
-import com.convx.music.constants.LibraryFilter
 import com.convx.music.constants.LocalOnlyModeKey
 import com.convx.music.constants.PlaylistSortDescendingKey
 import com.convx.music.constants.PlaylistSortType
@@ -49,13 +46,15 @@ import com.convx.music.extensions.filterExplicitAlbums
 import com.convx.music.extensions.filterVideoSongs
 import com.convx.music.extensions.filterYoutubeShorts
 import com.convx.music.extensions.toEnum
+import com.convx.music.library.ObserveLibraryPlaylists
+import com.convx.music.library.ObservePlaylist
+import com.convx.music.library.PlaylistOrder
+import com.convx.music.library.PlaylistCommands
 import com.convx.music.playback.DownloadUtil
 import com.convx.music.utils.LocalAudioScanner
 import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +69,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDateTime
-import javax.inject.Inject
 
 private data class SongLibraryOptions(
     val filter: SongFilter,
@@ -110,11 +108,8 @@ private data class ArtistSongOptions(
     val hideVideoSongs: Boolean,
 )
 
-@HiltViewModel
-class LibrarySongsViewModel
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+class LibrarySongsViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
     downloadUtil: DownloadUtil,
     private val syncUtils: SyncUtils,
@@ -219,11 +214,8 @@ constructor(
     }
 }
 
-@HiltViewModel
-class LibraryArtistsViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
+class LibraryArtistsViewModel(
+    context: Context,
     database: MusicDatabase,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
@@ -274,12 +266,8 @@ constructor(
         }
     }
 }
-
-@HiltViewModel
-class LibraryAlbumsViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
+class LibraryAlbumsViewModel(
+    context: Context,
     database: MusicDatabase,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
@@ -347,12 +335,11 @@ constructor(
     }
 }
 
-@HiltViewModel
-class LibraryPlaylistsViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
-    database: MusicDatabase,
+class LibraryPlaylistsViewModel(
+    context: Context,
+    private val observeLibraryPlaylists: ObserveLibraryPlaylists,
+    private val observePlaylist: ObservePlaylist,
+    private val playlistCommands: PlaylistCommands,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
     val allPlaylists =
@@ -366,30 +353,39 @@ constructor(
                 )
             }.distinctUntilChanged()
             .flatMapLatest { options ->
-                database.playlists(options.sortType, options.descending).map { playlists ->
-                    // A synced YouTube playlist carries a browseId; the ones the user
-                    // made here don't, and those are the only ones local-only shows.
-                    playlists
-                        .filter { !options.localOnly || it.playlist.browseId == null }
-                        .filterYoutubeShorts(options.hideYoutubeShorts)
-                }
+                observeLibraryPlaylists(
+                    order = options.sortType.toPlaylistOrder(),
+                    descending = options.descending,
+                    hideYoutubeShorts = options.hideYoutubeShorts,
+                    localOnly = options.localOnly,
+                )
             }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun sync() {
         viewModelScope.launch(Dispatchers.IO) { syncUtils.syncSavedPlaylists() }
     }
 
+    suspend fun loadPlaylistForMenu(playlistId: String) =
+        observePlaylist(playlistId).first()
+
+    suspend fun togglePin(playlistId: String): Boolean =
+        playlistCommands.togglePin(playlistId)
+
     val topValue =
         context.dataStore.data
             .map { it[TopSize] ?: "50" }
             .distinctUntilChanged()
+
+    private fun PlaylistSortType.toPlaylistOrder(): PlaylistOrder = when (this) {
+        PlaylistSortType.CREATE_DATE -> PlaylistOrder.CREATED
+        PlaylistSortType.NAME -> PlaylistOrder.NAME
+        PlaylistSortType.SONG_COUNT -> PlaylistOrder.SONG_COUNT
+        PlaylistSortType.LAST_UPDATED -> PlaylistOrder.LAST_UPDATED
+    }
 }
 
-@HiltViewModel
-class ArtistSongsViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
+class ArtistSongsViewModel(
+    context: Context,
     database: MusicDatabase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -417,11 +413,8 @@ constructor(
             }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }
 
-@HiltViewModel
-class LibraryMixViewModel
-@Inject
-constructor(
-    @ApplicationContext context: Context,
+class LibraryMixViewModel(
+    context: Context,
     database: MusicDatabase,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
@@ -515,12 +508,4 @@ constructor(
             }
         }
     }
-}
-
-@HiltViewModel
-class LibraryViewModel
-@Inject
-constructor() : ViewModel() {
-    private val curScreen = mutableStateOf(LibraryFilter.LIBRARY)
-    val filter: MutableState<LibraryFilter> = curScreen
 }

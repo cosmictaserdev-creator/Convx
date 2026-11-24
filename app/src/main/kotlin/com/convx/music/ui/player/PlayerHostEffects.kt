@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.convx.music.constants.PlayerBackgroundStyle
 import com.convx.music.ui.component.BottomSheetState
+import com.convx.music.designsystem.MotionTokens
 import kotlinx.coroutines.launch
 
 /** Status-bar icon colour and keep-screen-on while the sheet is expanded; skipped for the DIY preview copy. */
@@ -157,6 +158,6 @@ internal suspend fun playPillLanding(
 internal var landingGeneration = 0
 
 /** Slow landing rebound with one soft secondary bounce. */
-private const val LANDING_DAMPING = 0.5f
-private const val LANDING_STIFFNESS = 140f
-private val LANDING_MAX_DIP = 22.dp
+private const val LANDING_DAMPING = MotionTokens.PlayerLandingDamping
+private const val LANDING_STIFFNESS = MotionTokens.PlayerLandingStiffness
+private val LANDING_MAX_DIP = MotionTokens.PlayerLandingMaxDipDp.dp

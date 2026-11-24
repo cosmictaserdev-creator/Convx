@@ -57,7 +57,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import com.composables.sfsymbols.SfSymbols
 import com.music.innertube.SearchFilter.Companion.FILTER_ALBUM
@@ -118,7 +118,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun OnlineSearchResult(
     navController: NavController,
-    viewModel: OnlineSearchViewModel = hiltViewModel(),
+    viewModel: OnlineSearchViewModel = koinViewModel(),
     pureBlack: Boolean = false
 ) {
     val menuState = LocalMenuState.current

@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.convx.music.R
@@ -55,7 +55,7 @@ fun NetworkStorageSettingsScreen(
     navController: NavController,
     @Suppress("UNUSED_PARAMETER") scrollBehavior: TopAppBarScrollBehavior,
 ) {
-    val viewModel: NetworkStorageViewModel = hiltViewModel()
+    val viewModel: NetworkStorageViewModel = koinViewModel()
     val servers by viewModel.servers.collectAsStateWithLifecycle()
     val busyId by viewModel.busyId.collectAsStateWithLifecycle()
     val status by viewModel.status.collectAsStateWithLifecycle()

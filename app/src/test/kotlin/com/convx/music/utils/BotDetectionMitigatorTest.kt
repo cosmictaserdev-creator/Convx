@@ -49,7 +49,8 @@ class BotDetectionMitigatorTest {
     }
 
     @Test
-    fun `notifyPlaybackFailure returns true for a non-geo guest failure`() {
-        assertTrue(BotDetectionMitigator.notifyPlaybackFailure(isLoggedIn = false, errorMessage = "Missing stream expire time"))
+    fun `notifyPlaybackFailure returns true for a guest bot-detection failure`() {
+        assertTrue(BotDetectionMitigator.notifyPlaybackFailure(isLoggedIn = false, errorMessage = "Sign in to confirm you're not a bot"))
+        assertFalse(BotDetectionMitigator.notifyPlaybackFailure(isLoggedIn = false, errorMessage = "Missing stream expire time"))
     }
 }

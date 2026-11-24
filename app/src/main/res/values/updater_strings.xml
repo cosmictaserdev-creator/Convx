@@ -46,7 +46,7 @@
     <string name="app_updates_subtitle">App updates</string>
     <string name="app_update_uptodate">Up to date</string>
     <string name="auto_update_check">Automatic update check</string>
-    <string name="auto_update_check_subtitle">Automatically check for updates when opening the update screen</string>
+    <string name="auto_update_check_subtitle">Check for updates after Convx opens</string>
     <string name="update_notifications">Update Notifications</string>
     <string name="update_notifications_subtitle">Show a notification when a new update is found</string>
     <string name="settings_check_updates_title">Check for updates</string>

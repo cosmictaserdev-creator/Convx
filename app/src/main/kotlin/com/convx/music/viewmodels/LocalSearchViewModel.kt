@@ -20,8 +20,6 @@ import com.convx.music.db.entities.Song
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.fuzzyScore
 import com.convx.music.utils.LocalAudioScanner
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +30,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -57,11 +54,8 @@ private fun <T : LocalItem> exactOrFuzzy(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class LocalSearchViewModel
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+class LocalSearchViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
 ) : ViewModel() {
     val query = MutableStateFlow("")

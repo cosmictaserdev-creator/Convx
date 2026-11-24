@@ -32,7 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.convx.music.ui.component.SymbolIcon
@@ -50,9 +50,9 @@ import com.convx.music.constants.ListThumbnailSize
 import com.convx.music.db.entities.Album
 import com.convx.music.db.entities.Artist
 import com.convx.music.db.entities.LocalItem
-import com.convx.music.db.entities.Playlist
 import com.convx.music.db.entities.Song
 import com.convx.music.extensions.toMediaItem
+import com.convx.music.library.PlaylistSummary
 import com.convx.music.playback.queues.ListQueue
 import com.convx.music.ui.component.ListItem
 import com.convx.music.ui.component.NavigationTitle
@@ -82,7 +82,7 @@ internal fun LazyListScope.localHomeContent(
     songs: List<Song>,
     albums: List<Album>,
     artists: List<Artist>,
-    playlists: List<Playlist>,
+    playlists: List<PlaylistSummary>,
     folders: List<LocalFolderIndex.Folder>,
     columns: Int,
 ) {
@@ -160,7 +160,7 @@ internal fun LazyListScope.localHomeContent(
                 shape = listItemShape(index, shownPlaylists.size),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .bounceClick { deps.navController.navigate(localPlaylistRoute(playlist.id, playlist.thumbnailUrl)) },
+                    .bounceClick { deps.navController.navigate(localPlaylistRoute(playlist.id, playlist.artworkUrls.firstOrNull())) },
             )
         }
     }
@@ -231,7 +231,7 @@ internal fun LazyListScope.networkSourcesSection(deps: HomeSectionDeps) {
 }
 
 @Composable
-private fun NetworkSources(navController: NavController, viewModel: NetworkBrowserViewModel = hiltViewModel()) {
+private fun NetworkSources(navController: NavController, viewModel: NetworkBrowserViewModel = koinViewModel()) {
     val servers by viewModel.servers.collectAsStateWithLifecycle()
     Column(Modifier.fillMaxWidth()) {
         servers.forEachIndexed { index, server ->

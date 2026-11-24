@@ -1,6 +1,7 @@
 plugins {
+    id("java-library")
     alias(libs.plugins.kotlin.serialization)
-    id("kotlin")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 kotlin {
@@ -8,6 +9,7 @@ kotlin {
 }
 
 dependencies {
+    api(project(":canvas-core"))
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)

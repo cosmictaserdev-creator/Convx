@@ -25,11 +25,10 @@ import com.convx.music.models.toMediaMetadata
 import com.music.innertube.SearchFilter
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
+import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.reportException
 import com.convx.music.R
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -53,7 +52,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
 
 @Serializable
 data class SpotifySession(
@@ -94,10 +92,10 @@ private data class PlaylistImportData(
     val thumbnailUrl: String?
 )
 
-@HiltViewModel
-class SpotifyImportViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class SpotifyImportViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
+    private val syncUtils: SyncUtils,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SpotifyImportUiState(isLoading = true))
@@ -279,7 +277,7 @@ class SpotifyImportViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
-                        playlists = playlistsList,
+                        playlists = playlistsList.distinctBy { it.id },
                         likedSongsCount = likedSongsResult.total,
                         isLoading = false,
                         accountName = meResult.displayName.orEmpty(),
@@ -326,7 +324,7 @@ class SpotifyImportViewModel @Inject constructor(
                 }
 
                 val playlistShelves = shelves.mapNotNull { shelf ->
-                    val playlists = shelf.items.filter { it.type == SpotifyHomeItemType.PLAYLIST }
+                    val playlists = shelf.items.filter { it.type == SpotifyHomeItemType.PLAYLIST }.distinctBy { it.uri }
                     shelf.copy(items = playlists).takeIf { playlists.isNotEmpty() }
                 }
                 _uiState.update {
@@ -553,6 +551,7 @@ class SpotifyImportViewModel @Inject constructor(
 
                     val matchedMedia = matchSongs(importData, totalSongs)
 
+                    var hasRemoteCopy = false
                     database.withTransaction {
                         val now = LocalDateTime.now()
                         val entity = saveImportedPlaylistHeader(importData, now)
@@ -573,6 +572,11 @@ class SpotifyImportViewModel @Inject constructor(
                             )
                         }
                         update(entity.copy(lastUpdateTime = now))
+                        hasRemoteCopy = entity.browseId != null
+                    }
+                    // A playlist that already has a remote copy is left alone so re-importing does not duplicate its songs there.
+                    if (!hasRemoteCopy) {
+                        syncUtils.uploadPlaylistInBackground(importData.localPlaylistId, matchedMedia.map { it.id })
                     }
                 }
                 _importProgress.update { old ->

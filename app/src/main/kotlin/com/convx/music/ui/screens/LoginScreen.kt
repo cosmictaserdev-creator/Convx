@@ -51,7 +51,7 @@ import com.convx.music.ui.ios.compat.AppTheme
 import com.convx.music.utils.rememberPreference
 import com.convx.music.utils.reportException
 import com.convx.music.viewmodels.AccountSettingsViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,7 +83,7 @@ fun LoginScreen(
     var dataSyncId by rememberPreference(DataSyncIdKey, "")
     var innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
     var hasCompletedLogin by remember { mutableStateOf(false) }
-    val accountSettingsViewModel: AccountSettingsViewModel = hiltViewModel()
+    val accountSettingsViewModel: AccountSettingsViewModel = koinViewModel()
 
     // Read bridge values directly; DataStore may still return blank visitorData or dataSyncId
     // immediately after login.

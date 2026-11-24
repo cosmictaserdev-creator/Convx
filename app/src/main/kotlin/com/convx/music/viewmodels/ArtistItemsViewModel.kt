@@ -20,18 +20,12 @@ import com.convx.music.models.ItemsPage
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ArtistItemsViewModel
-@Inject
-constructor(
-    @ApplicationContext val context: Context,
+class ArtistItemsViewModel(
+    val context: Context,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val browseId = requireNotNull(savedStateHandle.get<String>("browseId")) { "Missing browseId" }

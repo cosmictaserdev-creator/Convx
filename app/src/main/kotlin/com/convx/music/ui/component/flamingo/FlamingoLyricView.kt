@@ -2,9 +2,14 @@
 package com.convx.music.ui.component.flamingo
 
 import android.os.Build
+import androidx.compose.ui.text.font.FontFamily
+import com.convx.music.ui.component.LyricsEndNote
 import com.convx.music.ui.component.followLyricLine
+import com.convx.music.ui.component.lyricRubber
+import com.convx.music.ui.component.rememberLyricRubber
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.EaseInOutQuad
@@ -55,6 +60,8 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,22 +69,24 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.CacheDrawScope
 import androidx.compose.ui.draw.DrawResult
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.res.stringResource
+import com.convx.music.R
+import com.convx.music.ui.ios.compat.FilledTonalButton
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
@@ -103,9 +112,14 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.PI
+import kotlin.math.sin
 
 val yosEasing = CubicBezierEasing(0.75f, 0.0f, 0.25f, 1.0f)
 
@@ -125,13 +139,19 @@ fun YosLyricView(
     uiConfig: YosUIConfig = YosUIConfig(),
     isSynced: Boolean = true,
     autoScrollEnabled: Boolean = true,
+    isPlaying: Boolean = false,
+    glowColor: Color = Color.White,
     weightLambda: () -> Boolean,
     modifier: Modifier,
     textStyle: TextStyle = MainTextStyle,
     otherSideForLines: List<Boolean>,
+    backgroundLines: List<Boolean> = emptyList(),
+    glow: Boolean = false,
+    brightSingingWords: Boolean = true,
+    wordSwell: Boolean = true,
+    exposure: () -> Float = { 0f },
     currentLyricIndex: androidx.compose.runtime.MutableIntState,
-    onBackClick: () -> Unit,
-    wordGlowEnabled: Boolean = true,
+    onBackClick: () -> Unit
 ) {
     val view = androidx.compose.ui.platform.LocalView.current
     val mainTextBasicColor = Color(uiConfig.mainTextBasicColor)
@@ -163,6 +183,21 @@ fun YosLyricView(
         }
     } else {
         val scrollState = rememberLazyListState()
+        val scrollScope = rememberCoroutineScope()
+        val rubber = rememberLyricRubber(scrollState)
+        val glowBreath = remember { Animatable(1f) }
+
+        LaunchedEffect(glow, isPlaying) {
+            if (!glow || !isPlaying || !android.animation.ValueAnimator.areAnimatorsEnabled()) {
+                glowBreath.animateTo(1f, tween(260, easing = yosEasing))
+                return@LaunchedEffect
+            }
+
+            while (true) {
+                glowBreath.animateTo(0.9f, tween(1700, easing = yosEasing))
+                glowBreath.animateTo(1f, tween(1700, easing = yosEasing))
+            }
+        }
 
         val ttmlLiveTime = remember("YosLyricView_ttmlLiveTime") {
             mutableIntStateOf(liveTimeLambda())
@@ -232,6 +267,7 @@ fun YosLyricView(
         val enableLyricScroll = remember("YosLyricView_enableLyricScroll") {
             mutableStateOf(true)
         }
+        val userRequestedRecenter = remember { mutableStateOf(false) }
 
         val height = rememberSaveable(key = "YosLyricView_height") { mutableIntStateOf(0) }
 
@@ -244,13 +280,6 @@ fun YosLyricView(
                 scrollState.layoutInfo.visibleItemsInfo
             }
         }
-        val targetItem = remember("YosLyricView_targetItem") {
-            derivedStateOf {
-                visibleItems.value.find {
-                    it.index == focusedLyricAnchorIndex.value + 1
-                }
-            }
-        }
         val supportBlur = rememberSaveable(key = "supportBlur") {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
@@ -260,7 +289,10 @@ fun YosLyricView(
             @Stable
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    if (source == NestedScrollSource.UserInput) isUserScrolling.value = true
+                    if (source == NestedScrollSource.UserInput) {
+                        isUserScrolling.value = true
+                        userRequestedRecenter.value = false
+                    }
                     return Offset.Zero
                 }
 
@@ -278,15 +310,12 @@ fun YosLyricView(
             LaunchedEffect(isUserScrolling.value, scrollState.isScrollInProgress) {
                 if (isUserScrolling.value && scrollState.isScrollInProgress) {
                     enableLyricScroll.value = false
-                } else {
-                    delay(2000)
-                    isUserScrolling.value = false
-                    enableLyricScroll.value = true
                 }
             }
         }
 
         YosWrapper {
+            Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 state = scrollState,
                 contentPadding = PaddingValues(vertical = with(LocalDensity.current) { (height.intValue / 2f).toDp() }),
@@ -324,6 +353,11 @@ fun YosLyricView(
                             index == (focusedLyricAnchorIndex.value - 1)
                         }
                     }
+                    val glowStrength = animateFloatAsState(
+                        targetValue = if (isCurrent.value) 1f else 0f,
+                        animationSpec = tween(if (isCurrent.value) 180 else 1000),
+                        label = "lyric_glow_decay",
+                    )
 
                     val showStateAnimation = remember(index) {
                         derivedStateOf {
@@ -375,7 +409,43 @@ fun YosLyricView(
                             otherSideForLines.getOrElse(index) { false }
                         }
 
+                        val isBackgroundLine = backgroundLines.getOrElse(index) { false }
+                        val reveal = animateFloatAsState(
+                            targetValue = if (!isBackgroundLine || isCurrent.value) 1f else 0f,
+                            animationSpec = tween(550, easing = yosEasing),
+                            label = "background_vocal_reveal",
+                        )
                         YosWrapper {
+                            Box(
+                                (if (isBackgroundLine) {
+                                    Modifier
+                                        .clipToBounds()
+                                        .layout { measurable, constraints ->
+                                            val placeable = measurable.measure(constraints)
+                                            val height = (placeable.height * reveal.value).roundToInt()
+                                            layout(placeable.width, height) { placeable.placeRelative(0, 0) }
+                                        }
+                                        .graphicsLayer {
+                                            alpha = reveal.value
+                                            scaleX = 0.92f + 0.08f * reveal.value
+                                            scaleY = scaleX
+                                            transformOrigin = TransformOrigin(if (otherSide) 1f else 0f, 0f)
+                                        }
+                                } else {
+                                    Modifier
+                                })
+                                    .lyricRubber(rubber, index + 1)
+                                    // Keep the previous line's layer alive while its light fades.
+                                    .lyricGlow(
+                                        enabled = glow,
+                                        exposure = exposure,
+                                        preserveBrightness = brightSingingWords,
+                                        glowColor = glowColor,
+                                        strength = {
+                                            glowStrength.value * if (isCurrent.value || isTop.value) glowBreath.value else 1f
+                                        },
+                                    ),
+                            ) {
                             LyricItem(
                                 mainTextStyle = textStyle,
                                 isCurrentLambda = {
@@ -393,8 +463,10 @@ fun YosLyricView(
                                 mainTextBasicColor,
                                 subTextBasicColor,
                                 otherSide = otherSide,
-                                wordGlowEnabled = wordGlowEnabled,
                                 liveTimeLambda = liveTimeLambda,
+                                glow = glow,
+                                glowColor = glowColor,
+                                wordSwell = wordSwell,
                                 measurer = measurer,
                                 isLyricEmpty = { isLyricEmpty.value },
                                 nextTime = {
@@ -408,25 +480,70 @@ fun YosLyricView(
                                 view.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
                                 mediaEvent.onSeek(lines.first().first.toInt())
                             }
+                            }
                         }
                     }
-
-
 
                 }
                 blankSpacer()
                 item("extra_blank") {
+                    LyricsEndNote(fontFamily = textStyle.fontFamily ?: FontFamily.Default, color = mainTextBasicColor)
                     Spacer(modifier = Modifier.height(500.dp))
                 }
+            }
+            AnimatedVisibility(
+                visible = isSynced && !enableLyricScroll.value,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                FilledTonalButton(onClick = {
+                    isUserScrolling.value = false
+                    userRequestedRecenter.value = true
+                    enableLyricScroll.value = true
+                    if (!autoScrollEnabled && focusedLyricAnchorIndex.value >= 0) {
+                        scrollScope.launch {
+                            scrollState.followLyricLine(focusedLyricAnchorIndex.value + 1, rubber = rubber)
+                        }
+                    }
+                }) {
+                    Text(stringResource(R.string.lyrics_recenter))
+                }
+            }
             }
         }
 
         YosWrapper {
-
             LaunchedEffect(focusedLyricAnchorIndex.value, translationLambda(), enableLyricScroll.value,
-                autoScrollEnabled, isSynced, height.intValue, targetItem.value?.size) {
+                autoScrollEnabled, isSynced) {
                 if (autoScrollEnabled && isSynced && enableLyricScroll.value && focusedLyricAnchorIndex.value >= 0) {
-                    scrollState.followLyricLine(focusedLyricAnchorIndex.value + 1)
+                    scrollState.followLyricLine(focusedLyricAnchorIndex.value + 1, rubber = rubber)
+                }
+            }
+        }
+
+        // Player controls expand and collapse the lyric viewport. Wait for that
+        // layout animation to settle before correcting the playhead's position;
+        // restarting the scroll on every intermediate height used to leave it off-center.
+        YosWrapper {
+            LaunchedEffect(scrollState, autoScrollEnabled, isSynced, enableLyricScroll.value, userRequestedRecenter.value) {
+                if ((!autoScrollEnabled && !userRequestedRecenter.value) || !isSynced || !enableLyricScroll.value) {
+                    return@LaunchedEffect
+                }
+
+                var previousViewport = scrollState.layoutInfo.viewportStartOffset to
+                    scrollState.layoutInfo.viewportEndOffset
+                snapshotFlow {
+                    val info = scrollState.layoutInfo
+                    info.viewportStartOffset to info.viewportEndOffset
+                }.distinctUntilChanged().collectLatest { viewport ->
+                    if (viewport == previousViewport) return@collectLatest
+                    previousViewport = viewport
+                    delay(140)
+                    val anchor = focusedLyricAnchorIndex.value
+                    if (anchor >= 0 && enableLyricScroll.value) {
+                        scrollState.followLyricLine(anchor + 1, rubber = rubber)
+                    }
                 }
             }
         }
@@ -533,20 +650,16 @@ fun LazyItemScope.LyricItem(
     nextTime: () -> Float,
     otherSide: Boolean,
     liveTimeLambda: () -> Int,
-    wordGlowEnabled: Boolean = true,
+    glow: Boolean,
+    glowColor: Color,
+    wordSwell: Boolean,
     onClick: () -> Unit
 ) {
     val viewAlign = if (otherSide) Alignment.End else Alignment.Start
 
     val focusedColor = Color(0xFFFFFFFF)
     val unfocusedColor = Color(0x2EFFFFFF)
-
-    val unfocusedSolidBrush = SolidColor(unfocusedColor)
-    val currentLineChrome = animateFloatAsState(
-        targetValue = if (isCurrentLambda()) 1f else 0f,
-        animationSpec = tween(durationMillis = 240, easing = yosEasing),
-        label = "currentLyricChrome",
-    )
+    val animateWords = wordSwell && android.animation.ValueAnimator.areAnimatorsEnabled()
 
     val isNotOneByOne = rememberSaveable(mainLyric) {
         mutableStateOf(
@@ -777,6 +890,11 @@ fun LazyItemScope.LyricItem(
                                             }
                                         }
                                     }
+                                    val completedLineLift = animateFloatAsState(
+                                        targetValue = if (isCurrentLambda()) 0f else -4f,
+                                        animationSpec = tween(180, easing = yosEasing),
+                                        label = "karaoke_completion_lift",
+                                    )
 
                                     Line(
                                         lines = mainLyric,
@@ -790,49 +908,6 @@ fun LazyItemScope.LyricItem(
                                             }
                                             .padding(vertical = 4.dp)
                                             .then(otherSidePadding.value)
-                                            .padding(horizontal = 10.dp, vertical = 5.dp)
-                                            .drawBehind {
-                                                val intensity = currentLineChrome.value
-                                                if (intensity > 0.001f) {
-                                                    val radius = CornerRadius(size.height / 2f)
-                                                    val accent = mainTextBasicColor
-                                                    drawRoundRect(
-                                                        brush = Brush.verticalGradient(
-                                                            colors = listOf(
-                                                                Color.White.copy(alpha = 0.025f * intensity),
-                                                                accent.copy(alpha = 0.075f * intensity),
-                                                                accent.copy(alpha = 0.035f * intensity),
-                                                            ),
-                                                        ),
-                                                        cornerRadius = radius,
-                                                    )
-                                                    drawRoundRect(
-                                                        brush = Brush.verticalGradient(
-                                                            colors = listOf(
-                                                                Color.White.copy(alpha = 0.30f * intensity),
-                                                                accent.copy(alpha = 0.11f * intensity),
-                                                                Color.White.copy(alpha = 0.04f * intensity),
-                                                            ),
-                                                        ),
-                                                        cornerRadius = radius,
-                                                        style = Stroke(width = 1.dp.toPx()),
-                                                    )
-                                                    drawLine(
-                                                        brush = Brush.horizontalGradient(
-                                                            colors = listOf(
-                                                                Color.Transparent,
-                                                                Color.White.copy(alpha = 0.38f * intensity),
-                                                                accent.copy(alpha = 0.22f * intensity),
-                                                                Color.Transparent,
-                                                            ),
-                                                        ),
-                                                        start = Offset(12.dp.toPx(), size.height - 1.dp.toPx()),
-                                                        end = Offset(size.width - 12.dp.toPx(), size.height - 1.dp.toPx()),
-                                                        strokeWidth = 1.5.dp.toPx(),
-                                                        cap = androidx.compose.ui.graphics.StrokeCap.Round,
-                                                    )
-                                                }
-                                            }
                                             .clickable(
                                                 indication = null,
                                                 interactionSource = remember { MutableInteractionSource() }
@@ -843,156 +918,106 @@ fun LazyItemScope.LyricItem(
                                     ) { parentConstraints, measureResult ->
 
                                         if (isNotOneByOne.value) {
-
                                             return@Line onDrawWithContent {
-                                                drawText(
-                                                    textLayoutResult = measureResult,
-                                                    color = focusedColor
-                                                )
+                                                drawText(textLayoutResult = measureResult, color = focusedColor)
                                             }
                                         }
 
-                                        if (!isCurrentLambda()) {
-
-                                            if (showHighLight.value) {
-
-                                                return@Line onDrawWithContent {
-                                                    drawText(
-                                                        textLayoutResult = measureResult,
-                                                        color = focusedColor,
-                                                        topLeft = Offset(0F, -4F)
-                                                    )
-                                                }
-                                            } else {
-
-                                                return@Line onDrawWithContent {
-                                                    drawText(
-                                                        textLayoutResult = measureResult,
-                                                        color = unfocusedColor
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        var sum = 0
-                                        var lastTime = 0f
-
+                                        // One layout per word, not per letter: a line turning current measures a handful of runs.
+                                        val tokenStyle = mainTextStyle.copy(textAlign = TextAlign.Start)
+                                        val lastChar = (mainLyric.sumOf { it.second.length } - 1).coerceAtLeast(0)
                                         val wordsToDraw = arrayListOf<DrawWord>()
-
-                                        var averageTime = 0f
-
-                                        lastTime = mainLyric.first().first
+                                        var charIndex = 0
+                                        var segmentStart = mainLyric.first().first
 
                                         mainLyric.fastForEachIndexed { wordIndex, word ->
+                                            val text = word.second
+                                            if (text.isEmpty()) return@fastForEachIndexed
 
-                                            val thisWord = word.second
+                                            val perChar = ((word.first - segmentStart) / text.length).coerceAtLeast(1f)
+                                            val groupStart = if (wordIndex == 0) mainLyric.first().first else mainLyric[wordIndex - 1].first
+                                            val wordSpan = (word.first - groupStart).coerceAtLeast(1f)
+                                            val lift = { 4f * easing.transform(((liveTime.intValue - groupStart) / wordSpan).coerceIn(0f, 1f)) }
 
-                                            if (thisWord.isEmpty()) {
-                                                return@fastForEachIndexed
-                                            }
-
-                                            averageTime = ((word.first - lastTime) / thisWord.length).coerceAtLeast(1f)
-
-                                            val thisWordGroupLastTime = if (wordIndex - 1 < 0) {
-                                                mainLyric.first().first
-                                            } else {
-                                                mainLyric[(wordIndex - 1)].first
-                                            }
-                                            val wordSpan = (word.first - thisWordGroupLastTime).coerceAtLeast(1f)
-                                            val lift = {
-                                                val progress = ((liveTime.intValue - thisWordGroupLastTime) / wordSpan).coerceIn(0f, 1f)
-                                                4f * easing.transform(progress)
-                                            }
-
-                                            thisWord.forEach { char ->
-
-                                                val charWord = char.toString()
-
-                                                val layout = measurer.measure(
-                                                    text = charWord,
-                                                    style = if (otherSide) mainTextStyle.copy(
-                                                        textAlign = TextAlign.End
-                                                    ) else mainTextStyle,
-                                                    constraints = measureResult.layoutInput.constraints
-                                                )
-
-                                                val thisWordLastTime = lastTime
-                                                val thisWordAverageTime = averageTime
-
+                                            WordRun.findAll(text).forEach { run ->
+                                                val start = segmentStart + perChar * run.range.first
+                                                val span = perChar * run.value.length
+                                                val origin = measureResult.getBoundingBox((charIndex + run.range.first).coerceAtMost(lastChar)).topLeft
                                                 wordsToDraw += DrawWord(
-                                                    time = lastTime + averageTime,
-                                                    word = charWord,
-                                                    layout = layout,
-                                                    topLeft = run {
-                                                        val origin = measureResult.getBoundingBox(sum.coerceIn(0, (mainLyric.sumOf { it.second.length } - 1).coerceAtLeast(0))).topLeft
-                                                        val position: () -> Offset = { origin.minus(Offset(0f, lift())) }
-                                                        position
-                                                    },
-                                                    brush = { px, percent ->
-                                                        if (thisWord == " ") {
-                                                            return@DrawWord unfocusedSolidBrush
-                                                        }
-
-                                                        val beforeColor = if (percent <= -0.5f) {
-                                                            unfocusedColor
-                                                        } else {
-                                                            focusedColor
-                                                        }
-
-                                                        val afterColor = if (percent >= 1f) {
-                                                            focusedColor
-                                                        } else {
-                                                            unfocusedColor
-                                                        }
-                                                        Brush.horizontalGradient(
-                                                            0f to beforeColor,
-                                                            (percent - px).coerceIn(
-                                                                0f,
-                                                                1f
-                                                            ) to beforeColor,
-                                                            (percent + px).coerceIn(
-                                                                0f,
-                                                                1f
-                                                            ) to afterColor
-                                                        )
-                                                    },
-                                                    percent = {
-                                                        if (thisWord == " ") {
-                                                            return@DrawWord 0f
-                                                        }
-
-                                                        ((liveTime.intValue - thisWordLastTime) / thisWordAverageTime)
-
-                                                    }
-                                                ).also {
-                                                    sum += charWord.length
-                                                    lastTime += averageTime
-                                                }
-                                            }
-                                        }
-
-                                        onDrawBehind {
-                                            wordsToDraw.fastForEach { l ->
-                                                val progress = l.percent()
-                                                val wordGlow = if (
-                                                    wordGlowEnabled && l.word.isNotBlank() && progress in 0f..1f
-                                                ) {
-                                                    Shadow(
-                                                        color = focusedColor.copy(alpha = (0.18f + 0.4f * progress).coerceAtMost(0.62f)),
-                                                        offset = Offset.Zero,
-                                                        blurRadius = 8f + 10f * progress,
-                                                    )
-                                                } else {
-                                                    null
-                                                }
-                                                drawText(
-                                                    textLayoutResult = l.layout,
-                                                    topLeft = l.topLeft(),
-                                                    brush = l.brush(0.3f, progress),
-                                                    shadow = wordGlow,
+                                                    layout = measurer.measure(run.value, tokenStyle, layoutDirection = LayoutDirection.Ltr),
+                                                    topLeft = { origin - Offset(0f, lift()) },
+                                                    spread = SWEEP_SPREAD / run.value.length,
+                                                    percent = { (liveTime.intValue - start) / span },
+                                                    durationMs = span,
+                                                    lineIndex = measureResult.getLineForOffset((charIndex + run.range.first).coerceAtMost(lastChar)),
                                                 )
                                             }
+                                            charIndex += text.length
+                                            segmentStart += perChar * text.length
                                         }
+
+                                        val wordsByLine = wordsToDraw.indices
+                                            .groupBy { wordsToDraw[it].lineIndex }
+                                            .values
+                                            .toList()
+                                        val drawSingingWords: DrawScope.() -> Unit = {
+                                            val scales = FloatArray(wordsToDraw.size) { index ->
+                                                val word = wordsToDraw[index]
+                                                balloonWordScale(word.percent(), word.durationMs, animateWords)
+                                            }
+                                            val shifts = FloatArray(wordsToDraw.size)
+                                            wordsByLine.fastForEach { indices ->
+                                                if (otherSide) {
+                                                    var trailingExpansion = 0f
+                                                    for (position in indices.indices.reversed()) {
+                                                        val index = indices[position]
+                                                        shifts[index] = -trailingExpansion
+                                                        trailingExpansion += wordsToDraw[index].layout.size.width * (scales[index] - 1f)
+                                                    }
+                                                } else {
+                                                    var leadingExpansion = 0f
+                                                    indices.fastForEach { index ->
+                                                        shifts[index] = leadingExpansion
+                                                        leadingExpansion += wordsToDraw[index].layout.size.width * (scales[index] - 1f)
+                                                    }
+                                                }
+                                            }
+
+                                            val glowRadius = WORD_GLOW_RADIUS.toPx()
+                                            val completedLineOffset = if (isCurrentLambda()) 0f else completedLineLift.value
+                                            wordsToDraw.fastForEachIndexed { index, w ->
+                                                val percent = w.percent()
+                                                val origin = w.topLeft() + Offset(shifts[index], completedLineOffset)
+                                                val wordScale = scales[index]
+                                                val pivotX = if (otherSide) w.layout.size.width.toFloat() else 0f
+                                                withTransform({
+                                                    scale(
+                                                        wordScale,
+                                                        wordScale,
+                                                        pivot = origin + Offset(pivotX, w.layout.size.height.toFloat()),
+                                                    )
+                                                }) {
+                                                    drawText(
+                                                        textLayoutResult = w.layout,
+                                                        topLeft = origin,
+                                                        brush = sweepBrush(percent, w.spread, focusedColor, unfocusedColor),
+                                                        // RenderEffect blooms the swept, bright glyphs on API 31+.
+                                                        // Older Android versions get a matching word halo.
+                                                        shadow = if (glow) {
+                                                            wordGlow(percent, glowColor, glowRadius, w.durationMs)
+                                                        } else null,
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        if (!isCurrentLambda() && !showHighLight.value) {
+                                            return@Line onDrawWithContent {
+                                                drawText(textLayoutResult = measureResult, color = unfocusedColor)
+                                            }
+                                        }
+
+                                        onDrawBehind { drawSingingWords() }
                                     }
                                 }
                                 YosWrapper {
@@ -1134,12 +1159,55 @@ val MainTextStyle = TextStyle(
     )
 )
 
+/** Width of the sweep's soft edge, in letters. */
+private const val SWEEP_SPREAD = 0.3f
+private const val WORD_SWELL_BASE = 0.04f
+private const val WORD_SWELL_HELD_GAIN = 0.04f
+private const val WORD_SWELL_RELEASE_RATIO = 0.42f
+private const val HELD_WORD_START_MS = 250f
+private const val HELD_WORD_FULL_MS = 1450f
+
+private val WordRun = Regex("\\S+")
+
+private val WORD_GLOW_RADIUS = 4.dp
+/** Share of a word's sweep over which its halo rises, then fades once the word is sung. */
+private const val WORD_GLOW_RISE = 0.15f
+private const val WORD_GLOW_FADE = 0.6f
+
+/** Halo around the word being sung, null once the sweep is clear of it. */
+private fun wordGlow(percent: Float, color: Color, radius: Float, durationMs: Float): Shadow? {
+    if (percent <= 0f || percent >= 1f + WORD_GLOW_FADE) return null
+    val strength = (percent / WORD_GLOW_RISE).coerceAtMost(1f) *
+        (1f - (percent - 1f) / WORD_GLOW_FADE).coerceIn(0f, 1f)
+    val heldBoost = 1f + 0.12f * heldWordFraction(durationMs)
+    return Shadow(
+        color = color.copy(alpha = (color.alpha * strength * heldBoost).coerceAtMost(1f)),
+        blurRadius = radius * heldBoost,
+    )
+}
+
+/** A balloon gathers tension before it swells; longer notes give it more room to inflate. */
+private fun balloonWordScale(percent: Float, durationMs: Float, enabled: Boolean): Float {
+    if (!enabled) return 1f
+    val progress = percent.coerceAtLeast(0f)
+    val envelope = if (progress <= 1f) {
+        yosEasing.transform(progress)
+    } else {
+        1f - yosEasing.transform(((progress - 1f) / WORD_SWELL_RELEASE_RATIO).coerceIn(0f, 1f))
+    }
+    val amount = WORD_SWELL_BASE + WORD_SWELL_HELD_GAIN * heldWordFraction(durationMs)
+    return 1f + amount * envelope
+}
+
+private fun heldWordFraction(durationMs: Float): Float =
+    ((durationMs - HELD_WORD_START_MS) / (HELD_WORD_FULL_MS - HELD_WORD_START_MS)).coerceIn(0f, 1f)
+
 @Stable
-private data class DrawWord(
-    val time: Float,
-    val word: String,
+private class DrawWord(
     val layout: TextLayoutResult,
     val topLeft: () -> Offset,
-    val brush: (px: Float, percent: Float) -> Brush,
-    val percent: () -> Float
+    val spread: Float,
+    val percent: () -> Float,
+    val durationMs: Float,
+    val lineIndex: Int,
 )

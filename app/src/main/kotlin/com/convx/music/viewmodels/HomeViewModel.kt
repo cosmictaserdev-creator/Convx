@@ -30,14 +30,15 @@ import com.convx.music.constants.HideVideoSongsKey
 import com.convx.music.constants.DataSaverEnabledKey
 import com.convx.music.constants.HideYoutubeShortsKey
 import com.convx.music.constants.InnerTubeCookieKey
-import com.convx.music.constants.PauseListenHistoryKey
 import com.convx.music.constants.QuickPicks
 import com.convx.music.constants.QuickPicksKey
 import com.convx.music.constants.ShowWrappedCardKey
 import com.convx.music.constants.WrappedSeenKey
 import com.convx.music.R
 import com.convx.music.db.MusicDatabase
-import com.convx.music.history.HistoryLocalDataSource
+import com.convx.music.history.ListenHistoryRepository
+import com.convx.music.history.ListenHistorySettingsRepository
+import com.convx.music.history.ListenHistorySettingsState
 import com.convx.music.db.entities.Album
 import com.convx.music.db.entities.LocalItem
 import com.convx.music.db.entities.Playlist
@@ -52,9 +53,7 @@ import com.convx.music.utils.SyncUtils
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.Lazy
+import com.convx.music.di.ValueProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -78,7 +77,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.time.LocalDate
-import javax.inject.Inject
 import kotlin.random.Random
 
 data class DailyDiscoverItem(
@@ -168,12 +166,12 @@ private fun List<YTItem>.filterRecommendationItems(
     .shuffled()
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class HomeViewModel @Inject constructor(
-    @ApplicationContext val context: Context,
+class HomeViewModel(
+    val context: Context,
     val database: MusicDatabase,
-    private val historyDataSource: Lazy<HistoryLocalDataSource>,
-    private val syncUtils: Lazy<SyncUtils>,
+    private val listenHistoryRepository: ValueProvider<ListenHistoryRepository>,
+    private val listenHistorySettingsRepository: ValueProvider<ListenHistorySettingsRepository>,
+    private val syncUtils: ValueProvider<SyncUtils>,
     val wrappedManager: WrappedManager,
     private val wrappedAudioService: WrappedAudioService,
 ) : ViewModel() {
@@ -192,11 +190,11 @@ class HomeViewModel @Inject constructor(
     val isLoading = MutableStateFlow(false)
     val isRandomizing = MutableStateFlow(false)
 
-    val eventCount = context.dataStore.data
-        .map { it[PauseListenHistoryKey] ?: false }
-        .distinctUntilChanged()
-        .flatMapLatest { isHistoryPaused ->
-            if (isHistoryPaused) historyDataSource.get().observeEventCount() else flowOf(0)
+    val eventCount = listenHistorySettingsRepository.get().observe()
+        .flatMapLatest { settingsState ->
+            val isHistoryPaused =
+                (settingsState as? ListenHistorySettingsState.Ready)?.settings?.paused == true
+            if (isHistoryPaused) listenHistoryRepository.get().observeEventCount() else flowOf(0)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 

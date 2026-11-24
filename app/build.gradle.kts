@@ -14,15 +14,14 @@ val versionProps = Properties().apply {
 val appVersionMajor = versionProps.getProperty("VERSION_MAJOR").toInt()
 val appVersionMinor = versionProps.getProperty("VERSION_MINOR").toInt()
 val appVersionPatch = versionProps.getProperty("VERSION_PATCH").toInt()
-// 1.5.1 -> 10501. Room for MINOR/PATCH up to 99 each before a scheme change is needed.
+// The source version uses two decimal digits each for MINOR and PATCH; updater builds reserve four low digits for the channel run.
 val appVersionCode = appVersionMajor * 10_000 + appVersionMinor * 100 + appVersionPatch
 val appVersionName = "$appVersionMajor.$appVersionMinor.$appVersionPatch"
 
 plugins {
     id("com.android.application")
-    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.protobufPlugin)
 }
@@ -36,8 +35,11 @@ android {
         applicationId = "com.convx.music"
         minSdk = 26
         targetSdk = 36
-        versionCode = appVersionCode
+        val nightlyRunForVersion = (project.findProperty("nightlyRun") as String?)?.toIntOrNull() ?: 0
+        require(nightlyRunForVersion in 0..9_998) { "Nightly run number exceeds the updater version-code range" }
+        versionCode = appVersionCode * 10_000 + if (nightlyRunForVersion == 0) 9_999 else nightlyRunForVersion
         versionName = appVersionName
+        buildConfigField("Boolean", "GITHUB_UPDATER_ENABLED", (project.findProperty("githubUpdater") == "true").toString())
 
         testInstrumentationRunner = providers.gradleProperty("convxTestRunner")
             .orElse("androidx.test.runner.AndroidJUnitRunner").get()
@@ -148,13 +150,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "ARCHITECTURE", "\"release\"")
         }
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            buildConfigField("String", "ARCHITECTURE", "\"debug\"")
         }
     }
 
@@ -170,6 +170,8 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+
+    sourceSets.getByName("androidTest").assets.srcDir("$projectDir/schemas")
 
     kotlin {
         jvmToolchain(21)
@@ -272,7 +274,7 @@ dependencies {
     implementation(libs.concurrent.futures)
 
     implementation(libs.activity)
-    implementation(libs.hilt.navigation)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.datastore)
     "universalImplementation"(libs.mmkv)
     "arm64Implementation"(libs.mmkv)
@@ -301,7 +303,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.exifinterface)
 
-    implementation(libs.coil)
+    implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
@@ -345,17 +347,24 @@ dependencies {
 
     implementation(libs.apache.lang3)
 
-    implementation(libs.hilt)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
     implementation(libs.jsoup)
-    ksp(libs.hilt.compiler)
 
     implementation(project(":innertube"))
-    implementation(project(":lyrics"))
+    implementation(project(":lyrics-data"))
     implementation(project(":integrations"))
     implementation(project(":spotify"))
     implementation(project(":artwork"))
     implementation(project(":network-storage"))
     implementation(project(":canvas"))
+    implementation(project(":playback-core"))
+    implementation(project(":playback-presentation"))
+    implementation(project(":history-core"))
+    implementation(project(":listen-together-core"))
+    implementation(project(":library-core"))
+    implementation(project(":search-core"))
+    implementation(project(":design-system"))
     implementation(project(":spine"))
     implementation(project(":hig"))
 
@@ -384,6 +393,12 @@ dependencies {
     implementation(libs.onnxruntime)
 
     testImplementation(libs.junit)
+    testImplementation(libs.koin.test)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.junit)
 }
 
 

@@ -97,7 +97,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEachReversed
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import com.composables.sfsymbols.SfSymbols
@@ -191,6 +190,7 @@ import com.convx.music.ui.utils.rememberHeroZoom
 import com.convx.music.utils.listItemShape
 import com.convx.music.utils.rememberPreference
 import com.convx.music.viewmodels.OnlinePlaylistViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.music.innertube.models.AlbumItem
 import com.music.innertube.models.ArtistItem
 import com.music.innertube.models.PlaylistItem
@@ -209,7 +209,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun OnlinePlaylistScreen(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: OnlinePlaylistViewModel = hiltViewModel(),
+    viewModel: OnlinePlaylistViewModel = koinViewModel(),
 ) {
     val menuState = LocalMenuState.current
     val database = LocalDatabase.current.get()

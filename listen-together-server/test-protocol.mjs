@@ -52,7 +52,9 @@ check(!!created?.payload?.session_token, 'room_created returns session token');
 check(created?.payload?.room_code === room.room_code, 'room code matches allocation');
 
 send(host, 'ping');
-check(!!(await waitFor(host, 'pong')), 'ping -> pong');
+const pong = await waitFor(host, 'pong');
+check(!!pong, 'ping -> pong');
+check(Math.abs((pong?.payload?.server_time ?? 0) - Date.now()) < 60_000, 'pong carries server_time');
 
 const guest = await open(`${wsBase}/room/${room.room_code}`);
 send(guest, 'join_room', { username: 'guest-user' });

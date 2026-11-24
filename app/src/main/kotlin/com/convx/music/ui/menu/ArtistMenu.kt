@@ -10,6 +10,7 @@ import com.convx.music.ui.component.SymbolIcon
 import com.convx.music.ui.component.menuBottomInset
 import android.content.Intent
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,6 +27,9 @@ import com.convx.music.ui.ios.compat.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -42,10 +46,12 @@ import com.convx.music.db.entities.Artist
 import com.convx.music.extensions.toMediaItem
 import com.convx.music.playback.queues.ListQueue
 import com.convx.music.ui.component.ArtistListItem
+import com.convx.music.ui.component.CoverSearchDialog
 import com.convx.music.ui.component.IosMenuGroup
 import com.convx.music.ui.component.IosMenuItemData
 import com.convx.music.ui.component.NewAction
 import com.convx.music.ui.component.NewActionGrid
+import com.convx.music.utils.SongBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -66,6 +72,14 @@ fun ArtistMenu(
     val artistState = database.artist(originalArtist.id).collectAsState(initial = originalArtist)
     val artist = artistState.value ?: originalArtist
     val isPinned by database.speedDialDao.isPinned(artist.id).collectAsState(initial = false)
+    var showCoverSearch by rememberSaveable { mutableStateOf(false) }
+    if (showCoverSearch) {
+        CoverSearchDialog(
+            initialQuery = artist.artist.name,
+            onDismiss = { showCoverSearch = false },
+            apply = { url -> SongBundle.applyArtistCover(context, database, artist.id, url) },
+        )
+    }
 
     ArtistListItem(
         artist = artist,
@@ -174,6 +188,37 @@ fun ArtistMenu(
                             }
                         )
                     )
+
+                    if (!artist.artist.isYouTubeArtist) {
+                        add(
+                            NewAction(
+                                icon = {
+                                    SymbolIcon(symbol = sf("photo"), contentDescription = null, size = 28.dp, tint = AppTheme.colorScheme.onSurfaceVariant)
+                                },
+                                text = stringResource(R.string.search_cover),
+                                onClick = { showCoverSearch = true }
+                            )
+                        )
+                        add(
+                            NewAction(
+                                icon = {
+                                    SymbolIcon(symbol = sf("arrow.down.circle"), contentDescription = null, size = 28.dp, tint = AppTheme.colorScheme.onSurfaceVariant)
+                                },
+                                text = stringResource(R.string.artist_download_image),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val saved = SongBundle.downloadArtistImage(context, database, artist.id, artist.artist.name)
+                                        Toast.makeText(
+                                            context,
+                                            if (saved) R.string.artist_image_downloaded else R.string.artist_image_not_found,
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    }
+                                    onDismiss()
+                                }
+                            )
+                        )
+                    }
 
                     if (artist.artist.isYouTubeArtist) {
                         add(

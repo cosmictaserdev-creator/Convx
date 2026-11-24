@@ -9,19 +9,16 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.convx.music.db.MusicDatabase
 import com.convx.music.listentogether.ListenTogetherPlayerConnectionBridge
 import com.convx.music.playback.MusicService.MusicBinder
-import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Provider
+import com.convx.music.di.ValueProvider
 
 /** Owns the activity-bound connection between the UI and the playback service. */
-@ActivityScoped
-class PlaybackServiceConnector @Inject constructor(
-    private val databaseProvider: Provider<MusicDatabase>,
+class PlaybackServiceConnector(
+    private val databaseProvider: ValueProvider<MusicDatabase>,
     private val listenTogetherConnectionBridge: ListenTogetherPlayerConnectionBridge,
 ) : ServiceConnection {
     private var isBound = false

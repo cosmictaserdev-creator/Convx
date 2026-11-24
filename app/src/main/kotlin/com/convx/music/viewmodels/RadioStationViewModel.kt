@@ -9,19 +9,15 @@ import com.convx.music.utils.get
 import com.music.innertube.YouTube
 import com.music.innertube.models.SongItem
 import com.music.innertube.models.WatchEndpoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class RadioStationViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class RadioStationViewModel(
+    private val context: Context,
 ) : ViewModel() {
     private val _tracks = MutableStateFlow<List<SongItem>?>(null)
     val tracks = _tracks.asStateFlow()

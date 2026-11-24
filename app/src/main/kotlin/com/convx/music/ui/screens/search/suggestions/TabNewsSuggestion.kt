@@ -46,7 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
@@ -79,7 +79,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun SuggestionsTabContent(
     navController: NavController,
-    viewModel: SuggestionsViewModel = hiltViewModel(),
+    viewModel: SuggestionsViewModel = koinViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val suggestionTracks by viewModel.suggestionTracks.collectAsStateWithLifecycle()

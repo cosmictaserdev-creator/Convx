@@ -2,7 +2,6 @@ package com.convx.music.eq.data
 
 import android.content.Context
 import com.tencent.mmkv.MMKV
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,8 +11,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Saved EQ Profile with metadata
@@ -34,9 +31,8 @@ data class SavedEQProfile(
  * Repository for managing EQ profiles
  * Handles saving, loading, and activating EQ profiles
  */
-@Singleton
-class EQProfileRepository @Inject constructor(
-    @ApplicationContext private val context: Context
+class EQProfileRepository(
+    private val context: Context
 ) {
     private val prefs: MMKV? = MMKV.mmkvWithID(
         "nanosonic_eq_profiles"

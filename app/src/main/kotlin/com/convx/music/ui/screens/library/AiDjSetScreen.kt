@@ -35,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.convx.music.LocalDatabase
@@ -72,7 +72,7 @@ fun AiDjSetScreen(
     scrollBehavior: TopAppBarScrollBehavior,
     seedSongId: String?,
     startInConcertMode: Boolean = false,
-    viewModel: AiDjSetViewModel = hiltViewModel(),
+    viewModel: AiDjSetViewModel = koinViewModel(),
 ) {
     val database = LocalDatabase.current.get()
     val playerConnection = LocalPlayerConnection.current ?: return

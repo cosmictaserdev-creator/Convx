@@ -19,22 +19,18 @@ import com.convx.music.ui.utils.resize
 import com.convx.music.utils.dataStore
 import com.convx.music.utils.get
 import com.convx.music.utils.reportException
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 enum class AccountContentType {
     PLAYLISTS, ALBUMS, ARTISTS
 }
 
-@HiltViewModel
-class AccountViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class AccountViewModel(
+    private val context: Context,
 ) : ViewModel() {
     val playlists = MutableStateFlow<List<PlaylistItem>?>(null)
     val albums = MutableStateFlow<List<AlbumItem>?>(null)

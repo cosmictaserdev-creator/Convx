@@ -12,15 +12,12 @@ import androidx.lifecycle.viewModelScope
 import com.convx.music.ai.AiDjSetBuilder
 import com.convx.music.ai.AiDjSetResult
 import com.convx.music.db.MusicDatabase
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class AiDjSetState(
     val isRunning: Boolean = false,
@@ -33,9 +30,8 @@ data class AiDjSetState(
     val savedPlaylistId: String? = null,
 )
 
-@HiltViewModel
-class AiDjSetViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+class AiDjSetViewModel(
+    private val context: Context,
     private val database: MusicDatabase,
 ) : ViewModel() {
 

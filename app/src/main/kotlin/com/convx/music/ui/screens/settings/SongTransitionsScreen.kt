@@ -43,6 +43,9 @@ import com.convx.music.playback.smart.DemucsModel
 import com.convx.music.playback.smart.StemQuality
 import com.convx.music.playback.smart.StemStore
 import com.convx.music.constants.DemucsModelUrlKey
+import com.convx.music.constants.DemucsAutoDownloadKey
+import com.convx.music.playback.smart.StemLab
+import androidx.compose.runtime.LaunchedEffect
 import com.convx.music.constants.StemQualityKey
 import com.convx.music.ui.component.TextFieldDialog
 import androidx.compose.ui.text.input.TextFieldValue
@@ -84,13 +87,38 @@ fun SongTransitionsScreen(navController: NavController) {
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var stemBytes by remember { mutableStateOf(StemStore.totalBytes(context)) }
     val (stemQuality, onStemQualityChange) = rememberEnumPreference(StemQualityKey, StemQuality.FAST)
-    val (modelUrl, onModelUrlChange) = rememberPreference(DemucsModelUrlKey, "")
+    val (modelUrl, onModelUrlChange) = rememberPreference(DemucsModelUrlKey, DemucsModel.DEFAULT_URL)
+    val (autoDownload, onAutoDownloadChange) = rememberPreference(DemucsAutoDownloadKey, false)
     var showStemQualityDialog by rememberSaveable { mutableStateOf(false) }
     var showLibraryStemNotice by rememberSaveable { mutableStateOf(false) }
     var libraryStemBytes by remember { mutableStateOf(0L) }
     var showModelDialog by rememberSaveable { mutableStateOf(false) }
     var modelInstalled by remember { mutableStateOf(DemucsModel.isInstalled(context)) }
-    var modelProgress by remember { mutableStateOf<Float?>(null) }
+    // Shared with the automatic download, which may be running without this screen having started it.
+    val modelProgress by DemucsModel.progress.collectAsStateWithLifecycle()
+    LaunchedEffect(modelProgress) { if (modelProgress == null) modelInstalled = DemucsModel.isInstalled(context) }
+    val stemLab by StemLab.state.collectAsStateWithLifecycle()
+    val playerConnection = com.convx.music.LocalPlayerConnection.current
+    val nowPlaying by (playerConnection?.mediaMetadata ?: kotlinx.coroutines.flow.MutableStateFlow(null)).collectAsStateWithLifecycle()
+
+    stemLab?.takeIf { it !is StemLab.State.Running }?.let { result ->
+        com.convx.music.ui.ios.compat.AlertDialog(
+            onDismissRequest = { StemLab.dismiss() },
+            title = { Text(stringResource(R.string.stem_lab)) },
+            text = {
+                Text(
+                    when (result) {
+                        is StemLab.State.Done -> (listOf(stringResource(R.string.stem_lab_saved, result.folder)) + result.report).joinToString("\n")
+                        is StemLab.State.Failed -> result.reason
+                        is StemLab.State.Running -> ""
+                    }
+                )
+            },
+            confirmButton = {
+                com.convx.music.ui.ios.compat.TextButton(onClick = { StemLab.dismiss() }) { Text(stringResource(android.R.string.ok)) }
+            },
+        )
+    }
 
     if (showLibraryStemNotice) {
         com.convx.music.ui.component.StemNoticeDialog(
@@ -120,19 +148,28 @@ fun SongTransitionsScreen(navController: NavController) {
     if (showModelDialog) {
         TextFieldDialog(
             title = { Text(stringResource(R.string.demucs_model)) },
-            initialTextFieldValue = TextFieldValue(modelUrl),
+            initialTextFieldValue = TextFieldValue(modelUrl.ifBlank { DemucsModel.DEFAULT_URL }),
             placeholder = { Text("https://…/htdemucs.onnx") },
-            extraContent = { Text(stringResource(R.string.demucs_notice), modifier = Modifier.padding(top = 8.dp)) },
+            extraContent = {
+                Text(
+                    stringResource(
+                        R.string.demucs_notice_default,
+                        android.text.format.Formatter.formatShortFileSize(context, DemucsModel.DEFAULT_BYTES),
+                    ),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            },
             onDone = { url ->
-                onModelUrlChange(url.trim())
+                val chosen = url.trim().ifBlank { DemucsModel.DEFAULT_URL }
+                onModelUrlChange(chosen)
+                showModelDialog = false
                 scope.launch {
-                    modelProgress = 0f
-                    val result = DemucsModel.install(context, url.trim()) { modelProgress = it }
-                    modelProgress = null
+                    val result = DemucsModel.install(context, chosen)
                     modelInstalled = DemucsModel.isInstalled(context)
                     val message = when (result) {
                         DemucsInstall.OK -> R.string.demucs_ready
                         DemucsInstall.DOWNLOAD_FAILED -> R.string.demucs_download_failed
+                        DemucsInstall.CORRUPT -> R.string.demucs_corrupt
                         DemucsInstall.INCOMPATIBLE -> R.string.demucs_incompatible
                     }
                     android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
@@ -287,6 +324,24 @@ fun SongTransitionsScreen(navController: NavController) {
                             ),
                             IosSettingsItem(
                                 icon = painterResource(R.drawable.equalizer),
+                                title = { Text(stringResource(R.string.demucs_auto_download)) },
+                                description = { Text(stringResource(R.string.demucs_auto_download_desc)) },
+                                trailingContent = {
+                                    Switch(
+                                        checked = autoDownload,
+                                        onCheckedChange = { on ->
+                                            onAutoDownloadChange(on)
+                                            if (on) scope.launch(Dispatchers.IO) { DemucsModel.autoDownloadIfWanted(context, enabled = true) }
+                                        },
+                                    )
+                                },
+                                onClick = {
+                                    onAutoDownloadChange(!autoDownload)
+                                    if (!autoDownload) scope.launch(Dispatchers.IO) { DemucsModel.autoDownloadIfWanted(context, enabled = true) }
+                                },
+                            ),
+                            IosSettingsItem(
+                                icon = painterResource(R.drawable.equalizer),
                                 title = { Text(stringResource(R.string.stems_storage)) },
                                 description = { Text(android.text.format.Formatter.formatShortFileSize(context, stemBytes)) },
                                 onClick = {
@@ -298,6 +353,32 @@ fun SongTransitionsScreen(navController: NavController) {
                             ),
                         ),
                     )
+                    if (com.convx.music.BuildConfig.DEBUG) {
+                        Spacer(Modifier.height(16.dp))
+                        IosSettingsGroup(
+                            title = stringResource(R.string.stem_lab),
+                            items = listOf(
+                                IosSettingsItem(
+                                    icon = painterResource(R.drawable.equalizer),
+                                    title = { Text(stringResource(R.string.stem_lab_split_now_playing)) },
+                                    description = {
+                                        Text(
+                                            (stemLab as? StemLab.State.Running)?.step
+                                                ?: nowPlaying?.title?.let { stringResource(R.string.stem_lab_desc, it) }
+                                                ?: stringResource(R.string.stem_lab_nothing_playing)
+                                        )
+                                    },
+                                    onClick = {
+                                        val song = nowPlaying
+                                        when {
+                                            stemLab is StemLab.State.Running -> StemLab.cancel()
+                                            song != null -> StemLab.run(context, song.id, song.title)
+                                        }
+                                    },
+                                ),
+                            ),
+                        )
+                    }
                     if (creative) {
                         Spacer(Modifier.height(16.dp))
                         IosSettingsGroup(

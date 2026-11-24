@@ -19,17 +19,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.convx.music.db.MusicDatabase
+import com.convx.music.di.ValueProvider
 import com.convx.music.playback.DownloadUtil
 import com.convx.music.playback.PlayerConnection
 import com.convx.music.ui.screens.settings.RingtoneViewModel
 import com.convx.music.utils.SyncUtils
 
-val LocalDatabase = staticCompositionLocalOf<dagger.Lazy<MusicDatabase>> { error("No database provided") }
+val LocalDatabase = staticCompositionLocalOf<ValueProvider<MusicDatabase>> { error("No database provided") }
 val LocalRingtoneViewModel = staticCompositionLocalOf<RingtoneViewModel> { error("No RingtoneViewModel provided") }
 val LocalPlayerConnection = staticCompositionLocalOf<PlayerConnection?> { error("No PlayerConnection provided") }
 val LocalPlayerAwareWindowInsets = compositionLocalOf<WindowInsets> { error("No WindowInsets provided") }
-val LocalDownloadUtil = staticCompositionLocalOf<dagger.Lazy<DownloadUtil>> { error("No DownloadUtil provided") }
-val LocalSyncUtils = staticCompositionLocalOf<dagger.Lazy<SyncUtils>> { error("No SyncUtils provided") }
+val LocalDownloadUtil = staticCompositionLocalOf<ValueProvider<DownloadUtil>> { error("No DownloadUtil provided") }
+val LocalSyncUtils = staticCompositionLocalOf<ValueProvider<SyncUtils>> { error("No SyncUtils provided") }
 val LocalListenTogetherManager = staticCompositionLocalOf<com.convx.music.listentogether.ListenTogetherManager?> { null }
 val LocalIsPlayerExpanded = compositionLocalOf { false }
 

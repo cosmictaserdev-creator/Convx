@@ -94,6 +94,8 @@ object SettingsHubs {
                         "Choose the playback control icons"),
                     SettingsLink("Canvas", R.drawable.canvas_art, { systemTeal }, route("settings/appearance/canvas"),
                         "Animated artwork behind the player", "video animated artwork"),
+                    SettingsLink("Ambient Mode", R.drawable.fullscreen, { systemIndigo }, route("settings/ambient"),
+                        "Canvas, lyrics and controls for a fullscreen listening view", "ambient fullscreen landscape canvas progress ring"),
                 ),
             ),
             SettingsLinkGroup(
@@ -102,7 +104,7 @@ object SettingsHubs {
                     SettingsLink("Lyrics style", R.drawable.lyrics, { systemPink }, SettingsAction.LyricsStyle,
                         "Animation, position, scrolling and swipe — live preview", "animation karaoke word by word apple music position auto scroll swipe"),
                     SettingsLink("Lyrics effects", R.drawable.lyrics, { systemPink }, route("settings/lyrics"),
-                        "Style, fonts, size, glow and blur", "convx lyrics font size glow blur apple music standard"),
+                        "Style, fonts, size, glow and blur", "flamingo font size glow blur apple music standard"),
                     SettingsLink("Text & layout", R.drawable.lyrics, { systemOrange }, route("settings/appearance"),
                         "Text size, spacing and full-screen lyrics", "size spacing fullscreen"),
                     SettingsLink("Sources & priority", R.drawable.lyrics, { systemBlue }, route("settings/content/advanced"),
