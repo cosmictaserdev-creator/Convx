@@ -64,9 +64,11 @@ sealed interface NetworkServer {
                 }
                 NetworkProtocol.NAVIDROME -> {
                     val input = address.trim().let { if (it.contains("://")) it else "http://$it" }
-                    val uri = URI(input)
-                    require(uri.scheme.lowercase() in setOf("https", "http") && !uri.host.isNullOrBlank() && uri.userInfo == null && uri.query == null && uri.fragment == null) { "Enter the Navidrome server URL" }
-                    require(uri.port == -1 || uri.port in 1..65535) { "Invalid server port" }
+                    val scheme = input.substringBefore("://").lowercase()
+                    val authority = input.substringAfter("://").substringBefore('/').substringBefore('?').substringBefore('#')
+                    require(scheme in setOf("https", "http") && authority.isNotBlank() && '@' !in authority && '?' !in input && '#' !in input) { "Enter the Navidrome server URL" }
+                    val portText = if (authority.startsWith("[")) authority.substringAfter("]", "").removePrefix(":") else authority.substringAfter(':', "")
+                    require(portText.isEmpty() || portText.toIntOrNull()?.let { it in 1..65535 } == true) { "Invalid server port" }
                     Navidrome(id, name.trim(), input.trimEnd('/') + "/", credentials)
                 }
                 NetworkProtocol.SMB -> {
