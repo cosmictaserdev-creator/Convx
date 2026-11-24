@@ -65,7 +65,7 @@ class NavidromeFileSource(val client: OkHttpClient = OkHttpClient.Builder()
             "cover" -> {
                 val url = signed(source, "getCoverArt", "id" to idOf(parts.getOrNull(1).orEmpty()), "size" to "800")
                 client.newCall(Request.Builder().url(url).build()).execute().use { response ->
-                    WebDavFileSource.checkStatus(response.code)
+                    checkNavidromeStatus(response.code)
                     val body = response.body ?: throw StorageException(StorageError.INVALID_RESPONSE)
                     if (body.contentLength() > MaxCoverBytes) throw StorageException(StorageError.LIMIT_REACHED)
                     BytesRemoteFile(body.bytes())
@@ -186,7 +186,7 @@ class NavidromeFileSource(val client: OkHttpClient = OkHttpClient.Builder()
     private fun call(server: NetworkServer.Navidrome, method: String, vararg params: Pair<String, String>): JSONObject {
         val request = Request.Builder().url(signed(server, method, *params, json = true)).build()
         val text = client.newCall(request).execute().use { response ->
-            WebDavFileSource.checkStatus(response.code)
+            checkNavidromeStatus(response.code)
             val body = response.body ?: throw StorageException(StorageError.INVALID_RESPONSE)
             if (body.contentLength() > MaxJsonBytes) throw StorageException(StorageError.LIMIT_REACHED)
             body.string()
@@ -244,7 +244,7 @@ private class HttpRangeFile(private val client: OkHttpClient, private val url: H
             close()
             val result = client.newCall(Request.Builder().url(url).header("Range", "bytes=$position-").build()).execute()
             try {
-                WebDavFileSource.checkStatus(result.code)
+                checkNavidromeStatus(result.code)
                 val body = result.body ?: throw StorageException(StorageError.INVALID_RESPONSE)
                 val stream = body.byteStream()
                 if (result.code == 200 && position > 0) {
@@ -269,4 +269,13 @@ private class HttpRangeFile(private val client: OkHttpClient, private val url: H
     }
 
     override fun close() { response?.close(); response = null; input = null }
+}
+
+private fun checkNavidromeStatus(code: Int) {
+    if (code in 200..299) return
+    throw StorageException(when (code) {
+        401, 403 -> StorageError.AUTHENTICATION
+        404 -> StorageError.NOT_FOUND
+        else -> StorageError.CONNECTION
+    })
 }
