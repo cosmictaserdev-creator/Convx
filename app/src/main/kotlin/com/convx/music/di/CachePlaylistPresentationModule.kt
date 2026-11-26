@@ -15,6 +15,7 @@ val playlistDetailPresentationModule = module {
             database = get(),
             playerCache = get(named("playerCache")),
             downloadCache = get(named("downloadCache")),
+            applicationScope = get(),
             savedStateHandle = get(),
         )
     }

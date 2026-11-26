@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings used by the BitChord lyrics panel, copied from BitChord (GPL-3.0). -->
+<resources>
+    <string name="bc_instrumental">Instrumental</string>
+    <string name="bc_lyrics_already_in_language">These lyrics are already in %1$s</string>
+    <string name="bc_lyrics_already_romanized">These lyrics already use Latin characters</string>
+    <string name="bc_lyrics_by">Lyrics by %1$s</string>
+    <string name="bc_lyrics_not_available">Lyrics not available</string>
+    <string name="bc_lyrics_romanization_unavailable">Romanization is unavailable for these lyrics</string>
+    <string name="bc_lyrics_romanized">Romanized pronunciation</string>
+    <string name="bc_lyrics_saved_with_download">Lyrics saved with this download</string>
+    <string name="bc_lyrics_translated_to">Translated to %1$s</string>
+    <string name="bc_lyrics_translation_unavailable">Translation is unavailable right now</string>
+    <string name="bc_no_lyrics_for_track">No lyrics for this track</string>
+    <string name="bc_no_lyrics_found">No lyrics found</string>
+    <string name="bc_open_lyrics">Lyrics</string>
+    <string name="bc_romanize_lyrics">Romanize lyrics</string>
+    <string name="bc_romanizing_lyrics">Romanizing lyrics…</string>
+    <string name="bc_show_original_lyrics">Show original lyrics</string>
+    <string name="bc_translate_lyrics">Translate lyrics</string>
+    <string name="bc_translating_lyrics_to">Translating to %1$s…</string>
+    <string-array name="bc_lyrics_intro_lines">
+        <item>The beat is landing</item>
+        <item>The song is starting</item>
+        <item>Warming up</item>
+        <item>Setting the mood</item>
+        <item>Bass first, words later</item>
+        <item>Wait for it</item>
+        <item>Feel that build</item>
+        <item>Just the groove for now</item>
+        <item>The hook is on the way</item>
+        <item>Let it breathe</item>
+        <item>Cue the vocals</item>
+        <item>First notes in</item>
+    </string-array>
+</resources>

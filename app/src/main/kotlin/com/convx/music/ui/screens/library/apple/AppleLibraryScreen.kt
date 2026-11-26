@@ -587,7 +587,7 @@ internal fun LibraryItemMenu(
                 }
             },
             shareUrl = when (item) {
-                is Album -> item.album.playlistId?.let { com.convx.music.utils.ShareUtils.albumUrl(it) }
+                is Album -> com.convx.music.utils.ShareUtils.albumUrl(item.album.playlistId, item.album.id)
                 is Playlist -> item.playlist.shareLink
                 else -> null
             },

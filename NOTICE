@@ -6,6 +6,14 @@ The provider clients and lyric parsers in lyrics/.../lyrics/bitchord are
 adapted from BitChord (https://github.com/kushagrasinghx/BitChord),
 Copyright its contributors, licensed under GPL-3.0. See LICENSE.
 
+## BitChord lyrics panel
+
+The lyrics renderer and supporting clock, focus, gesture, fading, language
+and playback helpers in app/.../ui/component/bitchord are adapted from
+BitChord (https://github.com/kushagrasinghx/BitChord), Copyright its
+contributors, licensed under GPL-3.0. See LICENSE. Convx supplies Android
+platform adapters and maps its lyrics and playback state into the panel.
+
 ## Flamingo lyrics and player controls
 
 The renderer in app/.../ui/component/flamingo and player chrome values
@@ -42,3 +50,9 @@ sessions and adds connection ownership checks for concurrent readers.
 
 Convx was originally built on an open-source GPL-3.0 music player and has since diverged
 completely. It remains licensed under the GNU General Public License v3.0 (see LICENSE).
+
+blur-widget-demo (MIT License)
+  Source: https://github.com/thatjoshguy67/blur-widget-demo
+  Used for: the approach of opting widgets into Samsung One UI's native wallpaper blur (the two provider attributes
+  plus a translucent @android:id/background root). Implemented in
+  app/src/main/kotlin/com/convx/music/widget/OneUiBlur.kt and ConvxWidgetManager.kt.

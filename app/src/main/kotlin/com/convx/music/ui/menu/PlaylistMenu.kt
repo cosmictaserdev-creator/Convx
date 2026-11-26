@@ -413,12 +413,14 @@ fun PlaylistMenu(
                         text = stringResource(R.string.share),
                         onClick = {
                             onDismiss()
-                            val intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, currentPlaylist.shareLink)
+                            currentPlaylist.shareLink?.let { link ->
+                                val intent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, link)
+                                }
+                                context.startActivity(Intent.createChooser(intent, null))
                             }
-                            context.startActivity(Intent.createChooser(intent, null))
                         }
                     )
                 ),
@@ -611,6 +613,17 @@ fun PlaylistMenu(
                                 }
                             )
                         )
+                    }
+                    if (songs.any { downloads[it.id]?.state == Download.STATE_COMPLETED }) {
+                        add(IosMenuItemData(
+                            title = { Text(stringResource(R.string.check_upgrade_playlist_downloads)) },
+                            description = { Text(stringResource(R.string.check_upgrade_playlist_downloads_desc)) },
+                            icon = { SymbolIcon(symbol = sf("arrow.up.circle"), contentDescription = null) },
+                            onClick = {
+                                downloadUtil.checkAndUpgradeDownloads(songs.map { it.id })
+                                onDismiss()
+                            },
+                        ))
                     }
                     if (downloadPlaylist != true) {
                         add(

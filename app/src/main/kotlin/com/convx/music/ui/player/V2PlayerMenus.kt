@@ -123,6 +123,7 @@ fun V2OptionsMenu(
     sleepTimerLabel: () -> String?,
     onOpenSleepTimer: () -> Unit,
     onOpenAudioDevices: () -> Unit,
+    onSearchCanvas: (() -> Unit)? = null,
 ) {
     V2MenuPopup(
         onDismiss = onDismiss,
@@ -166,6 +167,9 @@ fun V2OptionsMenu(
             IosMenuSection(listOf(
                 IosMenuItem(stringResource(R.string.v2_menu_more), onClick = onMore),
             )),
+            IosMenuSection(listOfNotNull(onSearchCanvas?.let { search ->
+                IosMenuItem(stringResource(R.string.search_canvas), icon = symbolGlyph(com.convx.music.ui.component.sf("magnifyingglass")), onClick = search)
+            })),
         ).filter { it.items.isNotEmpty() },
     )
 }
@@ -228,6 +232,12 @@ fun V2OptionsMenuHost(
     val librarySong by database.song(mediaMetadata.id).collectAsState(initial = null)
     var showGoTo by remember { mutableStateOf(false) }
     var showAddToPlaylist by remember { mutableStateOf(false) }
+    var canvasSearchTarget by remember { mutableStateOf<com.convx.music.models.MediaMetadata?>(null) }
+    canvasSearchTarget?.let { target ->
+        androidx.compose.runtime.key(target.id) {
+            CanvasSearchDialog(target) { canvasSearchTarget = null }
+        }
+    }
 
     if (expanded) {
         V2OptionsMenu(
@@ -254,6 +264,7 @@ fun V2OptionsMenuHost(
             sleepTimerLabel = sleepTimerLabel,
             onOpenSleepTimer = onOpenSleepTimer,
             onOpenAudioDevices = onOpenAudioDevices,
+            onSearchCanvas = { canvasSearchTarget = mediaMetadata; onDismiss() },
         )
     }
     if (showGoTo) {

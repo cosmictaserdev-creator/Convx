@@ -35,6 +35,7 @@ sealed interface CatalogEntry {
         val isVideo: Boolean,
         val isPlayable: Boolean,
         val isInLibrary: Boolean? = null,
+        val discNumber: Int? = null,
     ) : CatalogEntry
 
     data class Album(

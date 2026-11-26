@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import com.convx.music.playback.ExoDownloadService
+import com.convx.music.playback.HlsAudioCache
 import coil3.SingletonImageLoader
 import coil3.annotation.DelicateCoilApi
 import coil3.annotation.ExperimentalCoilApi
@@ -53,11 +54,15 @@ import com.convx.music.LocalPlayerConnection
 import com.convx.music.R
 import com.convx.music.constants.MaxImageCacheSizeKey
 import com.convx.music.constants.MaxSongCacheSizeKey
+import com.convx.music.constants.CacheEvictWhenFullKey
+import com.convx.music.constants.UpcomingCacheEnabledKey
+import com.convx.music.constants.UpcomingCacheMobileDataKey
 import com.convx.music.extensions.tryOrNull
 import com.convx.music.ui.component.ActionPromptDialog
 import com.convx.music.ui.component.IconButton
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.component.ModernSwitch
 import com.convx.music.ui.utils.backToMain
 import com.convx.music.ui.utils.formatFileSize
 import com.convx.music.utils.rememberPreference
@@ -95,8 +100,11 @@ fun StorageSettings(
     )
     val (maxSongCacheSize, onMaxSongCacheSizeChange) = rememberPreference(
         key = MaxSongCacheSizeKey,
-        defaultValue = 1024
+        defaultValue = 2048
     )
+    val (evictWhenFull, onEvictWhenFullChange) = rememberPreference(CacheEvictWhenFullKey, false)
+    val (upcomingCache, onUpcomingCacheChange) = rememberPreference(UpcomingCacheEnabledKey, true)
+    val (upcomingMobile, onUpcomingMobileChange) = rememberPreference(UpcomingCacheMobileDataKey, false)
 
     var clearDownloads by remember { mutableStateOf(false) }
     var clearCacheDialog by remember { mutableStateOf(false) }
@@ -147,6 +155,7 @@ fun StorageSettings(
                 playerCache.keys.forEach { key ->
                     playerCache.removeResource(key)
                 }
+                HlsAudioCache.forgetAll(context)
             }
         }
     }
@@ -201,6 +210,7 @@ fun StorageSettings(
                     playerCache.keys.forEach { key ->
                         playerCache.removeResource(key)
                     }
+                    HlsAudioCache.forgetAll(context)
                 }
                 clearCacheDialog = false
             },
@@ -357,6 +367,23 @@ fun StorageSettings(
                     onClick = {
                         clearCacheDialog = true
                     }
+                ),
+                IosSettingsItem(
+                    title = { Text(stringResource(R.string.cache_replace_old)) },
+                    description = { Text(stringResource(R.string.cache_replace_old_desc)) },
+                    trailingContent = { ModernSwitch(checked = evictWhenFull, onCheckedChange = onEvictWhenFullChange) },
+                    onClick = { onEvictWhenFullChange(!evictWhenFull) },
+                ),
+                IosSettingsItem(
+                    title = { Text(stringResource(R.string.cache_upcoming)) },
+                    description = { Text(stringResource(R.string.cache_upcoming_desc)) },
+                    trailingContent = { ModernSwitch(checked = upcomingCache, onCheckedChange = onUpcomingCacheChange) },
+                    onClick = { onUpcomingCacheChange(!upcomingCache) },
+                ),
+                IosSettingsItem(
+                    title = { Text(stringResource(R.string.cache_upcoming_mobile)) },
+                    trailingContent = { ModernSwitch(checked = upcomingMobile, onCheckedChange = onUpcomingMobileChange) },
+                    onClick = { onUpcomingMobileChange(!upcomingMobile) },
                 )
             )
         )

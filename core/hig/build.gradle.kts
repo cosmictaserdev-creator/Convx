@@ -9,6 +9,11 @@ plugins {
 group = "com.convx.shared"
 version = "0.1.0"
 
+compose.resources {
+    packageOfResClass = "com.convx.music.hig.resources"
+    generateResClass = always
+}
+
 kotlin {
     androidLibrary {
         namespace = "com.convx.music.hig"
@@ -28,7 +33,14 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.smoothCorner)
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
         commonMain.dependencies {
+            implementation(compose.components.resources)
             implementation(project(":design-system"))
             api(compose.runtime)
             api(compose.foundation)

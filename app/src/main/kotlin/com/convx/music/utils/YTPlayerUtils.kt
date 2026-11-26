@@ -187,12 +187,10 @@ object YTPlayerUtils {
                 val response = YouTube.player(videoId, null, client, null, null).getOrNull() ?: continue
                 if (response.playabilityStatus.status != "OK") continue
                 if (response.videoDetails?.musicVideoType == "MUSIC_VIDEO_TYPE_ATV") return@withContext null
-                val candidates = (response.streamingData?.adaptiveFormats.orEmpty() + response.streamingData?.formats.orEmpty())
-                    .filter { it.width != null && it.height != null && it.mimeType.startsWith("video/") }
-                    .sortedWith(compareByDescending<PlayerResponse.StreamingData.Format> { it.mimeType.contains("avc1") }
-                        .thenByDescending { (it.height ?: 0) <= 1080 }
-                        .thenByDescending { (it.fps ?: 30) <= 30 }
-                        .thenByDescending { it.height ?: 0 }.thenBy { it.bitrate })
+                val candidates = rankedVideoFormats(
+                    response.streamingData?.adaptiveFormats.orEmpty() + response.streamingData?.formats.orEmpty(),
+                    requestedHeight = null,
+                ).filter { it.width != null }
                 for (format in candidates.take(3)) {
                     // Never use findUrlOrNull's audio-only fallback for a video surface.
                     val rawUrl = format.url ?: (format.signatureCipher ?: format.cipher)?.let {

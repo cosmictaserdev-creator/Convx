@@ -73,3 +73,6 @@ project(":design-system").projectDir = file("../../core/design-system")
 project(":hig").projectDir = file("../../core/hig")
 include(":listen-together-core")
 project(":listen-together-core").projectDir = file("../../feature/listen-together/domain")
+
+include(":spotify-data")
+project(":spotify-data").projectDir = file("../../feature/spotify/data")

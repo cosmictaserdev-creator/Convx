@@ -10,7 +10,8 @@ class NetworkMusicRepository(
     private val webDav: WebDavFileSource = WebDavFileSource(),
     private val smb: SmbFileSource = SmbFileSource(),
     private val navidrome: NavidromeFileSource = NavidromeFileSource(),
-) : NetworkLibraryRepository by RemoteNetworkLibraryRepository(store, webDav, smb, Dispatchers.IO, navidrome) {
+    private val remote: RemoteNetworkLibraryRepository = RemoteNetworkLibraryRepository(store, webDav, smb, Dispatchers.IO, navidrome),
+) : NetworkLibraryRepository by remote, NetworkMediaAccess by remote {
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun dataSourceFactory(downstream: DataSource.Factory): DataSource.Factory = NetworkDataSourceFactory(downstream, store, webDav, smb, navidrome)
 }

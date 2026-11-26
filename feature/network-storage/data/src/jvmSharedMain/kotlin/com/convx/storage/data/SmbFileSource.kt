@@ -38,8 +38,12 @@ class SmbFileSource internal constructor(private val connect: (NetworkServer.Smb
         withSession(source) { connection, _ -> connection.list(fullPath(source, relative)) }.mapNotNull { entry ->
             coroutineContext.ensureActive()
             if (entry.name == "." || entry.name == "..") null
-            else entry.copy(path = RemotePath.child(relative, entry.name))
-        }.sortedWith(compareBy<NetworkEntry> { !it.directory }.thenBy { it.name.lowercase() })
+            // One file with a name we cannot address must not abort the whole folder listing.
+            else runCatching { entry.copy(path = RemotePath.child(relative, entry.name)) }.getOrNull()
+        }
+            // Some NAS firmware repeats entries when a large directory spans several SMB responses.
+            .distinctBy { it.path }
+            .sortedWith(compareBy<NetworkEntry> { !it.directory }.thenBy { it.name.lowercase() })
     }
 
     override fun open(server: NetworkServer, path: String): RemoteFile {
@@ -51,7 +55,9 @@ class SmbFileSource internal constructor(private val connect: (NetworkServer.Smb
                 override fun read(position: Long, buffer: ByteArray, offset: Int, length: Int): Int = try {
                     file.read(position, buffer, offset, length)
                 } catch (failure: Exception) {
-                    invalidate(source.id, owner)
+                    // Only a broken transport poisons the shared connection. A refused or vanished single file
+                    // must not cut every other open handle (the player's read-ahead, cover art) off mid-song.
+                    if (failure is IOException || !owner.share.connected) invalidate(source.id, owner)
                     throw failure
                 }
                 override fun close() { file.close() }

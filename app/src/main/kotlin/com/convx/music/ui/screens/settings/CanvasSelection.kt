@@ -49,6 +49,7 @@ import com.convx.music.R
 import com.convx.music.constants.CanvasSource
 import com.convx.music.constants.CanvasSourceKey
 import com.convx.music.constants.CanvasThumbnailAnimationKey
+import com.convx.music.constants.CanvasMiniPlayerEnabledKey
 import com.convx.music.ui.component.ExpressiveIconButton
 import com.convx.music.ui.component.IconButton
 import com.convx.music.ui.component.IosSettingsGroup
@@ -72,6 +73,9 @@ fun CanvasSelection(
         CanvasSourceKey,
         defaultValue = CanvasSource.AUTO
     )
+    val (miniCanvas, onMiniCanvasChange) = rememberPreference(CanvasMiniPlayerEnabledKey, true)
+    val (blurQuality, setBlurQuality) = rememberEnumPreference(
+        com.convx.music.constants.CanvasBlurQualityKey, com.convx.music.canvas.CanvasBlurQuality.HIGH)
 
     SettingsPage(
         navController = navController,
@@ -126,6 +130,18 @@ fun CanvasSelection(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        IosSettingsGroup(items = listOf(
+            IosSettingsItem(
+                title = { Text(stringResource(R.string.canvas_mini_player)) },
+                description = { Text(stringResource(R.string.canvas_mini_player_desc)) },
+                enabled = canvasThumbnailAnimation,
+                trailingContent = { ModernSwitch(checked = miniCanvas, onCheckedChange = onMiniCanvasChange, enabled = canvasThumbnailAnimation) },
+                onClick = { onMiniCanvasChange(!miniCanvas) },
+            ),
+        ))
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -198,6 +214,28 @@ fun CanvasSelection(
                     onClick = { onCanvasSourceChange(CanvasSource.SPOTIFY) }
                 )
             )
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        CanvasProviderControls(enabled = canvasThumbnailAnimation, automatic = canvasSource == CanvasSource.AUTO)
+        IosSettingsGroup(
+            title = stringResource(R.string.canvas_blur_quality),
+            items = com.convx.music.canvas.CanvasBlurQuality.entries.map { quality ->
+                IosSettingsItem(
+                    leadingContent = { RadioButton(selected = blurQuality == quality, onClick = null) },
+                    title = { Text(stringResource(when (quality) {
+                        com.convx.music.canvas.CanvasBlurQuality.HIGH -> R.string.canvas_blur_high
+                        com.convx.music.canvas.CanvasBlurQuality.BALANCED -> R.string.canvas_blur_balanced
+                        com.convx.music.canvas.CanvasBlurQuality.LOW -> R.string.canvas_blur_low
+                    })) },
+                    onClick = { setBlurQuality(quality) },
+                )
+            },
+        )
+        Text(
+            text = stringResource(R.string.canvas_blur_quality_desc),
+            style = AppTheme.typography.bodySmall,
+            color = AppTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
         )
         Spacer(modifier = Modifier.height(36.dp))
     
