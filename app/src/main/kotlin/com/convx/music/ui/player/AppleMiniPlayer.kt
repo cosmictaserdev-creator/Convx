@@ -79,7 +79,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun AppleMiniPlayer(
     progressState: ProgressState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    canvasVideo: CanvasVideoController? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     
@@ -136,8 +137,11 @@ fun AppleMiniPlayer(
         spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow)
     }
 
-    val autoSwipeThreshold = remember(swipeSensitivity) {
-        (600 / (1f + kotlin.math.exp(-(-11.44748 * swipeSensitivity + 9.04945)))).roundToInt()
+    val swipeDistancePercent by rememberPreference(com.convx.music.constants.SwipeDistanceKey, 30)
+    val swipeScreenWidthPx = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp *
+    androidx.compose.ui.platform.LocalDensity.current.density
+    val autoSwipeThreshold = remember(swipeDistancePercent, swipeScreenWidthPx) {
+    (swipeScreenWidthPx * swipeDistancePercent.coerceIn(10, 100) / 100f).roundToInt()
     }
 
     val (gradientColors, onGradientColorsChange) = remember { mutableStateOf<List<Color>>(emptyList()) }
@@ -165,7 +169,7 @@ fun AppleMiniPlayer(
             .padding(horizontal = 12.dp)
             .let { baseModifier ->
                 if (swipeThumbnail) {
-                    baseModifier.pointerInput(Unit) {
+                    baseModifier.pointerInput(autoSwipeThreshold) {
                         detectHorizontalDragGestures(
                             onDragStart = {
                                 dragStartTime = System.currentTimeMillis()
@@ -273,6 +277,9 @@ fun AppleMiniPlayer(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
+                    }
+                    if (canvasVideo != null) {
+                        CanvasVideoSurface(controller = canvasVideo, modifier = Modifier.fillMaxSize())
                     }
                 }
 

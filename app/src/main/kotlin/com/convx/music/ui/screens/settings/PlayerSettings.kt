@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Slider
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,12 @@ import com.convx.music.constants.AutoSkipNextOnErrorKey
 import com.convx.music.constants.CrossfadeEnabledKey
 import com.convx.music.constants.EnableGoogleCastKey
 import com.convx.music.constants.KeepScreenOn
+import com.convx.music.constants.MusicHapticsKey
+import com.convx.music.constants.MusicHapticsLeadKey
+import com.convx.music.constants.MusicHapticsSensitivityKey
+import com.convx.music.constants.MusicHapticsStrengthKey
+import com.convx.music.constants.VisualizerDelayKey
+import com.convx.music.constants.VisualizerEnabledKey
 import com.convx.music.constants.PauseOnMute
 import com.convx.music.constants.PersistentQueueKey
 import com.convx.music.constants.RememberShuffleAndRepeatKey
@@ -41,6 +48,7 @@ import com.convx.music.constants.SkipSilenceKey
 import com.convx.music.ui.component.EnumDialog
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.component.IosSettingsSymbolTile
 import com.convx.music.ui.ios.compat.Switch
 import com.convx.music.ui.ios.compat.Text
 import com.convx.music.utils.rememberEnumPreference
@@ -90,6 +98,14 @@ fun PlayerSettings(
         com.convx.music.constants.SaveDownloadsToMusicFolderKey,
         defaultValue = true
     )
+    val (keepDownloadsInApp, onKeepDownloadsInAppChange) = rememberPreference(
+        com.convx.music.constants.KeepDownloadsInAppKey,
+        defaultValue = true
+    )
+    val (showDownloadsInLocal, onShowDownloadsInLocalChange) = rememberPreference(
+        com.convx.music.constants.ShowDownloadsInLocalKey,
+        defaultValue = false
+    )
     val (similarContentEnabled, similarContentEnabledChange) = rememberPreference(
         key = SimilarContent,
         defaultValue = true
@@ -117,6 +133,34 @@ fun PlayerSettings(
     val (keepScreenOn, onKeepScreenOnChange) = rememberPreference(
         KeepScreenOn,
         defaultValue = false
+    )
+    val (musicHaptics, onMusicHapticsChange) = rememberPreference(
+        MusicHapticsKey,
+        defaultValue = false
+    )
+    val (hapticSensitivity, onHapticSensitivityChange) = rememberPreference(
+        MusicHapticsSensitivityKey,
+        defaultValue = 0.5f
+    )
+    val (hapticStrength, onHapticStrengthChange) = rememberPreference(
+        MusicHapticsStrengthKey,
+        defaultValue = 0.5f
+    )
+    val (hapticLead, onHapticLeadChange) = rememberPreference(
+        MusicHapticsLeadKey,
+        defaultValue = 30f
+    )
+    val (liveVisualizer, onLiveVisualizerChange) = rememberPreference(
+        VisualizerEnabledKey,
+        defaultValue = false
+    )
+    val (visualizerDelay, onVisualizerDelayChange) = rememberPreference(
+        VisualizerDelayKey,
+        defaultValue = 220f
+    )
+    val (queueBeforeContext, onQueueBeforeContextChange) = rememberPreference(
+        com.convx.music.constants.QueueBeforeContextKey,
+        defaultValue = true
     )
     var showAudioQualityDialog by remember {
         mutableStateOf(false)
@@ -333,6 +377,31 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onSaveDownloadsToMusicChange(!saveDownloadsToMusic) }
+                        ),
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("arrow.down.circle") },
+                            title = { Text(stringResource(R.string.keep_downloads_in_app)) },
+                            description = { Text(stringResource(R.string.keep_downloads_in_app_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = keepDownloadsInApp || !saveDownloadsToMusic,
+                                    enabled = saveDownloadsToMusic,
+                                    onCheckedChange = onKeepDownloadsInAppChange
+                                )
+                            },
+                            onClick = { if (saveDownloadsToMusic) onKeepDownloadsInAppChange(!keepDownloadsInApp) }
+                        ),
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("folder.fill") },
+                            title = { Text(stringResource(R.string.show_downloads_in_local)) },
+                            description = { Text(stringResource(R.string.show_downloads_in_local_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = showDownloadsInLocal,
+                                    onCheckedChange = onShowDownloadsInLocalChange
+                                )
+                            },
+                            onClick = { onShowDownloadsInLocalChange(!showDownloadsInLocal) }
                         )
                     )
                 )
@@ -349,6 +418,88 @@ fun PlayerSettings(
                             onClick = { navController.navigate("settings/scan_music") }
                         ))
                     }
+                )
+
+                Spacer(modifier = Modifier.height(27.dp))
+
+                IosSettingsGroup(
+                    title = "Music haptics",
+                    items = listOf(
+                        IosSettingsItem(
+                            title = { Text("Feel the beat") },
+                            description = { Text("Vibrate to the beat of songs stored on this device") },
+                            trailingContent = {
+                                Switch(
+                                    checked = musicHaptics,
+                                    onCheckedChange = onMusicHapticsChange
+                                )
+                            },
+                            onClick = { onMusicHapticsChange(!musicHaptics) }
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Sensitivity") },
+                            description = {
+                                Slider(
+                                    value = hapticSensitivity,
+                                    onValueChange = onHapticSensitivityChange,
+                                    valueRange = 0f..1f
+                                )
+                            },
+                            enabled = musicHaptics
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Strength") },
+                            description = {
+                                Slider(
+                                    value = hapticStrength,
+                                    onValueChange = onHapticStrengthChange,
+                                    valueRange = 0f..1f
+                                )
+                            },
+                            enabled = musicHaptics
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Timing: vibrate ${hapticLead.toInt()} ms early") },
+                            description = {
+                                Slider(
+                                    value = hapticLead,
+                                    onValueChange = onHapticLeadChange,
+                                    valueRange = 0f..200f
+                                )
+                            },
+                            enabled = musicHaptics
+                        )
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(27.dp))
+
+                IosSettingsGroup(
+                    title = "Live visualizer",
+                    items = listOf(
+                        IosSettingsItem(
+                            title = { Text("Bouncing bars") },
+                            description = { Text("Show bars that move with the music in the player") },
+                            trailingContent = {
+                                Switch(
+                                    checked = liveVisualizer,
+                                    onCheckedChange = onLiveVisualizerChange
+                                )
+                            },
+                            onClick = { onLiveVisualizerChange(!liveVisualizer) }
+                        ),
+                        IosSettingsItem(
+                            title = { Text("Sync delay: ${visualizerDelay.toInt()} ms") },
+                            description = {
+                                Slider(
+                                    value = visualizerDelay,
+                                    onValueChange = onVisualizerDelayChange,
+                                    valueRange = 0f..600f
+                                )
+                            },
+                            enabled = liveVisualizer
+                        )
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(27.dp))
@@ -377,6 +528,18 @@ fun PlayerSettings(
                                 )
                             },
                             onClick = { onResumeOnBluetoothConnectChange(!resumeOnBluetoothConnect) }
+                        ),
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("text.badge.plus") },
+                            title = { Text(stringResource(R.string.queue_before_context)) },
+                            description = { Text(stringResource(R.string.queue_before_context_desc)) },
+                            trailingContent = {
+                                Switch(
+                                    checked = queueBeforeContext,
+                                    onCheckedChange = onQueueBeforeContextChange
+                                )
+                            },
+                            onClick = { onQueueBeforeContextChange(!queueBeforeContext) }
                         ),
                         IosSettingsItem(
                             icon = painterResource(R.drawable.screenshot),

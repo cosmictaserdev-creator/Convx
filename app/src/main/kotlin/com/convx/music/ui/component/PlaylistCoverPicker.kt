@@ -155,6 +155,9 @@ internal fun persistPlaylistCover(context: Context, src: Uri, playlistId: String
         dest.delete()
         return@runCatching null
     }
-    dir.listFiles { f -> f != dest && f.name.startsWith("${safeId}_") }?.forEach { it.delete() }
+    dir.listFiles { f -> f != dest && isCoverFileOf(f.name, safeId) }?.forEach { it.delete() }
     dest.toUri()
 }.getOrNull()
+
+internal fun isCoverFileOf(fileName: String, playlistId: String): Boolean =
+    Regex("^${Regex.escape(playlistId)}_[0-9]+\\.jpg$").matches(fileName)

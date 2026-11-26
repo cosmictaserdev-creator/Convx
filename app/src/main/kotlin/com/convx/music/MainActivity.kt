@@ -26,10 +26,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.lifecycleScope
 import com.convx.music.constants.AppLanguageKey
 import com.convx.music.constants.DisableScreenshotKey
+import com.convx.music.constants.HideStatusBarKey
 import com.convx.music.constants.SYSTEM_DEFAULT
 import com.convx.music.constants.StopMusicOnTaskClearKey
 import com.convx.music.db.MusicDatabase
@@ -53,6 +56,25 @@ import java.util.Locale
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
+    private var hideStatusBar = false
+
+    /** Hides the status bar when the setting is on; a swipe from the top edge still reveals it briefly. */
+    private fun applyStatusBarVisibility() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        if (hideStatusBar) {
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.hide(WindowInsetsCompat.Type.statusBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.statusBars())
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Dialogs and the keyboard bring the bars back; put them away again when the window regains focus.
+        if (hasFocus) applyStatusBarVisibility()
+    }
+
     companion object {
         const val EXTRA_PLAY_INTRO = "com.convx.music.extra.PLAY_INTRO"
         internal const val ACTION_SEARCH = "com.convx.music.action.SEARCH"
@@ -154,6 +176,15 @@ class MainActivity : ComponentActivity() {
             setAppLocale(this, locale)
         }
 
+        lifecycleScope.launch {
+            dataStore.data
+                .map { it[HideStatusBarKey] ?: false }
+                .distinctUntilChanged()
+                .collect {
+                    hideStatusBar = it
+                    applyStatusBarVisibility()
+                }
+        }
         lifecycleScope.launch {
             dataStore.data
                 .map { it[DisableScreenshotKey] ?: false }

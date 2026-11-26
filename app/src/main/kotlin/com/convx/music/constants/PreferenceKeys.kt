@@ -22,6 +22,7 @@ val IsFirstRunKey = booleanPreferencesKey("isFirstRun")
 val FirstLaunchTimestampKey = longPreferencesKey("firstLaunchTimestamp")
 val DonationPromptLastShownKey = longPreferencesKey("donationPromptLastShown")
 val DonationPromptDismissedKey = booleanPreferencesKey("donationPromptDismissed")
+val HideStatusBarKey = booleanPreferencesKey("hideStatusBar")
 val AppIconKey = stringPreferencesKey("appIcon")
 
 /**
@@ -127,6 +128,14 @@ val SeekExtraSeconds = booleanPreferencesKey("seekExtraSeconds")
 val PauseOnMute = booleanPreferencesKey("pauseOnMute")
 val ResumeOnBluetoothConnectKey = booleanPreferencesKey("resumeOnBluetoothConnect")
 val KeepScreenOn = booleanPreferencesKey("keepScreenOn")
+val MusicHapticsKey = booleanPreferencesKey("musicHaptics")
+val MusicHapticsSensitivityKey = floatPreferencesKey("musicHapticsSensitivity")
+val MusicHapticsStrengthKey = floatPreferencesKey("musicHapticsStrength")
+val MusicHapticsLeadKey = floatPreferencesKey("musicHapticsLeadMs")
+val VisualizerEnabledKey = booleanPreferencesKey("liveVisualizer")
+val VisualizerDelayKey = floatPreferencesKey("liveVisualizerDelayMs")
+/** "Add to queue" plays after the current song and earlier queued songs, ahead of the rest of the playlist. */
+val QueueBeforeContextKey = booleanPreferencesKey("queueBeforeContext")
 val DeveloperModeKey = booleanPreferencesKey("developerMode")
 val EnableSettingsPopupKey = booleanPreferencesKey("enableSettingsPopup")
 
@@ -262,6 +271,10 @@ val DisableLoadMoreWhenRepeatAllKey = booleanPreferencesKey("disableLoadMoreWhen
 val AutoDownloadOnLikeKey = booleanPreferencesKey("autoDownloadOnLike")
 /** Copy finished downloads into Music/Convx as real .m4a files (Android 10+). */
 val SaveDownloadsToMusicFolderKey = booleanPreferencesKey("saveDownloadsToMusicFolder")
+/** Keep the in-app copy of a download after it is saved to the device. Off leaves the file only in Download/Convx. */
+val KeepDownloadsInAppKey = booleanPreferencesKey("keepDownloadsInApp")
+/** List the saved Download/Convx files in the Local library too, not only the in-app Downloaded list. */
+val ShowDownloadsInLocalKey = booleanPreferencesKey("showDownloadsInLocal")
 val SimilarContent = booleanPreferencesKey("similarContent")
 val AutoSkipNextOnErrorKey = booleanPreferencesKey("autoSkipNextOnError")
 val StopMusicOnTaskClearKey = booleanPreferencesKey("stopMusicOnTaskClear")
@@ -274,6 +287,10 @@ val CrossfadeGaplessKey = booleanPreferencesKey("crossfadeGapless")
 
 val MaxImageCacheSizeKey = intPreferencesKey("maxImageCacheSize")
 val MaxSongCacheSizeKey = intPreferencesKey("maxSongCacheSize")
+val UpcomingCacheEnabledKey = booleanPreferencesKey("upcomingCacheEnabled")
+val UpcomingCacheMobileDataKey = booleanPreferencesKey("upcomingCacheMobileData")
+val CacheEvictWhenFullKey = booleanPreferencesKey("cacheEvictWhenFull")
+val CachePlaybackReservePercentKey = intPreferencesKey("cachePlaybackReservePercent")
 
 val PauseListenHistoryKey = booleanPreferencesKey("pauseListenHistory")
 val PauseSearchHistoryKey = booleanPreferencesKey("pauseSearchHistory")
@@ -779,31 +796,7 @@ val FetchedModulesKey = stringPreferencesKey("fetchedModules")
 
 
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
-enum class LyricsAnimationStyle {
-    FLAMINGO,
-    NONE,
-    FADE,
-    GLOW,
-    SLIDE,
-    KARAOKE,
-    APPLE,
-    APPLE_V2,
-    BITCHORD,
-    CONVX_1,
-    LYRICS_V2,
-    METRO_LYRICS,
-
-    /**
-     * the reference app's treatment: Apple Music's karaoke view, rendered by
-     * `com.mocharealm.accompanist:lyrics-ui`. The only style that animates the whole
-     * column rather than one line at a time, which is what the smooth catch-up scroll,
-     * the depth-of-field falloff and duet (left/right) alignment all need.
-     */
-    ARCHIVE_TUNE,
-
-    /** Lines on a tilted plane that recedes into a starfield, like an opening crawl. */
-    STAR_CRAWL,
-}
+typealias LyricsAnimationStyle = com.convx.music.playback.LyricsAnimationStyle
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
 val LyricsFontKey = stringPreferencesKey("lyricsFont")
@@ -816,7 +809,13 @@ val RepeatModeKey = intPreferencesKey("repeatMode")
 val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")
 val CanvasThumbnailAnimationKey = booleanPreferencesKey("canvasThumbnailAnimation")
+val CanvasMiniPlayerEnabledKey = booleanPreferencesKey("canvasMiniPlayerEnabled")
+val CanvasBlurQualityKey = stringPreferencesKey("canvasBlurQuality")
 val CanvasSourceKey = stringPreferencesKey("canvasSource")
+val CanvasProviderOrderKey = stringPreferencesKey("canvasProviderOrder")
+val CanvasDisabledProvidersKey = stringPreferencesKey("canvasDisabledProviders")
+val CanvasFirstAvailableKey = booleanPreferencesKey("canvasFirstAvailable")
+val CanvasPriorityWaitSecondsKey = intPreferencesKey("canvasPriorityWaitSeconds")
 
 // Ambient Mode settings are separate from the main player canvas preferences.
 val AmbientVideoCanvasEnabledKey = booleanPreferencesKey("ambientVideoCanvasEnabled")
@@ -862,6 +861,7 @@ enum class CanvasSource {
     SPOTIFY,
 }
 val SwipeSensitivityKey = floatPreferencesKey("swipeSensitivity")
+val SwipeDistanceKey = intPreferencesKey("swipeDistancePercent")
 
 enum class SearchSource {
     LOCAL,
@@ -1124,3 +1124,12 @@ val SuggestionRegionSlugToName =
         "ae" to "United Arab Emirates",
         "il" to "Israel"
     )
+
+val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
+val ReleaseRadarEnabledKey = booleanPreferencesKey("releaseRadarEnabled")
+val OnboardingCompleteKey = booleanPreferencesKey("onboardingComplete")
+val PlayerInlineLyricsKey = booleanPreferencesKey("playerInlineLyrics")
+
+val FisheyeZoomKey = floatPreferencesKey("fisheyeZoom")
+val FisheyeRadiusKey = floatPreferencesKey("fisheyeRadius")
+val FisheyeTextSizeKey = floatPreferencesKey("fisheyeTextSize")

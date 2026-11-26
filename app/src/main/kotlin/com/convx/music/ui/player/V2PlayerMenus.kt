@@ -60,8 +60,9 @@ private fun V2MenuPopup(
     onDismiss: () -> Unit,
     sections: List<IosMenuSection>,
     quickActions: List<IosMenuItem> = emptyList(),
+    placement: V2Placement = AboveEnd
 ) {
-    V2Floating(onDismiss = onDismiss, placement = AboveEnd) {
+    V2Floating(onDismiss = onDismiss, placement = placement) {
         // Liquid glass, like every other floating player control.
         CompositionLocalProvider(com.convx.music.ui.ios.foundation.LocalMenuLiquid provides true) {
             CompositionLocalProvider(
@@ -74,6 +75,23 @@ private fun V2MenuPopup(
     }
 }
 
+/** Lists a song's artists in the same liquid-glass menu as the ellipsis button, so one can be picked. */
+@Composable
+fun V2ArtistPickerMenu(
+    artists: List<Pair<String, String>>,
+    onDismiss: () -> Unit,
+    onPick: (String) -> Unit,
+) {
+    V2MenuPopup(
+        onDismiss = onDismiss,
+        sections = listOf(
+            IosMenuSection(
+                items = artists.map { (id, name) -> IosMenuItem(title = name, onClick = { onPick(id) }) },
+            ),
+        ),
+        placement = AboveCenter,
+    )
+}
 private fun glyph(vector: ImageVector): @Composable (Color) -> Unit = { tint ->
     Icon(vector, null, tint = tint, modifier = Modifier.size(17.dp))
 }
@@ -105,6 +123,7 @@ fun V2OptionsMenu(
     sleepTimerLabel: () -> String?,
     onOpenSleepTimer: () -> Unit,
     onOpenAudioDevices: () -> Unit,
+    onSearchCanvas: (() -> Unit)? = null,
 ) {
     V2MenuPopup(
         onDismiss = onDismiss,
@@ -148,6 +167,9 @@ fun V2OptionsMenu(
             IosMenuSection(listOf(
                 IosMenuItem(stringResource(R.string.v2_menu_more), onClick = onMore),
             )),
+            IosMenuSection(listOfNotNull(onSearchCanvas?.let { search ->
+                IosMenuItem(stringResource(R.string.search_canvas), icon = symbolGlyph(com.convx.music.ui.component.sf("magnifyingglass")), onClick = search)
+            })),
         ).filter { it.items.isNotEmpty() },
     )
 }
@@ -210,6 +232,12 @@ fun V2OptionsMenuHost(
     val librarySong by database.song(mediaMetadata.id).collectAsState(initial = null)
     var showGoTo by remember { mutableStateOf(false) }
     var showAddToPlaylist by remember { mutableStateOf(false) }
+    var canvasSearchTarget by remember { mutableStateOf<com.convx.music.models.MediaMetadata?>(null) }
+    canvasSearchTarget?.let { target ->
+        androidx.compose.runtime.key(target.id) {
+            CanvasSearchDialog(target) { canvasSearchTarget = null }
+        }
+    }
 
     if (expanded) {
         V2OptionsMenu(
@@ -236,6 +264,7 @@ fun V2OptionsMenuHost(
             sleepTimerLabel = sleepTimerLabel,
             onOpenSleepTimer = onOpenSleepTimer,
             onOpenAudioDevices = onOpenAudioDevices,
+            onSearchCanvas = { canvasSearchTarget = mediaMetadata; onDismiss() },
         )
     }
     if (showGoTo) {

@@ -100,6 +100,13 @@ object PresetKeys {
         SquigglySliderKey,
         HideVolumeBarKey,
         CanvasThumbnailAnimationKey,
+        CanvasMiniPlayerEnabledKey,
+        CanvasBlurQualityKey,
+        CanvasSourceKey,
+        CanvasProviderOrderKey,
+        CanvasDisabledProvidersKey,
+        CanvasFirstAvailableKey,
+        CanvasPriorityWaitSecondsKey,
     )
 
     val LYRICS: List<Preferences.Key<*>> = listOf(

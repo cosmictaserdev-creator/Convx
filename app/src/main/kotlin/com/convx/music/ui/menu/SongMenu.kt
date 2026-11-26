@@ -152,6 +152,8 @@ fun SongMenu(
         }
     }
 
+    var showCanvasSearch by remember { mutableStateOf(false) }
+    if (showCanvasSearch) com.convx.music.ui.player.CanvasSearchDialog(song.toMediaMetadata()) { showCanvasSearch = false }
     var showEditDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -375,6 +377,11 @@ fun SongMenu(
         item {
             NewActionGrid(
                 actions = listOfNotNull(
+                    NewAction(
+                        icon = { SymbolIcon(symbol = sf("magnifyingglass"), contentDescription = null) },
+                        text = stringResource(R.string.search_canvas),
+                        onClick = { showCanvasSearch = true },
+                    ),
                     NewAction(
                         icon = { Icon(painterResource(R.drawable.sparks), contentDescription = null, modifier = Modifier.size(28.dp)) },
                         text = stringResource(R.string.song_insight_title),
@@ -776,7 +783,7 @@ fun SongMenu(
                             description = { Text(text = stringResource(R.string.upgrade_download_quality_desc)) },
                             icon = { SymbolIcon(symbol = sf("arrow.up.circle"), contentDescription = null) },
                             onClick = {
-                                downloadUtil.upgradeQuality(song.id)
+                                downloadUtil.checkAndUpgradeDownload(song.id)
                                 onDismiss()
                             }
                         )
@@ -869,7 +876,24 @@ fun SongMenu(
                     if (song.song.isLocal) {
                         add(
                             IosMenuItemData(
-                                title = { Text(text = stringResource(R.string.edit_tags)) },
+                                title = { Text(text = stringResource(R.string.tag_editor_title)) },
+                                description = {
+                                    Text(text = stringResource(R.string.tag_editor_desc))
+                                },
+                                icon = {
+                                    SymbolIcon(symbol = sf("square.and.pencil"), contentDescription = null)
+                                },
+                                onClick = {
+                                    onDismiss()
+                                    bottomSheetPageState.showFloating {
+                                        EditTagsPanel(song)
+                                    }
+                                }
+                            )
+                        )
+                        add(
+                            IosMenuItemData(
+                                title = { Text(text = stringResource(R.string.edit_tags_external)) },
                                 description = {
                                     Text(text = stringResource(R.string.edit_tags_desc))
                                 },

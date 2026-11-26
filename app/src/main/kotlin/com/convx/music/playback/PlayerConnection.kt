@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -181,6 +182,14 @@ class PlayerConnection(
     val currentLyrics = mediaMetadata.flatMapLatest { mediaMetadata ->
         database.lyrics(mediaMetadata?.id)
     }
+    val lyricsPreview = combine(mediaMetadata, currentLyrics) { metadata, lyrics ->
+        val lines = if (lyrics != null && lyrics.id == metadata?.id &&
+            lyrics.lyrics != com.convx.music.db.entities.LyricsEntity.LYRICS_NOT_FOUND) {
+            com.convx.music.lyrics.TimedLyricsParser.parse(lyrics.lyrics)
+        } else emptyList()
+        PlayerLyricsPreview(metadata?.id, lines)
+    }.flowOn(kotlinx.coroutines.Dispatchers.Default)
+
     val currentFormat =
         mediaMetadata.flatMapLatest { mediaMetadata ->
             database.format(mediaMetadata?.id)

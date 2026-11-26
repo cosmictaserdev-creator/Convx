@@ -5,6 +5,7 @@ import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.UriUtil
 import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DataSink
 import androidx.media3.datasource.DataSourceInputStream
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.cache.SimpleCache
@@ -14,6 +15,7 @@ import androidx.media3.exoplayer.hls.playlist.HlsPlaylistParser
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 
 /** An init section plus opening fMP4 fragments for the existing DJ model's MediaExtractor. */
 @UnstableApi
@@ -21,7 +23,13 @@ internal object HlsAnalysisHead {
     private const val MAX_BYTES = 12 * 1024 * 1024
     private const val HEAD_US = 48_000_000L
 
-    suspend fun prefetch(mediaId: String, uri: Uri, cache: SimpleCache, factory: DataSource.Factory) {
+    suspend fun prefetch(
+        mediaId: String,
+        uri: Uri,
+        cache: SimpleCache,
+        factory: DataSource.Factory,
+        sinkFactory: DataSink.Factory = PlayerCacheBudgetRegistry.sinkFactory(cache, prefetch = true),
+    ) {
         val key = "$mediaId#hls-analysis"
         if (cache.getCachedLength(key, 0, MAX_BYTES.toLong()) >= 512 * 1024) return
         var parsed = playlist(uri, factory)
@@ -51,9 +59,18 @@ internal object HlsAnalysisHead {
         val hole = cache.startReadWriteNonBlocking(key, 0, bytes.size().toLong()) ?: return
         if (hole.isCached) return
         try {
-            val file = cache.startFile(key, 0, bytes.size().toLong())
-            file.outputStream().use { bytes.writeTo(it) }
-            cache.commitFile(file, bytes.size().toLong())
+            // This derived file is background work too: use the shared admission
+            // ledger rather than writing directly past the automatic-cache limit.
+            val sink = sinkFactory.createDataSink()
+            try {
+                sink.open(DataSpec.Builder().setUri(uri).setKey(key).setLength(bytes.size().toLong()).build())
+                bytes.writeTo(object : OutputStream() {
+                    override fun write(value: Int) = write(byteArrayOf(value.toByte()), 0, 1)
+                    override fun write(buffer: ByteArray, offset: Int, length: Int) = sink.write(buffer, offset, length)
+                })
+            } finally {
+                sink.close()
+            }
         } finally {
             cache.releaseHoleSpan(hole)
         }

@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kmp.library)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.compose)
 }
 
 group = "com.convx.shared.presentation"
@@ -20,6 +22,12 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":account-core"))
+            api(compose.runtime)
+            api(compose.foundation)
+            api(compose.ui)
+            implementation(compose.animation)
+            implementation(project(":design-system"))
+            implementation(project(":hig"))
             api(libs.kotlinx.coroutines.core)
             implementation(libs.koin.core)
         }

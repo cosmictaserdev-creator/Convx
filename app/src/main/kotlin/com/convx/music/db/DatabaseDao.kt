@@ -122,7 +122,6 @@ interface DatabaseDao {
     @Query("SELECT * FROM song WHERE inLibrary IS NOT NULL ORDER BY totalPlayTime")
     fun songsByPlayTimeAsc(): Flow<List<Song>>
 
-
     fun songs(
         sortType: SongSortType,
         descending: Boolean,
@@ -179,7 +178,7 @@ interface DatabaseDao {
     fun likedSongsCount(): Flow<Int>
 
     @Transaction
-    @Query("SELECT song.* FROM song JOIN song_album_map ON song.id = song_album_map.songId WHERE song_album_map.albumId = :albumId")
+    @Query("SELECT song.* FROM song JOIN song_album_map ON song.id = song_album_map.songId WHERE song_album_map.albumId = :albumId ORDER BY song_album_map.`index`, song.title COLLATE NOCASE")
     fun albumSongs(albumId: String): Flow<List<Song>>
 
     @Transaction
@@ -585,10 +584,15 @@ interface DatabaseDao {
     @Query("SELECT * FROM song WHERE id IN (:songIds)")
     fun songsByIds(songIds: List<String>): Flow<List<Song>>
 
-
     @Transaction
     @Query("SELECT * FROM song_artist_map WHERE songId = :songId")
     fun songArtistMap(songId: String): List<SongArtistMap>
+
+    @Query("SELECT * FROM song_album_map WHERE songId = :songId")
+    fun songAlbumMaps(songId: String): List<SongAlbumMap>
+
+    @Delete
+    fun delete(songAlbumMap: SongAlbumMap)
 
     @Transaction
     @Query("SELECT * FROM song")
@@ -1960,6 +1964,23 @@ interface DatabaseDao {
 
     @Delete
     fun delete(albumArtistMap: AlbumArtistMap)
+
+    /** A re-scan replaces a network song's artist and album links instead of stacking new ones. */
+    @Query("DELETE FROM song_artist_map WHERE songId = :songId")
+    fun clearSongArtists(songId: String)
+
+    @Query("DELETE FROM song_album_map WHERE songId = :songId")
+    fun clearSongAlbums(songId: String)
+
+    @Query("UPDATE song_album_map SET `index` = :index WHERE songId = :songId AND `index` != :index")
+    fun setSongAlbumIndex(songId: String, index: Int)
+
+    /** After a tag edit moves a song, the album or artist it left may be empty. */
+    @Query("DELETE FROM album WHERE isLocal = 1 AND id LIKE 'local_album_%' AND id NOT IN (SELECT albumId FROM song_album_map)")
+    fun pruneEmptyLocalAlbums()
+
+    @Query("DELETE FROM artist WHERE isLocal = 1 AND id LIKE 'local_artist_%' AND id NOT IN (SELECT artistId FROM song_artist_map)")
+    fun pruneEmptyLocalArtists()
 
     @Delete
     fun delete(playlist: PlaylistEntity)

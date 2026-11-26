@@ -948,6 +948,11 @@ internal fun AppRootContent(
                             }
                         }
 
+                        com.convx.music.ui.onboarding.AndroidOnboardingHost(
+                            navController = navController,
+                            onYouTubeLoginRequest = { navController.navigate("login") },
+                        )
+
                         com.convx.music.ui.component.RingtoneTrimmerDialog(
                             isVisible = ringtoneUiState.showTrimmer,
                             songId = ringtoneUiState.targetSongId,

@@ -132,8 +132,14 @@ fun BottomSheet(
      *  page, not one composing its first frame. Measured but not placed: nothing draws, takes
      *  input or reports semantics. */
     keepContentComposed: Boolean = false,
+    /** The parent owns pane animation, gestures and back handling. */
+    embedded: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    if (embedded) {
+        Box(modifier = modifier) { content() }
+        return
+    }
     val density = LocalDensity.current
     var hasBeenShown by remember { mutableStateOf(false) }
     if (!state.isCollapsed) hasBeenShown = true

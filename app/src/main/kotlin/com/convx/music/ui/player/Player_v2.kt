@@ -14,6 +14,8 @@ import com.convx.music.ui.component.heroSideLiveBlur
 import com.convx.music.ui.utils.VibrantChromeInk
 import com.convx.music.ui.utils.vibrantChrome
 import com.convx.music.ui.ios.compat.AppTheme
+import com.convx.music.ui.ios.compat.IosAlertAction
+import com.convx.music.ui.ios.compat.IosAlertDialog
 import com.composables.sfsymbols.SfSymbols
 import com.composables.sfsymbols.monochrome.SFAirplayAudio
 import com.composables.sfsymbols.monochrome.SFHeadphones
@@ -111,6 +113,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import com.convx.music.constants.SwipeSensitivityKey
+import com.convx.music.constants.SwipeDistanceKey
 import com.convx.music.constants.SwipeThumbnailKey
 import kotlin.math.roundToInt
 import kotlinx.coroutines.isActive
@@ -156,7 +159,7 @@ import com.convx.music.LocalPlayerConnection
 import kotlinx.coroutines.launch
 import com.convx.music.ui.utils.Motion
 
-enum class PlayerInternalState { COVER, LYRICS, QUEUE }
+typealias PlayerInternalState = com.convx.music.playback.presentation.PlayerPane
 
 /** Mirrors Player.kt's PARENT_SHEET_SETTLE_TIMEOUT_MS (private to that file). */
 private const val V2_PARENT_SHEET_SETTLE_TIMEOUT_MS = 1_000L
@@ -186,6 +189,11 @@ fun PlayerV2(
     onCoverShowingChange: ((Boolean) -> Unit)? = null,
     /** Classic player uses these same squared panes, retaining its own cover. */
     auxiliaryPageState: PlayerAuxiliaryPageState? = null,
+    sharedCanvasVideo: CanvasVideoController? = null,
+    sharedTrackChoreography: TrackChoreography? = null,
+    miniCanvasEnabled: Boolean = false,
+    /** The sheet can host floating panels above its decorative sticker layer. */
+    overlayHost: MutableState<(@Composable () -> Unit)?>? = null,
 ) {
     val deviceDensity = androidx.compose.ui.platform.LocalDensity.current
     BoxWithConstraints(modifier.fillMaxSize()) {
@@ -197,10 +205,30 @@ fun PlayerV2(
         // Menus and the quality card float over this backdrop, which records the whole
         // player (artwork too) -- see V2Overlay.kt.
         val overlayBackdrop = com.convx.music.ui.component.backdrop.backdrops.rememberLayerBackdrop()
-        val overlaySlot = remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
+        val overlaySlot = remember { mutableStateOf<V2OverlayEntry?>(null) }
+        LaunchedEffect(state.isCollapsed) {
+            if (state.isCollapsed) overlaySlot.value?.dismiss?.invoke()
+        }
+        val appBackdrop = LocalAppBackdrop.current
+        val scaledDensity = remember(deviceDensity, scale) {
+            androidx.compose.ui.unit.Density(deviceDensity.density * scale, deviceDensity.fontScale)
+        }
+        val hostedOverlay: @Composable () -> Unit = remember(overlaySlot, overlayBackdrop, scaledDensity, appBackdrop) {
+            {
+                CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalDensity provides scaledDensity,
+                    LocalAppBackdrop provides appBackdrop,
+                    LocalPooledGlass provides null,
+                    LocalV2Overlay provides overlaySlot,
+                ) { V2OverlayHost(overlaySlot, overlayBackdrop) }
+            }
+        }
+        DisposableEffect(overlayHost, hostedOverlay) {
+            overlayHost?.value = hostedOverlay
+            onDispose { if (overlayHost?.value === hostedOverlay) overlayHost.value = null }
+        }
         CompositionLocalProvider(
-            androidx.compose.ui.platform.LocalDensity provides
-                androidx.compose.ui.unit.Density(deviceDensity.density * scale, deviceDensity.fontScale),
+            androidx.compose.ui.platform.LocalDensity provides scaledDensity,
             LocalV2Overlay provides overlaySlot,
         ) {
             Box(Modifier.fillMaxSize()) {
@@ -213,9 +241,10 @@ fun PlayerV2(
                     )
                 ) {
                     PlayerV2Content(state, navController, Modifier, showDiyStickers, forcedOrientation,
-                        isPreviewOnly, diyRootCoordinates, onCoverShowingChange, auxiliaryPageState)
+                        isPreviewOnly, diyRootCoordinates, onCoverShowingChange, auxiliaryPageState,
+                        sharedCanvasVideo, sharedTrackChoreography, miniCanvasEnabled)
                 }
-                V2OverlayHost(overlaySlot, overlayBackdrop)
+                if (overlayHost == null) V2OverlayHost(overlaySlot, overlayBackdrop)
             }
         }
     }
@@ -237,6 +266,9 @@ private fun PlayerV2Content(
     /** Reports whether the cover is showing so Player.kt can hide its sticker overlay on Lyrics and Queue. */
     onCoverShowingChange: ((Boolean) -> Unit)? = null,
     auxiliaryPageState: PlayerAuxiliaryPageState? = null,
+    sharedCanvasVideo: CanvasVideoController? = null,
+    sharedTrackChoreography: TrackChoreography? = null,
+    miniCanvasEnabled: Boolean = false,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
 
@@ -278,25 +310,29 @@ private fun PlayerV2Content(
         if (!isPlaying) delay(GLYPH_PAUSE_SETTLE_MS)
         glyphPlaying = isPlaying
     }
-    // One canvas decoder for the whole V2 player, shared by the cover and the lyrics/queue
-    // header (see PlayerV2Canvas.kt). Paused whenever the sheet is collapsed.
+    // The parent supplies the same decoder used by the mini player.
     val v2CrossfadeMs by ui.crossfadeDurationMs
     // Track-change ladder (TrackChoreography): cover -> words -> details -> ambience.
-    val trackChoreography = rememberTrackChoreography(mediaMetadata)
+    val trackChoreography = sharedTrackChoreography ?: rememberTrackChoreography(mediaMetadata)
     val artworkMetadata = trackChoreography.artwork.value
     val paneArtworkStore = remember { com.convx.artwork.ArtworkBitmapStore() }
     val textMetadata = trackChoreography.text.value
     val detailMetadata = trackChoreography.detail.value
-    val canvasVideo = rememberCanvasVideoController(
+    val canvasVideo = sharedCanvasVideo ?: rememberCanvasVideoController(
         mediaMetadata = trackChoreography.ambient.value,
         isPlaying = isPlaying && !state.isCollapsed,
         trackFadeMillis = ambientTransitionMillis(v2CrossfadeMs),
+        registerAsShared = !isPreviewOnly && auxiliaryPageState == null,
         videoStream = videoStream.takeIf { watchVideo },
         videoStartPositionMs = playerConnection.player.currentPosition,
     )
+    val fullCanvasAttached by remember(state, sharedCanvasVideo) {
+        derivedStateOf { sharedCanvasVideo == null || state.progress >= 0.25f }
+    }
     val videoLifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    LaunchedEffect(canvasVideo, watchVideo, videoStream?.videoId, state.isCollapsed, videoLifecycleOwner) {
-        if (!watchVideo || videoStream == null || state.isCollapsed) return@LaunchedEffect
+    val syncVideo = !state.isCollapsed || (sharedCanvasVideo != null && miniCanvasEnabled) || videoPresentation?.visible == true
+    LaunchedEffect(canvasVideo, watchVideo, videoStream?.videoId, syncVideo, videoLifecycleOwner) {
+        if (!watchVideo || videoStream == null || !syncVideo) return@LaunchedEffect
         videoLifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
             while (isActive) {
                 canvasVideo.synchronizeTo(playerConnection.player)
@@ -329,6 +365,7 @@ private fun PlayerV2Content(
     val currentLyrics by ui.currentLyrics
     val menuState = LocalMenuState.current
     var showV2Options by remember { mutableStateOf(false) }
+    var showArtistPicker by remember { mutableStateOf(false) }
     var showRoutePopover by remember { mutableStateOf(false) }
     // Same condition as LyricsMenu's "Translate with AI" entry.
     val lyricsAiProvider by rememberPreference(com.convx.music.constants.AiProviderKey, com.convx.music.ai.AiDefaults.PROVIDER)
@@ -420,7 +457,7 @@ private fun PlayerV2Content(
     // Re-register while expanded so this handler takes precedence over the sheet's back handler.
     androidx.compose.runtime.key(state.isExpanded) {
         androidx.activity.compose.BackHandler(enabled = playerState != PlayerInternalState.COVER) {
-            playerState = PlayerInternalState.COVER
+            playerState = playerState.back()
         }
     }
 
@@ -521,7 +558,6 @@ private fun PlayerV2Content(
         PlayerMorph.stayInPlace = false
         onDispose { PlayerMorph.stayInPlace = false }
     }
-    val heroVideoFrame = remember(canvasVideo) { mutableIntStateOf(0) }
     val selectedBackground by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.GRADIENT)
     // Hero owns its artwork gradient. Squared follows the same background choice
     // as Player.kt, including contrast on static and custom gradient backgrounds.
@@ -697,6 +733,17 @@ private fun PlayerV2Content(
             !(LocalTabView.current && compactPlayerInTabView)
     // The wide layout has room for the controls beside the pane, so lyrics and the queue never hide them.
     val controlsShown = controlsVisible || isWidePlayerLayout
+    if (showArtistPicker) {
+        V2ArtistPickerMenu(
+            artists = mediaMetadata?.artists.orEmpty().mapNotNull { artist -> artist.id?.let { it to artist.name } },
+            onDismiss = { showArtistPicker = false },
+            onPick = { id ->
+                showArtistPicker = false
+                state.collapseSoft()
+                navController.navigate("artist/$id")
+            },
+        )
+    }
 
     Box(
         modifier = modifier
@@ -713,6 +760,12 @@ private fun PlayerV2Content(
                 }
             }
     ) {
+        if (!state.isCollapsed) {
+            MusicBarsVisualizer(
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(200.dp),
+                color = adaptivePrimary,
+            )
+        }
         CompositionLocalProvider(
             LocalPooledGlass provides null,
         ) {
@@ -739,8 +792,13 @@ private fun PlayerV2Content(
                 fontWeight = FontWeight.Normal,
                 scroll = !state.isCollapsed,
                 modifier = artistModifier.clickable {
-                    state.collapseSoft()
-                    mediaMetadata?.artists?.firstOrNull()?.id?.let { navController.navigate("artist/$it") }
+    val tappable = mediaMetadata?.artists.orEmpty().filter { it.id != null }
+    if (tappable.size > 1) {
+        showArtistPicker = true
+    } else {
+        state.collapseSoft()
+        tappable.firstOrNull()?.id?.let { navController.navigate("artist/$it") }
+    }
                 }
             )
             DjReadout(
@@ -1142,9 +1200,9 @@ private fun PlayerV2Content(
                                             // art AND the canvas video (one blur of the real pixels), then
                                             // the frame's outer fade hands it to the gradient, which starts
                                             // from this art's own bottom-edge colour.
-                                            .then(if (isHeroLook && isWidePlayerLayout) Modifier.heroSideLiveBlur()
+                                            .then(if (isHeroLook && isWidePlayerLayout) Modifier.heroSideLiveBlur(videoFrame = { canvasVideo.renderedFrame }, rapidChanges = canvasVideo.blurWorkload.reduced)
                                                 else if (isHeroLook) Modifier.heroFootLiveBlur(boxExtent = 1f,
-                                                videoFrame = { heroVideoFrame.intValue }) else Modifier)
+                                                videoFrame = { canvasVideo.renderedFrame }, rapidChanges = canvasVideo.blurWorkload.reduced) else Modifier)
                                     ) {
                                         ThumbnailImage(
                                             artworkUri = artworkMetadata?.thumbnailUrl?.resize(1200, 1200),
@@ -1158,11 +1216,12 @@ private fun PlayerV2Content(
                                             bitmapStore = paneArtworkStore,
                                             modifier = Modifier.fillMaxSize(),
                                         )
-                                        CanvasVideoSurface(
-                                            controller = canvasVideo,
-                                            modifier = Modifier.fillMaxSize(),
-                                            onFrame = if (isHeroLook) ({ heroVideoFrame.intValue++ }) else null,
-                                        )
+                                        if (fullCanvasAttached) {
+                                            CanvasVideoSurface(
+                                                controller = canvasVideo,
+                                                modifier = Modifier.fillMaxSize(),
+                                            )
+                                        }
                                     }
                                     }
                                 }
@@ -1282,10 +1341,12 @@ private fun PlayerV2Content(
                                             bitmapStore = paneArtworkStore,
                                             modifier = Modifier.fillMaxSize(),
                                         )
-                                        CanvasVideoSurface(
-                                            controller = canvasVideo,
-                                            modifier = Modifier.fillMaxSize(),
-                                        )
+                                        if (fullCanvasAttached) {
+                                            CanvasVideoSurface(
+                                                controller = canvasVideo,
+                                                modifier = Modifier.fillMaxSize(),
+                                            )
+                                        }
                                     }
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Column(modifier = Modifier.weight(1f)) {
@@ -1496,6 +1557,7 @@ private fun PlayerV2Content(
                                                 iconButtonColor = adaptivePrimary,
                                                 pureBlack = false,
                                                 showInlineLyrics = false,
+                                                embedded = true,
                                                 playerBackground = playerBackground,
                                                 showHeaderRow = false,
                                                 // Not draggable: v2's queue is reached and left through
@@ -1816,7 +1878,7 @@ private fun PlayerV2Content(
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 val isLyricsActive = playerState == PlayerInternalState.LYRICS
                 IconButton(
-                    onClick = { playerState = if (isLyricsActive) PlayerInternalState.COVER else PlayerInternalState.LYRICS }
+                    onClick = { playerState = playerState.toggle(PlayerInternalState.LYRICS) }
                 ) {
                     V2TabGlyph(active = isLyricsActive, tint = bottomTint, chrome = tabChrome) { m, c ->
                         PlayerGlyph(
@@ -1883,7 +1945,7 @@ private fun PlayerV2Content(
                 val isQueueActive = playerState == PlayerInternalState.QUEUE
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 IconButton(
-                    onClick = { playerState = if (isQueueActive) PlayerInternalState.COVER else PlayerInternalState.QUEUE }
+                    onClick = { playerState = playerState.toggle(PlayerInternalState.QUEUE) }
                 ) {
                     V2TabGlyph(active = isQueueActive, tint = bottomTint, chrome = tabChrome) { m, c ->
                         PlayerGlyph(
@@ -2153,14 +2215,14 @@ private fun rememberSwipeCardModifier(
     onCommit: (forward: Boolean) -> Unit,
 ): Modifier {
     val (swipeThumbnail) = rememberPreference(SwipeThumbnailKey, true)
-    val (swipeSensitivity) = rememberPreference(SwipeSensitivityKey, 0.73f)
+    val (swipeDistancePercent) = rememberPreference(SwipeDistanceKey, 30)
     val coroutineScope = rememberCoroutineScope()
     val density = androidx.compose.ui.platform.LocalDensity.current.density
     val configuration = LocalConfiguration.current
     val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
     val travelPx = configuration.screenWidthDp * density
-    val autoSwipeThreshold = remember(swipeSensitivity, configuration.screenWidthDp, density) {
-        travelPx * (0.45f - 0.33f * swipeSensitivity.coerceIn(0f, 1f))
+    val autoSwipeThreshold = remember(swipeDistancePercent, configuration.screenWidthDp, density) {
+    travelPx * swipeDistancePercent.coerceIn(10, 100) / 100f
     }
     val currentOnCommit by rememberUpdatedState(onCommit)
 

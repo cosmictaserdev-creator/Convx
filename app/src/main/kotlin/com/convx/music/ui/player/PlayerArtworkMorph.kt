@@ -6,11 +6,13 @@ package com.convx.music.ui.player
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -204,6 +206,9 @@ fun PlayerArtworkMorphOverlay(
     val poster = remember(flying, mediaId, full.videoPoster) {
         if (flying && full.videoPoster) CanvasPosterSource.capture(mediaId) else null
     }
+    val flightVideo = CanvasPosterSource.controller?.takeIf {
+        flying && full.videoPoster && it.isShowing(mediaId)
+    }
     // onGloballyPositioned can fire once with a degenerate size before layout settles, and
     // coil3.size.Dimension throws on any px <= 0 (measured crash, Samsung).
     if (mini.rect.width <= 0f || mini.rect.height <= 0f || full.rect.width <= 0f || full.rect.height <= 0f) return
@@ -214,6 +219,7 @@ fun PlayerArtworkMorphOverlay(
             mini = mini,
             progress = progress,
             shrink = !full.fadeOnly,
+            canvasVideo = flightVideo,
         )
         return
     }
@@ -308,7 +314,17 @@ fun PlayerArtworkMorphOverlay(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(targetWidthDp, targetHeightDp)
-                    .graphicsLayer { alpha = posterAlpha(progress()) },
+                    .graphicsLayer { alpha = if (flightVideo != null) 1f else posterAlpha(progress()) },
+            )
+        }
+        if (flightVideo != null) {
+            CanvasVideoSurface(
+                controller = flightVideo,
+                modifier = Modifier.align(Alignment.Center).size(
+                    with(density) { target.width.toDp() },
+                    with(density) { target.height.toDp() },
+                ),
+                priority = 2,
             )
         }
     }
@@ -388,11 +404,15 @@ private fun FancyArtworkFadeOverlay(
     mini: MorphArtTarget,
     progress: () -> Float,
     shrink: Boolean,
+    canvasVideo: CanvasVideoController?,
 ) {
     val density = LocalDensity.current
     val boxWidthDp = with(density) { mini.rect.width.toDp() }
     val boxHeightDp = with(density) { mini.rect.height.toDp() }
     val miniRadiusDp = with(density) { mini.radiusPx.toDp() }
+    val videoVisible by remember(canvasVideo) {
+        androidx.compose.runtime.derivedStateOf { canvasVideo != null && PlayerMorph.active && progress() < PLAYER_MINI_FADE_END }
+    }
     Box(
         modifier = Modifier
             .offset { IntOffset(mini.rect.left.roundToInt(), mini.rect.top.roundToInt()) }
@@ -424,6 +444,7 @@ private fun FancyArtworkFadeOverlay(
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(boxWidthDp, boxHeightDp),
         )
+        if (videoVisible) CanvasVideoSurface(canvasVideo, Modifier.fillMaxSize(), priority = 2)
     }
 }
 

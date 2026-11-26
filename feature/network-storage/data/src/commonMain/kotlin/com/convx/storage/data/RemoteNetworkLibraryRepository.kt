@@ -13,6 +13,7 @@ class RemoteNetworkLibraryRepository(
     private val webDav: NetworkFileSource,
     private val smb: NetworkFileSource,
     private val io: CoroutineDispatcher = Dispatchers.Default,
+    private val navidrome: NetworkFileSource? = null,
 ) : NetworkLibraryRepository, NetworkMediaAccess, AutoCloseable {
     override val servers = store.servers
     override suspend fun loadServers() = store.load()
@@ -73,6 +74,7 @@ class RemoteNetworkLibraryRepository(
     private fun source(server: NetworkServer) = when (server) {
         is NetworkServer.WebDav -> webDav
         is NetworkServer.Smb -> smb
+        is NetworkServer.Navidrome -> navidrome ?: throw StorageException(StorageError.INVALID_CONFIGURATION)
     }
     private fun invalidate(id: String) { webDav.invalidate(id); smb.invalidate(id) }
 }

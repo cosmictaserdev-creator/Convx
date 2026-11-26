@@ -192,3 +192,10 @@
 # smbj / mbassador reference desktop-only javax.el and Kerberos (GSS) classes that Android does not ship.
 -dontwarn javax.el.**
 -dontwarn org.ietf.jgss.**
+
+# JAudioTagger loads its format handlers reflectively and references desktop-only Java classes
+-keep class org.jaudiotagger.** { *; }
+-dontwarn java.awt.**
+-dontwarn javax.imageio.**
+-dontwarn javax.swing.**
+-dontwarn org.jaudiotagger.**

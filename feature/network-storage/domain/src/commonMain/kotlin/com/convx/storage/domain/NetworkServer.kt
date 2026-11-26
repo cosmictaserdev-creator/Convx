@@ -5,7 +5,7 @@ import io.ktor.http.decodeURLPart
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-enum class NetworkProtocol { WEBDAV, SMB }
+enum class NetworkProtocol { WEBDAV, SMB, NAVIDROME }
 
 data class SourceCredentials(val username: String = "", val password: String = "", val domain: String = "") {
     override fun toString(): String = "SourceCredentials(username=$username, domain=$domain)"
@@ -41,6 +41,15 @@ sealed interface NetworkServer {
             encodeRemoteUriPath("/$share/$folder".trimEnd('/'))
     }
 
+    data class Navidrome(
+        override val id: String,
+        override val name: String,
+        override val address: String,
+        override val credentials: SourceCredentials = SourceCredentials(),
+    ) : NetworkServer {
+        override val protocol = NetworkProtocol.NAVIDROME
+    }
+
     companion object {
         @OptIn(ExperimentalUuidApi::class)
         fun create(protocol: NetworkProtocol, name: String, address: String, credentials: SourceCredentials, id: String = Uuid.random().toString()): NetworkServer {
@@ -52,6 +61,15 @@ sealed interface NetworkServer {
                     val uri = validatedUrl(input)
                     require(uri.protocol.name.lowercase() in setOf("https", "http")) { "Enter an HTTP or HTTPS folder URL" }
                     WebDav(id, name.trim(), input.trimEnd('/') + "/", credentials)
+                }
+                NetworkProtocol.NAVIDROME -> {
+                    val input = address.trim().let { if (it.contains("://")) it else "http://$it" }
+                    val scheme = input.substringBefore("://").lowercase()
+                    val authority = input.substringAfter("://").substringBefore('/').substringBefore('?').substringBefore('#')
+                    require(scheme in setOf("https", "http") && authority.isNotBlank() && '@' !in authority && '?' !in input && '#' !in input) { "Enter the Navidrome server URL" }
+                    val portText = if (authority.startsWith("[")) authority.substringAfter("]", "").removePrefix(":") else authority.substringAfter(':', "")
+                    require(portText.isEmpty() || portText.toIntOrNull()?.let { it in 1..65535 } == true) { "Invalid server port" }
+                    Navidrome(id, name.trim(), input.trimEnd('/') + "/", credentials)
                 }
                 NetworkProtocol.SMB -> {
                     val input = address.trim().replace('\\', '/').let {

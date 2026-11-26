@@ -54,62 +54,6 @@ import kotlin.math.tanh
 private val GlassCircleShape = ContinuousRoundedRectangle(percent = 50)
 
 /**
- * Same tanh-damped press/drag-out scale+translate distortion as
- * [com.convx.music.ui.component.backdrop.catalog.components.LiquidButton], reused
- * (not duplicated) here so every small floating glass button — top bar back/share/
- * search, selection-mode exit — gets the same "elastic stretch" liquid feel on
- * press. Cheap: a per-frame graphicsLayer transform, no extra backdrop re-capture.
- */
-internal fun elasticStretchLayerBlock(
-    interactiveHighlight: InteractiveHighlight,
-    // Bar pills pass 2x: same feel, larger travel so the stretch reads at pill size.
-    magnitude: Float = 1f,
-): GraphicsLayerScope.() -> Unit = {
-    val width = size.width
-    val height = size.height
-
-    val progress = interactiveHighlight.pressProgress
-    val scale = lerp(1f, 1f + magnitude * 4f.dp.toPx() / size.height, progress)
-
-    val maxOffset = size.minDimension
-    val initialDerivative = 0.05f
-    val offset = interactiveHighlight.offset
-    translationX = magnitude * maxOffset * tanh(initialDerivative * offset.x / maxOffset)
-    translationY = magnitude * maxOffset * tanh(initialDerivative * offset.y / maxOffset)
-
-    val maxDragScale = magnitude * 4f.dp.toPx() / size.height
-    val offsetAngle = atan2(offset.y, offset.x)
-    scaleX = scale +
-        maxDragScale * abs(cos(offsetAngle) * offset.x / size.maxDimension) *
-        (width / height).fastCoerceAtMost(1f)
-    scaleY = scale +
-        maxDragScale * abs(sin(offsetAngle) * offset.y / size.maxDimension) *
-        (height / width).fastCoerceAtMost(1f)
-}
-
-@Composable
-internal fun rememberElasticStretch(): InteractiveHighlight {
-    val animationScope = rememberCoroutineScope()
-    return remember(animationScope) { InteractiveHighlight(animationScope) }
-}
-
-/**
- * reference-style shadow under floating top chrome (back button, menu pills): one wide, soft
- * blurred drop -- 24dp, nudged 4dp down -- so the glass reads as lifted off the page,
- * rather than the tight Material elevation edge it replaces. Shared by every top-bar
- * button/pill so they all sit at the same height.
- */
-fun Modifier.chromeShadow(shape: androidx.compose.ui.graphics.Shape): Modifier = dropShadow(
-    shape,
-    androidx.compose.ui.graphics.shadow.Shadow(
-        radius = 24.dp,
-        color = Color.Black,
-        offset = androidx.compose.ui.unit.DpOffset(0.dp, 4.dp),
-        alpha = 0.18f,
-    ),
-)
-
-/**
  * A floating circular glass button for Artist, Album, and Playlist screens.
  * Falls back to a translucent circle when glass is disabled or unsupported.
  */

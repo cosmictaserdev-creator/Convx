@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,8 +63,10 @@ fun NetworkBrowserScreen(
     }
 
     val title = listing.folder.substringAfterLast('/').ifEmpty { servers.firstOrNull { it.id == serverId }?.name.orEmpty() }
-    val songs = listing.entries.filter { !it.directory && NetworkMedia.isAudio(it.name) }
-    val rows = listing.entries.filter { it.directory || NetworkMedia.isAudio(it.name) }
+    // A repeated entry would give the lazy list the same key twice, which crashes it.
+    val entries = remember(listing.entries) { listing.entries.distinctBy { it.path } }
+    val songs = entries.filter { !it.directory && NetworkMedia.isAudio(it.name) }
+    val rows = entries.filter { it.directory || NetworkMedia.isAudio(it.name) }
 
     ScreenLazyPage(title = title, onBack = { navController.navigateUp() }) {
         if (listing.loading || listing.failed || rows.isEmpty()) {

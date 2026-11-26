@@ -159,7 +159,7 @@ private fun ServerRow(
             Column(Modifier.weight(1f)) {
                 Text(server.name, style = AppTheme.typography.titleSmall)
                 Text(
-                    text = (if (server.protocol == NetworkProtocol.SMB) "SMB  " else "WebDAV  ") + server.address,
+                    text = (when (server.protocol) { NetworkProtocol.SMB -> "SMB  "; NetworkProtocol.NAVIDROME -> "Navidrome  "; else -> "WebDAV  " }) + server.address,
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -194,12 +194,16 @@ private fun AddServerDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (protocol == NetworkProtocol.SMB) {
-                        Button(onClick = {}) { Text("SMB") }
-                        OutlinedButton(onClick = { protocol = NetworkProtocol.WEBDAV }) { Text("WebDAV") }
-                    } else {
-                        OutlinedButton(onClick = { protocol = NetworkProtocol.SMB }) { Text("SMB") }
-                        Button(onClick = {}) { Text("WebDAV") }
+                    listOf(
+                        NetworkProtocol.SMB to "SMB",
+                        NetworkProtocol.WEBDAV to "WebDAV",
+                        NetworkProtocol.NAVIDROME to "Navidrome",
+                    ).forEach { (option, label) ->
+                        if (protocol == option) {
+                            Button(onClick = {}) { Text(label) }
+                        } else {
+                            OutlinedButton(onClick = { protocol = option }) { Text(label) }
+                        }
                     }
                 }
                 OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.network_storage_name)) }, singleLine = true)
@@ -207,10 +211,11 @@ private fun AddServerDialog(
                     address, { address = it },
                     label = {
                         Text(
-                            stringResource(
-                                if (protocol == NetworkProtocol.SMB) R.string.network_storage_address_smb
-                                else R.string.network_storage_address_webdav,
-                            ),
+                            when (protocol) {
+                                NetworkProtocol.NAVIDROME -> "Navidrome URL (http://192.168.1.5:4533)"
+                                NetworkProtocol.SMB -> stringResource(R.string.network_storage_address_smb)
+                                else -> stringResource(R.string.network_storage_address_webdav)
+                            },
                         )
                     },
                     singleLine = true,

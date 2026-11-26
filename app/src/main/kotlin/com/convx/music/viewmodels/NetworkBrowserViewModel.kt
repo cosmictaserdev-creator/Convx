@@ -50,7 +50,7 @@ class NetworkBrowserViewModel(
                 onSuccess = { entries ->
                     Listing(
                         folder = RemotePath.normalize(folder),
-                        entries = entries.sortedWith(compareBy({ !it.directory }, { it.name.lowercase() })),
+                        entries = entries.distinctBy { it.path }.sortedWith(compareBy({ !it.directory }, { it.name.lowercase() })),
                         loading = false,
                     )
                 },

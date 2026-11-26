@@ -67,6 +67,7 @@ import com.convx.music.constants.HidePlayerThumbnailKey
 import com.convx.music.constants.HomeCardCornerRadiusOverrideKey
 import com.convx.music.constants.HomeGridColumnsOverrideKey
 import com.convx.music.constants.HomeHeroCardHeightOverrideKey
+import com.convx.music.constants.HideStatusBarKey
 import com.convx.music.constants.IosOverscrollKey
 import com.convx.music.constants.LibraryFilter
 import com.convx.music.constants.LibraryIconsOnlyKey
@@ -93,6 +94,7 @@ import com.convx.music.ui.component.EnumDialog
 import com.convx.music.ui.component.IconButton
 import com.convx.music.ui.component.IosSettingsGroup
 import com.convx.music.ui.component.IosSettingsItem
+import com.convx.music.ui.component.IosSettingsSymbolTile
 import com.convx.music.ui.component.MenuSheetCornerRadius
 import com.convx.music.ui.component.SheetCornerRadiusModal
 import com.convx.music.ui.component.ThumbnailCornerRadiusModal
@@ -122,6 +124,10 @@ fun AppearanceAdvancedSettings(
 ) {
     // Keep the mini-player setting in sync with the main pure-black setting.
     val (pureBlack, onPureBlackChangeRaw) = rememberPreference(PureBlackKey, defaultValue = false)
+    val (swipeDistance, onSwipeDistanceChange) = rememberPreference(
+    com.convx.music.constants.SwipeDistanceKey,
+    defaultValue = 30
+)
     val (_, onPureBlackMiniPlayerChange) = rememberPreference(PureBlackMiniPlayerKey, defaultValue = false)
     val onPureBlackChange: (Boolean) -> Unit = { enabled ->
         onPureBlackChangeRaw(enabled)
@@ -129,6 +135,7 @@ fun AppearanceAdvancedSettings(
     }
 
     val (iosOverscroll, onIosOverscrollChange) = rememberPreference(IosOverscrollKey, defaultValue = true)
+    val (hideStatusBar, onHideStatusBarChange) = rememberPreference(HideStatusBarKey, defaultValue = false)
     val (hiddenNavigationRoutes, onHiddenNavigationRoutesChange) = rememberPreference(HiddenNavigationRoutesKey, "")
     val hiddenTabs = remember(hiddenNavigationRoutes) {
         hiddenNavigationRoutes.lineSequence().map(String::trim).filter(String::isNotEmpty).toSet()
@@ -409,6 +416,28 @@ fun AppearanceAdvancedSettings(
                 Spacer(modifier = Modifier.height(27.dp))
 
                 IosSettingsGroup(
+    title = "Swipe to change song",
+    items = listOf(
+        IosSettingsItem(
+            icon = painterResource(R.drawable.swipe),
+            title = { Text("Slide distance: $swipeDistance% of screen") },
+            description = {
+                Column {
+                    Text("How far you must slide the mini player or cover to change song. 100% is the full width.")
+                    Slider(
+                        value = swipeDistance.toFloat(),
+                        onValueChange = { onSwipeDistanceChange((it / 10f).roundToInt() * 10) },
+                        valueRange = 10f..100f,
+                        steps = 8,
+                    )
+                }
+            },
+        ),
+    )
+)
+
+Spacer(modifier = Modifier.height(27.dp))
+                IosSettingsGroup(
                     title = stringResource(R.string.app_background_text_color),
                     items = listOf(
                         IosSettingsItem(
@@ -443,6 +472,15 @@ fun AppearanceAdvancedSettings(
                 IosSettingsGroup(
                     title = "Layout & behaviour",
                     items = listOf(
+                        IosSettingsItem(
+                            leadingContent = { IosSettingsSymbolTile("arrow.up.left.and.arrow.down.right") },
+                            title = { Text(stringResource(R.string.hide_status_bar)) },
+                            description = { Text(stringResource(R.string.hide_status_bar_desc)) },
+                            trailingContent = {
+                                Switch(checked = hideStatusBar, onCheckedChange = onHideStatusBarChange)
+                            },
+                            onClick = { onHideStatusBarChange(!hideStatusBar) }
+                        ),
                         IosSettingsItem(
                             icon = painterResource(R.drawable.tune),
                             title = { Text(stringResource(R.string.ios_overscroll)) },

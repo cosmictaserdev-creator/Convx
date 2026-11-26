@@ -35,11 +35,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.convx.music.R
 
-data class LinkSegment(
-    val text: String,
-    val url: String? = null,
-)
-
 @Composable
 fun ExpandableText(
     text: String = "",
@@ -59,8 +54,9 @@ fun ExpandableText(
         } else {
             buildAnnotatedString {
                 runs.forEach { segment ->
-                    if (segment.url != null) {
-                        pushStringAnnotation(tag = "URL", annotation = segment.url)
+                    val url = segment.url
+                    if (url != null) {
+                        pushStringAnnotation(tag = "URL", annotation = url)
                         withStyle(SpanStyle(color = linkColor)) {
                             append(segment.text)
                         }
@@ -96,7 +92,7 @@ fun ExpandableText(
                 }
             }
         )
-        
+
         if (hasOverflow) {
             Box(
                 modifier = Modifier

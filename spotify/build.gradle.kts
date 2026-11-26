@@ -51,6 +51,7 @@ val buildSpotifyNative = tasks.register<Exec>("buildSpotifyNative") {
 tasks.matching { it.name.startsWith("merge") && it.name.endsWith("JniLibFolders") }.configureEach { dependsOn(buildSpotifyNative) }
 
 dependencies {
+    api(project(":spotify-data"))
     implementation(libs.webkit)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)

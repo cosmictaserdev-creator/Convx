@@ -191,6 +191,24 @@ private fun IosSettingsIconTile(icon: Painter, item: IosSettingsItem) {
     }
 }
 
+/**
+ * The same accent tile as [IosSettingsItem.icon], drawn from an SF symbol instead of a bundled drawable.
+ * Pass it as `leadingContent`. [name] must be a symbol the app already bundles.
+ */
+@Composable
+fun IosSettingsSymbolTile(name: String, enabled: Boolean = true) {
+    val colors = IosTheme.colors
+    Box(
+        modifier = Modifier
+            .size(IosMetrics.IconTileSize)
+            .clip(ContinuousRoundedRectangle(IosMetrics.IconTileRadius))
+            .background(if (enabled) IosTheme.tint.copy(alpha = 0.9f) else colors.systemGray3),
+        contentAlignment = Alignment.Center,
+    ) {
+        SymbolIcon(symbol = sf(name), contentDescription = null, size = 18.dp, tint = Color.White, effect = null)
+    }
+}
+
 /** One row of an [IosSettingsGroup]. */
 data class IosSettingsItem(
     val icon: Painter? = null,

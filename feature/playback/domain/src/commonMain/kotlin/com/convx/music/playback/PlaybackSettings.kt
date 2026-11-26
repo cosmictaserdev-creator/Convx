@@ -41,6 +41,8 @@ data class PlaybackSettings(
     val equalizerEnabled: Boolean = false,
     val equalizerProfile: EqualizerProfile = EqualizerProfile(preamp = 0.0, bands = emptyList()),
     val lyricsFontSize: Float = 30f,
+    val lyricsAnimationStyle: LyricsAnimationStyle = LyricsAnimationStyle.FLAMINGO,
+    val sponsorBlockEnabled: Boolean = false,
     val lyricsOffsetMs: Long = 0L,
     val lyricsProviderId: String? = null,
     val reducedMotion: Boolean = false,
